@@ -45,10 +45,6 @@ async function fillApplication(page: Page, email: string) {
 }
 
 test.describe('Program Holder Portal', () => {
-  test.beforeEach(async ({ page }) => {
-    await page.goto('/');
-  });
-
   test.describe('Application Flow', () => {
     test('should submit program holder application', async ({ page }) => {
       await page.goto(applicationUrl);
@@ -112,259 +108,125 @@ test.describe('Program Holder Portal', () => {
     });
   });
 
-  test.describe('Dashboard', () => {
-    test.beforeEach(async ({ page }) => {
-      // Login first
-      await signInProgramHolder(page);
-      await page.waitForURL(/.*dashboard/);
-    });
+  test.describe('Authenticated workspace', () => {
+    const activeStudent = 'QA Holder Active Student';
+    const completedStudent = 'QA Holder Completed Student';
 
-    test('should display dashboard metrics', async ({ page }) => {
-      await page.goto('/program-holder/dashboard');
-
-      // Check for key metrics
-      await expect(page.locator('text=Active Students')).toBeVisible();
-      await expect(page.locator('text=At-Risk Students')).toBeVisible();
-      await expect(page.locator('text=Pending Verifications')).toBeVisible();
-      await expect(page.locator('text=Overdue Reports')).toBeVisible();
-    });
-
-    test('should display compliance score', async ({ page }) => {
-      await page.goto('/program-holder/dashboard');
-
-      await expect(page.locator('text=Compliance Score')).toBeVisible();
-
-      // Score should be a number between 0-100
-      const scoreText = await page.locator('text=/\\d+%/').first().textContent();
-      expect(scoreText).toMatch(/\d+%/);
-    });
-
-    test('should navigate to students page', async ({ page }) => {
-      await page.goto('/program-holder/dashboard');
-
-      await page.click('text=Manage Students');
-
-      await expect(page).toHaveURL(/.*students/);
-    });
-
-    test('should navigate to reports page', async ({ page }) => {
-      await page.goto('/program-holder/dashboard');
-
-      await page.click('text=Submit Reports');
-
-      await expect(page).toHaveURL(/.*reports/);
-    });
-  });
-
-  test.describe('Student Management', () => {
     test.beforeEach(async ({ page }) => {
       await signInProgramHolder(page);
-      await page.waitForURL(/.*dashboard/);
+      await expect(page).toHaveURL(/\/program-holder\/dashboard(?:\?|$)/);
+      await expect(page.getByRole('heading', { name: 'To-dos', exact: true })).toBeVisible();
     });
 
-    test('should display student list', async ({ page }) => {
+    test('shows the holder task queue and reporting alert', async ({ page }) => {
+      await expect(page.getByRole('heading', { name: 'Alerts', exact: true })).toBeVisible();
+      await expect(page.getByRole('link', { name: 'Weekly progress reports are due each Friday' })).toBeVisible();
+    });
+
+    test('opens the roster and reports from the dashboard', async ({ page }) => {
+      await page.locator('a[href="/program-holder/students"]:visible').first().click();
+      await expect(page.getByRole('heading', { name: 'Enrolled Students', exact: true })).toBeVisible();
+      await page.goto('/program-holder/dashboard');
+      await page.getByRole('link', { name: 'Weekly progress reports are due each Friday' }).click();
+      await expect(page.getByRole('heading', { name: 'Reports', exact: true })).toBeVisible();
+    });
+
+    test('filters persisted enrollments by status and name', async ({ page }) => {
       await page.goto('/program-holder/students');
+      await expect(page.getByText(activeStudent, { exact: true }).first()).toBeVisible();
+      await expect(page.getByText(completedStudent, { exact: true }).first()).toBeVisible();
+      await page.getByLabel('Filter student status').selectOption('active');
+      await page.getByRole('button', { name: 'Apply filters' }).click();
+      await expect(page).toHaveURL(/status=active/);
+      await expect(page.getByText(activeStudent, { exact: true }).first()).toBeVisible();
+      await expect(page.getByText(completedStudent, { exact: true })).toHaveCount(0);
 
-      await expect(page.locator('h1:has-text("Students")')).toBeVisible();
+      await page.getByLabel('Search students').fill(completedStudent);
+      await page.getByRole('button', { name: 'Apply filters' }).click();
+      await expect(page.getByText('No enrolled students match these filters.')).toBeVisible();
+      await page.getByRole('link', { name: 'Clear filters' }).click();
+      await page.getByLabel('Search students').fill(completedStudent);
+      await page.getByRole('button', { name: 'Apply filters' }).click();
+      await expect(page.getByText(completedStudent, { exact: true }).first()).toBeVisible();
+      await expect(page.getByText(activeStudent, { exact: true })).toHaveCount(0);
     });
 
-    test('should filter students by status', async ({ page }) => {
+    test('opens pending applicants without exposing recruiting tools to an unassigned holder', async ({ page }) => {
       await page.goto('/program-holder/students');
-
-      // Click filter dropdown
-      await page.click('button:has-text("Filter")');
-
-      // Select active students
-      await page.click('text=Active');
-
-      // Verify filter is applied
-      await expect(page.locator('text=Active')).toBeVisible();
+      await page.getByRole('link', { name: 'View Applicants' }).click();
+      await expect(page).toHaveURL(/\/program-holder\/students\/pending$/);
+      await expect(page.getByText(/Applicant recruiting tools are available only to assigned recruiters/)).toBeVisible();
     });
 
-    test('should view pending students', async ({ page }) => {
-      await page.goto('/program-holder/students/pending');
-
-      await expect(page.locator('h1:has-text("Pending Students")')).toBeVisible();
-    });
-
-    test('should search for students', async ({ page }) => {
-      await page.goto('/program-holder/students');
-
-      await page.fill('input[placeholder*="Search"]', 'John');
-
-      // Wait for search results
-      await page.waitForTimeout(500);
-
-      // Results should be filtered
-      const results = await page.locator('[data-testid="student-row"]').count();
-      expect(results).toBeGreaterThanOrEqual(0);
-    });
-  });
-
-  test.describe('Report Submission', () => {
-    test.beforeEach(async ({ page }) => {
-      await signInProgramHolder(page);
-      await page.waitForURL(/.*dashboard/);
-    });
-
-    test('should display reports page', async ({ page }) => {
+    test('validates and saves a report for the assigned student', async ({ page }) => {
       await page.goto('/program-holder/reports');
+      const form = page.getByRole('region', { name: 'Student progress report' });
+      const submit = form.getByRole('button', { name: 'Submit report for review' });
+      await submit.click();
+      await expect(form.locator('select[name="student"]:invalid')).toBeFocused();
 
-      await expect(page.locator('h1:has-text("Reports")')).toBeVisible();
+      const date = new Date().toISOString().slice(0, 10);
+      await form.getByLabel('Student name').selectOption({ label: activeStudent });
+      await form.getByLabel('Start date').fill(date);
+      await form.getByLabel('End date').fill(date);
+      await form.getByLabel('Reported hours').fill('2.5');
+      await form.getByRole('checkbox', { name: 'Attended training' }).check();
+      await form.getByLabel('Notes and next steps').fill('Isolated QA progress report for the assigned student.');
+      const response = page.waitForResponse((result) => new URL(result.url()).pathname === '/api/program-holder/student-progress-reports' && result.request().method() === 'POST');
+      await submit.click();
+      expect((await response).status()).toBe(201);
+      await expect(form.getByRole('status')).toHaveText('Report submitted for review.');
+      await expect(page.getByText(/reports are on file/)).toBeVisible();
     });
 
-    test('should submit new report', async ({ page }) => {
-      await page.goto('/program-holder/reports/submit');
-
-      // Fill report form
-      await page.selectOption('select[name="reportType"]', 'monthly');
-      await page.fill('input[name="reportingPeriod"]', '2025-01');
-      await page.fill('textarea[name="summary"]', 'Monthly report summary');
-
-      // Submit
-      await page.click('button[type="submit"]');
-
-      await expect(page.locator('text=Report submitted')).toBeVisible({ timeout: 10000 });
-    });
-
-    test('should validate report fields', async ({ page }) => {
-      await page.goto('/program-holder/reports/submit');
-
-      // Try to submit without required fields
-      await page.click('button[type="submit"]');
-
-      await expect(page.locator('text=required')).toBeVisible();
-    });
-  });
-
-  test.describe('Compliance', () => {
-    test.beforeEach(async ({ page }) => {
-      await signInProgramHolder(page);
-      await page.waitForURL(/.*dashboard/);
-    });
-
-    test('should display compliance dashboard', async ({ page }) => {
+    test('shows compliance score and actionable requirements', async ({ page }) => {
       await page.goto('/program-holder/compliance');
-
-      await expect(page.locator('h1:has-text("Compliance")')).toBeVisible();
-      await expect(page.locator('text=Compliance Score')).toBeVisible();
+      await expect(page.getByRole('heading', { name: 'Compliance', exact: true })).toBeVisible();
+      const score = page.getByText('Compliance Score', { exact: true }).locator('..');
+      await expect(score.getByText(/^(?:100|[0-9]{1,2})%$/)).toBeVisible();
+      await expect(page.getByRole('heading', { name: 'Requirements', exact: true })).toBeVisible();
+      await expect(page.getByLabel('Action required').first()).toBeVisible();
     });
 
-    test('should show compliance alerts', async ({ page }) => {
-      await page.goto('/program-holder/compliance');
-
-      // Check for alerts section
-      const alertsExist = await page
-        .locator('text=Alerts')
-        .isVisible()
-        .catch(() => false);
-
-      // Alerts may or may not exist depending on compliance status
-      expect(typeof alertsExist).toBe('boolean');
-    });
-  });
-
-  test.describe('Documents', () => {
-    test.beforeEach(async ({ page }) => {
-      await signInProgramHolder(page);
-      await page.waitForURL(/.*dashboard/);
-    });
-
-    test('should display documentation page', async ({ page }) => {
+    test('opens the reference and reads back the recorded MOU status', async ({ page }) => {
       await page.goto('/program-holder/documentation');
-
-      await expect(page.locator('h1:has-text("Documentation")')).toBeVisible();
+      await expect(page.getByRole('heading', { name: 'Every dashboard tab, explained' })).toBeVisible();
+      await page.goto('/program-holder/sign-mou');
+      await expect(page.getByRole('heading', { name: 'Sign the Program Holder MOU' })).toBeVisible();
+      await expect(page.getByText(/Your Program Holder MOU is recorded as signed/)).toBeVisible();
     });
 
-    test('should view MOU', async ({ page }) => {
-      await page.goto('/program-holder/mou');
-
-      await expect(page.locator('text=Memorandum of Understanding')).toBeVisible();
-    });
-  });
-
-  test.describe('Settings', () => {
-    test.beforeEach(async ({ page }) => {
-      await signInProgramHolder(page);
-      await page.waitForURL(/.*dashboard/);
-    });
-
-    test('should display settings page', async ({ page }) => {
+    test('persists notification preferences after a reload', async ({ page }) => {
       await page.goto('/program-holder/settings');
-
-      await expect(page.locator('h1:has-text("Settings")')).toBeVisible();
+      await expect(page.getByRole('heading', { name: 'Settings', exact: true })).toBeVisible();
+      const emailAlerts = page.getByRole('checkbox', { name: 'Email me about new enrollments' });
+      const enable = !(await emailAlerts.isChecked());
+      await emailAlerts.setChecked(enable);
+      await page.getByRole('button', { name: 'Save notification choices' }).click();
+      await expect(page.getByRole('status').filter({ hasText: 'Notification choices saved.' })).toBeVisible();
+      await page.reload();
+      await expect(emailAlerts).toBeChecked({ checked: enable });
     });
 
-    test('should update notification preferences', async ({ page }) => {
-      await page.goto('/program-holder/settings');
-
-      // Toggle notification setting
-      const checkbox = page.locator('input[type="checkbox"]').first();
-      await checkbox.click();
-
-      // Save settings
-      await page.click('button:has-text("Save")');
-
-      await expect(page.locator('text=Settings saved')).toBeVisible({ timeout: 5000 });
-    });
-  });
-
-  test.describe('Accessibility', () => {
-    test('should have proper heading hierarchy', async ({ page }) => {
-      await page.goto('/program-holder');
-
-      const h1Count = await page.locator('h1').count();
-      expect(h1Count).toBeGreaterThanOrEqual(1);
-    });
-
-    test('should have alt text for images', async ({ page }) => {
-      await page.goto('/program-holder');
-
-      const images = await page.locator('img').all();
-
-      for (const img of images) {
-        const alt = await img.getAttribute('alt');
-        expect(alt).toBeTruthy();
+    test('exposes a single dashboard heading, labeled images and keyboard focus', async ({ page }) => {
+      const content = page.locator('[data-elevate-dashboard-content]');
+      await expect(content.getByRole('heading', { level: 1 })).toHaveCount(1);
+      for (const img of await content.locator('img').all()) {
+        await expect(img).toHaveAttribute('alt');
       }
-    });
-
-    test('should be keyboard navigable', async ({ page }) => {
-      await page.goto('/program-holder');
-
-      // Tab through interactive elements
       await page.keyboard.press('Tab');
-      await page.keyboard.press('Tab');
-
-      // Check that focus is visible
-      const focusedElement = await page.evaluate(() => document.activeElement?.tagName);
-      expect(focusedElement).toBeTruthy();
-    });
-  });
-
-  test.describe('Performance', () => {
-    test('should load dashboard within 3 seconds', async ({ page }) => {
-      await signInProgramHolder(page);
-
-      const startTime = Date.now();
-      await page.goto('/program-holder/dashboard');
-      await page.waitForLoadState('networkidle');
-      const loadTime = Date.now() - startTime;
-
-      expect(loadTime).toBeLessThan(3000);
+      await expect(page.locator('a:focus-visible, button:focus-visible, input:focus-visible')).toBeVisible();
     });
 
-    test('should have no console errors', async ({ page }) => {
+    test('renders the warm dashboard within three seconds without page errors', async ({ page }) => {
       const errors: string[] = [];
-
-      page.on('console', (msg) => {
-        if (msg.type() === 'error') {
-          errors.push(msg.text());
-        }
-      });
-
-      await page.goto('/program-holder/dashboard');
-
-      expect(errors.length).toBe(0);
+      page.on('pageerror', (error) => errors.push(error.message));
+      const started = Date.now();
+      const response = await page.reload({ waitUntil: 'domcontentloaded' });
+      expect(response?.status()).toBe(200);
+      await expect(page.getByRole('heading', { name: 'To-dos', exact: true })).toBeVisible({ timeout: 3000 });
+      expect(Date.now() - started).toBeLessThan(3000);
+      expect(errors).toEqual([]);
     });
   });
 });

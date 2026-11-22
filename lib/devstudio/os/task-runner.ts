@@ -804,6 +804,10 @@ export async function recoverStaleAiTasks(
 
   let recovered = 0;
   for (const task of stale ?? []) {
+    // OpenHands has its own provider-aware reconciler. Age alone is not a
+    // terminal signal when paid execution or human confirmation is pending.
+    // Do not let generic Studio recovery destroy the original provider receipt.
+    if (task.tool_name === 'openhands.execute') continue;
     const timeoutMessage = `Studio task exceeded the ${boundedTimeout}-minute runtime limit and was closed instead of remaining stuck.`;
     const { data: closed, error: closeError } = await db
       .from('ai_tasks')

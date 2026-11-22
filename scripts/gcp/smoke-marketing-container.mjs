@@ -14,8 +14,16 @@ const image = `elevate-${component}:${sha}`;
 const name = `${component}-smoke-${process.env.GITHUB_RUN_ID || process.pid}`;
 const docker = args => execFileSync('docker', args, { encoding: 'utf8', timeout: 30000, stdio: ['ignore', 'pipe', 'pipe'] }).trim();
 let started = false;
+let phase = 'image-content-check';
+let lastStartupObservation = 'not_checked';
+const phaseStart = Date.now();
+const reportPhase = label => {
+  phase = label;
+  console.log(`Marketing smoke phase=${label} elapsed_ms=${Date.now()-phaseStart}`);
+};
 try {
   // Resolve dependencies and assets inside the final image, as its runtime user.
+  reportPhase('image-content-check');
   docker(['run', '--rm', '--entrypoint=node', image, '-e', `
     const fs=require('fs');
     for(const file of ['/app/apps/marketing/server.js','/app/apps/marketing/.next/BUILD_ID','/app/apps/marketing/public/version.json','/app/apps/marketing/public/data/hero-banners.json']) {
@@ -25,6 +33,7 @@ try {
     const version=JSON.parse(fs.readFileSync('/app/apps/marketing/public/version.json','utf8'));
     if(version.commit!==process.env.GIT_SHA) throw new Error('Packaged version mismatch');
   `]);
+  reportPhase('start-local-container');
   docker(['run', '-d', '--name', name, '-p', '127.0.0.1::3000',
     '--env', 'PORT=3000', '--env', 'HOSTNAME=0.0.0.0',
     '--env', `K_SERVICE=elevate-${component}-migration`,
@@ -35,17 +44,28 @@ try {
   assert.match(port, /^\d+$/);
   const root = `http://127.0.0.1:${port}`;
   const deadline = Date.now() + 120000;
+  reportPhase('local-ping-startup');
+  let startupAttempts = 0;
   let ready = false;
   while (Date.now() < deadline) {
     assert.equal(docker(['inspect', '--format={{.State.Running}}', name]), 'true', 'Container exited during startup');
+    startupAttempts++;
     try {
       const {status,body} = await fetchSmoke(root + '/api/ping', {redirect:'manual'}, 5000);
       ready = status === 200 && body.ok === true && body.service === component && body.commit === sha;
+      lastStartupObservation = ready ? 'ready' : 'contract_not_ready';
       if (ready) break;
-    } catch { /* A bounded wait allows the real server to initialize. */ }
+    } catch (error) {
+      lastStartupObservation = error?.headersReceived === true
+        ? 'post_header_response_error' : 'connection_or_pre_header_timeout';
+    }
+    if (startupAttempts === 1 || startupAttempts % 5 === 0) {
+      console.log(`Marketing smoke startup attempts=${startupAttempts} result=${lastStartupObservation} elapsed_ms=${Date.now()-phaseStart}`);
+    }
     await new Promise(resolve => setTimeout(resolve, 2000));
   }
-  assert.ok(ready, 'Packaged server did not start within 120 seconds');
+  assert.ok(ready, `Packaged server did not start within 120 seconds; last=${lastStartupObservation}`);
+  reportPhase('multi-host-health-probes');
   // Diagnose and bound intermittent localhost response stalls on a freshly
   // unpacked image. Contract mismatches, non-200 HTTP and wrong SHA still fail.
   const probe = (url, options={}, timeoutMs=10000, type='json') =>
@@ -64,6 +84,7 @@ try {
       assert.equal(path === '/api/ping' ? body.ok : body.ready, true);
     }
   }
+  reportPhase('version-and-packaged-assets');
   const runtimeVersion = await probe(root + '/api/version', {}, 10000);
   assert.equal(runtimeVersion.status, 200);
   const identity = runtimeVersion.body;
@@ -75,6 +96,7 @@ try {
   assert.equal(packagedVersion.commit, sha);
   assert.equal(packagedVersion.service, component);
   if (component === 'marketing') {
+    reportPhase('homepage-render');
     const home = await probe(root + '/', {}, 20000, 'text');
     assert.equal(home.status, 200, 'Packaged homepage must render');
     const { assertHomepageHostShopContract } = await import('./homepage-content.mjs');
@@ -92,6 +114,7 @@ try {
   console.log('Final Marketing image dependencies, assets, startup and internal-host health routing verified.');
 } catch (error) {
   // Do not export raw application logs or runtime environment values from CI.
+  console.error(`Marketing smoke failure phase=${phase} elapsed_ms=${Date.now()-phaseStart} startup_last=${lastStartupObservation}`);
   console.error('Marketing container smoke test failed:', error.message);
   if (started) {
     console.error('Container state:', docker(['inspect', '--format={{.State.Status}} exit={{.State.ExitCode}} oom={{.State.OOMKilled}}', name]));

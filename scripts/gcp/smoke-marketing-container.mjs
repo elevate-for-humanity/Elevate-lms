@@ -59,9 +59,12 @@ try {
     await new Promise(resolve => setTimeout(resolve, 2000));
   }
   assert.ok(ready, 'Packaged server did not start within 120 seconds');
-  for (const host of ['169.254.1.1:3000', '10.0.0.2:3000', 'customer.example', 'acme.app.elevateforhumanity.org']) {
+  const hosts = ['169.254.1.1:3000', '10.0.0.2:3000', 'customer.example', 'acme.app.elevateforhumanity.org'];
+  for (const host of hosts) {
     for (const path of ['/api/ping', '/api/ready', '/api/health']) {
-      const {status,body} = await fetchSmoke(root + path, {headers:{host},redirect:'manual'}, 10000);
+      // The first request can load the packaged route from a cold image layer.
+      const timeoutMs = host === hosts[0] ? 20000 : 10000;
+      const {status,body} = await fetchSmoke(root + path, {headers:{host},redirect:'manual'}, timeoutMs);
       if (path === '/api/health') assert.ok([200,503].includes(status), 'Dependency health must return its real status');
       else assert.equal(status, 200, `${host}${path} must reach the service endpoint`);
       assert.equal(body.service, component);

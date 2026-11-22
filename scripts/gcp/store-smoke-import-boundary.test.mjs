@@ -29,7 +29,9 @@ test('hung Store smoke fetch rejects instead of exiting 13 on an unrefed deadlin
 test('timeout bounds response body and preserves host identity and status',async()=>{
  let signal,host;
  const hung=async (_url,options)=>{signal=options.signal;return {status:200,json:()=>new Promise(()=>{})}};
- await assert.rejects(fetchSmoke('http://localhost/api/ping',{},20,'json',hung),/timed out after 20 ms/);
+ await assert.rejects(fetchSmoke('http://localhost/api/ping?fixture=private',{},20,'json',hung),{
+   message:'Smoke HTTP response for /api/ping timed out after 20 ms',
+ });
  assert.equal(signal.aborted,true);
  const ok=async (_url,options)=>{host=options.headers.host;return {status:503,json:async()=>({ready:false})}};
  assert.deepEqual(await fetchSmoke('http://localhost/api/health',{headers:{host:'customer.example'}},100,'json',ok),{status:503,body:{ready:false}});

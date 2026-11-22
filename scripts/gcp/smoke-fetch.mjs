@@ -5,12 +5,13 @@
 export async function fetchSmoke(url, options = {}, timeoutMs = 10000, responseType = 'json', fetchImpl = globalThis.fetch) {
   if (!Number.isInteger(timeoutMs) || timeoutMs < 1 || timeoutMs > 120000) throw new RangeError('Smoke timeout must be 1..120000 ms');
   if (!['json', 'text'].includes(responseType)) throw new TypeError('Unsupported smoke response type');
+  const path = new URL(url).pathname;
   const controller = new AbortController();
   let deadline;
   const timeout = new Promise((_, reject) => {
     deadline = setTimeout(() => {
       controller.abort();
-      reject(new Error('Smoke HTTP response timed out after ' + timeoutMs + ' ms'));
+      reject(new Error(`Smoke HTTP response for ${path} timed out after ${timeoutMs} ms`));
     }, timeoutMs);
   });
   try {

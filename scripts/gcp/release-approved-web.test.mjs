@@ -120,7 +120,7 @@ test('a failed handoff can retry, but authorization denial cannot seek another i
   await assert.rejects(dispatchCompletedMainCI({ env: ciEnv, event: { workflow_run: completedCI }, request: denied.request }), /HTTP_403/);
   assert.equal(denied.calls.length, 1);
 });
-function setup({ green = true, current = sha, active = false, succeeded = false, readback = 'false' } = {}) {
+function setup({ green = true, current = sha, active = false, succeeded = false, serviceConclusions = {}, readback = 'false' } = {}) {
   const calls = []; let holdReads = 0;
   const request = async (url, init) => {
     const path = new URL(url).pathname;
@@ -132,9 +132,14 @@ function setup({ green = true, current = sha, active = false, succeeded = false,
       if (init.method === 'PATCH') return new Response(null, { status: 204 });
       return Response.json({ value: ++holdReads === 1 ? 'true' : readback });
     }
-    if (path.endsWith('/runs')) return Response.json({ workflow_runs: active
-      ? [{ head_sha: sha, status: 'in_progress' }]
-      : succeeded ? [{ head_sha: sha, status: 'completed', conclusion: 'success' }] : [] });
+    if (path.endsWith('/runs')) {
+      const workflow = path.split('/').at(-2);
+      const serviceConclusion = serviceConclusions[workflow];
+      return Response.json({ workflow_runs: active
+        ? [{ head_sha: sha, status: 'in_progress' }]
+        : serviceConclusion ? [{ head_sha: sha, status: 'completed', conclusion: serviceConclusion }]
+        : succeeded ? [{ head_sha: sha, status: 'completed', conclusion: 'success' }] : [] });
+    }
     if (path.endsWith('/dispatches')) return new Response(null, { status: 204 });
     throw Error('Unexpected request');
   };
@@ -167,9 +172,17 @@ test('a successful completed service is not redeployed while a failed service ca
   const completed = await releaseApprovedWeb({ sha, token: 'test', request: succeeded.request });
   assert.ok(completed.workflows.every(w => w.status === 'already_succeeded'));
   assert.equal(succeeded.calls.filter(c => c.path.endsWith('/dispatches')).length, 0);
-  const failed = setup();
-  const retried = await releaseApprovedWeb({ sha, token: 'test', request: failed.request });
-  assert.equal(retried.workflows.filter(w => w.status === 'dispatched').length, 4);
+  const mixed = setup({ serviceConclusions: {
+    'deploy-admin.yml': 'success',
+    'deploy-google-lms-trigger.yml': 'success',
+    'deploy-google-marketing-trigger.yml': 'failure',
+    'deploy-google-store-runtime.yml': 'success',
+  } });
+  const retried = await releaseApprovedWeb({ sha, token: 'test', request: mixed.request });
+  assert.deepEqual(retried.workflows.filter(w => w.status === 'dispatched').map(w => w.workflow),
+    ['deploy-google-marketing-trigger.yml']);
+  assert.equal(retried.workflows.filter(w => w.status === 'already_succeeded').length, 3);
+  assert.equal(mixed.calls.filter(c => c.method === 'POST').length, 1);
 });
 
 const workflowEnv = { GITHUB_REPOSITORY: 'elevate-for-humanity/Elevate-lms', GITHUB_REF: 'refs/heads/main', GITHUB_EVENT_NAME: 'workflow_dispatch', GITHUB_SHA: sha, GH_TOKEN: 'scoped-job-token', GOOGLE_RELEASE_HOLD: 'false' };

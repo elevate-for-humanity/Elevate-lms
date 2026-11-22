@@ -415,6 +415,7 @@ async function runParisCodeRepairTick({workflowOwnedDispatch=false}:{workflowOwn
  // A timed-out prepare is not a provider-terminal result. Observe only one
  // accepted task, under the same owner policy, without spending an attempt.
  const accepted=nextAcceptedOpenHandsObservation(blocked.data??[],policy.actor_id);
+ let observedOpenHandsRepairId: string | undefined;
  if(accepted){
   const busy=await db.from('paris_code_repairs').select('id').in('status',['dispatched','patching','validating','deploying','verifying']).limit(1);
   if(busy.error)throw busy.error;
@@ -457,8 +458,11 @@ async function runParisCodeRepairTick({workflowOwnedDispatch=false}:{workflowOwn
     },
    });
    if(result.dispatchRequired)return {enabled:true,dispatched:0,dispatchRequired:true,repairId:result.repairId};
-   if(result.awaitingProvider)return {enabled:true,dispatched:0,awaitingProvider:true,reason:'ACCEPTED_OPENHANDS_EXECUTION_PENDING'};
-   if(result.handled)return {enabled:true,dispatched:0,reason:'ACCEPTED_OPENHANDS_OBSERVATION_RECORDED'};
+   if(result.handled){
+    observedOpenHandsRepairId=accepted.id;
+    console.info('[PARIS] OpenHands observation did not claim a repair; continuing queue scan.',
+      {repairId:accepted.id,awaitingProvider:result.awaitingProvider===true});
+   }
   }
  }
  let recoveredProviderThisTick=false;
@@ -468,6 +472,8 @@ async function runParisCodeRepairTick({workflowOwnedDispatch=false}:{workflowOwn
  let githubAppRecoveryHealth: boolean | undefined;
  const ownedTier=resolveOwnedModelConnection().tier;
  for(const repair of blocked.data??[]){
+  // The observation may have updated this row since the blocked snapshot.
+  if(repair.id===observedOpenHandsRepairId)continue;
   // One post-fix replay for a source-free planner with an immutable zero-write
   // checkpoint. Do not reset attempts or override an existing source approval.
   if(!recoveredProviderThisTick && parisRepairEngine(repair.candidate)==='internal' && canResumeZeroWritePlannerRepair(repair)){

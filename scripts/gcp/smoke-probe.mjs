@@ -25,7 +25,13 @@ export async function smokeProbe(url, options={}, timeoutMs=10000, responseType=
         message === 'fetch failed' || error?.name === 'AbortError'
       );
       if (!retryable || attempt===attempts) {
-        throw new Error(`Smoke request ${target.pathname} (${options.headers?.host ?? 'default'}) failed at attempt ${attempt}/${attempts}: ${retryable ? 'local_transport_timeout' : 'response_unreadable'}`,{cause:error});
+        const responseStatus = Number.isInteger(error?.responseStatus)
+          ? `http_${error.responseStatus}_` : '';
+        const failure = retryable ? 'local_transport_timeout'
+          : error?.headersReceived === true
+            ? `${responseStatus}post_header_body_unreadable`
+            : 'response_unreadable';
+        throw new Error(`Smoke request ${target.pathname} (${options.headers?.host ?? 'default'}) failed at attempt ${attempt}/${attempts}: ${failure}`,{cause:error});
       }
       await pause(1000);
     }

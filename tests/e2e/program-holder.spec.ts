@@ -68,7 +68,7 @@ test.describe('Program Holder Portal', () => {
     });
 
     test('should prevent duplicate applications', async ({ page }) => {
-      const email = `duplicate-${Date.now()}@example.com`;
+      const email = `duplicate-${Date.now()}@qa.invalid`;
 
       await page.goto(applicationUrl);
       await fillApplication(page, email);
@@ -77,7 +77,12 @@ test.describe('Program Holder Portal', () => {
 
       await page.goto(applicationUrl);
       await fillApplication(page, email);
+      const duplicate = page.waitForResponse((response) =>
+        new URL(response.url()).pathname === '/api/program-holder/apply' &&
+        response.request().method() === 'POST',
+      );
       await page.getByRole('button', { name: 'Submit Program Holder Application' }).click();
+      expect((await duplicate).status()).toBe(409);
       await expect(page.getByText(/already pending/i)).toBeVisible();
     });
   });

@@ -124,34 +124,20 @@ test('focused regression reports current tests separately from the attested depl
   assert.match(job, /Require the attested release to remain live through acceptance/);
 });
 
-test('the push dispatcher requires a healthy live version and a matching successful Admin deployment', async () => {
-  const section = workflow.slice(workflow.indexOf('\n  request-employer-regression:'), workflow.indexOf('\n  hvac-public-playback:'));
-  const trigger = section.match(/^    if: (.+)$/m)?.[1];
-  assert.ok(trigger, 'Employer regression must have a workflow-level eligibility condition');
-  assert.equal(evaluate(trigger, event('push')), true);
-  assert.equal(evaluate(trigger, event('pull_request')), false, 'PR events cannot authorize live checks');
-  assert.equal(evaluate(trigger, event('workflow_run', {name:'Deploy Admin',conclusion:'success',head_branch:'main'})), true);
-  for (const upstream of [
-    {name:'Deploy Admin',conclusion:'failure',head_branch:'main'},
-    {name:'Deploy Admin',conclusion:'success',head_branch:'feature'},
-    {name:'Deploy Google Marketing on trigger',conclusion:'success',head_branch:'main'},
-  ]) assert.equal(evaluate(trigger, event('workflow_run', upstream)), false);
-  const script = section.split('          script: |\n')[1].split('\n').map(line=>line.startsWith('            ')?line.slice(12):line).join('\n');
-  const execute = new (Object.getPrototypeOf(async function(){}).constructor)('github','context','fetch',script);
-  const sha='a'.repeat(40);const calls=[];
-  const run={id:123,head_branch:'main',head_sha:sha,conclusion:'success'};
-  const github={rest:{actions:{listWorkflowRuns:async()=>({data:{workflow_runs:[run]}}),createWorkflowDispatch:async value=>calls.push(value)}}};
-  const context={repo:{owner:'owner',repo:'repo'}};
-  const health={service:'admin',commit:sha,ready:true,healthy:true,dependencies:{supabase:{ok:true}}};
-  await execute(github,context,async()=>Response.json(health));
-  assert.deepEqual(calls[0].inputs,{employer_only:'true',deployed_sha:sha,deployment_run_id:'123',component:'admin'});
-  assert.equal(calls[0].ref,'main');calls.length=0;
-  await assert.rejects(execute(github,context,async()=>Response.json({...health,ready:false})),/must be healthy/);
-  run.head_sha='b'.repeat(40);
-  await assert.rejects(execute(github,context,async()=>Response.json(health)),/must attest/);
-  assert.equal(calls.length,0);
+test('Admin release is the unique employer regression dispatcher after verified deployment', () => {
+  // An independent push/workflow_run dispatcher duplicated the attested
+  // deploy-admin acceptance job, consuming GitHub Actions runner capacity.
+  assert.doesNotMatch(workflow, /^  request-employer-regression:/m);
+  const admin = readFileSync(new URL('../../.github/workflows/deploy-admin.yml', import.meta.url), 'utf8');
+  const acceptance = admin.slice(admin.indexOf('\n  acceptance:'), admin.indexOf('\n  release-result:'));
+  assert.match(acceptance, /needs: deploy-admin/);
+  assert.match(acceptance, /needs\.deploy-admin\.result == 'success'/);
+  assert.match(acceptance, /node scripts\/gcp\/production-acceptance\.mjs dispatch/);
+  assert.match(acceptance, /employer_only: 'true'/);
+  assert.match(acceptance, /deployment_run_id: String\(context\.runId\)/);
+  assert.match(acceptance, /deployed_sha: context\.sha/);
+  assert.match(acceptance, /workflow_id: 'registered-apprenticeship-e2e\.yml'/);
 });
-
 test('LMS course playback is not skipped by the Marketing-film admission gate', () => {
   const marker = '- name: Verify authenticated HVAC course video playback and full-screen layout on devices';
   const section = job.split(marker)[1]?.split('\n      - name:')[0];

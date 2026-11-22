@@ -21,7 +21,8 @@ on:
 permissions:
   contents: read
 concurrency:
-  group: design-repair-${{ github.event.pull_request.number || github.ref }}
+  # Preserve evidence for each tested revision when the PR receives a new commit.
+  group: design-repair-${{ github.event.pull_request.number || github.ref }}-${{ github.sha }}
   cancel-in-progress: true
 jobs:
   responsive-marketing:

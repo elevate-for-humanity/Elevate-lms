@@ -17,8 +17,13 @@ export async function smokeProbe(url, options={}, timeoutMs=10000, responseType=
       return await request(url,options,timeoutMs,responseType);
     } catch(error) {
       const message=error instanceof Error?error.message:'';
-      const retryable=/^Smoke HTTP response timed out after \d+ ms$/.test(message) ||
-        message==='fetch failed' || error?.name==='AbortError';
+      // A timeout after HTTP headers (including a failing status) is not
+      // transport uncertainty: do not allow a later healthy request to mask it.
+      const beforeHeaders = error?.headersReceived === false;
+      const retryable = beforeHeaders && (
+        /^Smoke HTTP response timed out after \d+ ms$/.test(message) ||
+        message === 'fetch failed' || error?.name === 'AbortError'
+      );
       if (!retryable || attempt===attempts) {
         throw new Error(`Smoke request ${target.pathname} (${options.headers?.host ?? 'default'}) failed at attempt ${attempt}/${attempts}: ${retryable ? 'local_transport_timeout' : 'response_unreadable'}`,{cause:error});
       }

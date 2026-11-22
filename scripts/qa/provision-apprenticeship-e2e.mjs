@@ -339,6 +339,20 @@ async function cleanup() {
       throw new Error('QA cleanup rejected non-fixture shop');
     }
   }
+  // Host shop has the exact same ID as shops. The insert may have committed
+  // before the second checkpoint was saved during a cancelled runner.
+  const recoveredHostShopId = hostShopId || shopId;
+  if (hostShopId && shopId && hostShopId !== shopId) {
+    throw new Error('QA cleanup host shop checkpoint disagrees with canonical shop ID');
+  }
+  if (recoveredHostShopId) {
+    const hostShop = await checked(db.from('host_shops')
+      .select('id,name,owner_id').eq('id', recoveredHostShopId).maybeSingle(), 'load host shop');
+    if (hostShop && (hostShop.name !== `[QA E2E] Host Shop ${state.runId}`
+      || hostShop.owner_id !== hostId)) {
+      throw new Error('QA cleanup rejected non-fixture host shop');
+    }
+  }
   if (partnerId) {
     const partner = await checked(db.from('partners').select('id,name').eq('id', partnerId).maybeSingle(), 'load partner');
     if (partner && partner.name !== `[QA E2E] Host Shop ${state.runId}`) {
@@ -360,7 +374,7 @@ async function cleanup() {
   if (hostId && partnerId) await checked(db.from('partner_users').delete()
     .eq('user_id', hostId).eq('partner_id', partnerId), 'delete partner membership');
   if (shopId) await checked(db.from('shops').delete().eq('id', shopId), 'delete shop');
-  if (hostShopId) await checked(db.from('host_shops').delete().eq('id', hostShopId), 'delete host shop');
+  if (recoveredHostShopId) await checked(db.from('host_shops').delete().eq('id', recoveredHostShopId), 'delete host shop');
   if (partnerId) await checked(db.from('partners').delete().eq('id', partnerId), 'delete partner');
 
   for (const [userId, kind] of [[apprenticeId, 'apprentice'], [hostId, 'host']]) {
@@ -376,7 +390,7 @@ async function cleanup() {
     ['apprentice_placements', placementId],
     ['program_enrollments', enrollmentId],
     ['shops', shopId],
-    ['host_shops', hostShopId],
+    ['host_shops', recoveredHostShopId],
     ['partners', partnerId],
   ]) {
     if (!id) continue;

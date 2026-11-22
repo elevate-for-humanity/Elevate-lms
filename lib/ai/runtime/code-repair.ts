@@ -7,7 +7,7 @@ import {REPAIR_MODEL_PROBE_TIMEOUT_MS,repairRetryGoal} from '@/lib/devstudio/rep
 import {untouchedPlannerNeedsFreshGeneration} from '@/lib/devstudio/repair-checkpoint-recovery.mjs';
 import {verifyParisRuntimeOrigins} from './paris-runtime-evidence.mjs';
 import {failedCurrentReleases,queuedWorkflowRepairTarget,queuedWorkflowRepairDisposition} from './deployment-repair-events.mjs';
-import {recordFailedRepairWorkflow,repairDispatchValues} from './repair-workflow-reconciliation.mjs';
+import {recordFailedRepairWorkflow,repairDispatchValues,expireUnclaimedRepairDispatch} from './repair-workflow-reconciliation.mjs';
 import 'server-only';
 import {resolveOwnedModelConnection} from '@/lib/ai/providers/owned-model-config.mjs';
 import {reconcileRecoveredRepairs} from './repair-reconciliation';
@@ -701,7 +701,10 @@ async function runParisCodeRepairTick({workflowOwnedDispatch=false}:{workflowOwn
    }catch(error){await update(repair.id,{status:'blocked',error_code:String(error instanceof Error?error.message:error).slice(0,500)});}
    continue;
   }
-  if(repair.status==='dispatched'&&!repair.workflow_run_id&&Date.now()-Date.parse(repair.updated_at)>15*60000){await update(repair.id,{status:'blocked',error_code:'REPAIR_DISPATCH_NOT_CLAIMED'});continue;}
+  if(repair.status==='dispatched'&&!repair.workflow_run_id){
+   if(await expireUnclaimedRepairDispatch(db,repair))repair.status='blocked';
+   continue;
+  }
   if(['dispatched','patching','validating'].includes(repair.status)&&repair.workflow_run_id){
    const run=await gh(`/actions/runs/${repair.workflow_run_id}`);
    await recordFailedRepairWorkflow(db,repair,run);

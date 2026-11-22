@@ -31,6 +31,14 @@ export async function fetchSmoke(url, options = {}, timeoutMs = 10000, responseT
       })(),
       timeout,
     ]);
+  } catch (error) {
+    // Distinguish a connect failure from a body-read timeout. A response
+    // that already supplied headers must never become a retryable absence.
+    if (error instanceof Error && error.headersReceived === undefined) {
+      error.headersReceived = headersReceived;
+      error.responseStatus = responseStatus;
+    }
+    throw error;
   } finally {
     clearTimeout(deadline);
   }

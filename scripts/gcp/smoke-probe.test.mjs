@@ -56,7 +56,7 @@ test('200 headers followed by a stalled body never get retried', async()=>{
  };
  await assert.rejects(smokeProbe(url,{},20,'json',{
   request:(u,o,t,r)=>fetchSmoke(u,o,t,r,actualFetch),pause:sleep,
- }),/response_unreadable/);
+ }),/http_200_post_header_body_unreadable/);
  assert.equal(attempts,1);
 });
 
@@ -68,6 +68,6 @@ test('HTTP 500 response headers with an unreadable body cannot be retried', asyn
  };
  await assert.rejects(smokeProbe(url,{},20,'json',{
   request:(u,o,t,r)=>fetchSmoke(u,o,t,r,actualFetch),pause:sleep,
- }),/response_unreadable/);
+ }),/http_500_post_header_body_unreadable/);
  assert.equal(attempts,1);
 });

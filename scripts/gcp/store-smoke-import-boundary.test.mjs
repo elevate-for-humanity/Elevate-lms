@@ -2,6 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {spawnSync} from 'node:child_process';
+import {once} from 'node:events';
+import {createServer} from 'node:http';
 import {fetchSmoke} from './smoke-fetch.mjs';
 
 const source=readFileSync(new URL('./smoke-marketing-container.mjs',import.meta.url),'utf8');
@@ -36,6 +38,22 @@ test('timeout bounds response body and preserves host identity and status',async
  const ok=async (_url,options)=>{host=options.headers.host;return {status:503,json:async()=>({ready:false})}};
  assert.deepEqual(await fetchSmoke('http://localhost/api/health',{headers:{host:'customer.example'}},100,'json',ok),{status:503,body:{ready:false}});
  assert.equal(host,'customer.example');
+});
+test('custom smoke hosts arrive at the local server unchanged', async () => {
+ const server = createServer((request, response) => {
+   response.end(JSON.stringify({host:request.headers.host}));
+ });
+ server.listen(0, '127.0.0.1');
+ try {
+   await once(server, 'listening');
+   const address = `http://127.0.0.1:${server.address().port}/api/health`;
+   for (const host of ['169.254.1.1:3000', 'customer.example', 'acme.app.elevateforhumanity.org']) {
+     assert.deepEqual(await fetchSmoke(address, {headers:{host}}, 1000), {status:200, body:{host}});
+   }
+   await assert.rejects(fetchSmoke('http://customer.example/api/health', {headers:{host:'customer.example'}}), /require an HTTP loopback destination/);
+ } finally {
+   server.close();
+ }
 });
 test('all Store smoke network requests are bounded and independent from Cheerio',()=>{
  assert.doesNotMatch(source,/AbortSignal\.timeout/);

@@ -252,6 +252,7 @@ jobs:
       - name: Require dedicated live acceptance identities
         env:
           EMPLOYER_ONLY: ${{ inputs.employer_only }}
+          PORTAL_E2E_SECRET_SCOPE: production
         run: |
           node --test scripts/qa/require-portal-e2e-identities.test.mjs
           node scripts/qa/require-portal-e2e-identities.mjs

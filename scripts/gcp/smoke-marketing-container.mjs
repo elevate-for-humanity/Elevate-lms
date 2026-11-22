@@ -47,6 +47,7 @@ try {
   const port = docker('published port lookup', ['port', name, '3000/tcp']).split(':').at(-1);
   assert.match(port, /^\d+$/);
   const root = `http://127.0.0.1:${port}`;
+  const startedAt = Date.now();
   const deadline = Date.now() + 120000;
   let ready = false;
   while (Date.now() < deadline) {
@@ -59,12 +60,28 @@ try {
     await new Promise(resolve => setTimeout(resolve, 2000));
   }
   assert.ok(ready, 'Packaged server did not start within 120 seconds');
+  console.log(`[${component} smoke] server answered liveness in ${Date.now() - startedAt}ms`);
+
+  async function probeHttp(path, { host, timeoutMs = 10000, responseType = 'json' } = {}) {
+    const target = `${host || 'local'}${path}`;
+    const started = Date.now();
+    const options = { redirect: 'manual', ...(host ? { headers: { host } } : {}) };
+    console.log(`[${component} smoke] GET ${target} (deadline ${timeoutMs}ms)`);
+    try {
+      const response = await fetchSmoke(root + path, options, timeoutMs, responseType);
+      console.log(`[${component} smoke] GET ${target} returned ${response.status} in ${Date.now() - started}ms`);
+      return response;
+    } catch (error) {
+      throw new Error(`GET ${target}: ${error.message}`, { cause: error });
+    }
+  }
+
   const hosts = ['169.254.1.1:3000', '10.0.0.2:3000', 'customer.example', 'acme.app.elevateforhumanity.org'];
   for (const host of hosts) {
     for (const path of ['/api/ping', '/api/ready', '/api/health']) {
       // The first request can load the packaged route from a cold image layer.
       const timeoutMs = host === hosts[0] ? 20000 : 10000;
-      const {status,body} = await fetchSmoke(root + path, {headers:{host},redirect:'manual'}, timeoutMs);
+      const {status,body} = await probeHttp(path, {host, timeoutMs});
       if (path === '/api/health') assert.ok([200,503].includes(status), 'Dependency health must return its real status');
       else assert.equal(status, 200, `${host}${path} must reach the service endpoint`);
       assert.equal(body.service, component);
@@ -72,18 +89,18 @@ try {
       assert.equal(path === '/api/ping' ? body.ok : body.ready, true);
     }
   }
-  const runtimeVersion = await fetchSmoke(root + '/api/version', {}, 10000);
+  const runtimeVersion = await probeHttp('/api/version');
   assert.equal(runtimeVersion.status, 200);
   const identity = runtimeVersion.body;
   assert.equal(identity.service, component);
   assert.equal(identity.commitSha, sha);
-  const version = await fetchSmoke(root + '/version.json', {}, 10000);
+  const version = await probeHttp('/version.json');
   assert.equal(version.status, 200);
   const packagedVersion = version.body;
   assert.equal(packagedVersion.commit, sha);
   assert.equal(packagedVersion.service, component);
   if (component === 'marketing') {
-    const home = await fetchSmoke(root + '/', {}, 20000, 'text');
+    const home = await probeHttp('/', {timeoutMs: 20000, responseType: 'text'});
     assert.equal(home.status, 200, 'Packaged homepage must render');
     const { assertHomepageHostShopContract } = await import('./homepage-content.mjs');
     assertHomepageHostShopContract(home.body);
@@ -92,7 +109,7 @@ try {
     // Exercise the packaged pages: source-level rendering tests cannot detect a
     // Store image that accidentally prerendered the shared Marketing chrome.
     for (const path of ['/store', '/login', '/privacy', '/terms-of-service', '/security-and-data-protection']) {
-      const {status,body:html} = await fetchSmoke(root + path, {headers:{host:'store.elevateforhumanity.org'},redirect:'manual'}, 20000, 'text');
+      const {status,body:html} = await probeHttp(path, {host: 'store.elevateforhumanity.org', timeoutMs: 20000, responseType: 'text'});
       assert.equal(status, 200, `Store page ${path} must be served locally`);
       assertStorePageChrome(html, path);
     }

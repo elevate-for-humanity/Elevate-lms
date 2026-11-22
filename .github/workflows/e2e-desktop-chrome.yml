@@ -87,14 +87,22 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
       - name: Verify isolated QA database and three-service E2E configuration
-        run: node scripts/qa/verify-e2e-service-config.mjs
-      - name: Verify Website Builder authorization with disposable QA sessions
-        if: ${{ matrix.shard == 1 }}
-        run: node scripts/qa/test-builder-authorization.mjs
+        run: node scripts/qa/verify-e2e-service-config.mjs --infrastructure-only
       - name: Provision disposable Employer, Instructor, Staff, Case Manager and Admin QA identities
         run: node scripts/qa/provision-remaining-portal-e2e.mjs provision
       - name: Provision disposable Learner and Program Holder QA identities
         run: node scripts/qa/provision-learner-program-holder-e2e.mjs provision
+      - name: Provision disposable Host Shop and Apprentice identities when static credentials are absent
+        id: host_fixtures
+        if: ${{ env.E2E_HOST_SHOP_EMAIL == '' || env.E2E_HOST_SHOP_PASSWORD == '' }}
+        env:
+          QA_ISOLATED_APPRENTICESHIP_FIXTURES: 'true'
+        run: node scripts/qa/provision-apprenticeship-e2e.mjs provision
+      - name: Verify the full authenticated browser configuration
+        run: node scripts/qa/verify-e2e-service-config.mjs
+      - name: Verify Website Builder authorization with disposable QA sessions
+        if: ${{ matrix.shard == 1 }}
+        run: node scripts/qa/test-builder-authorization.mjs
       - name: Verify preinstalled Playwright browsers
         run: node scripts/verify-playwright-runtime.mjs chromium
       - name: Install locked Studio Browser dependencies
@@ -197,6 +205,11 @@ jobs:
       - name: Clean up disposable Learner and Program Holder QA identities
         if: always()
         run: node scripts/qa/provision-learner-program-holder-e2e.mjs cleanup
+      - name: Clean up disposable Host Shop and Apprentice QA identities
+        if: ${{ always() && steps.host_fixtures.outcome != '' && steps.host_fixtures.outcome != 'skipped' }}
+        env:
+          QA_ISOLATED_APPRENTICESHIP_FIXTURES: 'true'
+        run: node scripts/qa/provision-apprenticeship-e2e.mjs cleanup
       - name: Clean up disposable Employer, Instructor, Staff, Case Manager and Admin QA identities
         if: always()
         run: node scripts/qa/provision-remaining-portal-e2e.mjs cleanup

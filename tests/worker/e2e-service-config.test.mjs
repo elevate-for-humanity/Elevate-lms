@@ -20,6 +20,17 @@ function testEnv() {
 test('isolated QA and matching identities pass preflight without network requests',()=>{
   assert.deepEqual(auditE2EServiceConfiguration(testEnv()),{ok:true,missing:[],failures:[]});
 });
+test('database validation can run before disposable credentials are provisioned',()=>{
+  const env={
+    NEXT_PUBLIC_SUPABASE_URL:'https://isdgjcdabhxxozarmxta.supabase.co',
+    NEXT_PUBLIC_SUPABASE_ANON_KEY:'anon-fixture',
+    SUPABASE_SERVICE_ROLE_KEY:'service-fixture',
+  };
+  assert.equal(auditE2EServiceConfiguration(env,{infrastructureOnly:true}).ok,true);
+  assert.ok(auditE2EServiceConfiguration(env).missing.includes('E2E_HOST_SHOP_PASSWORD'));
+  const production={...env,NEXT_PUBLIC_SUPABASE_URL:'https://cuxzzpsyufcewtmicszk.supabase.co'};
+  assert.ok(auditE2EServiceConfiguration(production,{infrastructureOnly:true}).failures.includes('E2E_LOCAL_TESTS_TARGET_PRODUCTION_SUPABASE'));
+});
 test('missing authenticated Admin credentials fail immediately, not after hours of redirects',()=>{
   const env=testEnv();delete env.TEST_ADMIN_PASSWORD;
   const res=auditE2EServiceConfiguration(env);

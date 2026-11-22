@@ -12,7 +12,16 @@ const shard=jobs['desktop-chrome-shard'];
 test('browser shards connect to the separately provisioned QA project',()=>{
   assert.equal(shard.env.NEXT_PUBLIC_SUPABASE_URL,'${{ secrets.E2E_SUPABASE_URL }}');
   assert.equal(shard.env.SUPABASE_SERVICE_ROLE_KEY,'${{ secrets.E2E_SUPABASE_SERVICE_ROLE_KEY }}');
-  assert.ok(shard.steps.some(step=>step.run==='node scripts/qa/verify-e2e-service-config.mjs'));
+  const preflight=shard.steps.findIndex(step=>step.run==='node scripts/qa/verify-e2e-service-config.mjs --infrastructure-only');
+  const remaining=shard.steps.findIndex(step=>step.run==='node scripts/qa/provision-remaining-portal-e2e.mjs provision');
+  const host=shard.steps.findIndex(step=>step.run==='node scripts/qa/provision-apprenticeship-e2e.mjs provision');
+  const identities=shard.steps.findIndex(step=>step.run==='node scripts/qa/verify-e2e-service-config.mjs');
+  assert.ok(preflight>=0 && preflight<remaining && remaining<host && host<identities);
+  assert.equal(shard.steps[host].env.QA_ISOLATED_APPRENTICESHIP_FIXTURES,'true');
+  assert.match(shard.steps[host].if,/E2E_HOST_SHOP_(EMAIL|PASSWORD)/);
+  const cleanup=shard.steps.find(step=>step.run==='node scripts/qa/provision-apprenticeship-e2e.mjs cleanup');
+  assert.match(cleanup.if,/steps\.host_fixtures\.outcome/);
+  assert.equal(cleanup.env.QA_ISOLATED_APPRENTICESHIP_FIXTURES,'true');
 });
 test('same dedicated QA identities are used for both legacy TEST and canonical E2E variables',()=>{
   for(const role of ['ADMIN','PROGRAM_HOLDER']){

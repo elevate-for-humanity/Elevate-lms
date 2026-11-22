@@ -69,6 +69,28 @@ describe('actual OpenHands refresh while the accepted provider task is pending',
     expect(mocks.evaluate).not.toHaveBeenCalled();
   });
 
+  it('retains the pending-approval canonical state even when provider says running', async () => {
+    task.requires_approval = true;
+    task.approval_status = 'pending';
+    task.approval_reason = 'OpenHands is waiting for confirmation.';
+    mocks.lifecycle.mockResolvedValue({status: 'running', startTaskId: 'accepted-start'});
+    await refreshOpenHandsTask({taskId: 'owned-task', actorId: 'owner'});
+    const saved = updates.find(x => x.table === 'ai_tasks')!.values;
+    expect(saved.status).toBe('awaiting_approval');
+    expect(saved.requires_approval).toBe(true);
+    expect(saved.approval_status).toBe('pending');
+    expect(saved.approval_reason).toBe('OpenHands is waiting for confirmation.');
+    expect(saved.completed_at).toBeNull();
+    expect(saved).not.toHaveProperty('attempts');
+    expect(writeEqs).toEqual(expect.arrayContaining([
+      ['approval_status', 'pending'],
+      ['requires_approval', true],
+    ]));
+    expect(updates.filter(x => x.table === 'ai_task_steps').map(x => x.values.status))
+      .toEqual(['awaiting_approval', 'awaiting_approval']);
+    expect(mocks.start).not.toHaveBeenCalled();
+  });
+
   it('keeps a real provider failure terminal at its existing attempt limit', async () => {
     mocks.lifecycle.mockResolvedValue({status: 'failed', startTaskId: 'accepted-start', error: 'Provider rejected the execution.'});
     await refreshOpenHandsTask({taskId: 'owned-task', actorId: 'owner'});

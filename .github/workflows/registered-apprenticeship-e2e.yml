@@ -204,6 +204,28 @@ jobs:
       PLAYWRIGHT_BASE_URL: https://app.elevateforhumanity.org
       NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
       SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      # The QA fixture provisioners may only write to the isolated QA project,
+      # so this live job declares its fixture target and certifies with the
+      # dedicated production acceptance accounts instead.
+      PORTAL_FIXTURE_TARGET: live-production
+      E2E_APPRENTICE_EMAIL: ${{ secrets.PRODUCTION_E2E_APPRENTICE_EMAIL }}
+      E2E_APPRENTICE_PASSWORD: ${{ secrets.PRODUCTION_E2E_APPRENTICE_PASSWORD }}
+      E2E_HOST_SHOP_EMAIL: ${{ secrets.PRODUCTION_E2E_HOST_SHOP_EMAIL }}
+      E2E_HOST_SHOP_PASSWORD: ${{ secrets.PRODUCTION_E2E_HOST_SHOP_PASSWORD }}
+      E2E_LEARNER_EMAIL: ${{ secrets.PRODUCTION_E2E_LEARNER_EMAIL }}
+      E2E_LEARNER_PASSWORD: ${{ secrets.PRODUCTION_E2E_LEARNER_PASSWORD }}
+      E2E_PROGRAM_HOLDER_EMAIL: ${{ secrets.PRODUCTION_E2E_PROGRAM_HOLDER_EMAIL }}
+      E2E_PROGRAM_HOLDER_PASSWORD: ${{ secrets.PRODUCTION_E2E_PROGRAM_HOLDER_PASSWORD }}
+      E2E_EMPLOYER_EMAIL: ${{ secrets.PRODUCTION_E2E_EMPLOYER_EMAIL }}
+      E2E_EMPLOYER_PASSWORD: ${{ secrets.PRODUCTION_E2E_EMPLOYER_PASSWORD }}
+      E2E_INSTRUCTOR_EMAIL: ${{ secrets.PRODUCTION_E2E_INSTRUCTOR_EMAIL }}
+      E2E_INSTRUCTOR_PASSWORD: ${{ secrets.PRODUCTION_E2E_INSTRUCTOR_PASSWORD }}
+      E2E_STAFF_EMAIL: ${{ secrets.PRODUCTION_E2E_STAFF_EMAIL }}
+      E2E_STAFF_PASSWORD: ${{ secrets.PRODUCTION_E2E_STAFF_PASSWORD }}
+      E2E_CASE_MANAGER_EMAIL: ${{ secrets.PRODUCTION_E2E_CASE_MANAGER_EMAIL }}
+      E2E_CASE_MANAGER_PASSWORD: ${{ secrets.PRODUCTION_E2E_CASE_MANAGER_PASSWORD }}
+      E2E_ADMIN_EMAIL: ${{ secrets.PRODUCTION_E2E_ADMIN_EMAIL }}
+      E2E_ADMIN_PASSWORD: ${{ secrets.PRODUCTION_E2E_ADMIN_PASSWORD }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -263,19 +285,30 @@ jobs:
           set -euo pipefail
           test -n "${NEXT_PUBLIC_SUPABASE_URL:-}" || { echo '::error::NEXT_PUBLIC_SUPABASE_URL is not configured'; exit 1; }
           test -n "${SUPABASE_SERVICE_ROLE_KEY:-}" || { echo '::error::SUPABASE_SERVICE_ROLE_KEY is not configured'; exit 1; }
-      # The learner fixture requires the per-run isolated QA admin identity as
-      # its recorded enrollment approver. Create it before the learner fixture.
-      # The remaining-persona provisioner also rejects non-QA Supabase hosts.
+      # Disposable fixtures may only be created in the isolated QA project, which
+      # is not the project this live job certifies. The desktop QA workflow owns
+      # them; here they stay inert so live coordinates never reach them.
       - name: Provision Employer + Instructor + Staff + Case Manager + Admin identities
+        if: ${{ env.PORTAL_FIXTURE_TARGET == 'isolated-qa' }}
         run: node scripts/qa/provision-remaining-portal-e2e.mjs provision
       - name: Provision isolated Learner + Program Holder identities
+        if: ${{ env.PORTAL_FIXTURE_TARGET == 'isolated-qa' }}
         run: node scripts/qa/provision-learner-program-holder-e2e.mjs provision
       - name: Provision disposable Host Shop + Apprentice identities
+        if: ${{ env.PORTAL_FIXTURE_TARGET == 'isolated-qa' }}
         run: node scripts/qa/provision-apprenticeship-e2e.mjs provision
+      # Missing live identities must fail here, never silently skip a suite.
       - name: Require all nine roles so authenticated tests cannot silently skip
+        env:
+          EMPLOYER_ONLY: ${{ inputs.employer_only }}
         run: |
+          set -euo pipefail
           node --test scripts/qa/require-portal-e2e-identities.test.mjs scripts/qa/write-private-state.test.mjs
-          node scripts/qa/require-portal-e2e-identities.mjs
+          if [[ "${EMPLOYER_ONLY}" == "true" ]]; then
+            node -e "for (const key of ['E2E_EMPLOYER_EMAIL','E2E_EMPLOYER_PASSWORD']) if (!process.env[key]?.trim()) throw Error('E2E_FIXTURES_MISSING:' + key);"
+          else
+            node scripts/qa/require-portal-e2e-identities.mjs
+          fi
       # LMS lesson media and public Marketing films are different acceptance
       # surfaces. The marketing-only hvac-public-playback matrix is deliberately
       # skipped on LMS releases; this independent test certifies REAL authenticated
@@ -348,14 +381,32 @@ jobs:
         run: node scripts/gcp/production-acceptance.mjs verify
       - name: Clean disposable Host Shop + Apprentice identities
         if: ${{ always() && steps.install-dependencies.outcome == 'success' }}
-        run: node scripts/qa/provision-apprenticeship-e2e.mjs cleanup
+        run: |
+          set -euo pipefail
+          if [[ "${PORTAL_FIXTURE_TARGET:-live-production}" == "isolated-qa" ]]; then
+            node scripts/qa/provision-apprenticeship-e2e.mjs cleanup
+          else
+            echo 'No disposable fixtures were provisioned in the live project; nothing to clean.'
+          fi
       - name: Clean isolated Learner + Program Holder identities
         if: ${{ always() && steps.install-dependencies.outcome == 'success' }}
-        run: node scripts/qa/provision-learner-program-holder-e2e.mjs cleanup
+        run: |
+          set -euo pipefail
+          if [[ "${PORTAL_FIXTURE_TARGET:-live-production}" == "isolated-qa" ]]; then
+            node scripts/qa/provision-learner-program-holder-e2e.mjs cleanup
+          else
+            echo 'No disposable fixtures were provisioned in the live project; nothing to clean.'
+          fi
       # Remove the QA approver last to keep the learner approval's FK valid.
       - name: Clean Employer + Instructor + Staff + Case Manager + Admin identities
         if: ${{ always() && steps.install-dependencies.outcome == 'success' }}
-        run: node scripts/qa/provision-remaining-portal-e2e.mjs cleanup
+        run: |
+          set -euo pipefail
+          if [[ "${PORTAL_FIXTURE_TARGET:-live-production}" == "isolated-qa" ]]; then
+            node scripts/qa/provision-remaining-portal-e2e.mjs cleanup
+          else
+            echo 'No disposable fixtures were provisioned in the live project; nothing to clean.'
+          fi
       - name: Upload QA evidence
         if: always()
         uses: actions/upload-artifact@v7

@@ -275,16 +275,16 @@ jobs:
           node --test scripts/portal-route-contract.test.mjs scripts/portal-audit-detections.test.mjs
           node scripts/audit-portal-contracts.mjs
       - name: Portal/database schema drift — live production contract
-        if: ${{ !cancelled() && steps.dependencies.outcome == 'success' && (github.event_name != 'pull_request') }}
+        if: ${{ !cancelled() && steps.dependencies.outcome == 'success' && (github.ref == 'refs/heads/main' && github.event_name != 'pull_request') }}
         run: pnpm exec tsx scripts/audit-schema-drift.ts --baseline scripts/schema-drift-baseline.json --fail-on-new-drift
       - name: Supabase write payloads — live production contract
-        if: ${{ !cancelled() && steps.dependencies.outcome == 'success' && (github.event_name != 'pull_request') }}
+        if: ${{ !cancelled() && steps.dependencies.outcome == 'success' && (github.ref == 'refs/heads/main' && github.event_name != 'pull_request') }}
         run: pnpm tsx scripts/audit-supabase-mutations.ts
       - name: Portal/database schema drift — PR advisory
         if: ${{ !cancelled() && steps.dependencies.outcome == 'success' && (github.event_name == 'pull_request') }}
         run: pnpm audit:schema
       - name: Live portal data integrity
-        if: ${{ !cancelled() && steps.dependencies.outcome == 'success' && (github.event_name != 'pull_request') }}
+        if: ${{ !cancelled() && steps.dependencies.outcome == 'success' && (github.ref == 'refs/heads/main' && github.event_name != 'pull_request') }}
         run: node scripts/audit-portal-data-integrity.mjs
       - name: Assemble canonical PWA runtime assets
         if: ${{ !cancelled() && steps.dependencies.outcome == 'success' }}

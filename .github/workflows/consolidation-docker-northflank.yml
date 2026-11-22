@@ -48,8 +48,12 @@ jobs:
           - service: admin
             dockerfile: Dockerfile.admin
     env:
-      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+      NEXT_PUBLIC_SUPABASE_URL: >-
+        ${{ (github.event.pull_request.user.login == 'dependabot[bot]' && secrets.E2E_SUPABASE_URL)
+            || (github.event.pull_request.user.login != 'dependabot[bot]' && (secrets.NEXT_PUBLIC_SUPABASE_URL)) || '' }}
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: >-
+        ${{ (github.event.pull_request.user.login == 'dependabot[bot]' && secrets.E2E_SUPABASE_ANON_KEY)
+            || (github.event.pull_request.user.login != 'dependabot[bot]' && (secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY)) || '' }}
       RUNTIME_PORT: '3000'
     steps:
       - name: Checkout

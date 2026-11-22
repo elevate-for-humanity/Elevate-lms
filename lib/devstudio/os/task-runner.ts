@@ -738,7 +738,7 @@ export async function approveTask(
   // A PARIS OpenHands task with a recorded start receipt already exists at the
   // provider. Human approval must authorize observation of THAT task, never
   // re-enter the generic AI command executor and create a second conversation.
-  if (task.tool_name === 'openhands.execute' && task.tool_output?.start_task_id) {
+  if (task.tool_name === 'openhands.execute' &&\n      typeof task.correlation_id === 'string' && task.correlation_id.startsWith('paris-repair:')) {
     if (task.user_id !== reviewerId || (task.tenant_id ?? null) !== null ||
         task.status !== 'awaiting_approval' ||
         !isProviderConfirmationSnapshot(task) ||

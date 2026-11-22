@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import { FileText, Plus, Pencil, Trash2, Eye, Globe, Archive, RefreshCw, CheckCircle, XCircle, Loader2 } from 'lucide-react';
+import { type LucideIcon, FileText, Plus, Pencil, Trash2, Eye, Globe, Archive, RefreshCw, CheckCircle, XCircle, Loader2 } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 type PageStatus = 'published' | 'draft' | 'archived';
@@ -14,7 +14,7 @@ const STATUS_COLORS: Record<PageStatus, string> = {
   draft: 'bg-amber-950/40 border-amber-800 text-amber-300',
   archived: 'bg-slate-800 border-slate-700 text-slate-400',
 };
-const STATUS_ICONS: Record<PageStatus, React.ElementType> = { published: Globe, draft: Pencil, archived: Archive };
+const STATUS_ICONS: Record<PageStatus, LucideIcon> = { published: Globe, draft: Pencil, archived: Archive };
 
 function PageForm({ initial, onSave, onCancel, saving }: { initial?: Partial<PageRow>; onSave: (data: Omit<PageRow, 'id'>) => void; onCancel: () => void; saving: boolean }) {
   const [slug, setSlug] = useState(initial?.slug ?? '');

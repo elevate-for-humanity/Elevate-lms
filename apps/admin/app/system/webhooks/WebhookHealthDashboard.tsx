@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import {
+  type LucideIcon,
   Activity,
   AlertTriangle,
   CheckCircle2,
@@ -154,7 +155,7 @@ function SummaryCard({
 }: {
   label: string;
   value: number;
-  icon: React.ElementType;
+  icon: LucideIcon;
   color: string;
 }) {
   return (

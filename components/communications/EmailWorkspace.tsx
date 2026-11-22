@@ -1426,7 +1426,7 @@ export function EmailWorkspace({
                 {listening ? 'Stop dictation' : 'Start dictation'}
               </button>
               {speechError && <p role="alert" className="text-sm text-red-700">{speechError}</p>}
-              <p className="text-xs text-slate-600">In the message, say “command new line” or “command new paragraph.” Review your draft and recipients before sending.</p>
+              <p className="text-xs text-slate-600">Pause before and after saying “command new line” or “command new paragraph.” Review your draft and recipients before sending.</p>
               <label className="block text-sm font-black text-slate-800">
                 Message
                 <textarea

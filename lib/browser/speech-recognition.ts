@@ -43,13 +43,20 @@ export function speechSessionText(prefix: string, results: BrowserSpeechRecognit
   return `${before}${before && transcript ? ' ' : ''}${transcript}`;
 }
 
-/** Append final email dictation while interpreting explicit body formatting commands. */
+/** Append final email dictation, treating a standalone result as a body command. */
 export function appendEmailDictation(value: string, phrases: string[], field: 'subject' | 'body'): string {
-  const transcript = phrases.map(phrase => phrase.trim()).filter(Boolean).join(' ');
-  if (!transcript) return value;
-  const formatted = field === 'body'
-    ? transcript.replace(/[ \t]*\bcommand\s+new\s+(paragraph|line)\b[.,!?;:]?[ \t]*/gi,
-        (_, command: string) => command.toLowerCase() === 'paragraph' ? '\n\n' : '\n')
-    : transcript;
-  return value + (value && !/\s$/.test(value) && !/^\s/.test(formatted) ? ' ' : '') + formatted;
+  for (const spoken of phrases) {
+    const phrase = spoken.trim();
+    if (!phrase) continue;
+
+    const command = field === 'body'
+      ? /^command\s+new\s+(paragraph|line)[.,!?;:]?$/i.exec(phrase)
+      : null;
+    if (command) {
+      value += command[1].toLowerCase() === 'paragraph' ? '\n\n' : '\n';
+    } else {
+      value += (value && !/\s$/.test(value) ? ' ' : '') + phrase;
+    }
+  }
+  return value;
 }

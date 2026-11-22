@@ -117,7 +117,8 @@ describe('assigned student email suggestions', () => {
   });
 });
 
-it('offers only the student assigned instructor active course mailbox', async () => {
+it.each([false, true])('offers the assigned instructor from the legacy roster or current enrollment (%s)', async (currentEnrollment) => {
+  const current = { select: vi.fn().mockReturnThis(), or: vi.fn().mockReturnThis(), in: vi.fn().mockReturnThis(), is: vi.fn().mockResolvedValue({ data: currentEnrollment ? [{ program_holder_id: 'holder-1' }] : [] }) };
   const assignments: any = {
     select: vi.fn().mockReturnThis(),
     eq: vi.fn().mockReturnThis(),
@@ -141,7 +142,7 @@ it('offers only the student assigned instructor active course mailbox', async ()
   };
   const db = {
     from: vi.fn((table: string) =>
-      table === 'program_holder_students'
+      table === 'program_enrollments' ? current : table === 'program_holder_students'
         ? assignments
         : table === 'program_holders'
           ? holders
@@ -156,7 +157,10 @@ it('offers only the student assigned instructor active course mailbox', async ()
       mailbox_kind: 'program_holder',
     },
   ]);
-  expect(assignments.eq).toHaveBeenCalledWith('user_id', 'student-user');
+  expect(current.or).toHaveBeenCalledWith('user_id.eq.student-user,student_id.eq.student-user');
+  expect(current.is).toHaveBeenCalledWith('revoked_at', null);
+  if (currentEnrollment) expect(assignments.eq).not.toHaveBeenCalled();
+  else expect(assignments.eq).toHaveBeenCalledWith('user_id', 'student-user');
   expect(mailboxes.in).toHaveBeenCalledWith('program_holder_id', ['holder-1']);
   expect(mailboxes.eq).toHaveBeenCalledWith('active', true);
 });

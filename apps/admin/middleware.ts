@@ -212,6 +212,7 @@ export async function middleware(req: NextRequest) {
 
   const pendingCookies: PendingCookie[] = [];
   const requestHeaders = new Headers(req.headers);
+  requestHeaders.delete('x-elevate-staff-inbox');
   requestHeaders.set('x-pathname', `${pathname}${search}`);
 
   const supabase = createMiddlewareSupabaseClient(req, (cookiesToSet) => {
@@ -268,6 +269,10 @@ export async function middleware(req: NextRequest) {
     .map((row) => (row as { roles?: { name?: unknown } | null }).roles?.name)
     .filter((role): role is string => typeof role === 'string');
   const effectiveRoles = normalizeRoles([profile?.role, ...secondaryRoles]);
+  if (effectiveRoles.includes('staff') && !effectiveRoles.some((role) => role !== 'staff' && ADMIN_ROLES.includes(role))) {
+    requestHeaders.set('x-elevate-staff-inbox', '1');
+  }
+
 
   if (!hasAnyRole(effectiveRoles, requiredRoles(pathname), { adminOverride: false })) {
     return withCookies(

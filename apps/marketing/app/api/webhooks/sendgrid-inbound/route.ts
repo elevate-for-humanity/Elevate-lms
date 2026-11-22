@@ -72,7 +72,7 @@ async function _POST(request: NextRequest) {
     if (!delivery.stored && !delivery.filtered && !delivery.review) {
       throw new Error('Inbound mail could not be stored');
     }
-    if (delivery.stored && !delivery.review) await respondToParisMail(parsed);
+    if (delivery.stored) await respondToParisMail(parsed);
     await finalizeWebhookEvent('sendgrid-inbound', eventId, 'processed', undefined, {
       strict: true,
       leaseToken,

@@ -33,6 +33,14 @@ describe('staff authorization boundary', () => {
     const response = await middleware(new NextRequest('https://admin.elevateforhumanity.org/api/communications/email'));
     expect(response.status).toBe(403);
   });
+  it('sets staff chrome from the verified role and overwrites a forged role header', async () => {
+    const url = 'https://admin.elevateforhumanity.org/phone/email';
+    const staff = await middleware(new NextRequest(url));
+    expect(staff.headers.get('x-middleware-request-x-elevate-staff-inbox')).toBe('1');
+    state.role = 'admin';
+    const administrator = await middleware(new NextRequest(url, { headers: { 'x-elevate-staff-inbox': '1' } }));
+    expect(administrator.headers.get('x-middleware-request-x-elevate-staff-inbox')).toBeNull();
+  });
   it('retains platform administrator access', async () => {
     state.role = 'admin';
     const response = await middleware(new NextRequest('https://admin.elevateforhumanity.org/students'));

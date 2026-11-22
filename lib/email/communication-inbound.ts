@@ -54,41 +54,48 @@ export async function storeInboundCommunicationEmail(
 
   const db = await requireAdminClient();
   const originalSender = parseEmailList(parsed.from)[0];
-  const route = options.internalCopy || !envelope.length
-    ? null
-    : await programConversationRoute(db, [originalSender || ''], envelope);
   // Tagged business addresses alias the base mailbox when the exact address
   // has no mailbox. Never strip tags on another domain.
   const taggedAliases = new Map(envelope.flatMap((address) => {
     const alias = /^([^+@]+)\+[^@]+(@elevateforhumanity\.org)$/.exec(address);
     return alias ? [[address, alias[1] + alias[2]] as const] : [];
   }));
-  const recipients = [...new Set([...envelope, ...taggedAliases.values(), ...(route?.addresses || [])])];
-  const matched = recipients.length ? await db.from('communication_email_mailboxes')
-    .select('id,address,mailbox_kind,program_holder_id')
-    .in('address', recipients).eq('active', true) : { data: [], error: null };
-  if (matched.error) throw new Error('Mail routing unavailable');
-  const holderIds = [...new Set((matched.data || [])
-    .filter((mailbox) => mailbox.mailbox_kind === 'program_holder' && mailbox.program_holder_id)
-    .map((mailbox) => mailbox.program_holder_id))];
-  let archivedHolderIds = new Set<string>();
-  if (holderIds.length) {
-    const holders = await db.from('program_holders').select('id,features').in('id', holderIds);
-    if (holders.error) throw new Error('Archived mailbox routing check unavailable');
-    archivedHolderIds = new Set((holders.data || [])
-      .filter((holder: any) => holder.features?.portal_access_archived === true)
-      .map((holder: any) => holder.id));
+  async function findActiveMailboxes(recipients: string[]) {
+    if (!recipients.length) return [];
+    const matched = await db.from('communication_email_mailboxes')
+      .select('id,address,mailbox_kind,program_holder_id')
+      .in('address', recipients).eq('active', true);
+    if (matched.error) throw new Error('Mail routing unavailable');
+    const holderIds = [...new Set((matched.data || [])
+      .filter((mailbox) => mailbox.mailbox_kind === 'program_holder' && mailbox.program_holder_id)
+      .map((mailbox) => mailbox.program_holder_id))];
+    let archivedHolderIds = new Set<string>();
+    if (holderIds.length) {
+      const holders = await db.from('program_holders').select('id,features').in('id', holderIds);
+      if (holders.error) throw new Error('Archived mailbox routing check unavailable');
+      archivedHolderIds = new Set((holders.data || [])
+        .filter((holder: any) => holder.features?.portal_access_archived === true)
+        .map((holder: any) => holder.id));
+    }
+    // Preserve archived history while keeping new deliveries out of archived mailboxes.
+    return (matched.data || []).filter((mailbox) =>
+      !(mailbox.mailbox_kind === 'program_holder' &&
+        mailbox.program_holder_id && archivedHolderIds.has(mailbox.program_holder_id)));
   }
-  // Preserve archived history while keeping new deliveries out of archived mailboxes.
-  const activeMailboxes = (matched.data || []).filter((mailbox) =>
-    !(mailbox.mailbox_kind === 'program_holder' &&
-      mailbox.program_holder_id && archivedHolderIds.has(mailbox.program_holder_id)));
+
+  const activeMailboxes = await findActiveMailboxes([...new Set([...envelope, ...taggedAliases.values()])]);
   const activeAddresses = new Set(activeMailboxes.map((mailbox) => mailbox.address));
   const destinations = envelope.map((address) =>
     activeAddresses.has(address) ? address : taggedAliases.get(address) || address);
   const unresolved = envelope.filter((_, index) => !activeAddresses.has(destinations[index]));
-  const mailboxes = activeMailboxes.filter((mailbox) =>
-    destinations.includes(mailbox.address) || route?.addresses.includes(mailbox.address));
+  const direct = activeMailboxes.filter((mailbox) => destinations.includes(mailbox.address));
+  const route = options.internalCopy || !direct.length
+    ? null
+    : await programConversationRoute(db, [originalSender || ''], direct.map((mailbox) => mailbox.address));
+  const additional = await findActiveMailboxes((route?.addresses || []).filter(
+    (address) => !direct.some((mailbox) => mailbox.address === address),
+  ));
+  const mailboxes = [...direct, ...additional];
   const deliveries = mailboxes.map((mailbox) => ({ mailbox, review: false, reviewFolderId: null as string | null }));
   if (!options.internalCopy && (!envelope.length || unresolved.length)) {
     // Use the existing Admissions membership boundary for the routing review queue.
@@ -265,7 +272,7 @@ export async function storeInboundCommunicationEmail(
       )
         continue;
       const fileName = safeAttachmentName(file.name);
-      const storagePath = `${mailbox.id}/${messageId}/${index}-${fileName}`;
+      const storagePath = `${mailbox.id}/${messageId}/${index}`;
       const bytes = Buffer.from(await file.arrayBuffer());
       const { error: uploadError } = await db.storage
         .from(ATTACHMENT_BUCKET)

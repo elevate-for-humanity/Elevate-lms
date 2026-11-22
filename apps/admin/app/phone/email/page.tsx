@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { headers } from 'next/headers';
 import Link from 'next/link';
 import { EmailWorkspace } from '@/components/communications/EmailWorkspace';
 import { requireRole } from '@/lib/auth/require-role';
@@ -7,8 +8,6 @@ import { COMMUNICATION_MEMBER_ROLES } from '@/lib/phone/access';
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = { title: 'Elevate Email' };
 
-const LMS_ORIGIN = process.env.NEXT_PUBLIC_APP_URL || 'https://app.elevateforhumanity.org';
-
 export default async function AdminEmailPage({
   searchParams,
 }: {
@@ -16,6 +15,7 @@ export default async function AdminEmailPage({
 }) {
   const params = await searchParams;
   const { effectiveRoles } = await requireRole(COMMUNICATION_MEMBER_ROLES);
+  const staffInbox = (await headers()).get('x-elevate-staff-inbox') === '1';
   const canViewDirectory = effectiveRoles.some((role) => ['admin', 'super_admin'].includes(role));
   return (
     <main className="space-y-5 bg-slate-50 p-4 sm:p-6">
@@ -27,7 +27,12 @@ export default async function AdminEmailPage({
           <h1 className="mt-1 text-3xl font-black text-slate-950">Elevate Email</h1>
         </div>
         <div className="flex gap-2">
-          {canViewDirectory ? (
+          {staffInbox && (
+            <Link href="/staff-portal" className="rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-black text-slate-800">
+              Staff portal
+            </Link>
+          )}
+          {!staffInbox ? (
             <Link
               href="/phone"
               className="rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-black text-slate-800"
@@ -48,11 +53,7 @@ export default async function AdminEmailPage({
       <EmailWorkspace
         initialMailboxId={params.mailboxId}
         initialThreadId={params.threadId}
-        communicationLinks={canViewDirectory ? undefined : {
-          phone: `${LMS_ORIGIN}/communications/phone`,
-          chat: `${LMS_ORIGIN}/lms/messages`,
-          calendar: `${LMS_ORIGIN}/lms/calendar`,
-        }}
+        communicationLinks={staffInbox ? null : undefined}
       />
     </main>
   );

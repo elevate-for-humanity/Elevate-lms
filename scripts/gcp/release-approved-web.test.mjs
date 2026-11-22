@@ -32,7 +32,7 @@ test('every explicit course-image COPY input has an automatic source-change trig
   });
   assert.deepEqual(missing, [], 'copied runtime inputs must not be silently excluded from deployment triggers');
 });
-function completionSetup({ current = sha, prior = [], deny = false } = {}) {
+function completionSetup({ current = sha, prior = [], serviceRuns = {}, deny = false } = {}) {
   const calls = [];
   const request = async (url, init) => {
     const path = new URL(url).pathname;
@@ -40,7 +40,10 @@ function completionSetup({ current = sha, prior = [], deny = false } = {}) {
     assert.equal(init.headers.Authorization, 'Bearer scoped-ci-token');
     if (deny) return new Response('{}', { status: 403 });
     if (path.endsWith('git/ref/heads/main')) return Response.json({ object: { sha: current } });
-    if (path.endsWith('/runs')) return Response.json({ workflow_runs: prior });
+    if (path.endsWith('/runs')) {
+      const workflow = path.split('/').at(-2);
+      return Response.json({ workflow_runs: workflow === 'release-approved-google-web.yml' ? prior : (serviceRuns[workflow] ?? []) });
+    }
     if (path.endsWith('/dispatches')) return new Response(null, { status: 204 });
     throw Error('Unexpected completion request');
   };
@@ -83,12 +86,32 @@ test('a superseded CI completion does not dispatch a newer untested main', async
   assert.equal((await dispatchCompletedMainCI({ env: ciEnv, event: { workflow_run: completedCI }, request: s.request })).status, 'superseded');
   assert.equal(s.calls.length, 1);
 });
-test('active or successfully handed-off controller runs deduplicate CI reruns', async () => {
-  for (const prior of [{ head_sha: sha, status: 'pending' }, { head_sha: sha, status: 'in_progress' }, { head_sha: sha, status: 'completed', conclusion: 'success' }]) {
+test('only an active controller can deduplicate without examining downstream releases', async () => {
+  for (const prior of [{ head_sha: sha, status: 'pending' }, { head_sha: sha, status: 'in_progress' }]) {
     const s = completionSetup({ prior: [prior] });
     assert.equal((await dispatchCompletedMainCI({ env: ciEnv, event: { workflow_run: completedCI }, request: s.request })).status, 'already_requested');
     assert.ok(s.calls.every(c => c.method === 'GET'));
+    assert.equal(s.calls.length, 2);
   }
+});
+test('completed controller requires all four releases to succeed or remain active before deduplicating', async () => {
+  const names = ['deploy-admin.yml', 'deploy-google-lms-trigger.yml',
+    'deploy-google-marketing-trigger.yml', 'deploy-google-store-runtime.yml'];
+  const controller = [{ head_sha: sha, status: 'completed', conclusion: 'success' }];
+  const serviceRuns = Object.fromEntries(names.map(name => [name, [{ head_sha: sha, status: 'completed', conclusion: 'success' }]]));
+  const healthy = completionSetup({ prior: controller, serviceRuns });
+  assert.equal((await dispatchCompletedMainCI({ env: ciEnv, event: { workflow_run: completedCI }, request: healthy.request })).status, 'already_requested');
+  assert.equal(healthy.calls.filter(c => c.method === 'POST').length, 0);
+  const recovered = completionSetup({ prior: controller, serviceRuns: {
+    ...serviceRuns,
+    'deploy-google-marketing-trigger.yml': [{ head_sha: sha, status: 'completed', conclusion: 'failure' }],
+  } });
+  assert.equal((await dispatchCompletedMainCI({ env: ciEnv, event: { workflow_run: completedCI }, request: recovered.request })).status, 'requested');
+  assert.deepEqual(recovered.calls.filter(c => c.method === 'POST').map(c => c.body), [{ ref: 'main' }]);
+  const wrongSha = completionSetup({ prior: controller, serviceRuns: {
+    ...serviceRuns, 'deploy-google-marketing-trigger.yml': [{ head_sha: 'b'.repeat(40), status: 'completed', conclusion: 'success' }],
+  } });
+  assert.equal((await dispatchCompletedMainCI({ env: ciEnv, event: { workflow_run: completedCI }, request: wrongSha.request })).status, 'requested');
 });
 test('a failed handoff can retry, but authorization denial cannot seek another identity', async () => {
   const s = completionSetup({ prior: [{ head_sha: sha, status: 'completed', conclusion: 'failure' }] });
@@ -97,7 +120,7 @@ test('a failed handoff can retry, but authorization denial cannot seek another i
   await assert.rejects(dispatchCompletedMainCI({ env: ciEnv, event: { workflow_run: completedCI }, request: denied.request }), /HTTP_403/);
   assert.equal(denied.calls.length, 1);
 });
-function setup({ green = true, current = sha, active = false, readback = 'false' } = {}) {
+function setup({ green = true, current = sha, active = false, succeeded = false, readback = 'false' } = {}) {
   const calls = []; let holdReads = 0;
   const request = async (url, init) => {
     const path = new URL(url).pathname;
@@ -109,7 +132,9 @@ function setup({ green = true, current = sha, active = false, readback = 'false'
       if (init.method === 'PATCH') return new Response(null, { status: 204 });
       return Response.json({ value: ++holdReads === 1 ? 'true' : readback });
     }
-    if (path.endsWith('/runs')) return Response.json({ workflow_runs: active ? [{ head_sha: sha, status: 'in_progress' }] : [] });
+    if (path.endsWith('/runs')) return Response.json({ workflow_runs: active
+      ? [{ head_sha: sha, status: 'in_progress' }]
+      : succeeded ? [{ head_sha: sha, status: 'completed', conclusion: 'success' }] : [] });
     if (path.endsWith('/dispatches')) return new Response(null, { status: 204 });
     throw Error('Unexpected request');
   };
@@ -136,6 +161,15 @@ test('an existing active release is not dispatched again', async () => {
   const s = setup({ active: true }); const result = await releaseApprovedWeb({ sha, token: 'test', request: s.request });
   assert.ok(result.workflows.every(w => w.status === 'already_active'));
   assert.equal(s.calls.filter(c => c.path.endsWith('/dispatches')).length, 0);
+});
+test('a successful completed service is not redeployed while a failed service can retry', async () => {
+  const succeeded = setup({ succeeded: true });
+  const completed = await releaseApprovedWeb({ sha, token: 'test', request: succeeded.request });
+  assert.ok(completed.workflows.every(w => w.status === 'already_succeeded'));
+  assert.equal(succeeded.calls.filter(c => c.path.endsWith('/dispatches')).length, 0);
+  const failed = setup();
+  const retried = await releaseApprovedWeb({ sha, token: 'test', request: failed.request });
+  assert.equal(retried.workflows.filter(w => w.status === 'dispatched').length, 4);
 });
 
 const workflowEnv = { GITHUB_REPOSITORY: 'elevate-for-humanity/Elevate-lms', GITHUB_REF: 'refs/heads/main', GITHUB_EVENT_NAME: 'workflow_dispatch', GITHUB_SHA: sha, GH_TOKEN: 'scoped-job-token', GOOGLE_RELEASE_HOLD: 'false' };

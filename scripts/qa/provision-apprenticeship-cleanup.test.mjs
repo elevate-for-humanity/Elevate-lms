@@ -25,3 +25,10 @@ test('cleanup propagates errors and verifies database and Auth teardown', () => 
   assert.match(cleanup, /QA Auth identity remains active/);
   assert.doesNotMatch(cleanup, /console\.error\(`soft-delete auth user/);
 });
+
+test('interrupted host-shop checkpoint recovers shared ID and verifies removal', () => {
+  assert.match(cleanup, /const recoveredHostShopId = hostShopId \|\| shopId/);
+  assert.match(cleanup, /QA cleanup host shop checkpoint disagrees/);
+  assert.match(cleanup, /QA cleanup rejected non-fixture host shop/);
+  assert.match(cleanup, /\['host_shops', recoveredHostShopId\]/);
+});

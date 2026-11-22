@@ -32,6 +32,7 @@ export default function TasksClient({
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [actionError, setActionError] = useState<string | null>(null);
 
   const fetchTasks = useCallback(async () => {
     setLoading(true);
@@ -52,17 +53,24 @@ export default function TasksClient({
   }, [conversationId]);
 
   async function approveTask(id: string) {
-    const task = tasks.find((candidate) => candidate.id === id);
-    if (task?.source === 'agentic_build' && task.project_id) {
-      await fetch('/api/admin/dev-studio/course-agent', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'resume-after-review', projectId: task.project_id }),
-      });
-    } else {
-      await fetch(`/api/admin/dev-studio/tasks/${id}/approve`, { method: 'POST' });
+    setActionError(null);
+    try {
+      const task = tasks.find((candidate) => candidate.id === id);
+      const response = task?.source === 'agentic_build' && task.project_id
+        ? await fetch('/api/admin/dev-studio/course-agent', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'resume-after-review', projectId: task.project_id }),
+        })
+        : await fetch(`/api/admin/dev-studio/tasks/${id}/approve`, { method: 'POST' });
+      if (!response.ok) {
+        const result = await response.json().catch(() => null);
+        throw new Error(typeof result?.error === 'string' ? result.error : 'Task approval could not be confirmed.');
+      }
+      await fetchTasks();
+    } catch (e: unknown) {
+      setActionError(e instanceof Error ? e.message : 'Task approval could not be confirmed.');
     }
-    fetchTasks();
   }
 
   async function cancelTask(id: string) {
@@ -138,6 +146,12 @@ export default function TasksClient({
         {error && (
           <div className="rounded-xl border border-red-200 bg-red-50 px-5 py-4 text-sm text-red-700 mb-6">
             {error}
+          </div>
+        )}
+
+        {actionError && (
+          <div role="alert" className="rounded-xl border border-amber-200 bg-amber-50 px-5 py-4 text-sm text-amber-800 mb-6">
+            {actionError}
           </div>
         )}
 

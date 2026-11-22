@@ -48,7 +48,7 @@ export default function OpenHandsRepairPanel(){
    {repair.blockerCode&&<p className="mt-1 break-all text-amber-200">Blocker: {repair.blockerCode}</p>}
    <p className="mt-1 text-gray-300">{repair.status.replaceAll('_',' ')}{repair.verifiedLive?' · production verified':' · production not yet verified'}</p>
    {repair.conversationId&&<p className="mt-1 break-all text-gray-300">Existing conversation: {repair.conversationId}</p>}
-   {repair.approvalRequired&&repair.approvalStatus==='pending'&&repair.conversationId&&
+   {repair.providerConfirmationRequired&&repair.conversationId&&
     <a className="mt-2 inline-flex min-h-11 items-center underline text-amber-200"
       href={`https://app.all-hands.dev/conversations/${encodeURIComponent(repair.conversationId)}`}
       target="_blank" rel="noopener noreferrer">Review pending action in original OpenHands conversation</a>}

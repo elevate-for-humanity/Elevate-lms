@@ -40,6 +40,15 @@ const publicHostCounties: Readonly<Record<string, string>> = {
   'west lafayette': 'Tippecanoe',
 };
 
+function publicHostCounty(city: string) {
+  const normalized = city.trim().toLowerCase();
+  if (Object.hasOwn(publicHostCounties, normalized)) return publicHostCounties[normalized];
+  const hub = HOST_SHOP_REGIONS.find(area =>
+    area.counties.length === 1 && area.city.toLowerCase() === normalized,
+  );
+  return hub?.counties[0] ?? '';
+}
+
 export default async function IndianaApprenticeships({
   searchParams,
 }: {
@@ -53,7 +62,9 @@ export default async function IndianaApprenticeships({
     : '';
   const search = typeof params.q === 'string' ? params.q.trim().slice(0, 80) : '';
   const availability = params.availability === 'inquiry' ? 'inquiry' : params.availability === 'hosts' ? 'hosts' : '';
-  const shops = (await getHostShopNetwork()).filter((shop) => /^(IN|Indiana)$/i.test(shop.state));
+  const shops = (await getHostShopNetwork())
+    .filter((shop) => /^(IN|Indiana)$/i.test(shop.state))
+    .map((shop) => ({ ...shop, county: publicHostCounty(shop.city) }));
   const counties = [...new Set([
     ...HOST_SHOP_REGIONS.flatMap((area) => area.counties),
     ...Object.values(publicHostCounties),
@@ -63,10 +74,12 @@ export default async function IndianaApprenticeships({
   const filterKey = new URLSearchParams({ q: search, county, region: requestedRegion, occupation, availability }).toString();
   const searchTerms = search.toLowerCase().split(/\s+/);
   if (searchTerms.length > 1 && searchTerms.at(-1) === 'county') searchTerms.pop();
-  const inquiries = new URLSearchParams({ apprenticeship: occupation || 'general', region: requestedRegion, community: county ? county + ' County' : search });
+  const inquiries = new URLSearchParams({ apprenticeship: occupation || 'general' });
+  if (requestedRegion) inquiries.set('region', requestedRegion);
+  if (county) inquiries.set('community', county + ' County');
   const results = shops.filter((shop) => {
     const city = shop.city.trim().toLowerCase();
-    const shopCounty = publicHostCounties[city] ?? '';
+    const shopCounty = shop.county;
     const inRegion = !region || region.counties.includes(shopCounty) ||
       [region.city, ...region.nearbyCities].some((name) => name.toLowerCase() === city);
     const searchable = [shop.name, shop.city, shopCounty].join(' ').toLowerCase();
@@ -115,26 +128,7 @@ export default async function IndianaApprenticeships({
         </div>
       </header>
       <div className="mx-auto grid max-w-6xl gap-8 px-4 py-12 lg:grid-cols-[20rem_1fr]">
-        <section aria-labelledby="region-map">
-          <h2 id="region-map" className="text-2xl font-black">Indiana regions</h2>
-          <p className="my-3 text-sm text-slate-600">Select a region on the schematic map or use the directory filters. Map labels show regional hubs.</p>
-          <div className="grid grid-cols-3 grid-rows-5 gap-1 rounded-2xl border border-slate-200 bg-slate-100 p-2">
-            {HOST_SHOP_REGIONS.map((area) => (
-              <button
-                key={area.slug}
-                type="submit"
-                form="indiana-directory-filters"
-                name="mapRegion"
-                value={area.slug}
-                aria-current={region === area ? 'true' : undefined}
-                className={`flex min-h-11 items-center justify-center rounded-lg border border-slate-300 p-1 text-center text-xs font-bold hover:bg-blue-100 aria-[current=true]:bg-blue-900 aria-[current=true]:text-white ${positions[area.slug]}`}
-              >
-                {area.city}
-              </button>
-            ))}
-          </div>
-        </section>
-        <section id="directory" aria-labelledby="directory-title">
+        <section id="directory" aria-labelledby="directory-title" className="lg:col-start-2 lg:row-start-1">
           <h2 id="directory-title" className="text-2xl font-black">Search the public directory</h2>
           <form id="indiana-directory-filters" key={filterKey} action={path + '#directory'} className="my-5 grid gap-4 rounded-2xl border border-slate-200 p-4 sm:grid-cols-2">
             <label className="grid gap-1 font-semibold">Shop, city or county
@@ -165,7 +159,7 @@ export default async function IndianaApprenticeships({
                 <option value="inquiry">Request placement information</option>
               </select>
             </label>
-            <button className="min-h-11 rounded-lg bg-slate-950 px-4 font-bold text-white">Search</button>
+            <button type="submit" className="min-h-11 rounded-lg bg-slate-950 px-4 font-bold text-white">Search</button>
             <button type="submit" form="clear-indiana-filters" className="min-h-11 text-left font-semibold underline">Clear filters</button>
           </form>
           <form id="clear-indiana-filters" action={path + '#directory'} />
@@ -176,7 +170,7 @@ export default async function IndianaApprenticeships({
                 <li key={shop.id} className="rounded-xl border border-slate-200 p-4">
                   <Link href={`/host-shops/${shop.slug}`} className="font-black underline">{shop.name}</Link>
                   <p className="text-sm text-slate-700">
-                    {shop.city}, Indiana{publicHostCounties[shop.city.trim().toLowerCase()] ? ` · ${publicHostCounties[shop.city.trim().toLowerCase()]} County` : ''}
+                    {shop.city}, Indiana{shop.county ? ` · ${shop.county} County` : ''}
                   </p>
                   <p className="mt-1 text-sm">{shop.programs.map((program) => PROGRAM_LABELS[program]).filter(Boolean).join(', ')}</p>
                 </li>
@@ -189,6 +183,25 @@ export default async function IndianaApprenticeships({
             <Link href={'/contact?' + inquiries + '#contact-form'} className="underline">Request information</Link>
             <Link href={becomeHost} className="underline">Become a Host Shop</Link>
             {region && matchingHosts > 0 && <Link href={`/partners/host-shops/indiana/${region.slug}`} className="underline">Visit the {region.city} regional guide</Link>}
+          </div>
+        </section>
+        <section aria-labelledby="region-map" className="lg:col-start-1 lg:row-start-1">
+          <h2 id="region-map" className="text-2xl font-black">Indiana regions</h2>
+          <p className="my-3 text-sm text-slate-600">Select a region on the schematic map or use the directory filters. Map labels show regional hubs.</p>
+          <div className="grid grid-cols-3 grid-rows-5 gap-1 rounded-2xl border border-slate-200 bg-slate-100 p-2">
+            {HOST_SHOP_REGIONS.map((area) => (
+              <button
+                key={area.slug}
+                type="submit"
+                form="indiana-directory-filters"
+                name="mapRegion"
+                value={area.slug}
+                aria-current={region === area ? 'true' : undefined}
+                className={`flex min-h-11 items-center justify-center rounded-lg border border-slate-300 p-1 text-center text-xs font-bold hover:bg-blue-100 aria-[current=true]:bg-blue-900 aria-[current=true]:text-white ${positions[area.slug]}`}
+              >
+                {area.city}
+              </button>
+            ))}
           </div>
         </section>
       </div>

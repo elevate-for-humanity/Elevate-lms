@@ -126,7 +126,16 @@ test('focused regression reports current tests separately from the attested depl
 
 test('the push dispatcher requires a healthy live version and a matching successful Admin deployment', async () => {
   const section = workflow.slice(workflow.indexOf('\n  request-employer-regression:'), workflow.indexOf('\n  hvac-public-playback:'));
-  assert.match(section, /if: github.event_name == 'push' && github.ref == 'refs\/heads\/main'/);
+  const trigger = section.match(/^    if: (.+)$/m)?.[1];
+  assert.ok(trigger, 'Employer regression must have a workflow-level eligibility condition');
+  assert.equal(evaluate(trigger, event('push')), true);
+  assert.equal(evaluate(trigger, event('pull_request')), false, 'PR events cannot authorize live checks');
+  assert.equal(evaluate(trigger, event('workflow_run', {name:'Deploy Admin',conclusion:'success',head_branch:'main'})), true);
+  for (const upstream of [
+    {name:'Deploy Admin',conclusion:'failure',head_branch:'main'},
+    {name:'Deploy Admin',conclusion:'success',head_branch:'feature'},
+    {name:'Deploy Google Marketing on trigger',conclusion:'success',head_branch:'main'},
+  ]) assert.equal(evaluate(trigger, event('workflow_run', upstream)), false);
   const script = section.split('          script: |\n')[1].split('\n').map(line=>line.startsWith('            ')?line.slice(12):line).join('\n');
   const execute = new (Object.getPrototypeOf(async function(){}).constructor)('github','context','fetch',script);
   const sha='a'.repeat(40);const calls=[];

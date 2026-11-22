@@ -32,6 +32,14 @@ test('every explicit course-image COPY input has an automatic source-change trig
   });
   assert.deepEqual(missing, [], 'copied runtime inputs must not be silently excluded from deployment triggers');
 });
+function releaseJobFixture({acceptance=true, deploy=true}={}) {
+  const names=['Deploy and verify Admin on Google', 'deploy',
+    'Deploy and verify Marketing on Google', 'Deploy and verify Store on Google'];
+  return [
+    ...names.map(name => ({name,status:'completed',conclusion:deploy?'success':'skipped'})),
+    {name:'acceptance',status:'completed',conclusion:acceptance?'success':'skipped'},
+  ];
+}
 function completionSetup({ current = sha, prior = [], serviceRuns = {}, deny = false } = {}) {
   const calls = [];
   const request = async (url, init) => {
@@ -42,8 +50,10 @@ function completionSetup({ current = sha, prior = [], serviceRuns = {}, deny = f
     if (path.endsWith('git/ref/heads/main')) return Response.json({ object: { sha: current } });
     if (path.endsWith('/runs')) {
       const workflow = path.split('/').at(-2);
-      return Response.json({ workflow_runs: workflow === 'release-approved-google-web.yml' ? prior : (serviceRuns[workflow] ?? []) });
+      const service = (serviceRuns[workflow] ?? []).map((r, index) => ({id: r.id ?? 100 + index, ...r}));
+      return Response.json({ workflow_runs: workflow === 'release-approved-google-web.yml' ? prior : service });
     }
+    if (path.endsWith('/jobs')) return Response.json({jobs: releaseJobFixture()});
     if (path.endsWith('/dispatches')) return new Response(null, { status: 204 });
     throw Error('Unexpected completion request');
   };
@@ -136,10 +146,11 @@ function setup({ green = true, current = sha, active = false, succeeded = false,
       const workflow = path.split('/').at(-2);
       const serviceConclusion = serviceConclusions[workflow];
       return Response.json({ workflow_runs: active
-        ? [{ head_sha: sha, status: 'in_progress' }]
-        : serviceConclusion ? [{ head_sha: sha, status: 'completed', conclusion: serviceConclusion }]
-        : succeeded ? [{ head_sha: sha, status: 'completed', conclusion: 'success' }] : [] });
+        ? [{ id: 401, head_sha: sha, status: 'in_progress' }]
+        : serviceConclusion ? [{ id: 402, head_sha: sha, status: 'completed', conclusion: serviceConclusion }]
+        : succeeded ? [{ id: 403, head_sha: sha, status: 'completed', conclusion: 'success' }] : [] });
     }
+    if (path.endsWith('/jobs')) return Response.json({jobs:releaseJobFixture()});
     if (path.endsWith('/dispatches')) return new Response(null, { status: 204 });
     throw Error('Unexpected request');
   };
@@ -248,4 +259,20 @@ test('web release workflow accepts trusted dispatched CI and checks latest exact
   assert.match(workflow, /await requireExactLmsCI\(process\.env, \{ attempts: 90, intervalMs: 10000 \}\)/);
   assert.doesNotMatch(workflow, /event=push&per_page/);
   assert.match(workflow, /if: steps\.ci\.outputs\.ready == 'true'/);
+});
+
+test('completed green validation-only workflows do not count as deployed and accepted', async () => {
+  const jobs = releaseJobFixture({acceptance:false,deploy:false});
+  const request = async (url, init) => {
+    const path = new URL(url).pathname;
+    if (path.endsWith('git/ref/heads/main')) return Response.json({object:{sha}});
+    if (path.endsWith('ci.yml/runs')) return Response.json({workflow_runs:[{...completedCI,id:1,status:'completed'}]});
+    if (path.endsWith('/jobs') && path.includes('/runs/1/')) return Response.json({jobs:[{name:'CI Required Gate',status:'completed',conclusion:'success'}]});
+    if (path.endsWith('/jobs')) return Response.json({jobs});
+    if (path.endsWith('/runs')) return Response.json({workflow_runs:[{id:403,head_sha:sha,status:'completed',conclusion:'success'}]});
+    if (path.endsWith('/dispatches')) return new Response(null,{status:204});
+    throw Error('unexpected release request');
+  };
+  const result=await releaseApprovedWeb({sha,token:'scoped-test',releaseHold:'false',request});
+  assert.deepEqual(result.workflows.map(x=>x.status),Array(4).fill('dispatched'));
 });

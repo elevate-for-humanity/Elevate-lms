@@ -68,20 +68,6 @@ REVOKE ALL ON public.shops, public.shop_staff FROM PUBLIC, anon, authenticated;
 GRANT SELECT ON public.shops, public.shop_staff TO authenticated;
 GRANT SELECT, INSERT, UPDATE, DELETE ON public.shops, public.shop_staff TO service_role;
 
-DROP POLICY IF EXISTS shop_staff_own_read ON public.shop_staff;
-CREATE POLICY shop_staff_own_read ON public.shop_staff FOR SELECT TO authenticated
-  USING (user_id = (SELECT auth.uid()) AND tenant_id = (SELECT rpc_private.get_current_tenant_id()));
-
-DROP POLICY IF EXISTS shops_partner_read ON public.shops;
-CREATE POLICY shops_partner_read ON public.shops FOR SELECT TO authenticated
-  USING (
-    tenant_id = (SELECT rpc_private.get_current_tenant_id())
-    AND EXISTS (
-      SELECT 1 FROM public.shop_staff AS staff
-      WHERE staff.shop_id = shops.id AND staff.user_id = (SELECT auth.uid()) AND staff.active
-    )
-  );
-
 DROP POLICY IF EXISTS shops_admin_all ON public.shops;
 CREATE POLICY shops_admin_all ON public.shops FOR ALL TO authenticated
   USING (
@@ -99,34 +85,11 @@ CREATE POLICY require_privileged_aal2 ON public.shop_staff AS RESTRICTIVE FOR AL
   USING ((SELECT security_private.privileged_session_mfa_satisfied()))
   WITH CHECK ((SELECT security_private.privileged_session_mfa_satisfied()));
 
-
 -- QA's legacy current-tenant helper returns partner_id for this identity.
 -- Match Host Shop reads on the actual staff and approved partner links.
 DROP POLICY IF EXISTS shop_staff_own_read ON public.shop_staff;
 CREATE POLICY shop_staff_own_read ON public.shop_staff FOR SELECT TO authenticated
   USING (user_id = (SELECT auth.uid()));
-
-DROP POLICY IF EXISTS shops_partner_read ON public.shops;
-CREATE POLICY shops_partner_read ON public.shops FOR SELECT TO authenticated
-  USING (
-    active
-    AND EXISTS (
-      SELECT 1 FROM public.shop_staff AS staff
-      WHERE staff.shop_id = shops.id AND staff.tenant_id = shops.tenant_id
-        AND staff.user_id = (SELECT auth.uid()) AND staff.active
-    )
-    AND EXISTS (
-      SELECT 1 FROM public.partner_users AS membership
-      JOIN public.partners AS partner ON partner.id = membership.partner_id
-      WHERE membership.partner_id = shops.partner_id
-        AND membership.user_id = (SELECT auth.uid())
-        AND membership.status = 'active'
-        AND membership.role IN ('owner', 'partner_admin', 'admin', 'supervisor', 'mentor', 'manager')
-        AND partner.status = 'active' AND partner.approval_status = 'approved'
-        AND partner.is_active IS DISTINCT FROM false
-    )
-  );
-
 
 -- The approved-partner check must not require exposing partner records.
 CREATE OR REPLACE FUNCTION rpc_private.qa_has_approved_shop_membership(target_partner uuid)
@@ -147,7 +110,8 @@ $$;
 REVOKE ALL ON FUNCTION rpc_private.qa_has_approved_shop_membership(uuid) FROM PUBLIC, anon;
 GRANT EXECUTE ON FUNCTION rpc_private.qa_has_approved_shop_membership(uuid) TO authenticated;
 
-ALTER POLICY shops_partner_read ON public.shops
+DROP POLICY IF EXISTS shops_partner_read ON public.shops;
+CREATE POLICY shops_partner_read ON public.shops FOR SELECT TO authenticated
   USING (
     active
     AND EXISTS (
@@ -157,7 +121,6 @@ ALTER POLICY shops_partner_read ON public.shops
     )
     AND rpc_private.qa_has_approved_shop_membership(partner_id)
   );
-
 
 -- QA-ONLY audit sink structural stage. No production audit rows or triggers copied.
 CREATE TABLE public."audit_failures" (

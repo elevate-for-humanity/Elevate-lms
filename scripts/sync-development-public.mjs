@@ -20,7 +20,7 @@ function mirror(source, target) {
     for (const name of readdirSync(source)) mirror(resolve(source, name), resolve(target, name));
   }
 }
-for (const directory of ['images', 'hero-images', 'fonts', 'videos', 'audio']) {
+for (const directory of ['images', 'hero-images', 'fonts', 'videos', 'audio', 'docs']) {
   const source = resolve(root, 'public', directory);
   if (existsSync(source)) mirror(source, resolve(destination, directory));
 }

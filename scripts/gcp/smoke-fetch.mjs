@@ -24,9 +24,9 @@ export async function fetchSmoke(url, options = {}, timeoutMs = 10000, responseT
         const response = await fetchImpl(url, {...options,signal:controller.signal});
         headersReceived = true;
         responseStatus = response.status;
-        // A response with failing headers must fail closed even if its body
-        // stalls. Never turn that first HTTP failure into a successful retry.
-        if (!response.ok) return {status:response.status,body:null};
+        // Preserve real application response bodies (including HTTP 503
+        // dependency diagnostics). If the body stalls, the timeout carries
+        // responseStatus and headersReceived, so no later retry may hide it.
         return {status:response.status,body:await response[responseType]()};
       })(),
       timeout,

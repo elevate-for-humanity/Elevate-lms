@@ -1,11 +1,13 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { Plus, ExternalLink, Pencil, Globe2, Upload, Sparkles, X } from 'lucide-react';
 import { PromptWebsiteCreator } from '@/components/website-builder/PromptWebsiteCreator';
 import { ParisWebsiteInterview } from '@/components/store/ParisWebsiteInterview';
 import { tenantPublicHost, tenantPublicSiteUrl } from '@/lib/tenant/public-site-url';
+import { WEBSITE_BUILDER_CREDIT_COSTS, WEBSITE_BUILDER_TRIAL } from '@/lib/apps/website-builder-credit-policy';
 
 type WebsiteRow = {
   id: string;
@@ -26,13 +28,20 @@ interface Props {
   subscription: SubscriptionRow;
   websites: WebsiteRow[];
   trialDaysRemaining: number;
+  trialCreditBalance: number | null;
 }
 
-export function WebsiteBuilderApp({ subscription, websites: initialWebsites, trialDaysRemaining }: Props) {
+const plansUrl = '/store/apps/website-builder#plans';
+
+export function WebsiteBuilderApp({ subscription, websites: initialWebsites, trialDaysRemaining, trialCreditBalance }: Props) {
   const [websites, setWebsites] = useState(initialWebsites);
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showInterview, setShowInterview] = useState(false);
+  const isTrial = subscription.status === 'trial';
+  const generationCost = WEBSITE_BUILDER_CREDIT_COSTS.initial_site_generation;
+  const cannotGenerate = isTrial && trialCreditBalance !== null && trialCreditBalance < generationCost;
+  const showUpgrade = isTrial && (cannotGenerate || trialDaysRemaining <= 3);
 
   const createWebsite = async () => {
     setCreating(true);
@@ -56,25 +65,35 @@ export function WebsiteBuilderApp({ subscription, websites: initialWebsites, tri
   return (
     <main className="bg-slate-50 px-4 py-10">
       <div className="mx-auto max-w-6xl">
-        <div className="flex flex-wrap items-start justify-between gap-4">
+        <section className="grid items-center gap-6 overflow-hidden rounded-3xl border border-slate-200 bg-white p-6 shadow-sm md:grid-cols-[1fr_0.9fr] sm:p-8">
           <div>
             <p className="text-sm font-bold uppercase tracking-widest text-brand-red-700">Elevate Apps</p>
             <h1 className="mt-1 text-3xl font-black text-slate-900">AI Website Builder</h1>
             <p className="mt-2 max-w-2xl text-slate-600">
               Choose to build a new website or bring an existing one. PARIS handles the design, and you can preview, request changes, and publish without writing code.
             </p>
+            <div className="mt-5 flex flex-wrap gap-2">
+              {cannotGenerate ? (
+                <Link href={plansUrl} className="inline-flex items-center gap-2 rounded-xl bg-brand-red-700 px-5 py-3 font-bold text-white hover:bg-brand-red-800">
+                  Compare paid plans
+                </Link>
+              ) : (
+                <button type="button" onClick={() => setShowInterview(true)} className="inline-flex items-center gap-2 rounded-xl bg-brand-red-700 px-5 py-3 font-bold text-white hover:bg-brand-red-800">
+                  <Sparkles className="h-5 w-5" /> Build with PARIS
+                </button>
+              )}
+              {websites.length > 0 ? (
+                <button type="button" onClick={createWebsite} disabled={creating} className="inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-white px-5 py-3 font-bold text-slate-800 hover:bg-slate-50 disabled:opacity-60">
+                  <Plus className="h-5 w-5" /> {creating ? 'Creating…' : 'Blank Website'}
+                </button>
+              ) : null}
+            </div>
           </div>
-          <div className="flex flex-wrap gap-2">
-            <button type="button" onClick={() => setShowInterview(true)} className="inline-flex items-center gap-2 rounded-xl bg-brand-red-600 px-5 py-3 font-bold text-white hover:bg-brand-red-700">
-              <Sparkles className="h-5 w-5" /> Build with PARIS
-            </button>
-            {websites.length > 0 ? (
-              <button type="button" onClick={createWebsite} disabled={creating} className="inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-white px-5 py-3 font-bold text-slate-800 hover:bg-slate-50 disabled:opacity-60">
-                <Plus className="h-5 w-5" /> {creating ? 'Creating…' : 'Blank Website'}
-              </button>
-            ) : null}
+          <div className="relative aspect-[4/3] overflow-hidden rounded-2xl bg-slate-100 md:aspect-[16/10]">
+            <Image src="/images/pages/platform-page-12.webp" alt="Preview of the Elevate Website Builder"
+              fill priority sizes="(max-width: 767px) 90vw, 520px" className="object-contain" />
           </div>
-        </div>
+        </section>
 
         <div className="mt-6 flex flex-wrap gap-3 text-sm">
           <span className="rounded-full bg-white px-4 py-2 font-semibold text-slate-700 shadow-sm ring-1 ring-slate-200">Plan: {subscription.plan || 'starter'}</span>
@@ -83,6 +102,21 @@ export function WebsiteBuilderApp({ subscription, websites: initialWebsites, tri
             <span className="rounded-full bg-amber-50 px-4 py-2 font-semibold text-amber-800 ring-1 ring-amber-200">{Math.max(0, trialDaysRemaining)} trial days remaining</span>
           )}
         </div>
+
+        {isTrial && (
+          <section className={`mt-5 flex flex-wrap items-center justify-between gap-4 rounded-2xl border p-5 ${showUpgrade ? 'border-amber-300 bg-amber-50' : 'border-slate-200 bg-white'}`}
+            aria-label="Website Builder trial credits">
+            <div>
+              <h2 className="font-black text-slate-950">{trialCreditBalance === null ? 'Trial balance temporarily unavailable' : `${trialCreditBalance} trial credits remaining`}</h2>
+              <p className="mt-1 text-sm text-slate-700">
+                {cannotGenerate
+                  ? `A new AI draft needs ${generationCost} credits. Choose a paid plan to keep building.`
+                  : `Your ${WEBSITE_BUILDER_TRIAL.days}-day trial includes ${WEBSITE_BUILDER_TRIAL.credits} credits. An AI draft uses ${generationCost}; a PARIS edit uses ${WEBSITE_BUILDER_CREDIT_COSTS.paris_edit}. Choose a plan to continue after the trial ends.`}
+              </p>
+            </div>
+            {!cannotGenerate && <Link href={plansUrl} className="rounded-xl bg-slate-950 px-4 py-2.5 text-sm font-bold text-white hover:bg-slate-800">Upgrade my plan</Link>}
+          </section>
+        )}
 
         {error && <div className="mt-6 rounded-xl border border-red-200 bg-red-50 p-4 text-sm font-semibold text-red-800">{error}</div>}
 
@@ -111,7 +145,7 @@ export function WebsiteBuilderApp({ subscription, websites: initialWebsites, tri
               <span className="mt-5 inline-flex font-black text-brand-red-700 group-hover:underline">Start import →</span>
             </Link>
 
-            <button type="button" onClick={() => setShowInterview(true)} className="group rounded-2xl border border-slate-200 bg-white p-6 text-left shadow-sm hover:border-brand-red-300 hover:shadow-md">
+            <button type="button" onClick={() => setShowInterview(true)} disabled={cannotGenerate} className="group rounded-2xl border border-slate-200 bg-white p-6 text-left shadow-sm hover:border-brand-red-300 hover:shadow-md disabled:cursor-not-allowed disabled:opacity-60">
               <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-brand-red-50 text-brand-red-700"><Sparkles className="h-5 w-5" /></div>
               <h2 className="mt-4 text-xl font-black text-slate-950">Build a new website</h2>
               <p className="mt-2 text-sm leading-6 text-slate-600">Describe your business and what you need. PARIS will guide the design and build without asking you to supply a repository, database, or hosting account.</p>
@@ -154,14 +188,23 @@ export function WebsiteBuilderApp({ subscription, websites: initialWebsites, tri
           <div className="rounded-2xl border border-brand-red-200 bg-brand-red-50 p-6">
             <div className="flex items-center gap-2 text-brand-red-700"><Sparkles className="h-5 w-5" /><h2 className="text-lg font-black">Build another site with PARIS</h2></div>
             <p className="mt-2 text-sm leading-6 text-slate-700">Describe another business, program, service, or campaign. PARIS creates a separate draft instead of overwriting an existing site.</p>
-            <button type="button" onClick={() => setShowInterview(true)} className="mt-4 inline-flex font-black text-brand-red-700 hover:underline">Create another website →</button>
+            <button type="button" onClick={() => setShowInterview(true)} disabled={cannotGenerate} className="mt-4 inline-flex font-black text-brand-red-700 hover:underline disabled:cursor-not-allowed disabled:opacity-60">Create another website →</button>
           </div>
           <div className="rounded-2xl border border-slate-200 bg-white p-6">
             <h2 className="text-lg font-black text-slate-900">Need more sites or advanced capacity?</h2>
             <p className="mt-2 text-sm text-slate-600">Compare Website Builder plans and organization-level platform options in the Store.</p>
-            <div className="mt-4 flex flex-wrap gap-3"><Link href="/store/apps/website-builder" className="font-bold text-brand-red-700 hover:underline">Website Builder plans</Link><Link href="/store/plans" className="font-bold text-brand-red-700 hover:underline">Platform plans</Link></div>
+            <div className="mt-4 flex flex-wrap gap-3"><Link href={plansUrl} className="font-bold text-brand-red-700 hover:underline">Compare Website Builder plans</Link><Link href="/store/plans" className="font-bold text-brand-red-700 hover:underline">Platform plans</Link></div>
           </div>
         </div>
+        <section className="mt-5 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-slate-200 bg-white p-6">
+          <div>
+            <h2 className="text-lg font-black text-slate-950">Need to create courses?</h2>
+            <p className="mt-2 text-sm text-slate-700">Course Builder is a separate paid app with its own generation credits.</p>
+          </div>
+          <Link href="/store/course-builder" className="rounded-xl border border-slate-300 px-4 py-2.5 text-sm font-bold text-slate-900 hover:bg-slate-50">
+            Explore Course Builder
+          </Link>
+        </section>
       </div>
     </main>
   );

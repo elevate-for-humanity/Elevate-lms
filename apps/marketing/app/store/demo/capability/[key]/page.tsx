@@ -3,6 +3,7 @@ import CapabilitySubscriptionDemo from '@/components/store/CapabilitySubscriptio
 import { CAPABILITY_CATALOG } from '@/lib/platform/capability-catalog';
 import { ADD_ON_MARKETPLACE, BASE_PLANS } from '@/lib/store/platform-pricing';
 import { INDIVIDUAL_APP_CATALOG } from '@/lib/apps/individual-app-plans';
+import { COURSE_BUILDER_APP_SLUG, COURSE_BUILDER_MONTHLY_ALLOWANCE } from '@/lib/course-builder/credits';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -25,6 +26,20 @@ function individualCatalogForKey(key: string) {
 }
 
 function subscriptionSnapshot(key: string) {
+  if (key === 'course_builder' || key === 'course_factory') {
+    const courseBuilder = ADD_ON_MARKETPLACE.find((item) => item.slug === COURSE_BUILDER_APP_SLUG);
+    if (courseBuilder) {
+      return {
+        priceLabel: `$${courseBuilder.priceMonthly}/month`,
+        details: [
+          `${COURSE_BUILDER_MONTHLY_ALLOWANCE.toLocaleString()} Course Builder credits per month`,
+          'Generation and media use Course Builder credits',
+        ],
+        actionHref: '/store/course-builder',
+      };
+    }
+  }
+
   const individual = individualCatalogForKey(key);
   if (individual) {
     return {
@@ -86,8 +101,9 @@ export default async function CapabilityDemoPage({ params }: { params: Promise<{
   const individual = individualCatalogForKey(key);
   if (individual) redirect(`/store/demo/apps/${individual.slug}`);
   const subscription = subscriptionSnapshot(String(capability.key));
+  const paidOnly = key === 'course_builder' || key === 'course_factory';
   const actionHref =
-    capability.storeHref ||
+    paidOnly ? subscription.actionHref : capability.storeHref ||
     capability.marketingHref ||
     capability.appHref ||
     subscription.actionHref;
@@ -102,7 +118,10 @@ export default async function CapabilityDemoPage({ params }: { params: Promise<{
         priceLabel={subscription.priceLabel}
         subscriptionDetails={subscription.details}
         actionHref={actionHref}
-        trialText="The 14-day trial gives limited access so customers can experience the workflow before paying. AI-heavy actions consume trial credits; paid capacity continues through the selected plan, add-on, or credit pack."
+        paidOnly={paidOnly}
+        trialText={paidOnly
+          ? 'Preview the Course Builder workflow here. Generating courses requires the separate paid Course Builder app and available credits.'
+          : 'The 14-day trial gives limited access so customers can experience the workflow before paying. AI-heavy actions consume trial credits; paid capacity continues through the selected plan, add-on, or credit pack.'}
       />
     </main>
   );

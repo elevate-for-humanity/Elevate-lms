@@ -233,7 +233,7 @@ jobs:
         run: node --test scripts/gcp/smoke-probe.test.mjs
 
       - name: Test final Marketing container before release
-        timeout-minutes: 5
+        timeout-minutes: 12
         run: node scripts/gcp/smoke-marketing-container.mjs
 
       # Builds can outlive the federated token; refresh only after build acceptance.

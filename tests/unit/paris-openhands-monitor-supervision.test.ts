@@ -8,19 +8,23 @@ vi.mock('@/lib/devstudio/paris-openhands-adapter',()=>({observeParisOpenHandsRep
  h.observations++;return h.mode==='ready'?{state:'ready',candidate:{provider:'openhands',branch:{name:'studio/assigned',sha:'b'.repeat(40)},base_sha:'a'.repeat(40)}}:{state:'pending',taskId:'same-task'};
 }}));
 vi.mock('@/lib/supabase/admin',()=>({requireAdminClient:async()=>({from:(table:string)=>{
- let values:any;const eqs:any[]=[];let statuses:any;
+ let values:any;const eqs:any[]=[];let statuses:any;let countOnly=false;let ranged=false;
  const result=()=>{
   if(values&&table==='paris_autopilot_policy'){h.heartbeats.push(values);return {data:null,error:null};}
   if(values){h.updates.push({values,eqs});return {data:h.lose?null:{id:h.repair.id},error:null};}
   if(table==='paris_autopilot_policy')return {data:{enabled:h.enabled,actor_id:'owner'},error:null};
   if(table==='profiles')return {data:{role:h.role},error:null};
-  if(table==='ultimate_build_jobs')return {data:eqs.some(([key])=>key==='id')?h.source:h.latest,error:null};
+  if(table==='ultimate_build_jobs'){
+   if(countOnly)return {data:null,count:0,error:null};
+   if(ranged)return {data:[],error:null};
+   return {data:eqs.some(([key])=>key==='id')?h.source:h.latest,error:null};
+  }
   if(table==='ultimate_course_builds')return {data:h.build,error:null};
-  if(table==='paris_code_repairs')return {data:statuses?[]:[h.repair],error:null};
+  if(table==='paris_code_repairs')return {data:statuses||eqs.some(([key,value])=>key==='status'&&value==='queued')?[]:[h.repair],error:null};
   throw Error('Unexpected table '+table);
  };
- const q:any={select:()=>q,eq:(key:string,value:any)=>{eqs.push([key,value]);return q;},
-  in:(_:string,value:any)=>{statuses=value;return q;},order:()=>q,limit:()=>q,update:(v:any)=>{values=v;return q;},
+ const q:any={select:(_:unknown,options?:any)=>{countOnly=options?.head===true;return q;},eq:(key:string,value:any)=>{eqs.push([key,value]);return q;},
+  in:(_:string,value:any)=>{statuses=value;return q;},order:()=>q,limit:()=>q,range:()=>{ranged=true;return q;},update:(v:any)=>{values=v;return q;},
   maybeSingle:async()=>result(),single:async()=>result(),then:(resolve:any,reject:any)=>Promise.resolve(result()).then(resolve,reject)};
  return q;
 }})}));
@@ -35,7 +39,7 @@ beforeEach(()=>{
   event:'workflow_dispatch',head_branch:'main',status:'completed',conclusion:'failure'}),{status:200})));
 });
 it('actual signed monitor records pending provider evidence without dispatching another execution',async()=>{
- expect(await tickParisCodeRepairs({workflowOwnedDispatch:true})).toMatchObject({dispatched:0,awaitingProvider:true});
+ expect(await tickParisCodeRepairs({workflowOwnedDispatch:true})).toMatchObject({dispatched:0,reason:'NO_ELIGIBLE_REPAIR_IN_SCANNED_QUEUE',queueScan:{scanned:0}});
  expect(h.observations).toBe(1);expect(h.updates).toHaveLength(1);
  expect(h.heartbeats).toEqual([{last_tick_at:expect.any(String)}]);
  expect(h.updates[0].values.verification.openhandsObservation.state).toBe('pending');
@@ -50,7 +54,7 @@ it.each(['failure','timed_out'])('signed monitor observes the same task after a 
    {name:'publish',status:'completed',conclusion:'skipped'}],
  }:{id:12,path:'.github/workflows/paris-code-repair.yml',event:'workflow_dispatch',
   head_branch:'main',status:'completed',conclusion}),{status:200})));
- expect(await tickParisCodeRepairs({workflowOwnedDispatch:true})).toMatchObject({dispatched:0,awaitingProvider:true});
+ expect(await tickParisCodeRepairs({workflowOwnedDispatch:true})).toMatchObject({dispatched:0,reason:'NO_ELIGIBLE_REPAIR_IN_SCANNED_QUEUE',queueScan:{scanned:0}});
  expect(h.observations).toBe(1);
  expect(h.updates[0].values.verification.openhandsObservation.taskId).toBe('same-task');
  expect(h.updates[0].values.attempt_count).toBeUndefined();
@@ -64,7 +68,7 @@ it('signed monitor preserves failed validation after a generic workflow failure'
    {name:'publish',status:'completed',conclusion:'skipped'}],
  }:{id:12,path:'.github/workflows/paris-code-repair.yml',event:'workflow_dispatch',
   head_branch:'main',status:'completed',conclusion:'failure'}),{status:200})));
- expect(await tickParisCodeRepairs({workflowOwnedDispatch:true})).toMatchObject({dispatched:0,reason:'ACCEPTED_OPENHANDS_OBSERVATION_RECORDED'});
+ expect(await tickParisCodeRepairs({workflowOwnedDispatch:true})).toMatchObject({dispatched:0,reason:'NO_ELIGIBLE_REPAIR_IN_SCANNED_QUEUE',queueScan:{scanned:0}});
  expect(h.observations).toBe(0);
  expect(h.updates[0].values.verification.openhandsObservation.reason).toBe('FAILED_PREPARE_EVIDENCE_REQUIRED');
  expect(h.updates[0].values.status).toBeUndefined();
@@ -106,7 +110,7 @@ it('a paused source build is retained without provider refresh or workflow dispa
  h.repair.source_job_id='source';
  h.source={id:'source',build_id:'build',job_type:'quality',status:'failed',last_error:'LEARNER_RUNTHROUGH_CHECK_FAILED',monitor:{enabled:true}};
  h.latest={id:'source',build_id:'build',status:'failed'};h.build={id:'build',status:'running',profile:{ownerPaused:true}};
- expect(await tickParisCodeRepairs({workflowOwnedDispatch:true})).toMatchObject({dispatched:0,reason:'ACCEPTED_OPENHANDS_OBSERVATION_RECORDED'});
+ expect(await tickParisCodeRepairs({workflowOwnedDispatch:true})).toMatchObject({dispatched:0,reason:'NO_ELIGIBLE_REPAIR_IN_SCANNED_QUEUE',queueScan:{scanned:0}});
  expect(h.observations).toBe(0);expect(h.updates[0].values.verification.openhandsObservation.state).toBe('source_ineligible');
 });
 
@@ -115,6 +119,6 @@ it('a superseding failed source job cannot admit the older repair',async()=>{
  h.source={id:'source',build_id:'build',job_type:'quality',status:'failed',last_error:'quality failed',monitor:{enabled:true}};
  h.latest={id:'newer-source',build_id:'build',status:'failed'};
  h.build={id:'build',status:'running',profile:{ownerPaused:false},findings:[{code:'QUALITY',message:'quality failure'}]};
- expect(await tickParisCodeRepairs({workflowOwnedDispatch:true})).toMatchObject({dispatched:0,reason:'ACCEPTED_OPENHANDS_OBSERVATION_RECORDED'});
+ expect(await tickParisCodeRepairs({workflowOwnedDispatch:true})).toMatchObject({dispatched:0,reason:'NO_ELIGIBLE_REPAIR_IN_SCANNED_QUEUE',queueScan:{scanned:0}});
  expect(h.observations).toBe(0);
 });

@@ -232,3 +232,16 @@ test('main auto-merge handles retarget edits and fails closed on stale PR detail
   assert.match(enable, /--json baseRefName,headRefOid,isDraft/);
   assert.match(enable, /--match-head-commit "\$PR_HEAD"/);
 });
+
+test('isolated QA cleanup deletes and verifies disposable career resumes before profiles', () => {
+  const source = readFileSync(new URL('./provision-learner-program-holder-e2e.mjs', import.meta.url), 'utf8');
+  assert.ok(source.includes("qaHostname !== 'isdgjcdabhxxozarmxta.supabase.co'"));
+  const cleanup = source.slice(source.indexOf('async function cleanup()'));
+  const remove = cleanup.indexOf("db.from('resumes').delete().eq('user_id', state.learner.id)");
+  const verify = cleanup.indexOf("db.from('resumes').select('id').eq('user_id', state.learner.id)");
+  const removeProfile = cleanup.indexOf("db.from('profiles').delete().eq('id', userId)");
+  assert.ok(remove > 0 && verify > remove && removeProfile > verify,
+    'QA resumes must be deleted and read back before disposable profile cleanup');
+  assert.ok(cleanup.includes('if (remainingResumes?.length) {'));
+  assert.ok(cleanup.includes("throw new Error('QA learner resume cleanup left disposable learner rows')"));
+});

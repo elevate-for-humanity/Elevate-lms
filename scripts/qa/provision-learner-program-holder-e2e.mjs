@@ -150,6 +150,17 @@ async function cleanup() {
       const { error } = await db.from(table).delete().eq('user_id', state.learner.id);
       if (error) throw new Error('QA playback cleanup failed for ' + table + ': ' + error.message);
     }
+    // Isolated QA's resumes table has no profile cascade on soft auth deletion.
+    // Remove only this run's disposable learner rows before profile removal.
+    await must(db.from('resumes').delete().eq('user_id', state.learner.id),
+      'remove isolated QA learner resumes');
+    const remainingResumes = await must(
+      db.from('resumes').select('id').eq('user_id', state.learner.id).limit(1),
+      'verify isolated QA learner resume cleanup',
+    );
+    if (remainingResumes?.length) {
+      throw new Error('QA learner resume cleanup left disposable learner rows');
+    }
   }
   if (state.hvacEnrollmentId) {
     const { data, error } = await db.from('program_enrollments').delete()

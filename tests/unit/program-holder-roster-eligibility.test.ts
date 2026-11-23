@@ -47,6 +47,13 @@ describe('Program Holder learner roster boundary', () => {
   ])('excludes explicit test identities from the live roster: %s', (email) => {
     expect(isLearnerRosterProfile({ id: 'test-id', role: 'student', email })).toBe(false);
   });
+  it('rejects other reserved .invalid identities even when the QA fixture switch is on', () => {
+    for (const email of ['person@other.invalid', 'student@example.invalid', 'qa-portal-e2e-45102978350-holder-active-student@attacker.invalid']) {
+      const fixture = { id: 'qa-test-id', role: 'student', email };
+      expect(isLearnerRosterProfile(fixture)).toBe(false);
+      expect(isLearnerRosterProfile(fixture, { includeIsolatedQaFixtures: true })).toBe(false);
+    }
+  });
   it('keeps real learners whose names or email local parts contain test', () => {
     expect(
       isLearnerRosterProfile({ id: 'real-id', role: 'student', email: 'testa@gmail.com' }),

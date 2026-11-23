@@ -140,6 +140,21 @@ jobs:
             echo "STUDIO_BROWSER_PUBLIC_URL=$studio_origin"
             echo "STUDIO_BROWSER_SECRET=$studio_secret"
           } >> "$GITHUB_ENV"
+      - name: Start bounded CI process and cgroup memory sampler
+        run: |
+          node scripts/qa/monitor-e2e-memory.mjs > "$RUNNER_TEMP/e2e-runtime-memory.jsonl" 2> "$RUNNER_TEMP/e2e-runtime-memory.err" &
+          echo "E2E_MEMORY_MONITOR_PID=$!" >> "$GITHUB_ENV"
+      - name: Verify memory sampler reports cgroup and process evidence
+        run: |
+          sleep 2
+          test -s "$RUNNER_TEMP/e2e-runtime-memory.jsonl"
+          node --input-type=module -e '
+            import {readFileSync} from "node:fs";
+            const samples=readFileSync(process.env.RUNNER_TEMP+"/e2e-runtime-memory.jsonl","utf8").trim().split("\\n");
+            const item=JSON.parse(samples[0]);
+            if (!item.at || !Array.isArray(item.processes) || !item.cgroup) process.exit(1);
+            console.log("[e2e-memory] initial read-only sample valid");
+          '
       - name: Verify published marketing artwork through Next image loader
         run: node --test scripts/marketing-image-config.test.mjs
       - name: Verify Course Builder chat controls in short and landscape panels
@@ -200,6 +215,21 @@ jobs:
       - name: Clean up disposable Employer, Instructor, Staff, Case Manager and Admin QA identities
         if: always()
         run: node scripts/qa/provision-remaining-portal-e2e.mjs cleanup
+      - name: Stop memory sampler without changing browser verdict
+        if: always()
+        run: |
+          if [[ -n "${E2E_MEMORY_MONITOR_PID:-}" ]]; then
+            kill "$E2E_MEMORY_MONITOR_PID" 2>/dev/null || true
+          fi
+      - name: Upload bounded runtime memory evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: e2e-runtime-memory-shard-${{ matrix.shard }}
+          path: |
+            ${{ runner.temp }}/e2e-runtime-memory.jsonl
+            ${{ runner.temp }}/e2e-runtime-memory.err
+          if-no-files-found: warn
       - name: Upload Playwright report
         if: always()
         uses: actions/upload-artifact@v7

@@ -100,7 +100,7 @@ export default async function WebsiteBuilderStorePage({ searchParams }: { search
             </div>
           </div>
           <div className="relative min-h-[300px] overflow-hidden rounded-3xl border border-white bg-white shadow-2xl shadow-cyan-900/10 ring-1 ring-slate-200 sm:min-h-[380px]">
-            <Image src="/images/pages/platform-page-12.webp" alt="Elevate AI Website Builder workspace" fill priority sizes="(max-width: 1024px) 100vw, 52vw" className="object-contain p-2" />
+            <Image src="/images/pages/store-trial-detail.jpg" alt="Developer building a website at a desktop workspace" fill priority sizes="(max-width: 1024px) 100vw, 52vw" className="object-contain p-2" />
             <div className="absolute inset-x-0 bottom-0 border-t border-slate-200 bg-white/95 p-4 backdrop-blur"><p className="text-sm font-bold text-slate-800">Interview → first draft → talk or type changes → preview → publish → upgrade.</p></div>
           </div>
         </div>

@@ -57,10 +57,43 @@ export async function verifyCourseAccess(courseId: string): Promise<CourseAccess
       .limit(1)
       .maybeSingle();
     if (directError || !direct) {
-      return {
-        hasAccess: false,
-        reason: 'not_enrolled',
-      };
+      // Program-linked enrollment: an active program_enrollments row whose
+      // program_id is linked to this course in program_courses, even when
+      // course_id is null on the row. Resolve that row and let the
+      // approved-paid check below govern it.
+      const { data: programRows } = await supabase
+        .from('program_enrollments')
+        .select('*')
+        .eq('user_id', user.id)
+        .is('revoked_at', null)
+        .in('status', ['active', 'enrolled', 'in_progress', 'confirmed', 'completed'])
+        .not('program_id', 'is', null);
+      const programIds = [...new Set((programRows ?? []).map((row) => row.program_id).filter(Boolean))];
+      if (programIds.length) {
+        const { data: link } = await supabase
+          .from('program_courses')
+          .select('program_id')
+          .in('program_id', programIds)
+          .eq('course_id', courseId)
+          .limit(1)
+          .maybeSingle();
+        const linked = link
+          ? (programRows ?? []).find((row) => row.program_id === link.program_id)
+          : undefined;
+        if (linked) {
+          enrollment = linked;
+        } else {
+          return {
+            hasAccess: false,
+            reason: 'not_enrolled',
+          };
+        }
+      } else {
+        return {
+          hasAccess: false,
+          reason: 'not_enrolled',
+        };
+      }
     }
     if (direct.end_date && new Date(direct.end_date) < new Date()) {
       return { hasAccess: false, enrollment: direct, reason: 'expired' };

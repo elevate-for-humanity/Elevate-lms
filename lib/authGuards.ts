@@ -275,6 +275,30 @@ export async function canAccessCourse(courseId: string): Promise<boolean> {
     .maybeSingle();
   if (directEnrollment) return true;
 
+  // Program-linked enrollment: enrolled in a program whose program_courses
+  // link includes this course, even when course_id is null on the program
+  // row (e.g. enrolled at program level before grant-access resolves the
+  // course). loadLearnerCourseIds resolves enrollments the same way, so a
+  // course listed there must be openable here.
+  const { data: programRows } = await supabase
+    .from('program_enrollments')
+    .select('program_id')
+    .eq('user_id', user.id)
+    .is('revoked_at', null)
+    .in('status', ['active', 'enrolled', 'in_progress', 'confirmed', 'completed'])
+    .not('program_id', 'is', null);
+  const programIds = [...new Set((programRows ?? []).map((row) => row.program_id).filter(Boolean))];
+  if (programIds.length) {
+    const { data: link } = await supabase
+      .from('program_courses')
+      .select('course_id')
+      .in('program_id', programIds)
+      .eq('course_id', courseId)
+      .limit(1)
+      .maybeSingle();
+    if (link) return true;
+  }
+
   if (!hasAnyRole(effectiveRoles, ['instructor'], { adminOverride: false })) return false;
   return isAssignedCourseInstructor(supabase, user.id, courseId);
 }

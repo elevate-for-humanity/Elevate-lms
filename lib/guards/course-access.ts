@@ -25,7 +25,7 @@ export async function verifyCourseAccess(courseId: string): Promise<CourseAccess
   }
 
   // Check enrollment
-  const { data: enrollment, error: enrollError } = await supabase
+  const { data: enrollmentRow, error: enrollError } = await supabase
     .from('program_enrollments')
     .select(
       `
@@ -37,11 +37,35 @@ export async function verifyCourseAccess(courseId: string): Promise<CourseAccess
     .eq('course_id', courseId)
     .maybeSingle();
 
+  let enrollment = enrollmentRow;
   if (enrollError || !enrollment) {
-    return {
-      hasAccess: false,
-      reason: 'not_enrolled',
-    };
+    // Direct course enrollments are a canonical enrollment source too:
+    // loadLearnerCourseIds lists them, and verified paid store fulfillment
+    // (lib/store/fulfill-hvac-course.ts) creates ONLY a course_enrollments
+    // row. Previously this boundary consulted program_enrollments alone,
+    // so a directly-enrolled learner was reported as not enrolled and
+    // bounced to the enroll page. Direct rows exist only from verified
+    // paid fulfillment or the active-program sync trigger, and revoked
+    // rows are excluded, so no payment check is bypassed here.
+    const { data: direct, error: directError } = await supabase
+      .from('course_enrollments')
+      .select('id, status, revoked_at, end_date')
+      .eq('student_id', user.id)
+      .eq('course_id', courseId)
+      .is('revoked_at', null)
+      .in('status', ['active', 'enrolled', 'in_progress', 'confirmed', 'completed'])
+      .limit(1)
+      .maybeSingle();
+    if (directError || !direct) {
+      return {
+        hasAccess: false,
+        reason: 'not_enrolled',
+      };
+    }
+    if (direct.end_date && new Date(direct.end_date) < new Date()) {
+      return { hasAccess: false, enrollment: direct, reason: 'expired' };
+    }
+    return { hasAccess: true, enrollment: direct };
   }
 
   // Enforce program-level approval and verified payment at the content

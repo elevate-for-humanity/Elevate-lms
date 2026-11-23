@@ -258,6 +258,23 @@ export async function canAccessCourse(courseId: string): Promise<boolean> {
     .maybeSingle();
   if (enrollment) return true;
 
+  // Direct course enrollments are a canonical enrollment source too:
+  // loadLearnerCourseIds lists them, and verified paid store fulfillment
+  // (lib/store/fulfill-hvac-course.ts) creates ONLY a course_enrollments
+  // row. Previously this gate consulted program_enrollments alone, so a
+  // directly-enrolled learner was told they were not enrolled and could
+  // not click into their course. Revoked rows never grant access.
+  const { data: directEnrollment } = await supabase
+    .from('course_enrollments')
+    .select('id')
+    .eq('student_id', user.id)
+    .eq('course_id', courseId)
+    .is('revoked_at', null)
+    .in('status', ['active', 'enrolled', 'in_progress', 'confirmed', 'completed'])
+    .limit(1)
+    .maybeSingle();
+  if (directEnrollment) return true;
+
   if (!hasAnyRole(effectiveRoles, ['instructor'], { adminOverride: false })) return false;
   return isAssignedCourseInstructor(supabase, user.id, courseId);
 }

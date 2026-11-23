@@ -263,7 +263,7 @@ export const STORE_FEATURE_PROOFS: Partial<Record<PlatformFeatureKey, StoreFeatu
     access: 'public-product',
     sourcePaths: ['apps/admin/app/studio/courses/page.tsx', 'lib/course-builder/orchestrator.ts'],
     limitation:
-      'Course creation runs through a scoped, authenticated workspace. Generated drafts require review before publication.',
+      'Course creation is restricted to authorized staff in the scoped, authenticated Admin workspace. Paid organization delivery does not grant Course Builder access. Generated drafts require review before publication.',
   },
   [PlatformFeature.COURSE_FACTORY]: {
     title: 'AI Course Factory',

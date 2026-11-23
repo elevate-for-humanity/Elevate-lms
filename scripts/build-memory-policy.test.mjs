@@ -56,6 +56,12 @@ test('smaller explicit heaps are retained and large hosts stay bounded', () => {
   assert.throws(() => boundedBuildEnvironment({}, 2 * GiB), /at least 4 GiB/);
 });
 
+test('ephemeral bounded builders disable filesystem cache while preserving explicit opt-in', () => {
+  assert.equal(boundedBuildEnvironment({}, 8 * GiB).env.DISABLE_WEBPACK_FILESYSTEM_CACHE, '1');
+  assert.equal(boundedBuildEnvironment({ DISABLE_WEBPACK_FILESYSTEM_CACHE: '0' }, 8 * GiB).env.DISABLE_WEBPACK_FILESYSTEM_CACHE, '0');
+  assert.equal(boundedBuildEnvironment({ DISABLE_WEBPACK_FILESYSTEM_CACHE: '1' }, 8 * GiB).env.DISABLE_WEBPACK_FILESYSTEM_CACHE, '1');
+});
+
 test('new app defaults preserve features but reject expanded build concurrency', () => {
   delete process.env.ELEVATE_SEQUENTIAL_TYPECHECK;
   const config = withBuildMemoryDefaults({ experimental: { cpus: 8, optimizeCss: false }, typescript: { ignoreBuildErrors: true } });

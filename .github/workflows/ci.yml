@@ -123,7 +123,7 @@ jobs:
           tests/unit/portal-preview-subject.test.ts
       - name: Required CI completion policy
         if: ${{ !cancelled() && steps.dependencies.outcome == 'success' }}
-        run: node --test scripts/test-ci-required-gate.mjs tests/ci-required-gate-cancellation.node.test.mjs scripts/ci/require-exact-pr-browser-evidence.test.mjs scripts/test-github-branch-policy.mjs tests/unit/branch-protection-policy-audit.test.mjs lib/phone/microphone.test.mjs scripts/audits/ci-independent-steps.test.mjs scripts/audits/github-actions-history-audit.test.mjs scripts/audits/cron-schedule-routing.test.mjs
+        run: node --test scripts/test-ci-required-gate.mjs tests/ci-required-gate-cancellation.node.test.mjs scripts/ci/require-exact-pr-browser-evidence.test.mjs scripts/ci/resume-browser-gate.test.mjs scripts/test-github-branch-policy.mjs tests/unit/branch-protection-policy-audit.test.mjs lib/phone/microphone.test.mjs scripts/audits/ci-independent-steps.test.mjs scripts/audits/github-actions-history-audit.test.mjs scripts/audits/cron-schedule-routing.test.mjs
       - name: Studio GitHub credential fallback regression tests
         if: ${{ !cancelled() && steps.dependencies.outcome == 'success' }}
         run: node --test scripts/test-devstudio-github-token.mjs scripts/test-github-app-token.mjs scripts/gcp/paris-github-app-binding.test.mjs scripts/gcp/github-runtime-binding.test.mjs scripts/test-github-authorization-contract.mjs scripts/test-paris-release-wakeup.mjs scripts/test-paris-planner-identity.mjs scripts/test-paris-workflow-target.mjs scripts/test-paris-app-diagnostic.mjs scripts/test-paris-rejected-read-recovery.mjs scripts/test-paris-completion-audit.mjs scripts/test-studio-health-app-access.mjs scripts/test-paris-tool-outcomes.mjs tests/worker/course-workspace-controls.test.mjs
@@ -137,7 +137,7 @@ jobs:
         if: ${{ !cancelled() && steps.dependencies.outcome == 'success' }}
         run: |
           node scripts/check-build-memory-policy.mjs
-          node --test scripts/build-memory-policy.test.mjs scripts/build-next-app.test.mjs scripts/run-bounded-build.test.mjs scripts/gcp/check-database-recovery.test.mjs scripts/gcp/studio-build-boundary.test.mjs scripts/gcp/homepage-content.test.mjs scripts/gcp/store-build-capacity.test.mjs
+          node --test scripts/build-memory-policy.test.mjs scripts/build-next-app.test.mjs scripts/typecheck-next-app.test.mjs scripts/run-bounded-build.test.mjs scripts/gcp/check-database-recovery.test.mjs scripts/gcp/studio-build-boundary.test.mjs scripts/gcp/homepage-content.test.mjs scripts/gcp/store-build-capacity.test.mjs
       - name: Admin runtime composition packaging regression
         if: ${{ !cancelled() && steps.dependencies.outcome == 'success' }}
         run: node --test scripts/test-admin-remotion-packaging.mjs
@@ -312,15 +312,8 @@ jobs:
           cache-dependency-path: pnpm-lock.yaml
       - name: Install dependencies
         run: node scripts/run-bounded-build.mjs -- pnpm install --frozen-lockfile --strict-peer-dependencies=false
-      - name: Restore incremental TypeScript cache
-        uses: actions/cache@v6
-        with:
-          path: |
-            apps/${{ matrix.app }}/.next/cache/tsbuildinfo.json
-            apps/${{ matrix.app }}/tsconfig.tsbuildinfo
-          key: types-${{ runner.os }}-${{ matrix.app }}-${{ hashFiles('pnpm-lock.yaml', 'tsconfig.json', 'apps/*/tsconfig.json') }}-${{ github.sha }}
-          restore-keys: |
-            types-${{ runner.os }}-${{ matrix.app }}-${{ hashFiles('pnpm-lock.yaml', 'tsconfig.json', 'apps/*/tsconfig.json') }}-
+      # Compiler groups validate cold and do not consume monolithic build-info.
+      # Avoid restoring/uploading a cache that cannot accelerate this check.
       - name: Run typecheck
         run: pnpm run typecheck:${{ matrix.app }}
 
@@ -457,9 +450,9 @@ jobs:
     name: CI Required Gate
     runs-on: ubuntu-24.04
     needs: [preflight, typecheck, lint, enrollment-database, website-database, diagnostics]
-    # The protected branch requires this exact check. Keep it pending until
-    # independent exact-head browser acceptance actually completes.
-    timeout-minutes: 150
+    # The protected branch requires this exact check. Incomplete browser
+    # evidence fails closed; the completion finalizer retries this receipt.
+    timeout-minutes: 5
     permissions:
       actions: read
       contents: read

@@ -34,7 +34,7 @@ export function inspectExactPrBrowserEvidence({ runs, jobs, sourceRepository, he
 
 export async function verifyExactPrBrowserEvidence({
   repository, event, token, request = fetch, sleep = ms => new Promise(resolve => setTimeout(resolve, ms)),
-  timeoutMs = 135 * 60_000, pollMs = 20_000,
+  timeoutMs = 0, pollMs = 20_000,
 }) {
   if (!event?.pull_request || !SHA.test(event.pull_request.head?.sha || '') ||
       !event.pull_request.head?.ref || !event.pull_request.head?.repo?.full_name ||
@@ -99,7 +99,7 @@ export async function verifyExactPrBrowserEvidence({
     if (Date.now() + pollMs >= deadline) break;
     await sleep(pollMs);
   } while (Date.now() < deadline);
-  throw Error('E2E_EXACT_HEAD_TIMEOUT');
+  throw Error(timeoutMs === 0 ? 'E2E_EXACT_HEAD_PENDING' : 'E2E_EXACT_HEAD_TIMEOUT');
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
@@ -111,7 +111,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
       event,
       token: process.env.GITHUB_TOKEN,
     });
-    console.log('Required exact-head browser acceptance verified:', JSON.stringify(evidence));
+    console.info('Required exact-head browser acceptance verified:', JSON.stringify(evidence));
   } catch (error) {
     console.error(error?.message || 'E2E_REQUIRED_EVIDENCE_FAILED');
     process.exitCode = 1;

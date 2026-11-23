@@ -52,15 +52,46 @@ export function buildSceneAssignments(scenes: any[], assets: any[], configured: 
       (Boolean(a.storage_path) || Boolean(a.license_evidence_url));
     return Boolean(a.license_evidence_url) || approvedCourseSource;
   });
-  // Separate records do not establish separate shots. Prefer verified bytes,
-  // then the stored object, then the file URL without its expiring signature.
-  // Truly distinct attached segments retain their own object paths/hashes.
+  // Multiple rows and transcodes of one licensed item are not new scenes.
+  // Only independently hashed, inspected, NON-OVERLAPPING source excerpts can
+  // count as distinct uses of one parent item. A label, URL or crop flag alone
+  // is not sufficient; unverified excerpts keep the conservative item identity.
+  const verifiedExcerpt = (asset: any) => {
+    const observation = asset.visual_observation;
+    const start = observation?.excerptStartSeconds;
+    const end = observation?.excerptEndSeconds;
+    const parentHash = observation?.sourceContentSha256;
+    const digest = asset.content_sha256;
+    if (observation?.method !== 'sampled-frame-inspection' ||
+      observation.contentSha256 !== digest ||
+      !/^[a-f0-9]{64}$/i.test(String(digest ?? '')) ||
+      !/^[a-f0-9]{64}$/i.test(String(parentHash ?? '')) ||
+      !Number.isFinite(Date.parse(String(observation.reviewedAt ?? ''))) ||
+      !Number.isFinite(start) || !Number.isFinite(end) ||
+      start < 0 || end <= start || parentHash === digest) return null;
+    return { start, end, parentHash };
+  };
   const parents = candidates.map((_, index) => index);
   const root = (index: number): number => parents[index] === index ? index : (parents[index] = root(parents[index]));
   const keys = new Map<string, number>();
+  const byProviderItem = new Map<string, number[]>();
   candidates.forEach((asset, index) => {
-    for (const key of [asset.provider_item_id && `item:${asset.provider_item_id}`,
-      asset.content_sha256 && `hash:${asset.content_sha256}`, asset.storage_path && `object:${asset.storage_path}`,
+    const item = String(asset.provider_item_id ?? '').trim();
+    if (item) {
+      const peers = byProviderItem.get(item) ?? [];
+      const currentExcerpt = verifiedExcerpt(asset);
+      for (const other of peers) {
+        const otherExcerpt = verifiedExcerpt(candidates[other]);
+        const demonstrablyDistinct = currentExcerpt && otherExcerpt &&
+          currentExcerpt.parentHash === otherExcerpt.parentHash &&
+          (currentExcerpt.end <= otherExcerpt.start || otherExcerpt.end <= currentExcerpt.start);
+        if (!demonstrablyDistinct) parents[root(index)] = root(other);
+      }
+      peers.push(index);
+      byProviderItem.set(item, peers);
+    }
+    for (const key of [asset.content_sha256 && `hash:${asset.content_sha256}`,
+      asset.storage_path && `object:${asset.storage_path}`,
       `url:${String(asset.public_url).split(/[?#]/)[0]}`].filter(Boolean) as string[]) {
       const existing = keys.get(key);
       if (existing !== undefined) parents[root(index)] = root(existing);

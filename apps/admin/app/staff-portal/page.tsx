@@ -3,6 +3,8 @@ import { blurDataURL } from '@/lib/ui/blur-placeholder';
 import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
 import { requireStaffPortalAccess } from '@/lib/staff-portal/access';
+import { COMMUNICATION_MEMBER_ROLES } from '@/lib/phone/access';
+import { ADMIN_WORKSPACE_PWAS } from '@/lib/pwa/registry';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
@@ -33,7 +35,10 @@ export const metadata: Metadata = {
 const MARKETING_URL = process.env.NEXT_PUBLIC_SITE_URL ?? PLATFORM_DEFAULTS.siteUrl;
 
 export default async function StaffPortalLanding() {
-  const { user } = await requireStaffPortalAccess();
+  const { user, effectiveRoles } = await requireStaffPortalAccess();
+  const hasEmailAccess = effectiveRoles.some((role) =>
+    role === 'super_admin' || COMMUNICATION_MEMBER_ROLES.some((allowed) => role === allowed),
+  );
   const supabase = await createClient();
 
   let payrollDone = false;
@@ -163,6 +168,20 @@ export default async function StaffPortalLanding() {
             </Link>
           ))}
         </div>
+
+        {hasEmailAccess && (
+          <section className="mb-8 flex flex-wrap items-center justify-between gap-4 rounded-xl border bg-white p-4">
+            <h2 className="font-bold text-slate-900">Email</h2>
+            <div className="flex flex-wrap gap-2">
+              <Link href={ADMIN_WORKSPACE_PWAS.email.openPath} className="rounded-xl bg-brand-blue-600 px-4 py-3 text-sm font-bold text-white">
+                Open inbox
+              </Link>
+              <Link href={ADMIN_WORKSPACE_PWAS.email.installPath} className="rounded-xl border px-4 py-3 text-sm font-bold">
+                Install Email
+              </Link>
+            </div>
+          </section>
+        )}
 
         {!user && (
           <div className="rounded-xl border bg-white p-8 text-center">

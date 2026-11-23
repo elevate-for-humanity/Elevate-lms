@@ -10,7 +10,7 @@ export async function GET(
   const { id } = await params;
   let context;
   try {
-    context = await requireCurrentHostShopPartner();
+    context = await requireCurrentHostShopPartner({ allowPendingOnboarding: true });
   } catch (error) {
     const code = error instanceof Error ? error.message : '';
     if (code === 'HOST_SHOP_UNAUTHENTICATED') {

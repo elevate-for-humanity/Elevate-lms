@@ -104,7 +104,10 @@ describe('canonical admissions recovery', () => {
     db.rows.apprentice_document_types = [];
     await processApplicationSubmitted(db.asClient(), payload);
     await processApplicationSubmitted(db.asClient(), payload);
-    expect(db.rows.apprentice_document_types).toHaveLength(11);
+    expect(db.rows.apprentice_document_types.map((row) => row.document_type)).toEqual([
+      'government_id', 'ssn_card', 'hs_diploma_or_ged',
+      'income_verification', 'proof_of_residency',
+    ]);
     expect(db.writes.filter(write => write.table === 'apprentice_document_types')).toHaveLength(1);
   });
 

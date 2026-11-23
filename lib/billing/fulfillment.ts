@@ -1,3 +1,4 @@
+import { fulfillCleaningPayment } from '@/lib/cleaning/fulfillment';
 import { fulfillHvacCourseBundle } from '@/lib/store/fulfill-hvac-course';
 import 'server-only';
 import { queueApprenticeshipWelcome, queuePaidProgramWelcome } from '@/lib/enrollment/apprenticeship-welcome';
@@ -29,6 +30,10 @@ export async function fulfillPaidBillingInvoice(
   },
 ) {
   const payload = job.payload || {};
+  if (job.fulfillment_type === 'cleaning_membership' || job.fulfillment_type === 'cleaning_job') {
+    await fulfillCleaningPayment(db, job.fulfillment_type, job.billing_invoice_id);
+    return;
+  }
   if (job.fulfillment_type === 'tuition_payment') {
     const payment = await db.from('payment_logs').upsert(
       {

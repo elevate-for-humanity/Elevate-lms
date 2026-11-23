@@ -12,7 +12,7 @@ const reviews = [{ user: { login: 'independent-reviewer', type: 'User' }, state:
   commit_id: HEAD, submitted_at: '2026-11-14T01:00:00Z' }];
 const checks = [{ name: 'CI Required Gate', status: 'completed', conclusion: 'success' }];
 const evaluate = options => evaluateProtectedPullRequest({
-  reviewerPermissions: { 'independent-reviewer': 'write' }, ...options,
+  reviewerPermissions: { 'independent-reviewer': 'write' }, requiredApprovalCount: 1, ...options,
 });
 
 test('protected GitHub acceptance requires merge ancestry, current-head checks and independent review', () => {
@@ -278,4 +278,22 @@ test('explicit zero-review protected PR policy is accepted without inventing rev
   }
   const stricter = [{ type: 'pull_request', parameters: { required_approving_review_count: 2 } }];
   assert.equal(requiredMainReviewCount({ classic, rules: stricter }), 2);
+});
+
+test('policy proof required: omitted review count must fail closed rather than inventing one', () => {
+  const args = { pr, reviews: [], checks, requiredChecks: ['CI Required Gate'],
+    ancestryVerified: true, protectionVerified: true };
+  const withoutCount = evaluateProtectedPullRequest(args);
+  assert.equal(withoutCount.accepted, false);
+  assert.match(withoutCount.reasons.join(' '), /review count was not verifiable/);
+  const explicitZero = evaluateProtectedPullRequest({ ...args, requiredApprovalCount: 0 });
+  assert.equal(explicitZero.accepted, true, JSON.stringify(explicitZero.reasons));
+  const zeroWithFailedCI = evaluateProtectedPullRequest({ ...args, requiredApprovalCount: 0,
+    checks: [{ name: 'CI Required Gate', status: 'completed', conclusion: 'failure' }] });
+  assert.equal(zeroWithFailedCI.accepted, false);
+  const zeroWithBlockingChange = evaluateProtectedPullRequest({ ...args, requiredApprovalCount: 0,
+    reviews: [{ user: { login: 'reviewer', type: 'User' }, state: 'CHANGES_REQUESTED',
+      commit_id: HEAD, submitted_at: '2026-11-20T00:00:00Z' }],
+    reviewerPermissions: { reviewer: 'admin' } });
+  assert.equal(zeroWithBlockingChange.accepted, false);
 });

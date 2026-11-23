@@ -47,6 +47,7 @@ export default async function WebsiteLeadsPage({ params }: Props) {
             <h1 className="mt-1 text-3xl font-black text-slate-950">Leads · {site.site_name || 'Website'}</h1>
             <p className="mt-2 text-slate-600">Customer messages and hiring applications submitted through this website.</p>
           </div>
+          {websiteId === 'e0fcb1f1-33f8-4b2c-abeb-ec8e0a819231' ? <Link href={`/apps/website-builder/edit/${websiteId}/network`} className="rounded-xl border bg-white px-4 py-2 font-bold">Cleaning network and accounting</Link> : null}
           <Link href={`/apps/website-builder/edit/${websiteId}`} className="rounded-xl border border-slate-300 bg-white px-4 py-2 font-bold text-slate-800">Back to editor</Link>
         </div>
 
@@ -56,7 +57,7 @@ export default async function WebsiteLeadsPage({ params }: Props) {
           ) : (
             <div className="divide-y divide-slate-100">
               {leads.map((lead) => (
-                <article key={lead.id} className="p-6">
+                <article key={lead.id} id={lead.id} className="p-6">
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div>
                       <h2 className="text-lg font-black text-slate-950">{lead.name}</h2>

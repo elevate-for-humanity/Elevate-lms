@@ -6,6 +6,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { syncIndividualAppSubscription } from '@/lib/apps/sync-subscription';
 import { startAppTrial } from '@/lib/trial/start-app-trial';
 import { getWebsiteBuilderAccess } from '@/lib/apps/website-builder-access';
+import { WEBSITE_BUILDER_TRIAL } from '@/lib/apps/website-builder-trial';
 
 export const dynamic = 'force-dynamic';
 
@@ -47,11 +48,22 @@ export default async function WebsiteBuilderPage() {
     trialDaysRemaining = Math.max(0, Math.ceil((new Date(subscription.trial_ends_at).getTime() - Date.now()) / (1000 * 60 * 60 * 24)));
   }
 
-  const { data: rawWebsites } = await supabase
-    .from('user_websites')
-    .select('id, site_name, subdomain, is_published, updated_at, site_config')
-    .eq('user_id', user.id)
-    .order('updated_at', { ascending: false });
+  const [{ data: rawWebsites }, wallet] = await Promise.all([
+    supabase.from('user_websites')
+      .select('id, site_name, subdomain, is_published, updated_at, site_config')
+      .eq('user_id', user.id)
+      .order('updated_at', { ascending: false }),
+    access.status === 'trial'
+      ? supabase.rpc('ensure_app_trial_wallet', {
+          p_user_id: user.id,
+          p_app_slug: 'website-builder',
+          p_trial_credits: WEBSITE_BUILDER_TRIAL.credits,
+        })
+      : null,
+  ]);
+  const trialCreditBalance = typeof wallet?.data === 'number' && !wallet.error
+    ? wallet.data
+    : null;
 
   // Workspace trials intentionally contain an internal placeholder row so the
   // organization and future site share one identity. It is not a customer site
@@ -67,7 +79,8 @@ export default async function WebsiteBuilderPage() {
           <Breadcrumbs items={[{ label: 'Store', href: '/store/apps' }, { label: 'Website Builder' }]} />
         </div>
       </div>
-      <WebsiteBuilderApp user={user} subscription={subscription} websites={websites} trialDaysRemaining={trialDaysRemaining} />
+      <WebsiteBuilderApp user={user} subscription={subscription} websites={websites}
+        trialDaysRemaining={trialDaysRemaining} trialCreditBalance={trialCreditBalance} />
     </div>
   );
 }

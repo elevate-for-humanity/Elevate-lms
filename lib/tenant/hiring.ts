@@ -1,4 +1,5 @@
 import 'server-only';
+import { parseHourlyRate } from '@/lib/cleaning/pricing';
 import { createHash, randomBytes, timingSafeEqual } from 'node:crypto';
 import { z } from 'zod';
 import type { HiringProfile, HiringPublicState, HiringQuestion, HiringRole } from './hiring-types';
@@ -13,6 +14,7 @@ export const profileSchema = z.object({
   services: z.string().trim().min(2).max(1500), experience: z.string().trim().min(2).max(2000),
   availability: z.string().trim().min(2).max(500), capacity: z.string().trim().min(1).max(200),
   equipment: z.string().trim().max(1000).default(''), insurance: z.string().trim().max(500).default(''),
+  requestedHourlyRate: z.string().trim().refine(value => !value || parseHourlyRate(value) !== null, 'Choose an hourly rate from $15 to $200.').optional(),
   qualificationsNote: z.string().trim().max(1500).default(''),
 }).refine(p => p.role !== 'company' || p.company.length >= 2, { message: 'Enter your cleaning company name.', path: ['company'] });
 

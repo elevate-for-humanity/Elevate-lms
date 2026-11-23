@@ -1,6 +1,15 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { resolveVerifier, repairQuickBooksProduction } from './repair-quickbooks-production.mjs';
+import { isVerifierSecretName, resolveVerifier, repairQuickBooksProduction } from './repair-quickbooks-production.mjs';
+
+test('discovers Intuit webhook verifier aliases without matching generic OAuth or other provider secrets', () => {
+  for (const name of ['elevate-quickbooks-webhook-verifier', 'intuit-webhook-verifier', 'INTUIT_WEBHOOK_VERIFIER', 'qb_webhooks_verifier', 'webhook-intuit-verifier']) {
+    assert.equal(isVerifierSecretName(name), true, name);
+  }
+  for (const name of ['elevate-quickbooks-client-secret', 'intuit-oauth-token', 'stripe-webhook-verifier', 'elevate-admin-runtime-config', 'unrelated-webhook-secret']) {
+    assert.equal(isVerifierSecretName(name), false, name);
+  }
+});
 
 test('recovers either existing verifier alias without generating a replacement', () => {
   assert.equal(resolveVerifier([{ QUICKBOOKS_WEBHOOK_VERIFIER_TOKEN: 'existing' }]), 'existing');

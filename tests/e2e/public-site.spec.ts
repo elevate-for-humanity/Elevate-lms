@@ -55,8 +55,33 @@ async function assertSuccessfulResponse(
   href: string,
   context: string,
 ) {
-  const response = await request.get(href, { maxRedirects: 10 });
+  const response = await request.get(href, { maxRedirects: 10, timeout: 30_000 });
   expect(response.status(), `${context}: ${href} returned ${response.status()}`).toBeLessThan(400);
+}
+
+async function assertSuccessfulResponses(
+  request: APIRequestContext,
+  hrefs: string[],
+  context: string,
+) {
+  const failures: string[] = [];
+
+  for (let offset = 0; offset < hrefs.length; offset += 4) {
+    const batch = hrefs.slice(offset, offset + 4);
+    const results = await Promise.allSettled(
+      batch.map((href) => assertSuccessfulResponse(request, href, context)),
+    );
+
+    results.forEach((result, index) => {
+      if (result.status === 'rejected') {
+        const message =
+          result.reason instanceof Error ? result.reason.message : String(result.reason);
+        failures.push(`${batch[index]}: ${message}`);
+      }
+    });
+  }
+
+  expect(failures, `${context} failures:\n${failures.join('\n')}`).toEqual([]);
 }
 
 async function collectInternalLinks(page: Page, selector: string) {
@@ -122,12 +147,11 @@ test.describe('page-by-page public production audit', () => {
   }
 
   test('every homepage header and footer internal link resolves', async ({ page, request }) => {
+    test.setTimeout(180_000);
     await page.goto('/', { waitUntil: 'domcontentloaded' });
     const links = await collectInternalLinks(page, 'header a[href], footer a[href]');
     expect(links.length, 'No internal header or footer links were discovered').toBeGreaterThan(5);
-    for (const href of links) {
-      await assertSuccessfulResponse(request, href, 'navigation integrity');
-    }
+    await assertSuccessfulResponses(request, links, 'navigation integrity');
   });
 
   test('program directory links resolve', async ({ page, request }) => {

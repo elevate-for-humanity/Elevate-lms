@@ -537,7 +537,7 @@ test.describe('Studio single-session access and composer', () => {
     });
     const runtime = await runtimeResponse.json().catch(() => ({}));
     expect(runtimeResponse.status(), 'Studio browser runtime check must succeed').toBe(200);
-    test.skip(runtime.configured !== true, 'Studio browser runtime is not configured in this environment');
+    expect(runtime.configured, 'Studio browser must be configured for live mobile acceptance').toBe(true);
     expect(runtime.ready, 'Studio browser runtime must be ready for live mobile acceptance').toBe(true);
     const stream = page.getByAltText('Live isolated Chromium browser');
     await expect(stream).toBeVisible({ timeout: 30_000 });

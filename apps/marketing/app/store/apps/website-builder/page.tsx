@@ -49,7 +49,7 @@ const walkthrough = [
   { label: '2. Generate', title: 'PARIS creates your first draft', description: 'AI turns your business interview into a starting website structure, branding and conversion-focused content so you are not staring at a blank canvas.' },
   { label: '3. Keep talking', title: 'Tell PARIS what to change next', description: 'Say “make it more professional,” “rewrite my services,” “change the colors,” or “improve the homepage.” PARIS updates the current site instead of starting over.' },
   { label: '4. Preview', title: 'Watch the site change as you build', description: 'Preview the saved website, refine the message and make sure the business is represented correctly before anything is published.' },
-  { label: '5. Publish + upgrade', title: 'Go live, then add the business tools you need', description: 'Publish when ready and unlock custom domains, more credits, AI assistants, marketing, grant writing, images, commercial video, courses and automation as the business grows.' },
+  { label: '5. Publish + upgrade', title: 'Go live, then add the business tools you need', description: 'Publish when ready and explore custom domains, more credits, AI assistants, marketing, grant writing, images, commercial video and automation as the business grows.' },
 ];
 
 const setupQuestions = [
@@ -128,6 +128,17 @@ export default async function WebsiteBuilderStorePage({ searchParams }: { search
       <section className="border-y border-slate-200 bg-slate-50 px-4 py-14"><div className="mx-auto max-w-5xl"><h2 className="text-3xl font-black text-slate-950">How the revenue journey works</h2><div className="mt-8 grid gap-4 md:grid-cols-4">{['Start the limited trial', 'Build with PARIS + credits', 'Upgrade tools as needed', 'Publish, grow and add capacity'].map((step, index) => <div key={step} className="rounded-xl border border-slate-300 bg-white p-5"><div className="text-sm font-black text-brand-red-700">{index + 1}</div><div className="mt-2 font-black text-slate-950">{step}</div></div>)}</div><p className="mt-6 text-sm font-medium leading-6 text-slate-700">The base subscription gets the customer into the builder. Additional AI capacity, assistants and business capabilities can be activated as the customer asks PARIS to do more.</p></div></section>
 
       <div id="plans"><IndividualAppPlansSection catalog={catalog} /></div>
+      <section className="mx-auto max-w-6xl px-4 py-10">
+        <div className="flex flex-wrap items-center justify-between gap-5 rounded-2xl border border-slate-200 bg-slate-50 p-6">
+          <div>
+            <h2 className="text-xl font-black text-slate-950">Build courses with Course Builder</h2>
+            <p className="mt-2 text-sm leading-6 text-slate-700">Course generation is available through a separate paid app with its own credit allowance.</p>
+          </div>
+          <Link href="/store/course-builder" className="inline-flex items-center gap-2 rounded-xl bg-slate-950 px-5 py-3 font-bold text-white hover:bg-slate-800">
+            Explore Course Builder <ArrowRight className="h-4 w-4" />
+          </Link>
+        </div>
+      </section>
       <section className="px-4 py-14 text-center"><Link href={catalog.trialHref} className="inline-flex items-center gap-2 font-black text-brand-red-700 hover:underline">Start the Website Builder trial <ArrowRight className="h-4 w-4" /></Link></section>
     </main>
   );

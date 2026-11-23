@@ -29,6 +29,7 @@ interface Props {
   subscriptionDetails: string[];
   actionHref: string;
   trialText: string;
+  paidOnly?: boolean;
 }
 
 export default function CapabilitySubscriptionDemo({
@@ -40,6 +41,7 @@ export default function CapabilitySubscriptionDemo({
   subscriptionDetails,
   actionHref,
   trialText,
+  paidOnly = false,
 }: Props) {
   const workflow = capabilityWalkthrough(capabilityKey, name);
   const steps: DemoStep[] = [...workflow.map((slide, index) => ({ eyebrow: `${index + 1} · Workflow example`, title: slide.title, body: slide.action })),
@@ -49,19 +51,19 @@ export default function CapabilitySubscriptionDemo({
       body: description,
     },
     {
-      eyebrow: '2 · Try it first',
-      title: 'Use the capability during the 14-day trial',
+      eyebrow: paidOnly ? '2 · See the workflow' : '2 · Try it first',
+      title: paidOnly ? 'Preview the paid Course Builder' : 'Use the capability during the 14-day trial',
       body: trialText,
     },
     {
       eyebrow: '3 · Understand the subscription',
       title: priceLabel,
-      body: 'The demo shows the commercial model before checkout so customers know what continues after the trial and what becomes an upgrade.',
+      body: paidOnly ? 'Compare the monthly allowance against the number of lessons you need to draft.' : 'The demo shows the commercial model before checkout so customers know what continues after the trial and what becomes an upgrade.',
     },
     {
-      eyebrow: '4 · Activate when ready',
-      title: 'Keep the tools you actually use',
-      body: 'Start small, then activate the subscription, add-on, credits, or higher-capacity plan only when the business needs it.',
+      eyebrow: paidOnly ? '4 · Request availability' : '4 · Activate when ready',
+      title: paidOnly ? 'Choose the capacity you need' : 'Keep the tools you actually use',
+      body: paidOnly ? 'Ask about a monthly plan, one-time credits, or a larger monthly allowance.' : 'Start small, then activate the subscription, add-on, credits, or higher-capacity plan only when the business needs it.',
     },
   ];
 
@@ -126,7 +128,7 @@ export default function CapabilitySubscriptionDemo({
                   <p className="mt-3 font-bold">{workflow[step].record}</p>
                   <p className="mt-2 text-lg text-white">{workflow[step].result}</p>
                 </div>}
-                <p className="mt-5 text-sm text-slate-300">Slide {step + 1} of {steps.length}. This tour explains the workflow; use your trial workspace to test actual delivery.</p>
+                <p className="mt-5 text-sm text-slate-300">Slide {step + 1} of {steps.length}. {paidOnly ? 'This tour previews the Course Builder workflow.' : 'This tour explains the workflow; use your trial workspace to test actual delivery.'}</p>
                 <div className="mt-4 flex gap-3">
                   <button type="button" onClick={() => { setPlaying(false); setStep((value) => (value - 1 + steps.length) % steps.length); }} className="min-h-11 rounded-lg border border-white/30 px-4">Previous</button>
                   <button type="button" onClick={() => { setPlaying(false); setStep((value) => (value + 1) % steps.length); }} className="min-h-11 rounded-lg border border-white/30 px-4">Next</button>
@@ -164,11 +166,12 @@ export default function CapabilitySubscriptionDemo({
 
               <div className="mt-7 rounded-xl border border-cyan-200 bg-cyan-50 p-4">
                 <div className="flex items-center gap-2 font-black text-slate-950">
-                  <Sparkles className="h-5 w-5 text-cyan-700" /> Trial first
+                  <Sparkles className="h-5 w-5 text-cyan-700" /> {paidOnly ? 'Preview the workflow' : 'Trial first'}
                 </div>
                 <p className="mt-2 text-sm font-semibold leading-6 text-slate-800">
-                  Customers can see the workflow before they commit, then upgrade only for the
-                  capacity and automation they want to keep.
+                  {paidOnly
+                    ? 'See how course planning, generation, review, and publishing work before subscribing.'
+                    : 'Customers can see the workflow before they commit, then upgrade only for the capacity and automation they want to keep.'}
                 </p>
               </div>
 
@@ -176,7 +179,7 @@ export default function CapabilitySubscriptionDemo({
                 href={actionHref}
                 className="mt-6 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-brand-red-700 px-5 font-black text-white hover:bg-brand-red-800"
               >
-                View / start {name} <ArrowRight className="h-4 w-4" />
+                {paidOnly ? 'View Course Builder pricing' : `View / start ${name}`} <ArrowRight className="h-4 w-4" />
               </Link>
             </aside>
           </div>
@@ -230,27 +233,27 @@ export default function CapabilitySubscriptionDemo({
               Purchase path
             </p>
             <h2 className="mt-2 text-2xl font-black">
-              Test it, select the right capacity, then pay securely.
+              {paidOnly ? 'Choose Course Builder for your organization.' : 'Test it, select the right capacity, then pay securely.'}
             </h2>
             <p className="mt-2 max-w-2xl text-sm font-semibold leading-6 text-slate-200">
-              Start a no-card trial or choose a base plan and add-ons. Workspace setup happens
-              before payment so the subscription and entitlements attach to the correct
-              organization.
+              {paidOnly
+                ? 'Review the course sizes and monthly allowance, then request access or a quote for additional credits.'
+                : 'Start a no-card trial or choose a base plan and add-ons. Workspace setup happens before payment so the subscription and entitlements attach to the correct organization.'}
             </p>
           </div>
           <div className="mt-5 grid shrink-0 gap-2 sm:mt-0">
             <Link
-              href="/store/plans"
+              href={paidOnly ? actionHref : '/store/plans'}
               className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-brand-red-600 px-6 font-black text-white hover:bg-brand-red-700"
             >
-              Choose plan & payment <CreditCard className="h-4 w-4" />
+              {paidOnly ? 'View Course Builder plans' : 'Choose plan & payment'} <CreditCard className="h-4 w-4" />
             </Link>
-            <Link
+            {!paidOnly && <Link
               href="/store/trial"
               className="inline-flex min-h-11 items-center justify-center rounded-xl border border-white/30 px-6 font-bold text-white hover:bg-white/10"
             >
               Start 14-day trial
-            </Link>
+            </Link>}
           </div>
         </div>
       </div>

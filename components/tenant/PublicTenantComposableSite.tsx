@@ -15,6 +15,7 @@ import { resolveSiteLinkGroups } from '@/lib/tenant/site-navigation';
 import { TenantIntroduction } from '@/components/tenant/TenantIntroduction';
 import { TenantChoiceSection } from '@/components/tenant/TenantChoiceSection';
 import { TenantParis } from '@/components/tenant/TenantParis';
+import { TenantCleaningBooking, TenantCleaningProvider, TenantCleaningOffer } from '@/components/tenant/TenantCleaningNetwork';
 import { TenantCleaningMembership } from '@/components/tenant/TenantCleaningMembership';
 import { TenantHiringApplication } from '@/components/tenant/TenantHiringApplication';
 import { tenantSiteHref as hrefFor } from '@/lib/tenant/site-links';
@@ -138,6 +139,9 @@ function Section({ section, primary, secondary, basePath, websiteId, businessNam
   const centered = align === 'center';
   const variant = text(section.settings?.variant);
 
+  if (section.type === 'cleaning_booking') return <TenantCleaningBooking />;
+  if (section.type === 'cleaning_provider') return <TenantCleaningProvider />;
+  if (section.type === 'cleaning_offer') return <TenantCleaningOffer />;
   if (section.type === 'cleaning_membership') return <TenantCleaningMembership accent={primary} />;
 
   if (section.type === 'hiring_application') return <TenantHiringApplication websiteId={websiteId} businessName={businessName} accent={primary} />;

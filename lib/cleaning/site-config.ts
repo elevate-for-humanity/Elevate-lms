@@ -2,7 +2,7 @@ import type { TenantSiteConfig } from '@/lib/tenant/site-types';
 import { CLEANING_MEMBERSHIP } from './pricing';
 
 /** Apply only after the matching renderer is deployed. Preserves unrelated content. */
-export function prepareCleaningSiteConfig(current: TenantSiteConfig): TenantSiteConfig {
+export function prepareCleaningSiteConfig(current: TenantSiteConfig, enableCommerce = false): TenantSiteConfig {
   const config = structuredClone(current);
   if (!config.pages?.some(page => page.slug === '/join-network')) throw new Error('Cleaning network application page is required.');
   const application = config.pages.find(page => page.slug === '/join-network')!;
@@ -21,6 +21,12 @@ export function prepareCleaningSiteConfig(current: TenantSiteConfig): TenantSite
     seo: { title: 'Cleaning Membership | 2Exclusive Platinum Cleaning', description: 'Compare pay-as-you-go cleaning with the optional $19 monthly Platinum Cleaning Membership.' },
     sections: [{ id: 'cleaning-membership-plans', type: 'cleaning_membership', visible: true, content: {}, settings: {} }],
   });
-  config.meta = { ...config.meta, cleaningMembershipPlan: { ...CLEANING_MEMBERSHIP, collectionMode: 'manual_invoice', activation: 'verified_payment_required' } };
+  for (const page of [{ id:'cleaning-booking',slug:'/book-cleaning',title:'Book Cleaning',type:'cleaning_booking' as const,show:true },{id:'cleaning-provider',slug:'/provider',title:'Provider Account',type:'cleaning_provider' as const,show:true},{id:'cleaning-offer',slug:'/accept-job',title:'Review Job Offer',type:'cleaning_offer' as const,show:false}]) {
+    const existing=config.pages.find(item=>item.slug===page.slug);
+    if(existing&&!existing.sections.some(section=>section.type===page.type))throw new Error('Existing cleaning page needs manual reconciliation.');
+    if(!existing)config.pages.push({id:page.id,slug:page.slug,title:page.title,navLabel:page.title,showInNavigation:page.show,sections:[{id:page.id,type:page.type,visible:true,content:{},settings:{}}]});
+  }
+  if(enableCommerce){config.homepage.heroCtaHref='/book-cleaning';for(const page of config.pages)for(const section of page.sections){if(section.content.buttonHref==='/contact')section.content.buttonHref='/book-cleaning';if(section.content.secondaryButtonHref==='/contact')section.content.secondaryButtonHref='/book-cleaning';if(Array.isArray(section.content.items))for(const item of section.content.items)if(item&&typeof item==='object'&&item.href==='/contact')item.href='/book-cleaning';}}
+  config.meta = { ...config.meta, cleaningNetworkEnabled:enableCommerce, cleaningMembershipPlan: { ...CLEANING_MEMBERSHIP, collectionMode: 'manual_invoice', activation: 'verified_payment_required' } };
   return config;
 }

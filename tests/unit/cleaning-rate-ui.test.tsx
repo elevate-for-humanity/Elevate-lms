@@ -25,7 +25,7 @@ describe('membership terms', () => {
     render(<TenantCleaningMembership accent="#101820" />);
     expect(screen.getByText('$19.00 / month')).toBeTruthy();
     expect(screen.getByText(/Save 10%.*up to \$50/)).toBeTruthy();
-    expect(screen.getByRole('button', { name: 'Request membership invoice' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Continue to secure invoice' })).toBeTruthy();
     expect(screen.getByText(/Benefits begin after payment verification/)).toBeTruthy();
   });
 });

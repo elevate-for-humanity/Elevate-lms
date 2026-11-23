@@ -31,7 +31,8 @@ export function isProductionRosterProfile(profile: {
     profile.id.length > 0 &&
     !/^\[QA E2E\]/i.test(String(profile.full_name || '').trim()) &&
     !TEST_EMAIL_DOMAINS.has(domain) &&
-    !domain.endsWith('.test')
+    !domain.endsWith('.test') &&
+    !domain.endsWith('.invalid')
   );
 }
 

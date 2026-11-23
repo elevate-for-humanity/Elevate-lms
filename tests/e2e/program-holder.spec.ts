@@ -138,22 +138,28 @@ test.describe('Program Holder Portal', () => {
 
     test('filters persisted enrollments by status and name', async ({ page }) => {
       await page.goto('/program-holder/students');
-      await expect(page.getByText(activeStudent, { exact: true }).first()).toBeVisible();
-      await expect(page.getByText(completedStudent, { exact: true }).first()).toBeVisible();
+      const visibleEnrollments = page.getByTestId('student-row')
+        .or(page.getByTestId('student-card'))
+        .filter({ visible: true });
+      const activeEnrollment = visibleEnrollments.getByText(activeStudent, { exact: true });
+      const completedEnrollment = visibleEnrollments.getByText(completedStudent, { exact: true });
+      await expect(activeEnrollment).toBeVisible();
+      await expect(completedEnrollment).toBeVisible();
       await page.getByLabel('Filter student status').selectOption('active');
       await page.getByRole('button', { name: 'Apply filters' }).click();
       await expect(page).toHaveURL(/status=active/);
-      await expect(page.getByText(activeStudent, { exact: true }).first()).toBeVisible();
-      await expect(page.getByText(completedStudent, { exact: true })).toHaveCount(0);
+      await expect(activeEnrollment).toBeVisible();
+      await expect(completedEnrollment).toHaveCount(0);
 
       await page.getByLabel('Search students').fill(completedStudent);
       await page.getByRole('button', { name: 'Apply filters' }).click();
-      await expect(page.getByText('No enrolled students match these filters.')).toBeVisible();
+      await expect(page.getByText('No enrolled students match these filters.', { exact: true })
+        .filter({ visible: true })).toBeVisible();
       await page.getByRole('link', { name: 'Clear filters' }).click();
       await page.getByLabel('Search students').fill(completedStudent);
       await page.getByRole('button', { name: 'Apply filters' }).click();
-      await expect(page.getByText(completedStudent, { exact: true }).first()).toBeVisible();
-      await expect(page.getByText(activeStudent, { exact: true })).toHaveCount(0);
+      await expect(completedEnrollment).toBeVisible();
+      await expect(activeEnrollment).toHaveCount(0);
     });
 
     test('opens pending applicants without exposing recruiting tools to an unassigned holder', async ({ page }) => {

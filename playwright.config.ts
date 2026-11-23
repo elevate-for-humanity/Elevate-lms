@@ -145,13 +145,42 @@ const crossAppEnv = {
 };
 
 const requested = appsRequestedByCli();
+
+// Dev-server heap limits, per app. In dev only, after every request Next
+// checks `used_heap_size > 0.8 * heap_size_limit` and, once crossed, logs
+// "Server is approaching the used memory threshold, restarting..." and exits
+// with code 77; the `next dev` CLI restarts it, dropping every in-flight
+// request (ECONNRESET). Run 45254389225: that restart landed on the link test
+// late in shard 3/4, failing 19 links on Retry #2 (23 on the attempt before),
+// mostly different routes each time, no 404/500 anywhere.
+//   - Lowering the limit would make restarts EARLIER (80% of a smaller
+//     limit), so the limits below are never set below the job value.
+//   - Marketing compiles the most routes in the public-site shard and is the
+//     server observed restarting, so its limit is raised to 7168 MiB, moving
+//     its restart threshold to ~5.7 GiB. Deliberately NOT higher: three dev
+//     servers share one 7 GiB CI runner, and a larger ceiling risks the
+//     kernel OOM-killing the server instead of a clean restart.
+//   - The limit is a ceiling, not an allocation: the test-side fix (the link
+//     check in tests/e2e/public-site.spec.ts waits out a restart and retries
+//     only the failed links) is what makes a restart survivable; this limit
+//     only makes one less likely.
+const DEV_SERVER_HEAP_MB: Record<E2EApp, number> = {
+  marketing: 7168,
+  admin: 6144,
+  lms: 6144,
+};
+
 const webServer: PlaywrightTestConfig['webServer'] = apps
   .filter((app) => usesLocalDevServer(app) && requested.has(app))
   .map((app) => ({
     // Run the workspace's own dev script (and predev asset sync) on its port.
     command: `pnpm --filter ${E2E_APPS[app].workspace} dev --port ${E2E_APPS[app].port}`,
     url: `${appOrigin(app)}${E2E_APPS[app].readyPath}`,
-    env: { ...crossAppEnv, PORT: String(E2E_APPS[app].port) },
+    env: {
+      ...crossAppEnv,
+      PORT: String(E2E_APPS[app].port),
+      NODE_OPTIONS: `--max-old-space-size=${DEV_SERVER_HEAP_MB[app]}`,
+    },
     reuseExistingServer: !process.env.CI,
     timeout: 300_000,
     stdout: 'ignore',

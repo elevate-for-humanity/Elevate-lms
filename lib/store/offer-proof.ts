@@ -263,7 +263,7 @@ export const STORE_FEATURE_PROOFS: Partial<Record<PlatformFeatureKey, StoreFeatu
     access: 'public-product',
     sourcePaths: ['apps/admin/app/studio/courses/page.tsx', 'lib/course-builder/orchestrator.ts'],
     limitation:
-      'Course creation is restricted to authorized staff in the scoped, authenticated Admin workspace. Paid organization delivery does not grant Course Builder access. Generated drafts require review before publication.',
+      'Course creation is restricted to the staff-only, authenticated Admin workspace. Paid organization delivery does not grant Course Builder access. Generated drafts require review before publication.',
   },
   [PlatformFeature.COURSE_FACTORY]: {
     title: 'AI Course Factory',
@@ -273,7 +273,7 @@ export const STORE_FEATURE_PROOFS: Partial<Record<PlatformFeatureKey, StoreFeatu
     access: 'public-product',
     sourcePaths: ['lib/ultimate-course-builder/core/generation-request.ts', 'lib/course-factory/canonical-course-gate.ts'],
     limitation:
-      'Course generation is staged. Drafts must pass validation and publication review before learners can access them.',
+      'Course generation runs in the staff-only Course Builder workspace. Drafts must pass validation and publication review before learners can access them.',
   },
   [PlatformFeature.STUDENT_MANAGEMENT]: {
     title: 'Student Management',

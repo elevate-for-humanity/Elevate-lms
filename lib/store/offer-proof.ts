@@ -262,6 +262,8 @@ export const STORE_FEATURE_PROOFS: Partial<Record<PlatformFeatureKey, StoreFeatu
     evidenceLabel: 'Review the Course Builder product',
     access: 'public-product',
     sourcePaths: ['apps/admin/app/studio/courses/page.tsx', 'lib/course-builder/orchestrator.ts'],
+    limitation:
+      'Repair status: the public demo previews the workflow only. New self-service checkout is closed, so sales confirms availability, credit packs, and monthly allowances before payment; existing entitlements and credit limits are unchanged.',
   },
   [PlatformFeature.COURSE_FACTORY]: {
     title: 'AI Course Factory',
@@ -270,6 +272,8 @@ export const STORE_FEATURE_PROOFS: Partial<Record<PlatformFeatureKey, StoreFeatu
     evidenceLabel: 'Review the AI course workflow',
     access: 'public-product',
     sourcePaths: ['lib/ultimate-course-builder/core/generation-request.ts', 'lib/course-factory/canonical-course-gate.ts'],
+    limitation:
+      'Repair status: draft generation consumes Course Builder credits and requires human review before publishing. Larger courses, narration, and additional AI work are quoted by sales before payment.',
   },
   [PlatformFeature.STUDENT_MANAGEMENT]: {
     title: 'Student Management',

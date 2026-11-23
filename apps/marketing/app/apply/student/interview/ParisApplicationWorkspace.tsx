@@ -199,12 +199,9 @@ export default function ParisApplicationWorkspace({
     let alive = true;
     (async () => {
       try {
-        const resume = await fetch('/api/paris/application-interview', { cache: 'no-store' });
-        if (resume.ok) {
-          const data = (await resume.json()) as InterviewResponse;
-          if (alive && data.ok) setSession(data);
-          return;
-        }
+        // `start` resumes an existing cookie-bound interview before creating a
+        // new one. Using that idempotent entry point directly avoids a failing
+        // probe request for every first-time applicant.
         const data = await callInterview({ action: 'start', locale: 'en' });
         if (alive) setSession(data);
       } catch (err) {
@@ -658,7 +655,9 @@ export default function ParisApplicationWorkspace({
         </aside>
       </div>
     </div>
-    <ApplicationDocumentsPanel key={session.projectId} locale={locale} />
+    {answers.program ? (
+      <ApplicationDocumentsPanel key={session.projectId} locale={locale} />
+    ) : null}
     </>
   );
 }

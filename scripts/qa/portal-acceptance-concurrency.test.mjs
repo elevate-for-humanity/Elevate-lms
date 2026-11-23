@@ -69,23 +69,28 @@ test('live checks use dedicated accounts and never provision database fixtures',
 const mediaJob = workflow.slice(workflow.indexOf('\n  hvac-public-playback:'), workflow.indexOf('\n  production-authenticated-e2e:'));
 const mediaCondition = mediaJob.match(/^    if: (.+)$/m)?.[1];
 
-test('unchanged full-film acceptance runs for PRs and real Marketing releases', () => {
+test('full-film acceptance follows attested Marketing workflow path even with a dynamic run-name', () => {
+  const realMarketing = {
+    path: '.github/workflows/deploy-google-marketing-trigger.yml',
+    name: 'Execute Marketing release · ' + 'a'.repeat(40),
+    conclusion: 'success', event: 'workflow_dispatch', head_branch: 'main',
+  };
+  assert.match(mediaCondition, /workflow_run\.path/);
+  assert.doesNotMatch(mediaCondition, /workflow_run\.name/);
   assert.equal(evaluate(mediaCondition, event('pull_request')), true);
   assert.equal(evaluate(mediaCondition, event('workflow_dispatch', {}, { component: 'marketing' })), true);
-  assert.equal(evaluate(mediaCondition, event('workflow_run', {
-    name: 'Deploy Google Marketing on trigger', conclusion: 'success', event: 'workflow_dispatch', head_branch: 'main',
-  })), true);
+  assert.equal(evaluate(mediaCondition, event('workflow_run', realMarketing)), true);
   for (const upstream of [
-    { name: 'Deploy Admin', conclusion: 'success', event: 'workflow_dispatch', head_branch: 'main' },
-    { name: 'Deploy Google Marketing on trigger', conclusion: 'failure', event: 'workflow_dispatch', head_branch: 'main' },
-    { name: 'Deploy Google Marketing on trigger', conclusion: 'success', event: 'push', head_branch: 'main' },
-    { name: 'Deploy Google Marketing on trigger', conclusion: 'success', event: 'workflow_dispatch', head_branch: 'feature' },
-  ]) assert.equal(evaluate(mediaCondition, event('workflow_run', upstream)), false);
+    {...realMarketing, name: 'Deploy Google Marketing on trigger', path: '.github/workflows/deploy-admin.yml'},
+    {...realMarketing, conclusion: 'failure'},
+    {...realMarketing, event: 'push'},
+    {...realMarketing, head_branch: 'feature'},
+    {...realMarketing, path: '.github/workflows/deploy-google-lms-trigger.yml'},
+  ]) assert.equal(evaluate(mediaCondition, event('workflow_run', upstream)), false, JSON.stringify(upstream));
   assert.equal(evaluate(mediaCondition, event('workflow_dispatch', {}, {component:'marketing',employer_only:true})), false);
   assert.equal(evaluate(mediaCondition, event('push')), false);
   assert.equal(evaluate(mediaCondition, event('workflow_dispatch')), false);
 });
-
 
 test('focused employer acceptance shares the lock for the dedicated live employer fixture', () => {
   const inputs = {employer_only:true, deployment_run_id:'123', deployed_sha:'a'.repeat(40), component:'lms'};

@@ -42,6 +42,7 @@ export type TenantSiteSectionType =
   | 'cta'
   | 'contact_form'
   | 'hiring_application'
+  | 'cleaning_membership'
   | 'booking'
   | 'assessment'
   | 'journal'

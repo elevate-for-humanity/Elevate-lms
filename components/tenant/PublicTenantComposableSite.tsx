@@ -15,6 +15,7 @@ import { resolveSiteLinkGroups } from '@/lib/tenant/site-navigation';
 import { TenantIntroduction } from '@/components/tenant/TenantIntroduction';
 import { TenantChoiceSection } from '@/components/tenant/TenantChoiceSection';
 import { TenantParis } from '@/components/tenant/TenantParis';
+import { TenantCleaningMembership } from '@/components/tenant/TenantCleaningMembership';
 import { TenantHiringApplication } from '@/components/tenant/TenantHiringApplication';
 import { tenantSiteHref as hrefFor } from '@/lib/tenant/site-links';
 import type { PublishedTenantSite, TenantSiteSection } from '@/lib/tenant/site-types';
@@ -51,7 +52,7 @@ function list(value: unknown): Array<Record<string, unknown>> {
 
 function customFields(value: unknown): TenantCustomFormField[] {
   if (!Array.isArray(value)) return [];
-  const allowed = new Set(['text', 'email', 'tel', 'textarea', 'select']);
+  const allowed = new Set(['text', 'email', 'tel', 'textarea', 'select', 'provider_rate']);
   return value.slice(0, 20).flatMap((entry) => {
     if (!entry || typeof entry !== 'object' || Array.isArray(entry)) return [];
     const raw = entry as Record<string, unknown>;
@@ -136,6 +137,8 @@ function Section({ section, primary, secondary, basePath, websiteId, businessNam
   const align = text(section.settings?.align) || 'left';
   const centered = align === 'center';
   const variant = text(section.settings?.variant);
+
+  if (section.type === 'cleaning_membership') return <TenantCleaningMembership accent={primary} />;
 
   if (section.type === 'hiring_application') return <TenantHiringApplication websiteId={websiteId} businessName={businessName} accent={primary} />;
 

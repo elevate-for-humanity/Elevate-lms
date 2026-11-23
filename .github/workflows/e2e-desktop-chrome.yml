@@ -150,7 +150,7 @@ jobs:
           test -s "$RUNNER_TEMP/e2e-runtime-memory.jsonl"
           node --input-type=module -e '
             import {readFileSync} from "node:fs";
-            const samples=readFileSync(process.env.RUNNER_TEMP+"/e2e-runtime-memory.jsonl","utf8").trim().split("\\n");
+            const samples=readFileSync(process.env.RUNNER_TEMP+"/e2e-runtime-memory.jsonl","utf8").trim().split(/\r?\n/);
             const item=JSON.parse(samples[0]);
             if (!item.at || !Array.isArray(item.processes) || !item.cgroup) process.exit(1);
             console.log("[e2e-memory] initial read-only sample valid");

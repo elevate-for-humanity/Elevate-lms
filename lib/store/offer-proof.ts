@@ -262,6 +262,8 @@ export const STORE_FEATURE_PROOFS: Partial<Record<PlatformFeatureKey, StoreFeatu
     evidenceLabel: 'Review the Course Builder product',
     access: 'public-product',
     sourcePaths: ['apps/admin/app/studio/courses/page.tsx', 'lib/course-builder/orchestrator.ts'],
+    limitation:
+      'Course creation runs through a scoped, authenticated workspace. Generated drafts require review before publication.',
   },
   [PlatformFeature.COURSE_FACTORY]: {
     title: 'AI Course Factory',
@@ -270,6 +272,8 @@ export const STORE_FEATURE_PROOFS: Partial<Record<PlatformFeatureKey, StoreFeatu
     evidenceLabel: 'Review the AI course workflow',
     access: 'public-product',
     sourcePaths: ['lib/ultimate-course-builder/core/generation-request.ts', 'lib/course-factory/canonical-course-gate.ts'],
+    limitation:
+      'Course generation is staged. Drafts must pass validation and publication review before learners can access them.',
   },
   [PlatformFeature.STUDENT_MANAGEMENT]: {
     title: 'Student Management',

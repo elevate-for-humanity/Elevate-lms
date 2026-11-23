@@ -57,9 +57,12 @@ describe('automatic licensed scene assignment', () => {
       { ...asset, content_sha256: 'original' },
       { ...asset, id: 'derived', content_sha256: 'converted' },
     ];
-    expect(
-      buildSceneAssignments([...scenes, { ...scenes[0], id: 'second' }], copies).gaps,
-    ).toHaveLength(1);
+    const gaps = buildSceneAssignments([...scenes, { ...scenes[0], id: 'second' }], copies).gaps;
+    expect(gaps).toHaveLength(1);
+    expect(gaps[0]).toMatchObject({
+      licensedAssetCount: 1,
+      licensedAssetRecordCount: 2,
+    });
   });
   it('accepts distinct inspected non-overlapping excerpts from one licensed Envato item', () => {
     const parentHash = 'f'.repeat(64);

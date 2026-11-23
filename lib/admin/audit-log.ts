@@ -145,6 +145,7 @@ export const AdminAction = {
   JOB_UPDATED: 'job.updated',
   JOB_RETRIED: 'job.retried',
   HOURS_TRANSFER_PROCESSED: 'hours.transfer_processed',
+  HOURS_BACKFILLED: 'hours.backfilled',
   ENROLLMENT_POLICIES_FIXED: 'enrollment.policies_fixed',
 
   // Copilot / AI

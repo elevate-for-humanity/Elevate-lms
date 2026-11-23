@@ -27,6 +27,10 @@ export async function ensureApprenticeshipLmsEnrollment(
   };
   if (input.grantAccess) {
     enrollmentPatch.access_granted_at = now;
+    // The approved-paid gate requires access_status alongside
+    // access_granted_at; without it a granted learner is still bounced
+    // to /lms/access-pending.
+    enrollmentPatch.access_status = 'active';
     enrollmentPatch.enrollment_state = 'active';
     enrollmentPatch.status = 'active';
   }

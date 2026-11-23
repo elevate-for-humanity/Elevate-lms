@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
 import {observeAcceptedOpenHandsRepair,openHandsRepairPrompt} from '../../lib/devstudio/paris-openhands-repair.mjs';
-import {acceptedOpenHandsNeedsObservation,superviseAcceptedOpenHandsRepair} from '../../lib/devstudio/paris-openhands-supervision.mjs';
+import {acceptedOpenHandsNeedsObservation,superviseAcceptedOpenHandsRepair,shouldReconcileTerminalRepair} from '../../lib/devstudio/paris-openhands-supervision.mjs';
 const repairId='11111111-1111-4111-8111-111111111111', goal='Repair confirmed captions failure.';
 const now=4*60*60_000;
 function fixture(){
@@ -109,6 +109,8 @@ test('an approval-blocked repair may be observed but a real approval gate preven
  h.task.requires_approval=true;h.task.approval_status='pending';
  const result=await h.supervise();
  assert.equal(result.awaitingProvider,true);assert.equal(h.refreshes,0);
+  assert.equal(result.approvalRequired,true);
+  assert.equal(h.records[0].openhandsObservation.state,'approval_required');
  assert.equal(h.reads,0);assert.equal(h.claims.length,0);
 });
 
@@ -158,5 +160,61 @@ test('a provider-confirmation snapshot still pending approval is read but its pa
  h.observe=()=>observeAcceptedOpenHandsRepair({repairId,actorId:'owner',attempt:1,runId:12,goal,checkpoint:h.cp},{
   now:()=>now,findTask:async()=>h.task,refresh:async()=>({task:h.task,lifecycle:h.lifecycle}),
   resumeSandbox:async id=>{resumed.push(id)},readCandidate:async()=>{throw Error('no read')}});
- assert.deepEqual(await h.observe(),{state:'pending',taskId:'task'});assert.deepEqual(resumed,[]);
+ await assert.rejects(h.observe,/PARIS_OPENHANDS_APPROVAL_REQUIRED/);
+ assert.deepEqual(resumed,[]);
+});
+
+test('terminal reconciliation preserves simultaneous approval waits for the policy owner without trapping other admins', () => {
+ const first=fixture().repair;
+ first.error_code='PARIS_OPENHANDS_APPROVAL_REQUIRED';
+ first.verification.openhandsObservation={state:'approval_required',taskId:'task-1',checkedAt:new Date(now).toISOString()};
+ const second=structuredClone(first);
+ second.id='22222222-2222-4222-8222-222222222222';
+ second.candidate.checkpoint.taskId='task-2';
+ second.verification.openhandsObservation={state:'approval_required',taskId:'task-2',checkedAt:new Date(now+1000).toISOString()};
+ const foreign=structuredClone(first);
+ foreign.id='33333333-3333-4333-8333-333333333333';
+ foreign.actor_id='other-admin';
+ foreign.candidate.checkpoint.taskId='task-3';
+ // A signed monitor observes only its own actor's provider receipt.
+ const owned=[first,foreign,second].filter(r=>r.actor_id==='owner' && acceptedOpenHandsNeedsObservation(r));
+ assert.equal(owned.length,2);
+ assert.equal(shouldReconcileTerminalRepair(first,'owner'),false);
+ assert.equal(shouldReconcileTerminalRepair(second,'owner'),false);
+ // An accepted receipt from another administrator cannot be supervised by
+ // this policy identity. Preserve the original task but reconcile its linked
+ // blocked workflow action to a visible administrator-attention state.
+ assert.equal(acceptedOpenHandsNeedsObservation(foreign),true);
+ assert.equal(shouldReconcileTerminalRepair(foreign,'owner'),true);
+ const verified={...first,status:'verified',release_sha:'a'.repeat(40)};
+ assert.equal(shouldReconcileTerminalRepair(verified,'owner'),true);
+ const trulyFailed={...second,verification:{...second.verification,openhandsObservation:{state:'rejected'}}};
+ assert.equal(shouldReconcileTerminalRepair(trulyFailed,'owner'),true);
+ assert.equal(shouldReconcileTerminalRepair({...first,status:'queued'},'owner'),false);
+});
+
+test('transport failure observes the original task only after workflow evidence proves prepare failed', async () => {
+  for (const validationConclusion of ['skipped', 'failure']) {
+    const h = fixture();
+    h.repair.error_code = 'fetch failed';
+    const workflowJobs = [
+      { name: 'prepare', status: 'completed', conclusion: 'failure' },
+      { name: 'validate', status: 'completed', conclusion: validationConclusion },
+      { name: 'publish', status: 'completed', conclusion: 'skipped' },
+    ];
+    const result = await superviseAcceptedOpenHandsRepair(h.repair, {
+      now: () => now,
+      workflow: async () => h.run,
+      jobs: async () => ({ total_count: workflowJobs.length, jobs: workflowJobs }),
+      sourceEligible: async () => true,
+      observe: h.observe,
+      record: async (value) => h.records.push(value),
+      claim: async (value) => { h.claims.push(value); return true; },
+    });
+    const interruptedPrepare = validationConclusion === 'skipped';
+    assert.equal(result.awaitingProvider, interruptedPrepare);
+    assert.equal(h.refreshes, interruptedPrepare ? 1 : 0);
+    assert.equal(h.claims.length, 0);
+    assert.equal(h.records[0].openhandsObservation.state, interruptedPrepare ? 'pending' : 'attention_required');
+  }
 });

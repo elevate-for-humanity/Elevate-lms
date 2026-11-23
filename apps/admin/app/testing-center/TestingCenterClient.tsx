@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import {
+  type LucideIcon,
   ClipboardList, Calendar, Shield, TrendingUp,
   CheckCircle, XCircle, Clock, AlertTriangle,
   Users, Award, RefreshCw,
@@ -385,7 +386,7 @@ export default function TestingCenterClient({
 }) {
   const [tab, setTab] = useState<Tab>('bookings');
 
-  const tabs: { id: Tab; label: string; icon: React.ElementType; count?: number }[] = [
+  const tabs: { id: Tab; label: string; icon: LucideIcon; count?: number }[] = [
     { id: 'bookings', label: 'Bookings',  icon: ClipboardList, count: bookings.length },
     { id: 'sessions', label: 'Sessions',  icon: Shield,        count: sessions.length },
     { id: 'schedule', label: 'Schedule',  icon: Calendar,      count: slots.length },

@@ -498,7 +498,7 @@ export function AdminDashboardContent({
             shell on this device.
           </p>
         </div>
-        <PwaInstallCenter />
+        <PwaInstallCenter showWorkspaceApps={canAccessDevStudio} />
         <HostShopPortalLauncher />
       </section>
     </div>

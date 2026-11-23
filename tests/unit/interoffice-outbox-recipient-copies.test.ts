@@ -1,5 +1,5 @@
 import { expect, it, vi } from 'vitest';
-const mocks = vi.hoisted(() => ({ copy: vi.fn(), send: vi.fn(), sequence: 0 }));
+const mocks = vi.hoisted(() => ({ copy: vi.fn(), send: vi.fn(), sequence: 0, direct: false }));
 vi.mock('@/lib/email/communication-inbound', () => ({
   storeInboundCommunicationEmail: mocks.copy,
 }));
@@ -12,6 +12,8 @@ vi.mock('@/lib/supabase/admin', () => ({
   requireAdminClient: async () => ({
     from: (table: string) => {
       let action = 'select';
+      let owner = '';
+      let kind = '';
       const result = () => ({
         data:
           table === 'communication_email_outbox'
@@ -45,13 +47,22 @@ vi.mock('@/lib/supabase/admin', () => ({
         error: null,
       });
       const query: any = { then: (resolve: any) => Promise.resolve(result()).then(resolve) };
-      for (const method of ['select', 'eq', 'neq', 'in', 'limit', 'order'])
+      for (const method of ['select', 'limit', 'order'])
         query[method] = () => query;
       for (const method of ['update', 'insert'])
         query[method] = () => {
           action = method;
           return query;
         };
+      query.eq = (field: string, value: string) => {
+        if (field === 'owner_user_id') owner = value;
+        if (field === 'mailbox_kind') kind = value;
+        return query;
+      };
+      query.maybeSingle = async () => ({
+        data: owner && kind === 'individual' ? { address: mocks.direct ? `${owner}@example.org` : `${owner}@elevateforhumanity.org` } : null,
+        error: null,
+      });
       query.single = async () => ({
         data:
           table === 'communication_email_mailboxes'
@@ -64,16 +75,18 @@ vi.mock('@/lib/supabase/admin', () => ({
   }),
 }));
 import { processInterofficeOutbox } from '@/lib/email/interoffice-outbox';
-it('preserves two recipients in one campaign when their copies reach the same shared mailbox', async () => {
+it('keeps each campaign copy in its recipient’s individual inbox', async () => {
   mocks.send.mockResolvedValue({ success: true, data: { messageId: 'accepted' } });
   mocks.copy.mockResolvedValue({ stored: true, mailboxCount: 1 });
   expect(await processInterofficeOutbox()).toMatchObject({ sent: 2, failed: 0 });
   expect(mocks.copy).toHaveBeenCalledTimes(2);
   expect(mocks.copy.mock.calls[0][0]).toMatchObject({
+    envelopeRecipients: ['one@elevateforhumanity.org'],
     eventId: 'outbox-copy:delivery-one',
     text: 'For one',
   });
   expect(mocks.copy.mock.calls[1][0]).toMatchObject({
+    envelopeRecipients: ['two@elevateforhumanity.org'],
     eventId: 'outbox-copy:delivery-two',
     text: 'For two',
   });
@@ -85,4 +98,15 @@ it('preserves two recipients in one campaign when their copies reach the same sh
     internalCopy: true,
     applicantEmail: 'two@example.org',
   });
+});
+
+it('does not create a local copy when SendGrid is already delivering to the personal inbox address', async () => {
+  mocks.direct = true;
+  mocks.copy.mockClear();
+  try {
+    expect(await processInterofficeOutbox()).toMatchObject({ sent: 2, failed: 0 });
+    expect(mocks.copy).not.toHaveBeenCalled();
+  } finally {
+    mocks.direct = false;
+  }
 });

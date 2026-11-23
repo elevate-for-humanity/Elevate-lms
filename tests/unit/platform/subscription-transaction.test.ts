@@ -4,7 +4,10 @@ import {
   getCourseBuilderCreditBalance,
   reserveCourseBuilderCredits,
   refundCourseBuilderCredits,
+  COURSE_BUILDER_APP_SLUG,
+  COURSE_BUILDER_MONTHLY_ALLOWANCE,
 } from '@/lib/course-builder/credits';
+import { COURSE_BUILDER_MONTHLY_PRICE, COURSE_DRAFT_SIZES } from '@/lib/course-builder/offer';
 import { fulfillPaidBillingInvoice } from '@/lib/billing/fulfillment';
 import { getOrganizationFeatures } from '@/lib/platform/organization-features';
 import { withLicense } from '@/lib/middleware/withLicense';
@@ -37,6 +40,9 @@ periodStart.setUTCHours(0, 0, 0, 0);
 const periodEnd = new Date(periodStart);
 periodEnd.setUTCFullYear(periodEnd.getUTCFullYear() + 1);
 const publicAddons = ADD_ON_MARKETPLACE.filter((a) => !a.hiddenFromMarketplace);
+const deliveryAddons = ADD_ON_MARKETPLACE.filter(
+  (a) => !a.hiddenFromMarketplace || a.slug === COURSE_BUILDER_APP_SLUG,
+);
 const schema = `
 CREATE SCHEMA auth; CREATE FUNCTION auth.role() RETURNS text LANGUAGE sql AS $$ SELECT 'service_role'::text $$;
 CREATE FUNCTION auth.uid() RETURNS uuid LANGUAGE sql AS $$ SELECT NULL::uuid $$; CREATE TABLE auth.users(id uuid PRIMARY KEY);
@@ -123,7 +129,7 @@ beforeAll(async () => {
       ]);
     }
   }
-  for (const a of publicAddons)
+  for (const a of deliveryAddons)
     await db.query(`INSERT INTO saas_addon_catalog VALUES($1,$2,true,$3)`, [
       normalizeAddonCode(a.slug),
       a.priceMonthly,
@@ -155,6 +161,12 @@ beforeEach(async () => {
   );
 });
 describe('Atomic Store subscription delivery against PostgreSQL', () => {
+  it('keeps the $130 Course Builder offer visible through sales while self-service is unavailable', () => {
+    expect(COURSE_BUILDER_MONTHLY_PRICE).toBe(130);
+    expect(publicAddons.some((addon) => addon.slug === COURSE_BUILDER_APP_SLUG)).toBe(false);
+    expect(COURSE_DRAFT_SIZES.map(({ credits }) => Math.floor(COURSE_BUILDER_MONTHLY_ALLOWANCE / credits)))
+      .toEqual([5, 1, 1]);
+  });
   for (const plan of Object.values(BASE_PLANS))
     for (const interval of ['month', 'year'])
       it(`delivers ${plan.id} ${interval} with its advertised capabilities and limits`, async () => {
@@ -289,6 +301,13 @@ describe('Atomic Store subscription delivery against PostgreSQL', () => {
       idempotencyKey: 'usage:test',
     });
     expect(usage.balance).toBe(1000);
+    await expect(reserveCourseBuilderCredits({
+      db: client as any,
+      tenantId: tenant,
+      userId,
+      operation: 'generate',
+      idempotencyKey: 'usage:second-draft',
+    })).rejects.toMatchObject({ code: 'INSUFFICIENT_CREDITS', balance: 1000 });
     await refundCourseBuilderCredits({
       db: client as any,
       tenantId: tenant,

@@ -3,6 +3,8 @@ import Image from 'next/image';
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
+import { HVAC_COURSE_ID } from '@/lib/courses/hvac-uuids';
+import { isAssignedCourseInstructor } from '@/lib/lms/instructor-course-access';
 import { loadInstructorPendingReviews } from '@/lib/instructor/pending-reviews';
 import { requireRole } from '@/lib/auth/require-role';
 import Link from 'next/link';
@@ -139,6 +141,7 @@ export default async function InstructorDashboard() {
   // These review tables are intentionally unavailable to the browser database role.
   // requireRole above establishes identity; the reader preserves assignment scope.
   const reviewDb = await requireAdminClient();
+  const showHvacCourse = isAdmin || await isAssignedCourseInstructor(reviewDb, user.id, HVAC_COURSE_ID);
   const { pendingOjtResult, pendingSignoffsResult } = await loadInstructorPendingReviews(
     reviewDb, { isAdmin, studentIds: scopedStudentIds },
   );
@@ -358,6 +361,14 @@ export default async function InstructorDashboard() {
             <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
               <h3 className="font-bold text-black mb-4">Quick Actions</h3>
               <div className="space-y-3">
+                {showHvacCourse && (
+                  <Link
+                    href={`/instructor/courses/${HVAC_COURSE_ID}`}
+                    className="block rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 font-bold text-blue-900 hover:bg-blue-100"
+                  >
+                    HVAC syllabus and simulator
+                  </Link>
+                )}
                 <Link
                   href="/instructor/progress"
                   className="flex items-center justify-between w-full px-4 py-3 bg-emerald-50 hover:bg-emerald-100 rounded-lg border border-emerald-200 transition"

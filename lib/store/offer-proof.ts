@@ -262,6 +262,7 @@ export const STORE_FEATURE_PROOFS: Partial<Record<PlatformFeatureKey, StoreFeatu
     evidenceLabel: 'Review the Course Builder product',
     access: 'public-product',
     sourcePaths: ['apps/admin/app/studio/courses/page.tsx', 'lib/course-builder/orchestrator.ts'],
+    limitation: 'Beta: course editing remains restricted to authorized Admin Studio staff. A paid subscription does not yet grant self-service Course Builder access; generation, publishing and quality approval require configured workflows.',
   },
   [PlatformFeature.COURSE_FACTORY]: {
     title: 'AI Course Factory',
@@ -270,6 +271,7 @@ export const STORE_FEATURE_PROOFS: Partial<Record<PlatformFeatureKey, StoreFeatu
     evidenceLabel: 'Review the AI course workflow',
     access: 'public-product',
     sourcePaths: ['lib/ultimate-course-builder/core/generation-request.ts', 'lib/course-factory/canonical-course-gate.ts'],
+    limitation: 'Beta: generated drafts require configured AI providers, available credits, review and approval before publication. Automatic completion, licensed media and unattended publishing are not guaranteed.',
   },
   [PlatformFeature.STUDENT_MANAGEMENT]: {
     title: 'Student Management',

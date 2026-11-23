@@ -1,4 +1,5 @@
 // pre-auth-registry: exempt - Public tenant contact form intentionally captures anonymous leads before account creation; rows are website-owned and do not require user reconciliation.
+import { parseHourlyRate, money } from '@/lib/cleaning/pricing';
 import { NextRequest, NextResponse } from 'next/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { requireAdminClient } from '@/lib/supabase/admin';
@@ -22,10 +23,16 @@ export async function POST(request: NextRequest) {
   const name = clean(body.name, 160);
   const email = clean(body.email, 240).toLowerCase();
   const phone = clean(body.phone, 80);
-  const message = clean(body.message, 4000);
+  const requestedRate = body.providerHourlyRate === undefined ? undefined : clean(body.providerHourlyRate, 16);
+  const rateCents = requestedRate === undefined ? null : parseHourlyRate(requestedRate);
+  if (requestedRate !== undefined && rateCents === null) {
+    return NextResponse.json({ error: 'Choose an hourly rate from $15 to $200.' }, { status: 400 });
+  }
+  const rawMessage = clean(body.message, 4000);
+  const message = rateCents === null ? rawMessage : `Requested business pay per cleaner-hour: ${money(rateCents)} USD\n\n${rawMessage}`;
   const path = clean(body.path, 500) || '/contact';
 
-  if (!name || !email || !message) {
+  if (!name || !email || !rawMessage) {
     return NextResponse.json({ error: 'Name, email, and message are required' }, { status: 400 });
   }
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {

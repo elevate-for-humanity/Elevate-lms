@@ -1,3 +1,4 @@
+import { processCleaningOutbox } from '@/lib/cleaning/outbox';
 import { NextRequest, NextResponse } from 'next/server';
 import { fulfillPaidBillingInvoice } from '@/lib/billing/fulfillment';
 import { recordStoreSubscriptionPayment } from '@/lib/store/subscription-ledger';
@@ -90,8 +91,12 @@ export async function POST(request: NextRequest) {
         .eq('id', job.id);
     }
   }
+  let cleaningNotifications: { sent: number; held: number } | null = null;
+  let cleaningNotificationError: string | null = null;
+  try { cleaningNotifications = await processCleaningOutbox(db); } catch { cleaningNotificationError = 'Cleaning notification processing needs review.'; }
+  // Notification failure is reported separately; unrelated paid deliveries retain their own result.
   return NextResponse.json(
-    { ok: failed === 0, processed: (jobs || []).length, completed, failed, skipped },
-    { status: failed ? 207 : 200 },
+    { cleaningNotifications, cleaningNotificationError, ok: failed === 0 && !cleaningNotificationError, processed: (jobs || []).length, completed, failed, skipped },
+    { status: failed || cleaningNotificationError ? 207 : 200 },
   );
 }

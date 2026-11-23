@@ -7,6 +7,7 @@ import { executeAICommand } from '@/lib/ai/runtime/command-executor';
 import { getAITool, type AIAgentId } from '@/lib/ai/tools/registry';
 import { planAIToolFromCommand } from '@/lib/ai/tools/planner';
 import { reconcileStudioRunFromTask } from '@/lib/devstudio/studio-run-reconciler';
+import { isProviderConfirmationSnapshot } from '@/lib/devstudio/openhands/provider-confirmation.mjs';
 
 export type TaskExecutionRuntimeContext = {
   actorRoles: readonly string[];
@@ -734,6 +735,22 @@ export async function approveTask(
   const { data: task } = await db.from('ai_tasks').select('*').eq('id', taskId).single();
   if (!task) throw new Error('Task not found');
   const isInteractive = task.tool_input?.__executionMode === 'interactive';
+
+  // PARIS already has an accepted OpenHands conversation. Cloud's
+  // waiting_for_confirmation is a provider-side decision on pending actions,
+  // not approval of a new local command. Approve it in the original OpenHands
+  // conversation. Never invoke runTaskExecution or fabricate a local approval.
+  if (task.tool_name === 'openhands.execute' &&
+      typeof task.correlation_id === 'string' && task.correlation_id.startsWith('paris-repair:')) {
+    if (task.user_id !== reviewerId || (task.tenant_id ?? null) !== null ||
+        task.status !== 'awaiting_approval' ||
+        !isProviderConfirmationSnapshot(task) ||
+        task.tool_input?.repository !== 'elevate-for-humanity/Elevate-lms' ||
+        !/^studio\/[a-zA-Z0-9/_-]+$/.test(task.tool_input?.branch ?? '')) {
+      throw new Error('OPENHANDS_APPROVAL_RECEIPT_OR_OWNER_MISMATCH');
+    }
+    throw new Error('OPENHANDS_PROVIDER_CONFIRMATION_REQUIRED');
+  }
 
   await db
     .from('ai_approvals')

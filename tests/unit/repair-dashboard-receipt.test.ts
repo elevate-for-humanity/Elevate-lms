@@ -69,3 +69,17 @@ it('unauthorized requests cannot read repair or conversation records',async()=>{
  expect((await GET(new NextRequest('https://admin.test/api/admin/dev-studio/engineering'))).status).toBe(401);
  expect(h.reads).toHaveLength(0);
 });
+
+it('offers provider confirmation only for the owned accepted provider wait',()=>{
+ const pending={...task(),status:'awaiting_approval',correlation_id:`paris-repair:${repairId}:attempt:1`,
+  approval_reason:'OpenHands is waiting for confirmation. Elevate retains approval authority.',
+  tool_output:{conversation_id:'original-conversation',start_task_id:'original-start'}};
+ expect(repairDashboardReceipt(repair(),pending,'owner').providerConfirmationRequired).toBe(true);
+ for(const change of [{status:'completed'},{approval_reason:'Missing verifiable GitHub output'},
+  {requires_approval:false},{tool_output:{conversation_id:'original-conversation'}},{user_id:'other'},
+  {approval_status:'rejected'},{correlation_id:'other-task'}]){
+  expect(repairDashboardReceipt(repair(),{...pending,...change},'owner').providerConfirmationRequired).toBe(false);
+ }
+ const receipt=repairDashboardReceipt(repair(),pending,'owner');
+ expect(JSON.stringify(receipt)).not.toContain(pending.approval_reason);
+});

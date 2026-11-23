@@ -1,4 +1,4 @@
-import { NextRequest } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { apiRequireDevStudio } from '@/lib/devstudio/api-auth';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { requireAdminClient } from '@/lib/supabase/admin';
@@ -36,6 +36,12 @@ export async function POST(request: NextRequest, context: RouteContext) {
     return jsonOk({ task, approved: true });
   } catch (err) {
     const message = err instanceof Error ? err.message : '';
+    if (message === 'OPENHANDS_PROVIDER_CONFIRMATION_REQUIRED') {
+      return NextResponse.json({
+        error: 'Confirm the pending action in the original OpenHands conversation. The existing provider task was not replayed.',
+        code: message,
+      }, { status: 409 });
+    }
     if (message.includes('not found')) return tableNotReadyResponse();
     return safeInternalError(err, 'Failed to approve task');
   }

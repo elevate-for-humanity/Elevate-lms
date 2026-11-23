@@ -5,6 +5,7 @@
 
 import type { PlatformFeatureKey } from '@/lib/platform/features';
 import { PlatformFeature } from '@/lib/platform/features';
+import { COURSE_BUILDER_MONTHLY_PRICE } from '@/lib/course-builder/offer';
 
 export type BasePlanId = 'solo' | 'business' | 'professional';
 export type BillingInterval = 'monthly' | 'annual';
@@ -234,7 +235,9 @@ export const ADD_ON_MARKETPLACE: AddOnDefinition[] = [
   {
     slug: 'course-creation-learning-platform',
     name: 'Course Creation & Learning Platform',
-    priceMonthly: 79,
+    priceMonthly: COURSE_BUILDER_MONTHLY_PRICE,
+    // Paid organization delivery does not currently grant access to the staff-only builder.
+    hiddenFromMarketplace: true,
     description:
       'Build, generate, publish and deliver complete instructor-led courses from one unified workspace.',
     features: [
@@ -253,8 +256,7 @@ export const ADD_ON_MARKETPLACE: AddOnDefinition[] = [
       '2,500 Course Builder credits each month',
       'Course structures remain available; AI generation and media use credits',
     ],
-    usageNote:
-      'Includes 2,500 monthly credits. Additional credits require an upgrade or credit pack.',
+    usageNote: '2,500 monthly credits. Request a quote for more capacity.',
   },
   {
     slug: 'online-courses-lms',

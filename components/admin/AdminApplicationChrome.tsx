@@ -11,15 +11,17 @@ import type { NavSection } from '@/lib/admin/nav-config';
 export function AdminApplicationChrome({
   children,
   navSections,
+  staffInbox = false,
 }: {
   children: React.ReactNode;
   navSections: NavSection[];
+  staffInbox?: boolean;
 }) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   // Staff owns a separate, server-authorized shell. Never mount the platform
   // administrator menu, inbox notices, or mobile dock around that workspace.
-  if (pathname === '/staff-portal' || pathname.startsWith('/staff-portal/')) {
+  if (pathname === '/staff-portal' || pathname.startsWith('/staff-portal/') || (staffInbox && pathname === '/phone/email')) {
     return (
       <div data-elevate-staff-shell className="min-h-dvh min-w-0 bg-white">
         {children}

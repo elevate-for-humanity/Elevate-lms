@@ -1,6 +1,15 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { resolveVerifier, repairQuickBooksProduction } from './repair-quickbooks-production.mjs';
+import { isQuickBooksVerifierSecretName, resolveVerifier, repairQuickBooksProduction } from './repair-quickbooks-production.mjs';
+
+test('finds actual Intuit and QuickBooks named verifier secrets, never unrelated credentials', () => {
+  for (const name of ['elevate-intuit-webhook-verification', 'elevate-quickbooks-webhook-verifier', 'QB_WEBHOOK_VERIFIER_TOKEN', 'intuit_signature']) {
+    assert.equal(isQuickBooksVerifierSecretName(name), true, name);
+  }
+  for (const name of ['elevate-intuit-oauth-client-secret', 'elevate-quickbooks-runtime-config', 'stripe-webhook-verifier', 'random-secret']) {
+    assert.equal(isQuickBooksVerifierSecretName(name), false, name);
+  }
+});
 
 test('recovers either existing verifier alias without generating a replacement', () => {
   assert.equal(resolveVerifier([{ QUICKBOOKS_WEBHOOK_VERIFIER_TOKEN: 'existing' }]), 'existing');
@@ -20,7 +29,7 @@ test('requires all owning runtime configurations before any mutation', () => {
 for (const enabled of [true, false]) {
   test(`audits a ${enabled ? 'populated' : 'prepared empty'} standalone verifier using the supported Google CLI arguments`, () => {
     const components = ['admin', 'marketing', 'lms', 'store'];
-    const standalone = 'elevate-quickbooks-webhook-verifier';
+    const standalone = enabled ? 'elevate-intuit-webhook-verification' : 'elevate-quickbooks-webhook-verifier';
     const calls = [];
     const run = args => {
       calls.push(args);
@@ -49,6 +58,10 @@ for (const enabled of [true, false]) {
     assert.equal(report.webhookDeliveryVerified, false);
     assert.equal(JSON.stringify(report).includes('private-existing-verifier'), false);
     assert.equal(calls.some(args => args.includes('add') || args.includes('update')), false);
+    if (!enabled) {
+      assert.throws(() => repairQuickBooksProduction({ run, apply: true }), /QB_VERIFIER_UNAVAILABLE/);
+      assert.equal(calls.some(args => args.includes('add') || args.includes('update')), false, 'no mutation with missing verifier');
+    }
   });
 }
 

@@ -4,6 +4,7 @@ import { Metadata } from 'next';
 import { Phone, Mail, MapPin, Clock, MessageSquare, Users, Building2 } from 'lucide-react';
 import Link from 'next/link';
 import { ContactRequestForm } from '@/components/forms/ContactRequestForm';
+import { COURSE_BUILDER_REQUESTS } from '@/lib/course-builder/offer';
 
 export const metadata: Metadata = {
   title: 'Contact | Workforce Development & Apprenticeship Programs',
@@ -25,10 +26,13 @@ export default async function ContactPage({ searchParams }: ContactPageProps) {
   const submitted = params.submitted === '1';
   const submitError = typeof params.error === 'string' ? params.error : '';
   const requestedItem = product || course;
-  const defaultSubject = course ? 'enrollment' : requestedItem ? 'other' : '';
-  const defaultMessage = requestedItem
+  const courseBuilderMessage = Object.hasOwn(COURSE_BUILDER_REQUESTS, product)
+    ? COURSE_BUILDER_REQUESTS[product as keyof typeof COURSE_BUILDER_REQUESTS]
+    : null;
+  const defaultSubject = courseBuilderMessage ? 'course-builder' : course ? 'enrollment' : requestedItem ? 'other' : '';
+  const defaultMessage = courseBuilderMessage ?? (requestedItem
     ? `I would like current availability, delivery details, access terms, and final pricing for ${titleFromSlug(requestedItem)}.`
-    : '';
+    : '');
 
   return (
     <main id="main-content" className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
@@ -67,6 +71,7 @@ export default async function ContactPage({ searchParams }: ContactPageProps) {
                 )}
                 
                 <ContactRequestForm>
+                  {courseBuilderMessage && <input type="hidden" name="interest" value={product} />}
                   {/* Name */}
                   <div>
                     <label htmlFor="name" className="block text-sm font-semibold text-slate-700 mb-2">
@@ -141,6 +146,7 @@ export default async function ContactPage({ searchParams }: ContactPageProps) {
                       <option value="host-shop">Host Shop / Training Site</option>
                       <option value="job-placement">Job Placement Services</option>
                       <option value="technical">Technical Support</option>
+                      <option value="course-builder">Course Builder Plans & Credits</option>
                       <option value="feedback">Program Feedback</option>
                       <option value="media">Media / Press Inquiry</option>
                       <option value="other">Other</option>
@@ -160,8 +166,15 @@ export default async function ContactPage({ searchParams }: ContactPageProps) {
                       minLength={10}
                       defaultValue={defaultMessage}
                       className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-orange-500 focus:border-brand-orange-500 transition-colors resize-none"
-                      placeholder="Tell us about your goals, questions, or how we can support you..."
+                      placeholder={courseBuilderMessage
+                        ? 'Tell us how many courses you need and how many lessons each will have.'
+                        : 'Tell us about your goals, questions, or how we can support you...'}
                     />
+                    {courseBuilderMessage && (
+                      <p className="mt-2 text-sm text-slate-600">
+                        Include the number of courses, approximate lessons per course, and any narration or video needs.
+                      </p>
+                    )}
                   </div>
 
                   {/* Submit */}

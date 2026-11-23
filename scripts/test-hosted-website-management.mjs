@@ -239,7 +239,11 @@ test('PARIS cannot overwrite manual edits made while inference was in flight', a
 });
 
 const trialSource = await readFile(new URL('../lib/apps/website-builder-trial.ts', import.meta.url), 'utf8');
-const trialFactory = new Function('getWebsiteBuilderAccess', stripTypeScriptTypes(trialSource).replace(/^import .*;\r?$/gm, '').replace(/^export /gm, '') + '\nreturn consumeWebsiteBuilderCredits;');
+const trialPolicy = await readFile(new URL('../lib/apps/website-builder-credit-policy.ts', import.meta.url), 'utf8');
+const trialFactory = new Function('getWebsiteBuilderAccess', stripTypeScriptTypes(trialPolicy + '\n' + trialSource)
+  .replace(/^import\b[^;]*;\r?$/gm, '')
+  .replace(/^export \{[^}]+\};\r?$/gm, '')
+  .replace(/^export /gm, '') + '\nreturn consumeWebsiteBuilderCredits;');
 for (const [balance, allowed] of [[16,true],[8,true],[0,false]]) test(`actual trial helper preflights ${balance} credits without debiting`, async () => {
  const calls=[];
  const consume=trialFactory(async()=>({allowed:true,status:'trial'}));

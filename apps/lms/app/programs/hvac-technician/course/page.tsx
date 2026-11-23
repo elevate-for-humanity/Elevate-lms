@@ -1,7 +1,10 @@
 import type { Metadata } from 'next';
+import { notFound, redirect } from 'next/navigation';
+import { resolveCourseEnrollment } from '@/lib/enrollment/resolve-course-enrollment';
 import { getCurrentUser } from '@/lib/auth';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import CanonicalHvacCourseHome from './CanonicalHvacCourseHome';
+import { findPublishedHvacCourseId } from '@/lib/courses/resolvers';
 import { loadCourseActivity } from '@/lib/learner/course-activity';
 
 export const metadata: Metadata = {
@@ -12,12 +15,18 @@ export const metadata: Metadata = {
 export const dynamic = 'force-dynamic';
 
 export default async function HvacCoursePage() {
+  const user = await getCurrentUser();
+  if (!user) redirect('/login?next=/programs/hvac-technician/course');
+
   const db = await requireAdminClient();
-  const { data: course, error: courseError } = await db
+  const activeCourseId = await findPublishedHvacCourseId();
+  const { data: course, error: courseError } = activeCourseId ? await db
     .from('courses')
     .select('id, title, description, slug, is_active')
-    .eq('slug', 'hvac-technician')
-    .maybeSingle();
+    .eq('id', activeCourseId)
+    .eq('is_active', true)
+    .eq('status', 'published')
+    .maybeSingle() : { data: null, error: null };
 
   if (courseError) {
     throw new Error(`HVAC_COURSE_LOOKUP_FAILED:${courseError.message}`);
@@ -28,11 +37,28 @@ export default async function HvacCoursePage() {
         <div className="mx-auto max-w-xl rounded-2xl border border-slate-200 bg-white p-8 text-center shadow-sm">
           <h1 className="text-2xl font-bold text-slate-950">HVAC course is not published yet</h1>
           <p className="mt-3 text-slate-700">
-            The canonical course record could not be found. An administrator must publish the HVAC blueprint before learners can enter the course.
+            Course materials will be available here after the course is published.
           </p>
         </div>
       </main>
     );
+  }
+
+  const accessStatuses = ['active', 'enrolled', 'in_progress', 'confirmed', 'completed'];
+  const enrollment = await resolveCourseEnrollment(user.id, course.id);
+  if (!enrollment || !accessStatuses.includes(enrollment.status)) {
+    // The paid digital bundle grants access to this course on its own.
+    const { data: directEnrollment, error: directEnrollmentError } = await db
+      .from('course_enrollments')
+      .select('id')
+      .eq('student_id', user.id)
+      .eq('course_id', course.id)
+      .in('status', accessStatuses)
+      .is('revoked_at', null)
+      .limit(1)
+      .maybeSingle();
+    if (directEnrollmentError) throw new Error('HVAC_COURSE_ENROLLMENT_UNAVAILABLE');
+    if (!directEnrollment) notFound();
   }
 
   const [{ data: modules, error: modulesError }, { data: lessons, error: lessonsError }] = await Promise.all([
@@ -72,29 +98,24 @@ export default async function HvacCoursePage() {
 
   let completedLessonIds: string[] = [];
   let totalTimeSeconds = 0;
-  let savedActivity: { assessmentsPassed: number; videosCompleted: number } | null = null;
-  const user = await getCurrentUser();
+  const { data: progress, error: progressError } = await db
+    .from('lesson_progress')
+    .select('lesson_id, completed, time_spent_seconds')
+    .eq('user_id', user.id)
+    .eq('course_id', course.id);
 
-  if (user) {
-    const { data: progress, error: progressError } = await db
-      .from('lesson_progress')
-      .select('lesson_id, completed, time_spent_seconds')
-      .eq('user_id', user.id)
-      .eq('course_id', course.id);
-
-    if (progressError) throw new Error('HVAC_PROGRESS_UNAVAILABLE');
-    const publishedIds = new Set((lessons ?? []).map(lesson => String(lesson.id)));
-    savedActivity = await loadCourseActivity(db, user.id, course.id, [...publishedIds]);
-    if (progress) {
-      const publishedProgress = progress.filter(row => publishedIds.has(String(row.lesson_id)));
-      completedLessonIds = publishedProgress
-        .filter((row) => row.completed === true && row.lesson_id)
-        .map((row) => String(row.lesson_id));
-      totalTimeSeconds = publishedProgress.reduce(
-        (sum, row) => sum + Number(row.time_spent_seconds ?? 0),
-        0,
-      );
-    }
+  if (progressError) throw new Error('HVAC_PROGRESS_UNAVAILABLE');
+  const publishedIds = new Set((lessons ?? []).map(lesson => String(lesson.id)));
+  const savedActivity = await loadCourseActivity(db, user.id, course.id, [...publishedIds]);
+  if (progress) {
+    const publishedProgress = progress.filter(row => publishedIds.has(String(row.lesson_id)));
+    completedLessonIds = publishedProgress
+      .filter((row) => row.completed === true && row.lesson_id)
+      .map((row) => String(row.lesson_id));
+    totalTimeSeconds = publishedProgress.reduce(
+      (sum, row) => sum + Number(row.time_spent_seconds ?? 0),
+      0,
+    );
   }
 
   return (

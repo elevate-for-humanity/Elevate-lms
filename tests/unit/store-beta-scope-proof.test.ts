@@ -12,7 +12,17 @@ describe('public Store repair/beta capability evidence', () => {
   }
 
   it('does not present the staff-only Course Builder as instant self-service', () => {
-    expect(STORE_FEATURE_PROOFS.course_builder?.limitation).toMatch(/staff|self-service/i);
-    expect(STORE_FEATURE_PROOFS.course_factory?.limitation).toMatch(/approval|review/i);
+    expect(STORE_FEATURE_PROOFS.course_builder?.limitation).toMatch(
+      /restricted to authorized Admin Studio staff/i,
+    );
+    expect(STORE_FEATURE_PROOFS.course_builder?.limitation).toMatch(
+      /does not yet grant self-service Course Builder access/i,
+    );
+    expect(STORE_FEATURE_PROOFS.course_factory?.limitation).toMatch(
+      /generated drafts require configured AI providers/i,
+    );
+    expect(STORE_FEATURE_PROOFS.course_factory?.limitation).toMatch(
+      /review and approval before publication/i,
+    );
   });
 });

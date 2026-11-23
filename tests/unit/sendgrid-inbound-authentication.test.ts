@@ -87,6 +87,16 @@ for (const [name, post] of [
       { strict: true, leaseToken: 'test-lease' },
     );
   });
+  it(`${name} advances admissions when delivery includes a review copy`, async () => {
+    m.store.mockResolvedValue({ stored: true, mailboxCount: 1, review: true });
+    expect((await post(await signedRequest())).status).toBe(200);
+    expect(m.paris).toHaveBeenCalledOnce();
+  });
+  it(`${name} keeps review-only messages out of admissions automation`, async () => {
+    m.store.mockResolvedValue({ stored: false, mailboxCount: 0, review: true });
+    expect((await post(await signedRequest())).status).toBe(200);
+    expect(m.paris).not.toHaveBeenCalled();
+  });
   it(`${name} rejects a modified signed body before database or forwarding work`, async () => {
     expect((await post(await signedRequest(true))).status).toBe(401);
     expect(m.claim).not.toHaveBeenCalled();

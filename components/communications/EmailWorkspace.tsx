@@ -136,7 +136,7 @@ export function EmailWorkspace({
   roleLabel?: string;
   initialRecipient?: string;
   initialSubject?: string;
-  communicationLinks?: { phone: string; chat: string; calendar: string };
+  communicationLinks?: { phone: string; chat: string; calendar: string } | null;
 }) {
   const [data, setData] = useState<WorkspaceData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -566,46 +566,48 @@ export function EmailWorkspace({
           </div>
         </div>
 
-        <nav
-          aria-label="Communication tools"
-          className="flex gap-3 overflow-x-auto border-b border-slate-200 bg-white p-3 text-sm font-bold"
-        >
-          <a
-            className="shrink-0 rounded-lg border px-3 py-2"
-            href={communicationLinks?.phone ?? (data.isAdmin ? '/phone/inbox' : '/communications/phone')}
+        {communicationLinks !== null && (
+          <nav
+            aria-label="Communication tools"
+            className="flex gap-3 overflow-x-auto border-b border-slate-200 bg-white p-3 text-sm font-bold"
           >
-            Phone inbox
-          </a>
-          <a
-            className="shrink-0 rounded-lg border px-3 py-2"
-            href={
-              communicationLinks?.chat ?? (data.isAdmin
-                ? '/staff-portal/messages'
-                : 'https://app.elevateforhumanity.org/lms/messages')
-            }
-          >
-            Chat
-          </a>
-          <a
-            className="shrink-0 rounded-lg border px-3 py-2"
-            href={
-              communicationLinks?.calendar ?? (data.isAdmin ? '/phone/meetings' : 'https://app.elevateforhumanity.org/lms/calendar')
-            }
-          >
-            Calendar
-          </a>
-          {data.isAdmin && (
-            <a className="shrink-0 rounded-lg border px-3 py-2" href="/phone/meetings">
-              Video meetings & group conferences
+            <a
+              className="shrink-0 rounded-lg border px-3 py-2"
+              href={communicationLinks?.phone ?? (data.isAdmin ? '/phone/inbox' : '/communications/phone')}
+            >
+              Phone inbox
             </a>
-          )}
-          <a
-            className="shrink-0 rounded-lg border px-3 py-2"
-            href={data.isAdmin ? '/phone/texts' : '/communications/texts'}
-          >
-            Text messages
-          </a>
-        </nav>
+            <a
+              className="shrink-0 rounded-lg border px-3 py-2"
+              href={
+                communicationLinks?.chat ?? (data.isAdmin
+                  ? '/staff-portal/messages'
+                  : 'https://app.elevateforhumanity.org/lms/messages')
+              }
+            >
+              Chat
+            </a>
+            <a
+              className="shrink-0 rounded-lg border px-3 py-2"
+              href={
+                communicationLinks?.calendar ?? (data.isAdmin ? '/phone/meetings' : 'https://app.elevateforhumanity.org/lms/calendar')
+              }
+            >
+              Calendar
+            </a>
+            {data.isAdmin && (
+              <a className="shrink-0 rounded-lg border px-3 py-2" href="/phone/meetings">
+                Video meetings & group conferences
+              </a>
+            )}
+            <a
+              className="shrink-0 rounded-lg border px-3 py-2"
+              href={data.isAdmin ? '/phone/texts' : '/communications/texts'}
+            >
+              Text messages
+            </a>
+          </nav>
+        )}
         <div className="grid min-h-[620px] min-w-0 md:grid-cols-[minmax(260px,0.9fr)_minmax(0,1.6fr)] xl:grid-cols-[220px_minmax(280px,0.9fr)_minmax(0,1.6fr)]">
           <aside
             className={`border-b border-slate-200 bg-slate-50 p-3 md:col-span-2 xl:col-span-1 xl:border-b-0 xl:border-r ${data.selectedThread ? 'hidden md:block' : 'block'}`}

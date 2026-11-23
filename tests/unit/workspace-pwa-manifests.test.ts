@@ -1,17 +1,30 @@
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { GET as studio } from '@/apps/admin/app/manifest-dev-studio.json/route';
 import { GET as courses } from '@/apps/admin/app/manifest-course-builder.json/route';
+import { GET as email } from '@/apps/admin/app/manifest-email.json/route';
 
 describe('separate workspace apps', () => {
-  it('uses distinct app identities with direct same-origin session-preserving launch paths', async () => {
-    const dev = await studio().json();
-    const course = await courses().json();
-    expect(dev.id).not.toBe(course.id);
-    expect(dev.start_url).toBe('/studio');
-    expect(course.start_url).toBe('/studio/courses');
-    expect(dev.scope).toBe('/');
-    expect(course.scope).toBe('/');
-    expect(dev.background_color).toBe('#ffffff');
-    expect(course.background_color).toBe('#ffffff');
+  it('keeps each installed launcher and its assets within an independent scope', async () => {
+    const manifests = await Promise.all([studio(), courses(), email()].map((response) => response.json()));
+    expect(new Set(manifests.map((manifest) => manifest.id)).size).toBe(3);
+    const entries = [
+      ['/install/dev-studio.html', '/studio'],
+      ['/install/course-builder.html', '/studio/courses'],
+      ['/install/email.html', '/phone/email'],
+    ];
+    for (const [index, manifest] of manifests.entries()) {
+      const [launcher, destination] = entries[index];
+      expect(manifest.start_url).toBe(launcher);
+      expect(manifest.scope).toBe(launcher);
+      expect(manifest.display).toBe('standalone');
+      const document = readFileSync(`apps/admin/public${launcher}`, 'utf8');
+      expect(document).toContain(`href="${destination}"`);
+      for (const icon of manifest.icons) {
+        expect(icon.src).toMatch(new RegExp(launcher.replace('.html', '-')));
+        const png = readFileSync(`apps/admin/public${icon.src}`);
+        expect(`${png.readUInt32BE(16)}x${png.readUInt32BE(20)}`).toBe(icon.sizes);
+      }
+    }
   });
 });

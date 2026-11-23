@@ -50,19 +50,53 @@ function isInternalHref(href: string | null): href is string {
   );
 }
 
+// One slow route must not consume the whole test timeout while every later
+// link waits behind it (run 45237452466: GET /funding/wrg was still in flight
+// when the 60s test timeout expired, and the dev server was resetting
+// connections under load). Fetch in parallel with a bounded pool and a
+// per-request timeout so a single stalled route fails fast on its own.
+const LINK_REQUEST_TIMEOUT_MS = 15_000;
+const LINK_CHECK_CONCURRENCY = 5;
+
 async function assertSuccessfulResponse(
   request: APIRequestContext,
   href: string,
   context: string,
 ) {
-  const response = await request.get(href, { maxRedirects: 10 });
+  const response = await request.get(href, { maxRedirects: 10, timeout: LINK_REQUEST_TIMEOUT_MS });
   expect(response.status(), `${context}: ${href} returned ${response.status()}`).toBeLessThan(400);
 }
 
-async function collectInternalLinks(page: Page, selector: string) {
-  const hrefs = await page.locator(selector).evaluateAll((links) =>
-    links.map((link) => link.getAttribute('href')),
+async function assertAllLinksResolve(
+  request: APIRequestContext,
+  hrefs: string[],
+  context: string,
+) {
+  const failures: string[] = [];
+  let next = 0;
+  async function worker() {
+    while (next < hrefs.length) {
+      const href = hrefs[next++];
+      try {
+        await assertSuccessfulResponse(request, href, context);
+      } catch (error) {
+        failures.push(`${href}: ${error instanceof Error ? error.message : String(error)}`);
+      }
+    }
+  }
+  await Promise.all(
+    Array.from({ length: Math.min(LINK_CHECK_CONCURRENCY, hrefs.length) }, () => worker()),
   );
+  expect(
+    failures,
+    `${context}: ${failures.length} link(s) failed to resolve:\n${failures.join('\n')}`,
+  ).toEqual([]);
+}
+
+async function collectInternalLinks(page: Page, selector: string): Promise<string[]> {
+  const hrefs = (await page.locator(selector).evaluateAll((links) =>
+    links.map((link) => link.getAttribute('href')),
+  )) as (string | null)[];
   return [...new Set(hrefs.filter(isInternalHref))].sort();
 }
 
@@ -122,21 +156,21 @@ test.describe('page-by-page public production audit', () => {
   }
 
   test('every homepage header and footer internal link resolves', async ({ page, request }) => {
+    // Parallel fetch (see assertAllLinksResolve) still needs headroom above
+    // the 60s global test timeout when the dev server is cold / under load.
+    test.setTimeout(180_000);
     await page.goto('/', { waitUntil: 'domcontentloaded' });
     const links = await collectInternalLinks(page, 'header a[href], footer a[href]');
     expect(links.length, 'No internal header or footer links were discovered').toBeGreaterThan(5);
-    for (const href of links) {
-      await assertSuccessfulResponse(request, href, 'navigation integrity');
-    }
+    await assertAllLinksResolve(request, links, 'navigation integrity');
   });
 
   test('program directory links resolve', async ({ page, request }) => {
+    test.setTimeout(180_000);
     await page.goto('/programs', { waitUntil: 'domcontentloaded' });
     const links = await collectInternalLinks(page, 'main a[href^="/programs/"]');
     expect(links.length, 'No program links were discovered').toBeGreaterThan(0);
-    for (const href of links) {
-      await assertSuccessfulResponse(request, href, 'program route');
-    }
+    await assertAllLinksResolve(request, links, 'program route');
   });
 });
 

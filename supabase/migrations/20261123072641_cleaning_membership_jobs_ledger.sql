@@ -19,7 +19,7 @@ create table public.cleaning_providers (
  review_note text not null default '', reviewed_by uuid references auth.users(id), reviewed_at timestamptz,
  created_at timestamptz not null default now(),
  check(eligibility<>'eligible' or (reviewed_by is not null and reviewed_at is not null and length(review_note)>0)),
- unique(website_id,email)
+ unique(website_id,email),unique(id,website_id)
 );
 create table public.cleaning_jobs (
  id uuid primary key default gen_random_uuid(), website_id uuid not null references public.user_websites(id),
@@ -31,9 +31,13 @@ create table public.cleaning_jobs (
  status text not null default 'requested' check(status in ('requested','quoted','offered','assigned','completed','cancelled','refund_review')),
  invoice_id uuid unique references public.billing_invoices(id), provider_id uuid references public.cleaning_providers(id),
  created_at timestamptz not null default now(), completion_note text,
- unique(website_id,customer_id,request_key),
+ unique(website_id,customer_id,request_key),unique(id,website_id),
+ foreign key(provider_id,website_id) references public.cleaning_providers(id,website_id),
  check(discount_cents>=0), check(customer_cents is null or customer_cents=base_cents-discount_cents),
- check(base_cents is null or (base_cents>=provider_pay_cents and customer_cents>=provider_pay_cents))
+ check(base_cents is null or (base_cents>=provider_pay_cents and customer_cents>=provider_pay_cents)),
+ check(status not in ('quoted','offered','assigned','completed') or (summary is not null and cleaner_hours is not null and duration_hours is not null and hourly_cents is not null and provider_pay_cents is not null and base_cents is not null and customer_cents is not null and quote_expires_at is not null)),
+ check(status not in ('offered','assigned','completed') or invoice_id is not null),
+ check(status not in ('assigned','completed') or provider_id is not null)
 );
 create table public.cleaning_discount_ledger (
  job_id uuid primary key references public.cleaning_jobs(id), period_id uuid not null references public.cleaning_member_periods(id),
@@ -44,14 +48,19 @@ create table public.cleaning_offers (
  id uuid primary key default gen_random_uuid(), website_id uuid not null references public.user_websites(id),
  job_id uuid not null references public.cleaning_jobs(id), provider_id uuid not null references public.cleaning_providers(id),
  token_hash text not null check(token_hash ~ '^[a-f0-9]{64}$'), expires_at timestamptz not null,
- status text not null default 'open' check(status in ('open','accepted','withdrawn')), unique(job_id,provider_id)
+ status text not null default 'open' check(status in ('open','accepted','withdrawn')), unique(job_id,provider_id),unique(id,website_id),
+ foreign key(job_id,website_id) references public.cleaning_jobs(id,website_id),
+ foreign key(provider_id,website_id) references public.cleaning_providers(id,website_id)
 );
 create table public.cleaning_outbox (
  id uuid primary key default gen_random_uuid(), website_id uuid not null references public.user_websites(id),
  job_id uuid not null references public.cleaning_jobs(id), kind text not null check(kind in ('request','quote','offer','assigned_customer','assigned_operator')),
  dedupe_key text not null unique, offer_id uuid references public.cleaning_offers(id), capability text,
  status text not null default 'pending' check(status in ('pending','sending','sent','unknown','suppressed')),
- attempted_at timestamptz, sent_at timestamptz, error text, created_at timestamptz not null default now()
+ attempted_at timestamptz, sent_at timestamptz, error text, created_at timestamptz not null default now(),
+ foreign key(job_id,website_id) references public.cleaning_jobs(id,website_id),
+ foreign key(offer_id,website_id) references public.cleaning_offers(id,website_id),
+ check(kind<>'offer' or offer_id is not null)
 );
 create table public.cleaning_job_accounts (
  job_id uuid primary key references public.cleaning_jobs(id), invoice_id uuid not null unique references public.billing_invoices(id),
@@ -81,7 +90,7 @@ begin
  select * into i from billing_invoices where id=p_invoice_id for update;
  if i.id is null or i.status<>'paid' or i.fulfillment_type<>'cleaning_membership' or i.total_cents<>1900 or lower(i.currency)<>'usd' or i.paid_at is null or i.paid_at>now()+interval '5 minutes' then raise exception 'Verified membership payment required'; end if;
  select * into m from cleaning_memberships where id=(i.fulfillment_payload->>'membership_id')::uuid for update;
- if m.id is null or lower(m.email)<>lower(i.customer_email) or m.website_id::text<>i.fulfillment_payload->>'website_id' then raise exception 'Membership invoice mismatch'; end if;
+ if m.id is null or lower(m.email)<>lower(i.customer_email) or m.website_id::text is distinct from (i.fulfillment_payload->>'website_id') then raise exception 'Membership invoice mismatch'; end if;
  select id into existing_id from cleaning_member_periods where invoice_id=i.id;
  if existing_id is not null then return existing_id; end if;
  select greatest(i.paid_at,coalesce(max(ends_at),i.paid_at)) into start_time from cleaning_member_periods where membership_id=m.id;
@@ -109,7 +118,7 @@ declare j cleaning_jobs; p cleaning_member_periods; used integer; base integer; 
 begin
  select * into j from cleaning_jobs where id=p_job_id and website_id=p_website_id for update;
  if j.id is null or j.status<>'requested' then raise exception 'Only a new request can be quoted'; end if;
- if p_hourly_cents is null or p_hourly_cents not between 1500 and 20000 or p_hours is null or p_hours not between 2 and 200 or p_hours*4<>trunc(p_hours*4) or length(p_summary) not between 5 and 1000 then raise exception 'Invalid job price or summary'; end if;
+ if p_hourly_cents is null or p_hourly_cents not between 1500 and 20000 or p_hours is null or p_hours not between 2 and 200 or p_hours*4<>trunc(p_hours*4) or p_summary is null or length(p_summary) not between 5 and 1000 then raise exception 'Invalid job price or summary'; end if;
  p_duration_hours:=coalesce(p_duration_hours,p_hours);
  if p_duration_hours<0.25 or p_duration_hours>p_hours or p_duration_hours*4<>trunc(p_duration_hours*4) then raise exception 'Invalid elapsed duration'; end if;
  if j.starts_at<=now()+interval '2 hours' then raise exception 'Job start must allow time to confirm a provider'; end if;
@@ -133,7 +142,7 @@ begin
  select * into i from billing_invoices where id=p_invoice_id for update;
  if i.id is null or i.status<>'paid' or i.fulfillment_type<>'cleaning_job' or i.paid_at is null or lower(i.currency)<>'usd' then raise exception 'Verified job payment required'; end if;
  select * into j from cleaning_jobs where id=(i.fulfillment_payload->>'job_id')::uuid for update;
- if j.id is null or j.website_id::text<>i.fulfillment_payload->>'website_id' or lower(j.customer_email)<>lower(i.customer_email) or j.customer_cents<>i.total_cents then raise exception 'Job invoice mismatch'; end if;
+ if j.id is null or j.website_id::text is distinct from (i.fulfillment_payload->>'website_id') or lower(j.customer_email)<>lower(i.customer_email) or j.customer_cents<>i.total_cents then raise exception 'Job invoice mismatch'; end if;
  if j.invoice_id=i.id and j.status in ('offered','assigned','completed') then return j.id; end if;
  if j.invoice_id is not null and j.invoice_id<>i.id then raise exception 'Duplicate payment requires separate refund review';end if;
  if j.status<>'quoted' or i.paid_at>j.quote_expires_at or now()>=j.starts_at or (j.period_id is not null and not exists(select 1 from cleaning_member_periods cp join billing_invoices bi on bi.id=cp.invoice_id where cp.id=j.period_id and bi.status='paid')) then
@@ -150,11 +159,11 @@ create function public.cleaning_accept_offer(p_offer_id uuid,p_website_id uuid,p
 declare o cleaning_offers; j cleaning_jobs; p cleaning_providers;
 begin
  -- All competing claims lock the same job before changing any assignment.
- select cj.* into j from cleaning_jobs cj join cleaning_offers co on co.job_id=cj.id where co.id=p_offer_id and co.website_id=p_website_id and co.token_hash=p_token_hash for update of cj;
+ select cj.* into j from cleaning_jobs cj join cleaning_offers co on co.job_id=cj.id where co.id=p_offer_id and cj.website_id=p_website_id and co.website_id=p_website_id and co.token_hash=p_token_hash for update of cj;
  if j.id is null then raise exception 'Offer unavailable'; end if;
  select * into o from cleaning_offers where id=p_offer_id and website_id=p_website_id for update;
  select * into p from cleaning_providers where id=o.provider_id and website_id=j.website_id for update;
- if o.status<>'open' or o.expires_at<=now() or j.status<>'offered' or j.starts_at<=now() or p.eligibility<>'eligible' or not p.opted_in or p.hourly_cents>j.hourly_cents then raise exception 'Offer unavailable'; end if;
+ if p.id is null or o.id is null or o.status<>'open' or o.expires_at<=now() or j.status<>'offered' or j.starts_at<=now() or p.eligibility<>'eligible' or not p.opted_in or p.hourly_cents>j.hourly_cents then raise exception 'Offer unavailable'; end if;
  if not exists(select 1 from billing_invoices where id=j.invoice_id and status='paid') then raise exception 'Payment unavailable'; end if;
  if exists(select 1 from cleaning_jobs busy where busy.provider_id=p.id and busy.status='assigned' and busy.id<>j.id and busy.starts_at < j.starts_at + make_interval(secs => j.duration_hours::double precision*3600) and j.starts_at < busy.starts_at + make_interval(secs => busy.duration_hours::double precision*3600)) then raise exception 'Provider already assigned during this time'; end if;
  update cleaning_jobs set status='assigned',provider_id=p.id where id=j.id;
@@ -167,7 +176,7 @@ create function public.cleaning_complete_job(p_job_id uuid,p_website_id uuid,p_n
 declare j cleaning_jobs;
 begin
  select * into j from cleaning_jobs where id=p_job_id and website_id=p_website_id for update;
- if j.id is null or j.status not in ('assigned','completed') or length(p_note) not between 5 and 2000 then raise exception 'Assigned job and completion evidence required'; end if;
+ if j.id is null or j.status not in ('assigned','completed') or p_note is null or length(p_note) not between 5 and 2000 then raise exception 'Assigned job and completion evidence required'; end if;
  if not exists(select 1 from billing_invoices where id=j.invoice_id and status='paid') then raise exception 'Payment not verified'; end if;
  insert into cleaning_job_accounts(job_id,invoice_id,provider_id,collected_cents,provider_payable_cents,discount_cents,platform_gross_cents) values(j.id,j.invoice_id,j.provider_id,j.customer_cents,j.provider_pay_cents,j.discount_cents,j.customer_cents-j.provider_pay_cents) on conflict(job_id) do nothing;
  update cleaning_jobs set status='completed',completion_note=p_note where id=j.id;
@@ -194,7 +203,7 @@ declare j cleaning_jobs; p cleaning_providers; oid uuid;
 begin
  select * into j from cleaning_jobs where id=p_job_id for update;
  select * into p from cleaning_providers where id=p_provider_id and website_id=j.website_id for share;
- if j.status<>'offered' or p.eligibility<>'eligible' or not p.opted_in or not j.zip=any(p.zips) or not j.service=any(p.services) or p.hourly_cents>j.hourly_cents or p_capability !~ '^[a-f0-9]{64}$' or p_hash<>encode(sha256(p_capability::bytea),'hex') then return false; end if;
+ if j.id is null or p.id is null or j.status<>'offered' or p.eligibility<>'eligible' or not p.opted_in or not j.zip=any(p.zips) or not j.service=any(p.services) or p.hourly_cents>j.hourly_cents or p_capability is null or p_hash is null or p_capability !~ '^[a-f0-9]{64}$' or p_hash<>encode(sha256(p_capability::bytea),'hex') then return false; end if;
  insert into cleaning_offers(website_id,job_id,provider_id,token_hash,expires_at) values(j.website_id,j.id,p.id,p_hash,least(now()+interval '72 hours',j.starts_at)) on conflict(job_id,provider_id) do nothing returning id into oid;
  if oid is null then return false; end if;
  insert into cleaning_outbox(website_id,job_id,kind,dedupe_key,offer_id,capability) values(j.website_id,j.id,'offer','offer:'||oid,oid,p_capability);
@@ -222,11 +231,12 @@ begin
  select * into o from cleaning_outbox where id=p_outbox_id;
  select * into j from cleaning_jobs where id=o.job_id for update;
  select * into o from cleaning_outbox where id=p_outbox_id for update;
- if o.id is null or o.status<>'unknown' or length(p_note) not between 10 and 2000 then raise exception 'Delivery review required';end if;
+ if o.id is null or j.id is null or j.website_id is distinct from o.website_id or p_actor is null or o.status<>'unknown' or p_note is null or length(p_note) not between 10 and 2000 then raise exception 'Delivery review required';end if;
  if o.kind='offer' then
  select * into ofr from cleaning_offers where id=o.offer_id;
- select * into p from cleaning_providers where id=ofr.provider_id for update;
- if j.status<>'offered' or j.starts_at<=now() or p.eligibility<>'eligible' or not p.opted_in or p_capability !~ '^[a-f0-9]{64}$' or p_hash<>encode(sha256(p_capability::bytea),'hex') then raise exception 'Offer cannot be reissued';end if;
+ select * into p from cleaning_providers where id=ofr.provider_id and website_id=j.website_id for update;
+ if ofr.id is null or ofr.website_id is distinct from j.website_id then raise exception 'Offer scope mismatch';end if;
+ if j.status<>'offered' or j.starts_at<=now() or p.eligibility<>'eligible' or not p.opted_in or p_capability is null or p_hash is null or p_capability !~ '^[a-f0-9]{64}$' or p_hash<>encode(sha256(p_capability::bytea),'hex') then raise exception 'Offer cannot be reissued';end if;
  update cleaning_offers set token_hash=p_hash,expires_at=least(now()+interval '72 hours',j.starts_at),status='open' where id=ofr.id;
  elsif o.kind='quote' and (j.status<>'quoted' or j.quote_expires_at<=now()) then raise exception 'Quote is no longer available';
  end if;

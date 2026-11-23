@@ -12,6 +12,10 @@ begin
  denied:=false; begin perform cleaning_activate_membership(inv); exception when others then denied:=true; end;
  if not denied then raise exception 'Unpaid invoice activated membership'; end if;
  update billing_invoices set status='paid',paid_at=now() where id=inv;
+ update billing_invoices set fulfillment_payload=fulfillment_payload-'website_id' where id=inv;
+ denied:=false;begin perform cleaning_activate_membership(inv);exception when others then denied:=true;end;
+ if not denied then raise exception 'Missing membership website scope accepted';end if;
+ update billing_invoices set fulfillment_payload=fulfillment_payload||jsonb_build_object('website_id',site) where id=inv;
  period:=cleaning_activate_membership(inv); perform cleaning_activate_membership(inv);
  select count(*) into n from cleaning_member_periods where membership_id=m;
  if n<>1 then raise exception 'Duplicate payment extended membership'; end if;
@@ -31,6 +35,10 @@ begin
  if (result->>'discount_cents')::integer<>1000 then raise exception 'Cancelled reservation not released'; end if;
  insert into billing_invoices(provider,idempotency_key,customer_external_key,customer_email,total_cents,status,paid_at,fulfillment_type,fulfillment_payload)
  values('quickbooks','cleaning-job-qa:'||j1,'cleaning-qa:'||m,'cleaning-qa@example.invalid',36000,'paid',now(),'cleaning_job',jsonb_build_object('job_id',j1,'website_id',site)) returning id into job_invoice;
+ update billing_invoices set fulfillment_payload=fulfillment_payload-'website_id' where id=job_invoice;
+ denied:=false;begin perform cleaning_mark_job_paid(job_invoice);exception when others then denied:=true;end;
+ if not denied then raise exception 'Missing job website scope accepted';end if;
+ update billing_invoices set fulfillment_payload=fulfillment_payload||jsonb_build_object('website_id',site) where id=job_invoice;
  perform cleaning_mark_job_paid(job_invoice); perform cleaning_mark_job_paid(job_invoice);
  if not exists(select 1 from cleaning_discount_ledger where job_id=j1 and status='consumed') then raise exception 'Paid discount not consumed'; end if;
  insert into tenant_site_leads(website_id,user_id,name,email,message,source_path,status)

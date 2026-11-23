@@ -150,6 +150,9 @@ const requested = appsRequestedByCli();
 const webServer: PlaywrightTestConfig['webServer'] = apps
   .filter((app) => usesLocalDevServer(app) && requested.has(app))
   .map((app) => ({
+    // Prefix Next.js stderr with the app name so RSC aborts and ECONNRESET
+    // are attributable to Marketing, Admin, or LMS instead of [WebServer].
+    name: `next-${app}`,
     // Run the workspace's own dev script (and predev asset sync) on its port.
     command: `pnpm --filter ${E2E_APPS[app].workspace} dev --port ${E2E_APPS[app].port}`,
     url: `${appOrigin(app)}${E2E_APPS[app].readyPath}`,

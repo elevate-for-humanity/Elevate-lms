@@ -75,7 +75,7 @@ jobs:
   # workflow on main pushes or the completed-deployment notification.
 
   hvac-public-playback:
-    if: (inputs.employer_only != true) && (github.event_name == 'pull_request' || (github.ref == 'refs/heads/main' && ((github.event_name == 'workflow_run' && github.event.workflow_run.name == 'Deploy Google Marketing on trigger' && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'workflow_dispatch' && github.event.workflow_run.head_branch == 'main') || (github.event_name == 'workflow_dispatch' && inputs.component == 'marketing'))))
+    if: (inputs.employer_only != true) && (github.event_name == 'pull_request' || (github.ref == 'refs/heads/main' && ((github.event_name == 'workflow_run' && github.event.workflow_run.path == '.github/workflows/deploy-google-marketing-trigger.yml' && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'workflow_dispatch' && github.event.workflow_run.head_branch == 'main') || (github.event_name == 'workflow_dispatch' && inputs.component == 'marketing'))))
     strategy:
       fail-fast: false
       matrix:

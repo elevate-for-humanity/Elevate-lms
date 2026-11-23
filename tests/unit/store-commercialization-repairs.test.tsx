@@ -3,6 +3,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 import CapabilitySubscriptionDemo from '@/components/store/CapabilitySubscriptionDemo';
 import { capabilityWalkthrough } from '@/lib/store/capability-walkthroughs';
 import { CAPABILITY_CATALOG } from '@/lib/platform/capability-catalog';
+import { ADD_ON_MARKETPLACE, BASE_PLANS } from '@/lib/store/platform-pricing';
 afterEach(cleanup);
 describe('commercial product walkthroughs', () => {
   it('provides navigable workflow examples, pauses on selection and labels sample states', () => {
@@ -34,6 +35,9 @@ describe('capability demo pricing', () => {
   it('uses the available learning bundle instead of a retired standalone LMS add-on', async () => {
     const { default: CapabilityDemoPage } = await import('@/apps/marketing/app/store/demo/capability/[key]/page');
     const page = await CapabilityDemoPage({ params: Promise.resolve({ key: 'lms' }) });
-    expect(page.props.children.props.priceLabel).toBe('$79/month add-on');
+    const expectedPlan = BASE_PLANS.professional;
+    expect(expectedPlan.features).toContain('lms');
+    expect(ADD_ON_MARKETPLACE.find((item) => item.slug === 'online-courses-lms')?.hiddenFromMarketplace).toBe(true);
+    expect(page.props.children.props.priceLabel).toBe(`Included from ${expectedPlan.priceMonthly}/month`);
   });
 });

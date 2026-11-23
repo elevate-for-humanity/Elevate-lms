@@ -287,7 +287,7 @@ async function sendCredentialEmail(
 
             <div style="background: #f1f5f9; padding: 16px; text-align: center; font-size: 12px; color: #64748b;">
               <p>${PLATFORM_DEFAULTS.orgName} Career & Technical Institute</p>
-              <p>8888 Keystone Crossing, Indianapolis, IN</p>
+              <p>120 East Market Street, Suite 930, Indianapolis, IN 46204</p>
               <p>${PLATFORM_DEFAULTS.supportPhone} | info@${PLATFORM_DEFAULTS.canonicalDomain}</p>
             </div>
           </div>

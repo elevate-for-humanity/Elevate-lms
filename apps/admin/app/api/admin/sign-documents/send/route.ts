@@ -45,10 +45,10 @@ async function buildW9(sigPngBytes: Uint8Array): Promise<Uint8Array> {
   form.getTextField('topmostSubform[0].Page1[0].Boxes3a-b_ReadOrder[0].f1_03[0]').setText('S');
   form
     .getTextField('topmostSubform[0].Page1[0].Address_ReadOrder[0].f1_07[0]')
-    .setText('8888 Keystone Crossing, Suite 1300');
+    .setText('120 East Market Street, Suite 930, Indianapolis, IN 46204');
   form
     .getTextField('topmostSubform[0].Page1[0].Address_ReadOrder[0].f1_08[0]')
-    .setText('Indianapolis, IN 46240');
+    .setText('Indianapolis, IN 46204');
   form.getTextField('topmostSubform[0].Page1[0].f1_14[0]').setText('88');
   form.getTextField('topmostSubform[0].Page1[0].f1_15[0]').setText('2609728');
 
@@ -169,8 +169,8 @@ function buildACH(sigDataUrl: string): Promise<Buffer> {
       '2Exclusive LLC-S DBA ' + PLATFORM_DEFAULTS.orgName + ' Career & Technical Institute',
     );
     fieldRow([
-      ['Address', '8888 Keystone Crossing, Suite 1300'],
-      ['City, State, Zip', 'Indianapolis, IN 46240'],
+      ['Address', '120 East Market Street, Suite 930, Indianapolis, IN 46204'],
+      ['City, State, Zip', 'Indianapolis, IN 46204'],
     ]);
 
     // Classification
@@ -285,7 +285,7 @@ function buildACH(sigDataUrl: string): Promise<Buffer> {
       .fillColor(GRAY)
       .font('Helvetica')
       .text(
-        `${PLATFORM_DEFAULTS.orgLegalName}  |  8888 Keystone Crossing, Suite 1300, Indianapolis, IN 46240  |  ${PLATFORM_DEFAULTS.supportPhone}`,
+        `${PLATFORM_DEFAULTS.orgLegalName}  |  120 East Market Street, Suite 930, Indianapolis, IN 46204  |  ${PLATFORM_DEFAULTS.supportPhone}`,
         { align: 'center', width: W },
       );
 

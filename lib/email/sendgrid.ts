@@ -302,7 +302,7 @@ export async function sendWelcomeEmail(params: {
           <p>Best regards,<br>The ${PLATFORM_DEFAULTS.orgName} Team</p>
         </div>
         <div style="padding:20px;text-align:center;color:#666;font-size:14px">
-          <p>Elevate for Humanity Career &amp; Technical Institute<br>8888 Keystone Crossing Suite 1300, Indianapolis, IN 46240</p>
+          <p>Elevate for Humanity Career &amp; Technical Institute<br>120 East Market Street, Suite 930, Indianapolis, IN 46204</p>
         </div>
       </div>
     </body></html>`;

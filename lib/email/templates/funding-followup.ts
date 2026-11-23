@@ -31,7 +31,7 @@ function wrap(body: string): string {
     </div>
     <div style="background:#f9fafb;padding:20px 32px;border-top:1px solid #e5e7eb;font-size:13px;color:#6b7280;text-align:center">
       <p style="margin:0 0 4px">${PLATFORM_DEFAULTS.orgName} Career &amp; Technical Institute</p>
-      <p style="margin:0 0 4px">8888 Keystone Crossing Suite 1300 · Indianapolis, IN 46240</p>
+      <p style="margin:0 0 4px">120 East Market Street, Suite 930, Indianapolis, IN 46204</p>
       <p style="margin:0"><a href="tel:+1${PLATFORM_DEFAULTS.supportPhone}" style="color:#dc2626">${PHONE}</a> · <a href="mailto:info@${PLATFORM_DEFAULTS.canonicalDomain}" style="color:#dc2626">info@${PLATFORM_DEFAULTS.canonicalDomain}</a></p>
     </div>
   </div>

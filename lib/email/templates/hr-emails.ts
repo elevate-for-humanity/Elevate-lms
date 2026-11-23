@@ -44,7 +44,7 @@ function layout(body: string) {
     <!-- Footer -->
     <div style="background:${BRAND.light};border-top:1px solid #e2e8f0;padding:20px 32px;text-align:center;color:${BRAND.muted};font-size:12px">
       <p style="margin:0 0 4px">${PLATFORM_DEFAULTS.orgName} Career &amp; Technical Institute</p>
-      <p style="margin:0 0 4px">8888 Keystone Crossing Suite 1300 · Indianapolis, IN 46240</p>
+      <p style="margin:0 0 4px">120 East Market Street, Suite 930, Indianapolis, IN 46204</p>
       <p style="margin:0">${PLATFORM_DEFAULTS.supportPhone} · <a href="mailto:hr@${PLATFORM_DEFAULTS.canonicalDomain}" style="color:${BRAND.primary}">hr@${PLATFORM_DEFAULTS.canonicalDomain}</a></p>
     </div>
   </div>
@@ -273,7 +273,7 @@ export const hrEmailTemplates = {
       </div>
       ${btn('Open Onboarding Portal', p.onboardingLink ?? `${BASE_URL}/onboarding/staff`, BRAND.primary)}
       <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:16px 20px;margin:20px 0">
-        <p style="margin:0;font-size:14px;color:#1e40af"><strong>First Day Info:</strong> Report to 8888 Keystone Crossing Suite 1300, Indianapolis, IN 46240. Bring a valid government-issued ID. Orientation begins at 9:00 AM.</p>
+        <p style="margin:0;font-size:14px;color:#1e40af"><strong>First Day Info:</strong> Report to 120 East Market Street, Suite 930, Indianapolis, IN 46204. Bring a valid government-issued ID. Orientation begins at 9:00 AM.</p>
       </div>
       <p>See you tomorrow!</p>
       <p style="margin-bottom:0">Warmly,<br><strong>${PLATFORM_DEFAULTS.orgName} HR Team</strong></p>

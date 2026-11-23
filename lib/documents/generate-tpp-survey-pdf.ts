@@ -282,7 +282,7 @@ export async function generateTppSurveyPdf(data: TppSurveyData): Promise<Uint8Ar
   // Org name in header
   const hx = logoImg ? ML + (logoImg.width / logoImg.height) * 52 + 12 : ML;
   txt(PLATFORM_DEFAULTS.orgLegalName, hx, H - 30, bold, 11, C.headerText);
-  txt(`8888 Keystone Crossing, Suite 1300  ·  Indianapolis, IN 46240  ·  ${PLATFORM_DEFAULTS.supportPhone}`, hx, H - 44, regular, 8, rgb(0.75, 0.85, 1));
+  txt(`120 East Market Street, Suite 930  ·  Indianapolis, IN 46204  ·  ${PLATFORM_DEFAULTS.supportPhone}`, hx, H - 44, regular, 8, rgb(0.75, 0.85, 1));
   txt(`elevate4humanityedu@gmail.com  ·  ${PLATFORM_DEFAULTS.canonicalDomain}`, hx, H - 56, regular, 8, rgb(0.75, 0.85, 1));
 
   y = H - 90;
@@ -870,7 +870,7 @@ export async function generateTppSurveyPdf(data: TppSurveyData): Promise<Uint8Ar
     if (pg === coverPage) return;
     addRunningHeader(pg, i); // page number = index (cover is 0, content starts at 1)
     pg.drawLine({ start: { x: ML, y: MB + 14 }, end: { x: W - MR, y: MB + 14 }, thickness: 0.5, color: C.rule });
-    pg.drawText(`${PLATFORM_DEFAULTS.orgLegalName}  ·  8888 Keystone Crossing, Suite 1300, Indianapolis, IN 46240  ·  ${PLATFORM_DEFAULTS.supportPhone}`, {
+    pg.drawText(`${PLATFORM_DEFAULTS.orgLegalName}  ·  120 East Market Street, Suite 930, Indianapolis, IN 46204  ·  ${PLATFORM_DEFAULTS.supportPhone}`, {
       x: ML, y: MB + 4, size: 6.5, font: regular, color: C.lightGray,
     });
     pg.drawText(`Page ${i} of ${allPages.length - 1}`, {

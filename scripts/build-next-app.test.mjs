@@ -19,7 +19,7 @@ test('compilation exits before generated-route type checking starts', async () =
   assert.ok(calls[0].args.includes('--no-lint'));
   assert.equal(calls[0].env.ELEVATE_SEQUENTIAL_TYPECHECK, '1');
   assert.equal(calls[1].env.ELEVATE_SEQUENTIAL_TYPECHECK, '0');
-  assert.ok(calls[1].args.includes('--noEmit'));
+  assert.ok(calls[1].args.some(arg => arg.endsWith('/scripts/typecheck-next-app.mjs')));
   assert.equal(calls[1].env.KEEP, 'value');
 });
 

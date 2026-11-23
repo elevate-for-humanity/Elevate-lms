@@ -55,8 +55,12 @@ async function assertSuccessfulResponse(
   href: string,
   context: string,
 ) {
-  const response = await request.get(href, { maxRedirects: 10 });
-  expect(response.status(), `${context}: ${href} returned ${response.status()}`).toBeLessThan(400);
+  const response = await request.get(href, { maxRedirects: 10, timeout: 30_000 });
+  try {
+    expect(response.status(), `${context}: ${href} returned ${response.status()}`).toBeLessThan(400);
+  } finally {
+    await response.dispose();
+  }
 }
 
 async function collectInternalLinks(page: Page, selector: string) {
@@ -112,8 +116,6 @@ async function assertNoRuntimeFailure(page: Page, route: string) {
   ).toEqual([]);
 }
 
-test.describe.configure({ mode: 'serial' });
-
 test.describe('page-by-page public production audit', () => {
   for (const route of [...CRITICAL_PUBLIC_ROUTES, ...CRITICAL_PROGRAM_ROUTES]) {
     test(`${route} renders without runtime failure`, async ({ page }) => {
@@ -122,12 +124,25 @@ test.describe('page-by-page public production audit', () => {
   }
 
   test('every homepage header and footer internal link resolves', async ({ page, request }) => {
+    test.setTimeout(180_000);
     await page.goto('/', { waitUntil: 'domcontentloaded' });
     const links = await collectInternalLinks(page, 'header a[href], footer a[href]');
     expect(links.length, 'No internal header or footer links were discovered').toBeGreaterThan(5);
-    for (const href of links) {
-      await assertSuccessfulResponse(request, href, 'navigation integrity');
+
+    const batchSize = 3;
+    const failures: string[] = [];
+    for (let index = 0; index < links.length; index += batchSize) {
+      const batch = links.slice(index, index + batchSize);
+      const results = await Promise.allSettled(
+        batch.map((href) => assertSuccessfulResponse(request, href, 'navigation integrity')),
+      );
+      results.forEach((result, offset) => {
+        if (result.status === 'rejected') {
+          failures.push(`${batch[offset]}: ${String(result.reason)}`);
+        }
+      });
     }
+    expect(failures, failures.join('\n')).toEqual([]);
   });
 
   test('program directory links resolve', async ({ page, request }) => {

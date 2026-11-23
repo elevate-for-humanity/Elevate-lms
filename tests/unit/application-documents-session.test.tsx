@@ -25,13 +25,17 @@ describe('application document session lifecycle', () => {
     const pending = new Promise((resolve) => {
       finishStart = resolve;
     });
-    const fetch = vi
-      .fn()
-      .mockResolvedValueOnce({ ok: false, status: 404 })
-      .mockReturnValueOnce(pending);
+    const fetch = vi.fn().mockReturnValueOnce(pending);
     vi.stubGlobal('fetch', fetch);
     render(<ParisApplicationWorkspace programs={[]} />);
-    await waitFor(() => expect(fetch).toHaveBeenCalledTimes(2));
+    await waitFor(() => expect(fetch).toHaveBeenCalledTimes(1));
+    expect(fetch).toHaveBeenCalledWith(
+      '/api/paris/application-interview',
+      expect.objectContaining({
+        method: 'POST',
+        body: JSON.stringify({ action: 'start', locale: 'en' }),
+      }),
+    );
     expect(
       screen.queryByRole('region', { name: 'Session document panel' }),
     ).not.toBeInTheDocument();
@@ -40,7 +44,7 @@ describe('application document session lifecycle', () => {
       json: async () => ({
         ok: true,
         projectId: 'session-1',
-        state: { locale: 'en', answers: {}, confirmed: [] },
+        state: { locale: 'en', answers: { program: 'barber-apprenticeship' }, confirmed: ['program'] },
         progress: {
           percent: 0,
           required: ['applicationCertification'],

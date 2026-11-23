@@ -63,6 +63,7 @@ export function HomeFeaturedHostShop() {
       aria-labelledby="featured-host-shop-heading"
       data-scroll-narration
       data-narration="Host Shops are working barbershops and salons where apprentices build hands-on skills with licensed supervision. Elevate supports instruction and training records. Explore a shop or join the network. Placement and availability are confirmed during enrollment."
+      data-narration-src="/audio/home-introductions/featured-host-shop.mp3"
       data-narration-style="instructor"
     >
       <div className="mx-auto max-w-6xl">

@@ -99,6 +99,10 @@ export function buildSceneAssignments(scenes: any[], assets: any[], configured: 
     }
   });
   const identity = (asset: any) => `source:${root(candidates.indexOf(asset))}`;
+  // The raw licensed rows may contain repeated placements of the same footage.
+  // Expose distinct physical source count separately from the row count so
+  // pending acquisition never mistakes 142 placements for 142 unique clips.
+  const distinctLicensedAssetCount = new Set(candidates.map(asset => identity(asset))).size;
   const physicalScene = (scene: any) => (options.competencyType ? options.competencyType === 'practical_skill' : options.requiresPracticalEvidence !== false) &&
     [scene.stage, scene.title, scene.sceneType, scene.scene_type].some(value =>
       /^(demonstration|guided_practice|independent_practice|mistake_and_correction|mistake and correction)$/.test(String(value ?? '').trim().toLowerCase()));
@@ -198,7 +202,7 @@ export function buildSceneAssignments(scenes: any[], assets: any[], configured: 
     if (!choice) {
       if (physicalScene(scene) || !scene.teachingVisual?.steps?.length) {
         gaps.push({sceneId:scene.id, visualRequirement:scene.visualRequirement,
-          reason: 'No distinct approved course asset is available for this scene', licensedAssetCount:candidates.length});
+          reason: 'No distinct approved course asset is available for this scene', licensedAssetCount:distinctLicensedAssetCount, licensedAssetRecordCount:candidates.length});
         continue;
       }
       assignments.push({

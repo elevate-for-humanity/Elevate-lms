@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {probeRedirect, probeEndpoint, auditEdge} from './verify-public-edge.mjs';
+import {probeRedirect, probeEndpoint, probeDns, auditEdge} from './verify-public-edge.mjs';
 
 const origin = 'https://app.elevateforhumanity.org';
 function redirect(requested, change = value => value) {
@@ -80,4 +80,31 @@ test('full public-edge certification requires an authoritative expected main SHA
   assert.equal((await auditEdge({...checks,sha:null})).allVerified,false);
   assert.equal((await auditEdge({...checks,sha:'invalid'})).allVerified,false);
   assert.equal((await auditEdge({...checks,sha:expectedSha})).allVerified,true);
+});
+
+test('DNS probe does not certify empty A and AAAA answers', async () => {
+  const result=await probeDns('admin.elevateforhumanity.org',{
+    resolveIpv4:async()=>[],
+    resolveIpv6:async()=>[],
+  });
+  assert.equal(result.state,'inconclusive');
+  assert.equal(result.reason,'dns_lookup_unavailable');
+  assert.deepEqual(result.ipv4,[]);
+  assert.deepEqual(result.ipv6,[]);
+});
+test('DNS probe does not mark a rejected A and empty AAAA lookup as healthy',async()=>{
+  const result=await probeDns('app.elevateforhumanity.org',{
+    resolveIpv4:async()=>{throw Object.assign(new Error('resolver unavailable'),{code:'EAI_AGAIN'});},
+    resolveIpv6:async()=>[],
+  });
+  assert.equal(result.state,'inconclusive');
+});
+test('DNS probe accepts an actual A address when AAAA is unavailable',async()=>{
+  const result=await probeDns('www.elevateforhumanity.org',{
+    resolveIpv4:async()=>['34.110.235.233'],
+    resolveIpv6:async()=>{throw Object.assign(new Error('no IPv6 record'),{code:'ENODATA'});},
+  });
+  assert.equal(result.state,'passed');
+  assert.deepEqual(result.ipv4,['34.110.235.233']);
+  assert.deepEqual(result.ipv6,[]);
 });

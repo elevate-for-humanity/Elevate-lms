@@ -1,9 +1,11 @@
 import HostShopCourses from '@/components/host-shop/HostShopCourses';
 import Link from 'next/link';
 import { AlertTriangle, BookOpen, CheckCircle2, Users } from 'lucide-react';
+import { resolveHostShopAdminPreview } from '@/lib/admin/host-shop-preview';
 import { requireRole } from '@/lib/auth/require-role';
 import { getHostShopBoard } from '@/lib/partner/board';
 import { HOST_SHOP_ROLES } from '@/lib/rbac/role-matrix';
+import { hostShopStudentPrograms } from '@/lib/partners/host-shop-student-links';
 import { getBeautyApprenticeshipConfig } from '@/lib/apprenticeship/beauty-program-config';
 
 export const dynamic = 'force-dynamic';
@@ -15,11 +17,15 @@ export const metadata = {
 };
 
 export default async function HostShopProgramsPage() {
-  const { user } = await requireRole(HOST_SHOP_ROLES);
+  const preview = await resolveHostShopAdminPreview();
+  const { user } = preview ? { user: { id: preview.actorId } } : await requireRole(HOST_SHOP_ROLES);
   const board = await getHostShopBoard(user.id);
   const configured = board.unconfiguredPrograms.length === 0;
   const timeBased = board.timeBasedPrograms.length > 0;
   const hybrid = board.hybridPrograms.length > 0;
+  const assignedSyllabi = hostShopStudentPrograms(board.partner ?? {})
+    .map(getBeautyApprenticeshipConfig)
+    .filter((syllabus) => syllabus !== null);
 
   return (
     <main className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
@@ -131,8 +137,12 @@ export default async function HostShopProgramsPage() {
           })}
           {!board.apprentices.length ? (
             <p className="rounded-xl bg-slate-50 p-4 text-sm font-medium text-slate-600">
-              Syllabi and occupation standards appear automatically when an active apprentice
-              placement is connected.
+              {assignedSyllabi.length ? assignedSyllabi.map(syllabus => (
+                <Link key={syllabus.syllabusHref} href={syllabus.syllabusHref} className="block font-bold text-brand-blue-800 underline">
+                  Open the {syllabus.label} syllabus
+                </Link>
+              )) : 'No syllabus is linked for the assigned occupation.'}
+              <span className="mt-2 block">Student progress appears when an apprentice is assigned.</span>
             </p>
           ) : null}
         </div>

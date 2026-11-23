@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import {
+  type LucideIcon,
   Activity, AlertTriangle, Bot, CheckCircle, Clock,
   Database, Mail, RefreshCw, Server, Shield, Wifi, XCircle, Zap,
 } from 'lucide-react';
@@ -38,7 +39,7 @@ function formatRelative(iso: string, nowMs: number) {
   return `${Math.floor(m / 60)}h ago`;
 }
 
-const SERVICE_ICONS: Record<string, React.ElementType> = {
+const SERVICE_ICONS: Record<string, LucideIcon> = {
   Database: Database,
   Redis: Zap,
   'Billing (QuickBooks + PayPal)': Shield,

@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import {
+  type LucideIcon,
   Upload, FileText, File, ChevronRight, Loader2,
   CheckCircle2, AlertTriangle, Clock, Archive,
   PenLine, Download, Sparkles, Plus, X,
@@ -31,7 +32,7 @@ const SOURCE_TYPE_LABELS: Record<string, string> = {
   other:             'Other',
 };
 
-const STATUS_CONFIG: Record<string, { label: string; cls: string; Icon: React.ElementType }> = {
+const STATUS_CONFIG: Record<string, { label: string; cls: string; Icon: LucideIcon }> = {
   uploaded:   { label: 'Uploaded',   cls: 'bg-slate-100 text-slate-600',  Icon: Clock },
   extracting: { label: 'Extracting', cls: 'bg-amber-100 text-amber-700',  Icon: Loader2 },
   extracted:  { label: 'Extracted',  cls: 'bg-blue-100 text-blue-700',    Icon: CheckCircle2 },

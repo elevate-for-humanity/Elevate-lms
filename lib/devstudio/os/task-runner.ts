@@ -1,4 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
+import { isOpenHandsManagedTask } from '@/lib/devstudio/openhands/studio-timeout-policy.mjs';
 import { approvalReason, detectRiskTags, requiresApproval } from './risk';
 import { newTraceId, writeDevAuditLog } from './audit';
 import type { CreateTaskInput, TaskPlanStep } from './types';
@@ -798,12 +799,17 @@ export async function recoverStaleAiTasks(
       'id,status,studio_run_id,studio_run_step_id,tool_name,result_json,tool_output,error_message,tenant_id,user_id,started_at,created_at',
     )
     .eq('status', 'running')
+    .or('tool_name.is.null,tool_name.neq.openhands.execute')
     .or(`started_at.lt.${cutoff},and(started_at.is.null,created_at.lt.${cutoff})`)
     .limit(50);
   if (error) throw new Error(`Unable to load stale Studio tasks: ${error.message}`);
 
   let recovered = 0;
   for (const task of stale ?? []) {
+    // OpenHands has its own provider-aware reconciler. Age alone is not a
+    // terminal signal when paid execution or human confirmation is pending.
+    // Do not let generic Studio recovery destroy the original provider receipt.
+    if (isOpenHandsManagedTask(task)) continue;
     const timeoutMessage = `Studio task exceeded the ${boundedTimeout}-minute runtime limit and was closed instead of remaining stuck.`;
     const { data: closed, error: closeError } = await db
       .from('ai_tasks')
@@ -815,6 +821,7 @@ export async function recoverStaleAiTasks(
       })
       .eq('id', task.id)
       .eq('status', 'running')
+      .or('tool_name.is.null,tool_name.neq.openhands.execute')
       .select(
         'id,status,studio_run_id,studio_run_step_id,tool_name,result_json,tool_output,error_message',
       )

@@ -8,6 +8,7 @@ import {hasApplicationSourceCorrection,nextRepairActionConstraint,assertCommitte
 import {bindRepairWorkflowInspection,bindVerifiedFailedWorkflowInspection} from './paris-workflow-target.mjs';
 import {resolveOwnedModelConnection} from '@/lib/ai/providers/owned-model-config.mjs';
 import {budgetRepairMessages,repairCompletionTokens,REPAIR_INFERENCE_TIMEOUT_MS,REPAIR_MODEL_PROBE_TIMEOUT_MS} from './repair-inference-budget.mjs';
+import {budgetRepairTurn} from './repair-inference-time-budget.mjs';
 import {retryRepairInference} from './repair-inference-retry.mjs';
 import { probeOwnedModel } from '@/lib/ai/providers/owned-model-health.mjs';
 import { NextResponse } from 'next/server';
@@ -483,6 +484,23 @@ export async function stageParisCodeRepair(task: string, repairId?: string, acto
       if (provider === 'elevate') {
         inferenceOptions.messages = budgetRepairMessages(inferenceOptions.messages,
           Number(process.env.ELEVATE_LLM_CONTEXT_TOKENS ?? 8192), inferenceOptions.maxTokens, ownedTier);
+        // PR2 (#2515): estimate this turn against the 210s CPU budget
+        // BEFORE dispatching. A turn that cannot fit is deferred with its
+        // checkpoint intact instead of burning the single CPU slot for a
+        // 211s timeout that writes nothing. Never shrink below the minimum
+        // useful allowance to force a fit — defer instead.
+        const turnBudget = budgetRepairTurn({messages: inferenceOptions.messages,
+          maxTokens: inferenceOptions.maxTokens, deadlineMs: REPAIR_INFERENCE_TIMEOUT_MS, tier: ownedTier});
+        if (!turnBudget.fits) {
+          observations.push(`INFERENCE_DEFERRED: turn ${turn + 1} estimated ${turnBudget.estimatedMs}ms for ${turnBudget.promptTokens} prompt tokens; exceeds the 210s CPU budget. No inference call was made.`);
+          await checkpoint();
+          logger.warn('[PARIS] repair inference deferred', {repairId: taskId, turn: turn + 1,
+            reason: turnBudget.reason, estimatedMs: turnBudget.estimatedMs, promptTokens: turnBudget.promptTokens});
+          return NextResponse.json({error: turnBudget.reason, branch:{name:branch},
+            changed_files:[...changedFiles], observations:observations.slice(-6),
+            estimated_ms: turnBudget.estimatedMs}, {status:503});
+        }
+        inferenceOptions.maxTokens = turnBudget.maxCompletionTokens;
       }
       const infer=(signal: AbortSignal)=>aiChat({...inferenceOptions,signal});
       // A single transient gateway fault (e.g. HTTP 502) must not discard a

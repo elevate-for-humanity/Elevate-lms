@@ -7,6 +7,7 @@
  * Requires admin, admin, or staff role.
  */
 
+import { hasAdmissionPaymentOrFunding } from '@/lib/learner/approved-paid-admission.mjs';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
@@ -50,7 +51,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   // Fetch enrollment + student profile
   const { data: enrollment, error: fetchError } = await db
     .from('program_enrollments')
-    .select('id, user_id, program_id, program_slug, full_name, email, access_granted_at, payment_status, revoked_at, cancelled_at, suspended_at, refunded_at')
+    .select('id, user_id, program_id, program_slug, full_name, email, access_granted_at, payment_status, funding_source, funding_verified, eligibility_status, revoked_at, cancelled_at, suspended_at, refunded_at')
     .eq('id', enrollmentId)
     .maybeSingle();
 
@@ -59,8 +60,8 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   if (enrollment.revoked_at || enrollment.cancelled_at || enrollment.suspended_at || enrollment.refunded_at) {
     return safeError('Enrollment is not eligible for activation', 409);
   }
-  if (!['paid', 'paid_in_full'].includes(String(enrollment.payment_status || '').toLowerCase())) {
-    return safeError('Verified payment required before administrator can approve learner access', 409);
+  if (!hasAdmissionPaymentOrFunding(enrollment)) {
+    return safeError('Verified payment or confirmed state funding is required before approval', 409);
   }
 
   // Fail closed: OCR submission is not verification. Every applicable

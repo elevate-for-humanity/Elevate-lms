@@ -411,6 +411,9 @@ jobs:
           ENROLLMENT_TEST_DATABASE_URL: postgresql://postgres@127.0.0.1:5432/elevate_enrollment_regression
         run: node --test tests/database/canonical-enrollment.node.test.mjs
 
+      - name: Verify student application program identity and duplicate protection
+        run: node --test tests/database/student-application-identity.node.test.mjs
+
       - name: Test completed lesson attachment in an isolated database
         env:
           ATTACHMENT_TEST_DATABASE_URL: postgresql://postgres@127.0.0.1:5432/postgres

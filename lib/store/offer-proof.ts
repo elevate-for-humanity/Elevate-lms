@@ -262,6 +262,8 @@ export const STORE_FEATURE_PROOFS: Partial<Record<PlatformFeatureKey, StoreFeatu
     evidenceLabel: 'Review the Course Builder product',
     access: 'public-product',
     sourcePaths: ['apps/admin/app/studio/courses/page.tsx', 'lib/course-builder/orchestrator.ts'],
+    limitation:
+      'Staff-only workspace: self-service checkout is closed and paid access is quoted through sales by monthly allowance.',
   },
   [PlatformFeature.COURSE_FACTORY]: {
     title: 'AI Course Factory',
@@ -270,6 +272,8 @@ export const STORE_FEATURE_PROOFS: Partial<Record<PlatformFeatureKey, StoreFeatu
     evidenceLabel: 'Review the AI course workflow',
     access: 'public-product',
     sourcePaths: ['lib/ultimate-course-builder/core/generation-request.ts', 'lib/course-factory/canonical-course-gate.ts'],
+    limitation:
+      'Runs inside the staff-only Course Builder workspace, so generation is limited to the quoted monthly credit allowance.',
   },
   [PlatformFeature.STUDENT_MANAGEMENT]: {
     title: 'Student Management',

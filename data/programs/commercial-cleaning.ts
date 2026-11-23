@@ -37,9 +37,14 @@ export const COMMERCIAL_CLEANING: ProgramSchema = {
   sector: 'skilled-trades',
   category: 'Commercial Cleaning',
   programType: 'certification',
-  // TODO: verify this asset exists; swap for a real cleaning image before merge.
-  heroImage: '/images/pexels/commercial-cleaning.webp',
-  heroImageAlt: 'Commercial cleaning training',
+  // Canonical image verified present in public/ at main. No dedicated
+  // cleaning photo exists in the repo: the only cleaning image
+  // (/images/refresh-20261014/sanitation.webp) is already the canonical image
+  // for sanitation-infection-control, and reusing it would fail the
+  // duplicate-image integrity gate. This program's sector is skilled-trades,
+  // so it uses the unused skilled-trades image from the same refresh set.
+  heroImage: '/images/refresh-20261014/trades.webp',
+  heroImageAlt: 'Skilled-trades learner in hands-on training',
   deliveryMode: 'hybrid',
   deliveredBy: 'Elevate',
   durationWeeks: 0,

@@ -48,8 +48,10 @@ describe('program-holder dashboard hero', () => {
 
   it('requires every roster row to belong to an assigned program and learner role', () => {
     expect(holderData).toContain(".in('program_id', programIds)");
-    expect(holderData).toContain("import { isLearnerRosterProfile } from './roster-eligibility'");
-    expect(holderData).toContain('.filter(isLearnerRosterProfile)');
+    // Require the QA-only roster exception to be bound to the isolated project and explicit mode.
+    expect(holderData).toContain("import { isIsolatedQaProgramHolderRosterContext, isLearnerRosterProfile } from './roster-eligibility'");
+    expect(holderData).toContain('isIsolatedQaProgramHolderRosterContext({');
+    expect(holderData).toContain('.filter((row: any) => isLearnerRosterProfile(row, { includeIsolatedQaFixtures }))');
     expect(holderData).toContain('eligibleRosterUserIds.has(row.user_id)');
     expect(holderData).not.toContain("'pending',\n        'applied'");
   });

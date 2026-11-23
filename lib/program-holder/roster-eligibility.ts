@@ -64,5 +64,6 @@ export function isLearnerRosterProfile(
     return false;
   }
   const email = String(profile.email || '').trim().toLowerCase();
-  return /^qa-portal-e2e-[0-9]+-holder-(?:active|completed)-student@qa\.invalid$/.test(email);
+  // The provisioner uses a numeric fallback or the CI run-attempt-shard ID.
+  return /^qa-portal-e2e-[0-9]+(?:-[0-9]+-[0-9]+)?-holder-(?:active|completed)-student@qa\.invalid$/.test(email);
 }

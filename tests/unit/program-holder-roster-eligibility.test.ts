@@ -91,10 +91,20 @@ describe('Isolated Program Holder roster acceptance', () => {
     expect(isIsolatedQaProgramHolderRosterContext({ supabaseUrl: 'https://isdgjcdabhxxozarmxta.supabase.co.attacker.invalid', testMode: 'true' })).toBe(false);
     expect(isIsolatedQaProgramHolderRosterContext({ supabaseUrl: 'invalid', testMode: 'true' })).toBe(false);
   });
-  it('admits only the approved disposable holder learner fixtures, never by default', () => {
-    for (const learner of [active, completed]) {
-      expect(isLearnerRosterProfile(learner)).toBe(false);
-      expect(isLearnerRosterProfile(learner, { includeIsolatedQaFixtures: true })).toBe(true);
+  it.each(['45102978350', '45102978350-1-4'])(
+    'admits both disposable holder learners for run %s only in isolated QA',
+    (runId) => {
+      for (const learner of [active, completed]) {
+        const fixture = { ...learner, email: learner.email.replace('45102978350', runId) };
+        expect(isLearnerRosterProfile(fixture)).toBe(false);
+        expect(isLearnerRosterProfile(fixture, { includeIsolatedQaFixtures: true })).toBe(true);
+      }
+    },
+  );
+  it('rejects identities outside the approved holder fixtures', () => {
+    for (const runId of ['45102978350-1', '45102978350-1-4-2', '45102978350-1-four']) {
+      const fixture = { ...active, email: `qa-portal-e2e-${runId}-holder-active-student@qa.invalid` };
+      expect(isLearnerRosterProfile(fixture, { includeIsolatedQaFixtures: true })).toBe(false);
     }
     expect(isLearnerRosterProfile({ ...active, role: 'staff' }, { includeIsolatedQaFixtures: true })).toBe(false);
     expect(isLearnerRosterProfile({ ...active, email: 'qa-portal-e2e-45102978350-holder-active-student@other.invalid' }, { includeIsolatedQaFixtures: true })).toBe(false);

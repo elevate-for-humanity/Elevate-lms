@@ -166,12 +166,20 @@ test.describe('Program Holder Portal', () => {
     test('validates and saves a report for the assigned student', async ({ page }) => {
       await page.goto('/program-holder/reports');
       const form = page.getByRole('region', { name: 'Student progress report' });
+      const student = form.getByLabel('Student name');
+      await expect(student.getByRole('option', { name: activeStudent, exact: true })).toHaveCount(1);
+      await expect(student.getByRole('option', { name: completedStudent, exact: true })).toHaveCount(1);
+
+      const reportsOnFile = page.getByText(
+        /^(?:\d+ reports are on file\.|No submitted Program Holder reports are on file\.)$/,
+      );
+      const priorReportCount = Number((await reportsOnFile.innerText()).match(/^\d+/)?.[0] ?? '0');
       const submit = form.getByRole('button', { name: 'Submit report for review' });
       await submit.click();
       await expect(form.locator('select[name="student"]:invalid')).toBeFocused();
 
       const date = new Date().toISOString().slice(0, 10);
-      await form.getByLabel('Student name').selectOption({ label: activeStudent });
+      await student.selectOption({ label: activeStudent });
       await form.getByLabel('Start date').fill(date);
       await form.getByLabel('End date').fill(date);
       await form.getByLabel('Reported hours').fill('2.5');
@@ -181,7 +189,8 @@ test.describe('Program Holder Portal', () => {
       await submit.click();
       expect((await response).status()).toBe(201);
       await expect(form.getByRole('status')).toHaveText('Report submitted for review.');
-      await expect(page.getByText(/reports are on file/)).toBeVisible();
+      await page.reload();
+      await expect(reportsOnFile).toHaveText(`${priorReportCount + 1} reports are on file.`);
     });
 
     test('shows compliance score and actionable requirements', async ({ page }) => {

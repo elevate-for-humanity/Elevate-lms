@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import { practicalServiceKey } from '@/lib/apprenticeship/practical-service-progress.mjs';
 import { useSafeSearchParams } from '@/hooks/useSafeSearchParams';
-type Apprentice = { enrollmentId: string; name: string; standard: { occupationTitle: string } };
+type Apprentice = { enrollmentId: string; studentId?: string; name: string; standard: { occupationTitle: string } };
 type Entry = {
   id: string;
   service_name: string;
@@ -79,6 +79,7 @@ function listFor(program: string) {
 }
 export default function PracticalProgressEntry() {
   const searchParams = useSafeSearchParams();
+  const requestedEnrollment = searchParams.get('enrollmentId');
   const requestedStudent = searchParams.get('studentId');
   const [loading, setLoading] = useState(true);
   const [loadingProgress, setLoadingProgress] = useState(false);
@@ -111,13 +112,16 @@ export default function PracticalProgressEntry() {
         const data = await response.json();
         if (!response.ok) throw Error(data.error || 'Unable to load assigned apprentices.');
         if (!current) return;
-        const rows = data.apprentices || [];
+        const rows: Apprentice[] = data.apprentices || [];
         setApprentices(rows);
-        const requested = rows.find(
-          (row: Apprentice & { studentId?: string }) => row.studentId === requestedStudent,
-        );
-        if (requested) setSelected(requested.enrollmentId);
-        else if (rows.length === 1) setSelected(rows[0].enrollmentId);
+        if (requestedEnrollment) {
+          const enrollment = rows.find(row => row.enrollmentId === requestedEnrollment);
+          setSelected(enrollment?.enrollmentId || '');
+          if (!enrollment) setMessage('The requested enrollment is not assigned to this shop.');
+        } else {
+          const matches = requestedStudent ? rows.filter(row => row.studentId === requestedStudent) : rows;
+          setSelected(matches.length === 1 ? matches[0].enrollmentId : '');
+        }
       })
       .catch((error) => {
         if (current) setMessage(error.message || 'Unable to load assigned apprentices.');
@@ -128,7 +132,7 @@ export default function PracticalProgressEntry() {
     return () => {
       current = false;
     };
-  }, [requestedStudent]);
+  }, [requestedEnrollment, requestedStudent]);
   const apprentice = apprentices.find((a) => a.enrollmentId === selected);
   const options = apprentice
     ? Array.from(

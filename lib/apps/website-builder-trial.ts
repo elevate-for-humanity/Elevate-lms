@@ -1,44 +1,14 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { getWebsiteBuilderAccess } from '@/lib/apps/website-builder-access';
 
-export const WEBSITE_BUILDER_TRIAL = {
-  days: 14,
-  credits: 500,
-  websiteLimit: 1,
-  pageLimit: 5,
-  publishToElevateSubdomain: true,
-  customDomainPurchase: false,
-  whiteLabel: false,
-  apiAccess: false,
-  includedPreviewCapabilities: [
-    'PARIS AI Website Builder',
-    'PARIS Sales Assistant',
-    'ELLIE Customer Support',
-    'LIZZY Operations Assistant',
-    'ZORA Compliance Assistant',
-    'Marketing Assistant',
-    'Grant Writer',
-    'Grant Discovery',
-    'Image & Brand Asset Builder',
-    'Commercial / Reel Video Builder',
-    'Course Builder / Course Factory',
-    'CRM, Forms & Booking',
-    'Email, SMS & Automations',
-  ],
-} as const;
+import {
+  WEBSITE_BUILDER_CREDIT_COSTS,
+  WEBSITE_BUILDER_TRIAL,
+  type WebsiteBuilderCreditOperation,
+} from '@/lib/apps/website-builder-credit-policy';
 
-export const WEBSITE_BUILDER_CREDIT_COSTS = {
-  initial_site_generation: 60,
-  paris_edit: 8,
-  assistant_chat: 12,
-  marketing_generation: 25,
-  image_generation: 40,
-  grant_draft: 80,
-  course_generation: 150,
-  video_generation: 200,
-} as const;
-
-export type WebsiteBuilderCreditOperation = keyof typeof WEBSITE_BUILDER_CREDIT_COSTS;
+export { WEBSITE_BUILDER_CREDIT_COSTS, WEBSITE_BUILDER_TRIAL };
+export type { WebsiteBuilderCreditOperation };
 
 export type TrialCreditResult = {
   allowed: boolean;

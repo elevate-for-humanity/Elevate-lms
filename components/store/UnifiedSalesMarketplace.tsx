@@ -11,6 +11,7 @@ import {
 } from '@/lib/platform/capability-catalog';
 import { BASE_PLANS, ADD_ON_MARKETPLACE } from '@/lib/store/platform-pricing';
 import { INDIVIDUAL_APP_CATALOG } from '@/lib/apps/individual-app-plans';
+import { COURSE_BUILDER_MONTHLY_PRICE } from '@/lib/course-builder/offer';
 
 const categoryMeta: Record<CapabilityCategory, { label: string }> = {
   business: { label: 'Business' },
@@ -120,6 +121,7 @@ function priceFor(capability: PlatformCapability): string {
     return INDIVIDUAL_APP_CATALOG['sam-gov'].plans[0]?.priceLabel ?? 'See plans';
   if (capability.key === 'grants_discovery')
     return INDIVIDUAL_APP_CATALOG.grants.plans[0]?.priceLabel ?? 'See plans';
+  if (capability.key === 'course_builder') return `$${COURSE_BUILDER_MONTHLY_PRICE}/mo`;
   const addon = ADD_ON_MARKETPLACE.find(
     (candidate) => !candidate.hiddenFromMarketplace && candidate.features.includes(capability.key),
   );

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { isLearnerRosterProfile } from '../../lib/program-holder/roster-eligibility';
+import { isIsolatedQaProgramHolderRosterContext, isLearnerRosterProfile } from '../../lib/program-holder/roster-eligibility';
 
 describe('Program Holder learner roster boundary', () => {
   it.each([
@@ -62,4 +62,40 @@ it('excludes named QA fixture accounts from production directories', async () =>
   expect(isProductionRosterProfile({ id: 'qa', role: 'staff', full_name: '[QA E2E] Staff', email: 'staff@elevateforhumanity.org' })).toBe(false);
   expect(isProductionRosterProfile({ id: 'staff', role: 'staff', full_name: 'Office Staff', email: 'staff@elevateforhumanity.org' })).toBe(true);
   expect(isProductionRosterProfile({ id: 'qa', role: 'admin', email: 'admin@qa.invalid' })).toBe(false);
+});
+
+
+describe('Isolated Program Holder roster acceptance', () => {
+  const qaUrl = 'https://isdgjcdabhxxozarmxta.supabase.co';
+  const active = {
+    id: 'qa-user-id',
+    role: 'student',
+    full_name: 'QA Holder Active Student',
+    email: 'qa-portal-e2e-45102978350-holder-active-student@qa.invalid',
+  };
+  const completed = {
+    ...active,
+    email: 'qa-portal-e2e-45102978350-holder-completed-student@qa.invalid',
+  };
+  it('requires both the exact QA database and explicit browser-test mode', () => {
+    expect(isIsolatedQaProgramHolderRosterContext({ supabaseUrl: qaUrl, testMode: 'true' })).toBe(true);
+    expect(isIsolatedQaProgramHolderRosterContext({ supabaseUrl: qaUrl, testMode: 'false' })).toBe(false);
+    expect(isIsolatedQaProgramHolderRosterContext({ supabaseUrl: 'https://cuxzzpsyufcewtmicszk.supabase.co', testMode: 'true' })).toBe(false);
+    expect(isIsolatedQaProgramHolderRosterContext({ supabaseUrl: 'https://isdgjcdabhxxozarmxta.supabase.co.attacker.invalid', testMode: 'true' })).toBe(false);
+    expect(isIsolatedQaProgramHolderRosterContext({ supabaseUrl: 'invalid', testMode: 'true' })).toBe(false);
+  });
+  it('admits only the approved disposable holder learner fixtures, never by default', () => {
+    for (const learner of [active, completed]) {
+      expect(isLearnerRosterProfile(learner)).toBe(false);
+      expect(isLearnerRosterProfile(learner, { includeIsolatedQaFixtures: true })).toBe(true);
+    }
+    expect(isLearnerRosterProfile({ ...active, role: 'staff' }, { includeIsolatedQaFixtures: true })).toBe(false);
+    expect(isLearnerRosterProfile({ ...active, email: 'qa-portal-e2e-45102978350-holder-active-student@other.invalid' }, { includeIsolatedQaFixtures: true })).toBe(false);
+    expect(isLearnerRosterProfile({ ...active, email: 'other@qa.invalid' }, { includeIsolatedQaFixtures: true })).toBe(false);
+    expect(isLearnerRosterProfile({ ...active, id: '' }, { includeIsolatedQaFixtures: true })).toBe(false);
+  });
+  it('preserves live learner inclusion and production exclusions', () => {
+    expect(isLearnerRosterProfile({ id: 'real', role: 'student', email: 'person@gmail.com' }, { includeIsolatedQaFixtures: true })).toBe(true);
+    expect(isLearnerRosterProfile({ ...active, full_name: '[QA E2E] Program Holder', role: 'program_holder' }, { includeIsolatedQaFixtures: true })).toBe(false);
+  });
 });

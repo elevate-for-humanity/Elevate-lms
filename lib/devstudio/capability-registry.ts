@@ -42,6 +42,13 @@ export const DEV_STUDIO_CAPABILITIES: DevStudioCapability[] = [
     evidence: 'PR #2823; feed clients exist in lib/industry/ and lib/onet/, but keys cannot be confirmed from the repo.',
   },
   {
+    id: 'code-fix-own-engine',
+    capability: 'Code fix — read repo, change, PR, check CI (owned engine)',
+    engine: 'Own engine: runAITask code_repair (owned-only, elevate-local) + agent loop (lib/devstudio/own-engine/agent-loop.ts) + muse-loop hands',
+    status: 'implemented-unverified',
+    evidence: 'This PR. Unit-tested with mocked model/hands/ledger; no live run yet — first live run must be a small reviewed change via POST /api/admin/dev-studio/own-engine.',
+  },
+  {
     id: 'code-fix-muse-loop',
     capability: 'Code fix — read repo, change, PR, check CI',
     engine: 'Muse loop (lib/devstudio/muse-loop.ts) via the PARIS GitHub App',
@@ -52,10 +59,10 @@ export const DEV_STUDIO_CAPABILITIES: DevStudioCapability[] = [
   {
     id: 'code-fix-openhands',
     capability: 'Code fix / autofix via OpenHands',
-    engine: 'OpenHands (lib/devstudio/openhands/), key OPENHANDS_API_KEY',
+    engine: 'OpenHands (lib/devstudio/openhands/), opt-in only via PARIS_REPAIR_ENGINE=openhands',
     status: 'unproven',
-    evidence: '29 tasks, 22 failed, 0 completed; key untested since 2026-09-15; HEAD fails closed on missing PARIS start receipt / pending approval.',
-    fallback: 'code-fix-muse-loop',
+    evidence: '29 tasks, 22 failed, 0 completed; key untested since 2026-09-15; HEAD fails closed on missing PARIS start receipt / pending approval. Opt-in-only since the own-engine PR: routes, planner, and PARIS staging all fail closed without the opt-in; adapter retained, gated off.',
+    fallback: 'code-fix-own-engine',
   },
   {
     id: 'repair-ledger',

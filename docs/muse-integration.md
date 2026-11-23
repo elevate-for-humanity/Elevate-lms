@@ -34,7 +34,7 @@ happens and must be retried.
 | App ID | (Meta-owned; not in this repo) | 5477907 |
 | Owner | Meta | Elevate (in-repo runtime) |
 | Where it runs | Outside the repo, in Muse | Inside the Admin server, via `lib/devstudio/github-token.ts` |
-| Used by | Muse, in chat with the user | Dev Studio code: the PARIS/OpenHands adapter, the git route, the Muse loop |
+| Used by | Muse, in chat with the user | Dev Studio code: the PARIS adapter, the git route, the Muse loop, the own engine |
 | Can one call the other? | No | No |
 
 The PARIS App is the credential Dev Studio uses to call the GitHub API
@@ -52,14 +52,18 @@ draft PRs and reports CI state; it never merges.
 Why a separate loop exists at all: Dev Studio's existing code-fix engine
 is OpenHands, and OpenHands has 0 completed tasks in this repo (29 tasks,
 22 failed; key untested since 2026-09-15). The Muse loop is the working
-replacement until OpenHands is proven live. See
+replacement, and the own engine (`docs/own-engine.md`) now drives it with
+the owned model. OpenHands is opt-in-only (`PARIS_REPAIR_ENGINE=openhands`)
+and is not required to be proven live. See
 `lib/devstudio/capability-registry.ts` — OpenHands is marked `unproven`
-with the Muse loop as its fallback.
+with the own engine as its fallback.
 
 ## What remains unproven
 
 - The Muse loop is unit-tested against a mocked GitHub API. Its first
   live run from the Admin server must be a small, reviewed change.
-- OpenHands: prove it (key test must return
-  `read_authorization_verified`, then one small task must complete) or
-  retire its panels.
+- The own engine is unit-tested with a mocked model. Its first live run
+  must be a small, reviewed change via `POST /api/admin/dev-studio/own-engine`,
+  and the owned worker answering live is still unproven.
+- OpenHands: retired as the required path (opt-in-only). Proving it live
+  is only needed if someone opts in.

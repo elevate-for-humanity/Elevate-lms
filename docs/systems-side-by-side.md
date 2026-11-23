@@ -68,7 +68,7 @@ it for the five systems below.
 | G5 | **ESLint exemption points at routes that don't exist.** `no-direct-ai-providers` exempts legacy `/api/devstudio/chat` and `/execute`. | **Yes** — exemption updated to the canonical `/api/admin/dev-studio/chat` path, with a comment stating the exception is intentional multi-provider tool-calling. |
 | G6 | **Course-generation boundary is implicit.** `course_generation` output is raw JSON; nothing in code says it must cross Course Factory before it becomes a course. | **Yes** — `lib/ai/course-generation-authority.ts`: a named boundary + helper the LMS route and future callers use to label output as draft-only. |
 | G7 | **No live proof the Muse loop runs from the Admin server.** Unit tests mock GitHub; CI typechecks. | **Not in this PR** — first live run must be a small, reviewed change via the route, after merge + deploy. See "What remains". |
-| G8 | **OpenHands still unproven.** | **Not fixed here** — marked unproven in the registry with a fallback. Proving it needs a live key test (`read_authorization_verified`) + one completed task; that is a live-admin step, not a code change. |
+| G8 | **OpenHands still unproven.** | **Retired as the required path in this PR (own-engine extension)** — OpenHands is now opt-in-only (`PARIS_REPAIR_ENGINE=openhands`): PARIS staging, the planner, the master-studio specialist, and both Dev Studio OpenHands routes fail closed without it; the adapter is retained, gated off. The owned engine (`code-fix-own-engine` in the registry) is the replacement. Proving OpenHands live is no longer required; it needs a live key test (`read_authorization_verified`) + one completed task only if someone opts in. |
 | G9 | **PR #2812 migration untested in QA; #2813 phone unverified live; #2821 E2E shard 3/4 still red.** | **Not in this PR** — tracked in the registry as `pending` / `implemented-unverified`. |
 
 ## 5. What remains
@@ -78,9 +78,14 @@ it for the five systems below.
    small fix, reviews the plan, then `action: 'execute'`, and confirms
    the branch, PR, and CI state in the response. Until then the loop is
    unit-tested, not live-proven.
-2. **OpenHands:** prove or retire. If the key test fails or no task
-   completes, the OpenHands panels should be hidden or removed, not left
-   looking live.
+2. **Live proof of the own engine:** after merge + deploy, an admin calls
+   `POST /api/admin/dev-studio/own-engine` with `action: 'plan'`, then
+   `action: 'execute'` for a small fix, and confirms the draft PR was
+   opened from a model-produced change with the PARIS ledger row updated.
+   Until then the engine is unit-tested (mocked model), not live-proven —
+   in particular the owned worker answering live is still unproven.
+3. **OpenHands:** retired as the required path (opt-in-only). No live
+   proof is needed unless someone opts in with `PARIS_REPAIR_ENGINE=openhands`.
 3. **Merge queue:** #2821 (E2E), #2822 (enrollment/hours), #2823
    (single Course Builder) must go green and merge before this PR's
    registry statuses can be upgraded from `pending`.

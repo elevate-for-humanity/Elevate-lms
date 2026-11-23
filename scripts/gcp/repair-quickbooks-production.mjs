@@ -5,6 +5,15 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
 const verifierKeys = ['QB_WEBHOOK_VERIFIER_TOKEN', 'QUICKBOOKS_WEBHOOK_VERIFIER_TOKEN'];
+/** Match explicit provider and webhook/verifier secret names, including Intuit aliases.
+ * Do not match unrelated providers or generic OAuth credentials. */
+export function isVerifierSecretName(name) {
+  if (typeof name !== 'string') return false;
+  const parts = name.toLowerCase().split(/[-_]/).filter(Boolean);
+  return parts.some(part => ['quickbooks', 'qb', 'intuit'].includes(part)) &&
+    parts.some(part => ['webhook', 'webhooks', 'verifier'].includes(part));
+}
+
 export function resolveVerifier(environments, standalone = []) {
   const candidates = [...environments.flatMap(env => verifierKeys.map(key => env[key])), ...standalone]
     .filter(value => typeof value === 'string' && value.trim()).map(value => value.trim());
@@ -42,7 +51,7 @@ export function repairQuickBooksProduction({ run: executor = google, apply = fal
     serving.push(env);
   }
   const standalone = [];
-  for (const name of names.filter(name => /(?:quickbooks|(?:^|-)qb)(?:-|_).*?(?:webhook|verifier)/i.test(name))) {
+  for (const name of names.filter(isVerifierSecretName)) {
     // Prepared, empty secrets have no enabled versions. Do not confuse them with lost credentials.
     const versions = JSON.parse(run(['secrets', 'versions', 'list', name, '--project', PROJECT, '--filter=state:ENABLED', '--format=json']));
     if (versions.length) standalone.push(run(['secrets', 'versions', 'access', 'latest', '--secret', name, '--project', PROJECT]));

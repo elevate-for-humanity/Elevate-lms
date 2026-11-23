@@ -63,5 +63,5 @@ export function isLearnerRosterProfile(
     return false;
   }
   const email = String(profile.email || '').trim().toLowerCase();
-  return /^qa-portal-e2e-[0-9]+-holder-(?:active|completed)-student@qa\\.invalid$/.test(email);
+  return /^qa-portal-e2e-[0-9]+-holder-(?:active|completed)-student@qa\.invalid$/.test(email);
 }

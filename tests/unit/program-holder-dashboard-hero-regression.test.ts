@@ -56,6 +56,15 @@ describe('program-holder dashboard hero', () => {
     expect(holderData).not.toContain("'pending',\n        'applied'");
   });
 
+  it('loads hands-on training clocks only for the Hours page', () => {
+    expect(workspace).toContain(
+      "getProgramHolderWorkspace({ includeOnlineStudy: section === 'hours' })",
+    );
+    expect(holderData).toMatch(
+      /includeOnlineStudy\s*\? await loadHolderOnlineStudy\(db, enrolledRoster\)\s*: \[\]/,
+    );
+  });
+
   it('does not label shared dashboard tools as HVAC-only', () => {
     expect(callList).toContain('call every new applicant');
     expect(callList).not.toContain('HVAC applicants');

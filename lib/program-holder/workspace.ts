@@ -94,7 +94,9 @@ function getGaryRegionalCityCenter(city: unknown): RegionalLocation | null {
 }
 
 /** Canonical, holder-scoped data contract shared by every Program Holder page. */
-export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspace> {
+export async function getProgramHolderWorkspace({
+  includeOnlineStudy = false,
+}: { includeOnlineStudy?: boolean } = {}): Promise<ProgramHolderWorkspace> {
   const ctx = await requireProgramHolder();
   if (ctx.mode === 'holder') {
     const holderId = ctx.holderId;
@@ -543,7 +545,9 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
         training_start_date: row.training_start_date || verified.firstDate || null,
       };
     });
-  const onlineStudySessions = await loadHolderOnlineStudy(db, enrolledRoster);
+  const onlineStudySessions = includeOnlineStudy
+    ? await loadHolderOnlineStudy(db, enrolledRoster)
+    : [];
   const upcomingRoster = (upcomingRes.data ?? []).filter(
     (row: any) => !row.user_id || eligibleRosterUserIds.has(row.user_id),
   );

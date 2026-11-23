@@ -178,7 +178,8 @@ jobs:
           tests/e2e/employer-onboarding.spec.ts
           tests/e2e/hvac-live-lesson-playback.spec.ts
           tests/e2e/portal-responsive-design.spec.ts
-          --grep "Employer setup|Authenticated live HVAC lesson media|critical (Program Holder|Employer|Case Manager) surfaces"
+          tests/e2e/program-holder.spec.ts
+          --grep "Employer setup|Authenticated live HVAC lesson media|critical (Program Holder|Employer|Case Manager) surfaces|filters persisted enrollments by status and name|validates and saves a report for the assigned student"
           --project=desktop-chrome
       - name: Verify the corrected browser assertions
         id: focused

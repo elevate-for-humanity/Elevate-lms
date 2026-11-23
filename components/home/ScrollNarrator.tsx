@@ -103,6 +103,14 @@ export function ScrollNarrator() {
     if (Array.from(document.querySelectorAll<HTMLMediaElement>('audio, video')).some(
       (media) => !media.paused && (!media.muted && media.volume > 0 || media.hasAttribute('data-narrated-tour')),
     )) return false;
+    // Browsers cannot play audible narration before a visitor gesture.
+    // Do not generate billable provider speech while the document is still
+    // untouched (including automated page-readiness checks). The existing
+    // pointer/keyboard listener will begin narration on first interaction.
+    if (typeof navigator !== 'undefined' && navigator.userActivation && !navigator.userActivation.hasBeenActive) {
+      setNotice(NARRATION_GESTURE_NOTICE);
+      return false;
+    }
     const section = mostVisiblePageSection();
     if (!section) {
       // Mobile layouts frequently have spacing between narrated sections.
@@ -269,9 +277,12 @@ export function ScrollNarrator() {
 
     const preload = (section: HTMLElement) => {
       const text = narrationFor(section);
-      if (text)
+      const src = narrationSourceFor(section);
+      // Only preload existing same-origin recordings. Generated speech must
+      // not invoke an unconfigured provider merely because a page is viewed.
+      if (text && src && (!navigator.userActivation || navigator.userActivation.hasBeenActive))
         void prepare(text, {
-          src: narrationSourceFor(section),
+          src,
           voice: 'coral',
           style: narrationStyleFor(section),
           rate: narrationRateFor(section),

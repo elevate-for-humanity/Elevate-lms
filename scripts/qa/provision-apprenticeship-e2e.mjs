@@ -18,7 +18,7 @@ const db = createClient(supabaseUrl, serviceRoleKey, {
 });
 
 const tenantId = '6ba71334-58f4-4104-9b2a-5114f2a7614c';
-const runId = String(process.env.GITHUB_RUN_ID || Date.now());
+const runId = String(process.env.QA_PORTAL_E2E_RUN_ID || process.env.GITHUB_RUN_ID || Date.now());
 const marker = `qa-e2e-${runId}`;
 
 function password() {

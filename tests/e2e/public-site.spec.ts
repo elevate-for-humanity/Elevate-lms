@@ -116,6 +116,8 @@ async function assertNoRuntimeFailure(page: Page, route: string) {
   ).toEqual([]);
 }
 
+test.describe.configure({ mode: 'serial' });
+
 test.describe('page-by-page public production audit', () => {
   for (const route of [...CRITICAL_PUBLIC_ROUTES, ...CRITICAL_PROGRAM_ROUTES]) {
     test(`${route} renders without runtime failure`, async ({ page }) => {
@@ -181,17 +183,31 @@ test.describe('responsive navigation acceptance', () => {
 });
 
 test.describe('application entry audit', () => {
-  for (const route of ['/apply', '/apply/student', '/programs/barber-apprenticeship/apply']) {
-    test(`${route} exposes an actionable application experience`, async ({ page }) => {
-      await assertNoRuntimeFailure(page, route);
-      const control = page.locator('form, input, select, textarea, button[type="submit"]').first();
-      await expect(control, `${route} has no actionable application control`).toBeVisible();
-    });
-  }
+  test('application chooser exposes the canonical intake path', async ({ page }) => {
+    await assertNoRuntimeFailure(page, '/apply');
+    await expect(page.getByRole('link', { name: /intake application/i })).toHaveAttribute(
+      'href',
+      '/apply/student?intent=inquiry',
+    );
+  });
 
-  test('student application has a submission control', async ({ page }) => {
-    await page.goto('/apply/student', { waitUntil: 'domcontentloaded' });
-    await expect(page.getByRole('button', { name: /submit application/i })).toBeVisible();
+  test('canonical student entry redirects to an actionable guided application', async ({ page }) => {
+    await assertNoRuntimeFailure(page, '/apply/student');
+    await expect(page).toHaveURL(/\/apply\/student\/(?:interview|form)/);
+    await expect(page.locator('form, input, select, textarea, button').first()).toBeVisible();
+  });
+
+  test('barber application chooser exposes inquiry, enrollment, and Host Shop paths', async ({ page }) => {
+    await assertNoRuntimeFailure(page, '/programs/barber-apprenticeship/apply');
+    await expect(page.getByRole('link', { name: 'Submit Free Inquiry' })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Start Enrollment' })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Start Host Site Application' })).toBeVisible();
+  });
+
+  test('standard student application exposes its first actionable step', async ({ page }) => {
+    await assertNoRuntimeFailure(page, '/apply/student/form');
+    await expect(page.locator('form')).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Continue' })).toBeVisible();
   });
 
   test('application status page accepts tracking information', async ({ page }) => {

@@ -2,6 +2,7 @@ export type HiringRole = 'company' | 'individual' | 'apprentice';
 export type HiringProfile = {
   role: HiringRole; name: string; email: string; phone: string; company: string;
   serviceArea: string; services: string; experience: string; availability: string;
+  requestedHourlyRate?: string;
   capacity: string; equipment: string; insurance: string; qualificationsNote: string;
 };
 export type HiringQuestion = { id: string; question: string; options: string[] };

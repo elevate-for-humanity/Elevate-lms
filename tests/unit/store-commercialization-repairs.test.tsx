@@ -38,6 +38,6 @@ describe('capability demo pricing', () => {
     const expectedPlan = BASE_PLANS.professional;
     expect(expectedPlan.features).toContain('lms');
     expect(ADD_ON_MARKETPLACE.find((item) => item.slug === 'online-courses-lms')?.hiddenFromMarketplace).toBe(true);
-    expect(page.props.children.props.priceLabel).toBe(`Included from ${expectedPlan.priceMonthly}/month`);
+    expect(page.props.children.props.priceLabel).toBe(`Included from $${expectedPlan.priceMonthly}/month`);
   });
 });

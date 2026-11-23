@@ -30,6 +30,10 @@ import { withLaminarSpan } from '@/lib/observability/laminar';
  */
 
 import { aiChat, aiReason, isReasoningAvailable } from '@/lib/ai/ai-service';
+import {
+  COURSE_GENERATION_AUTHORITY_NOTE,
+  isCourseGenerationTask,
+} from '@/lib/ai/course-generation-authority';
 import { logger } from '@/lib/logger';
 import type { ChatMessage } from '@/lib/ai/types';
 import { getRAGContext } from '@/lib/platform/rag';
@@ -119,6 +123,12 @@ export type AITaskResult = {
   tokensUsed?: number;
   blocked?: boolean;
   blockReason?: string;
+  /**
+   * Set for course/lesson/quiz generation tasks. Generated output is a
+   * draft: it must cross Course Factory before it becomes a course.
+   * See lib/ai/course-generation-authority.ts.
+   */
+  authorityNote?: string;
 };
 
 // ─── System prompt templates ──────────────────────────────────────────────────
@@ -409,6 +419,9 @@ async function runAITaskInternal(input: AITaskInput): Promise<AITaskResult> {
       provider: result.provider ?? 'unknown',
       task,
       tokensUsed: result.usage?.totalTokens,
+      ...(isCourseGenerationTask(task)
+        ? { authorityNote: COURSE_GENERATION_AUTHORITY_NOTE }
+        : {}),
     };
 
     // Persist results for operational tasks (fire-and-forget, non-blocking)

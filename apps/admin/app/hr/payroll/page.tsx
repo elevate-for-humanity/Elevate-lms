@@ -15,7 +15,7 @@ export default async function PayrollPage() {
   await requireRole(['admin', 'super_admin']);
   const supabase = await createClient();
 
-  const [{ count: staffCount }, { data: payrollRuns }, { data: w9Queue, count: pendingW9Count }] =
+  const [staffResult, runsResult, w9Result] =
     await Promise.all([
       supabase
         .from('profiles')
@@ -40,11 +40,16 @@ export default async function PayrollPage() {
 
   return (
     <div className="min-h-screen bg-white">
+      {(staffResult.error || runsResult.error || w9Result.error) && (
+        <p role="alert" className="mx-4 mt-4 rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-950">
+          Some payroll records could not be loaded. Refresh the page before relying on the totals.
+        </p>
+      )}
       <PayrollClient
-        staffCount={staffCount ?? 0}
-        payrollRuns={payrollRuns ?? []}
-        w9Queue={w9Queue ?? []}
-        pendingW9Count={pendingW9Count ?? 0}
+        staffCount={staffResult.count ?? 0}
+        payrollRuns={runsResult.data ?? []}
+        w9Queue={w9Result.data ?? []}
+        pendingW9Count={w9Result.count ?? 0}
       />
     </div>
   );

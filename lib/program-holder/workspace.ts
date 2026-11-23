@@ -11,7 +11,7 @@ import { verifiedTrainingForEnrollment } from './verified-hours';
 import { hasActiveProgramEnrollment, learnerProgramKey } from './enrollment-identity';
 import { holderCredentialStatus, holderTrainingRecord } from './student-training';
 import { studentContactProjection } from './contact-privacy';
-import { isLearnerRosterProfile } from './roster-eligibility';
+import { isIsolatedQaProgramHolderRosterContext, isLearnerRosterProfile } from './roster-eligibility';
 import { requireProgramHolder } from '@/lib/auth/require-program-holder';
 import { calculateDistanceMiles, geocodeAddress, isGeocodingResult } from '@/lib/geo/geocode';
 
@@ -514,8 +514,14 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
         : {}),
       ...holderCredentialStatus(row, credentialUploads ?? []),
     });
+  const includeIsolatedQaFixtures = isIsolatedQaProgramHolderRosterContext({
+    supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL,
+    testMode: process.env.TEST_MODE,
+  });
   const eligibleRosterUserIds = new Set(
-    (rosterProfiles ?? []).filter(isLearnerRosterProfile).map((row: any) => row.id),
+    (rosterProfiles ?? [])
+      .filter((row: any) => isLearnerRosterProfile(row, { includeIsolatedQaFixtures }))
+      .map((row: any) => row.id),
   );
   const nameByUserId = new Map<string, string>(
     (rosterProfiles ?? [])

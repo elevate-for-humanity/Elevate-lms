@@ -110,7 +110,7 @@ function approvedDescription(shop: HostShop) {
 export async function getApprovedShops(program?: ProgramKey): Promise<HostShop[]> {
   const db = await requireAdminClient();
 
-  const [barberResult, hostResult, publicResult, activeShopResult, archivedPartnerResult] = await Promise.all([
+  const [barberResult, hostResult, publicResult, activeShopResult, archivedPartnerResult, approvedPartnerResult, optedInResult] = await Promise.all([
     db
       .from('barbershop_partner_applications')
       .select(
@@ -127,15 +127,20 @@ export async function getApprovedShops(program?: ProgramKey): Promise<HostShop[]
     db
       .from('public_host_shops')
       .select(
-        'id, public_slug, display_name, description, logo_url, flyer_url, website_url, website, phone, address_line1, address_line2, city, state, zip, programs, media_gallery, video_url, source_url',
+        'id, public_slug, public_profile_published_at, display_name, description, logo_url, flyer_url, website_url, website, phone, address_line1, address_line2, city, state, zip, programs, media_gallery, video_url, source_url',
       ),
     db.from('host_shops')
       .select('id,name,address,city,state,zip_code,phone,website,image_url,description,services,specializations')
       .eq('is_approved', true).eq('shop_status', 'active').order('name'),
     db.from('partners').select('name,shop_name,dba').or('status.in.(archived,inactive),account_status.eq.archived'),
+    db.from('partners').select('id,public_slug,programs')
+      .eq('status', 'active').eq('account_status', 'active').eq('approval_status', 'approved')
+      .not('public_profile_published_at', 'is', null),
+    db.from('host_shop_partnerships').select('partner_id')
+      .eq('status', 'active').eq('directory_listing', true),
   ]);
 
-  for (const result of [barberResult, hostResult, publicResult, activeShopResult, archivedPartnerResult]) {
+  for (const result of [barberResult, hostResult, publicResult, activeShopResult, archivedPartnerResult, approvedPartnerResult, optedInResult]) {
     if (result.error) throw new Error(`HOST_SHOP_DIRECTORY_QUERY_FAILED:${result.error.message}`);
   }
   const barberRows = barberResult.data;
@@ -236,7 +241,52 @@ export async function getApprovedShops(program?: ProgramKey): Promise<HostShop[]
       return { id: row.id, name: row.name, address: row.address ?? '', city: row.city ?? '', state: row.state === 'Indiana' ? 'IN' : row.state || 'IN', zip: row.zip_code ?? '', phone: row.phone ?? '', email: '', supervisor: '', programs, primaryProgram: programs[0], badge: 'partner', publicSlug: featured?.slug ?? slug, website: row.website || featured?.websiteUrl, description: row.description || featured?.marketingBlurb || `${row.name} participates in Elevate’s approved Host Shop network. Occupation and placement availability are confirmed by Elevate.`, mediaGallery: row.image_url ? [{url: row.image_url, alt: `${row.name} shop photo`}] : undefined };
     });
   const archivedNames = new Set((archivedPartnerResult.data ?? []).flatMap((row) => [row.name, row.shop_name, row.dba]).filter(Boolean).map(businessKey));
-  const all = [...existing, ...activeShopBacked].map(shop => ({ ...shop, ...normalizeHostShopAddress(shop) })).filter((shop) =>
+  // Older and migrated Host Sites can have their canonical approval on the
+  // partner record rather than in either application table. This is an
+  // additional approval source, not permission to publish profile-only rows.
+  const optedInPartnerIds = new Set((optedInResult.data ?? []).map(row => row.partner_id));
+  const alreadyListed = [...existing, ...activeShopBacked];
+  const partnerBacked: HostShop[] = [];
+  for (const partner of approvedPartnerResult.data ?? []) {
+    if (!partner.public_slug || !optedInPartnerIds.has(partner.id)) continue;
+    const profile = (publicRows ?? []).find(row =>
+      row.id === partner.id && row.public_slug === partner.public_slug && row.public_profile_published_at,
+    );
+    if (!profile?.display_name || !businessKey(profile.display_name)) continue;
+    if ([...alreadyListed, ...partnerBacked].some(shop =>
+      shop.publicSlug === profile.public_slug || businessKey(shop.name) === businessKey(profile.display_name),
+    )) continue;
+    const programs = [...new Set((Array.isArray(partner.programs) ? partner.programs : [])
+      .map(normalizeHostShopProgram).filter((value): value is string => value !== null))];
+    if (!programs.length) continue;
+    const shop: HostShop = {
+      id: partner.id,
+      name: profile.display_name,
+      address: [profile.address_line1, profile.address_line2].filter(Boolean).join(', '),
+      city: profile.city ?? '',
+      state: profile.state ?? 'IN',
+      zip: profile.zip ?? '',
+      phone: (profile.source_url || profile.website_url || profile.website) ? (profile.phone ?? '') : '',
+      email: '',
+      supervisor: '',
+      programs,
+      primaryProgram: programs[0],
+      badge: 'partner',
+      publicSlug: profile.public_slug,
+      website: profile.website_url || profile.website || undefined,
+      logoUrl: profile.logo_url ?? undefined,
+      flyerUrl: profile.flyer_url ?? undefined,
+      videoUrl: profile.video_url ?? undefined,
+      mediaGallery: parseMedia(profile.media_gallery),
+    };
+    partnerBacked.push({
+      ...shop,
+      description: profile.description || approvedDescription(shop),
+      googleMapsUrl: approvedMapsUrl(shop),
+    });
+  }
+
+  const all = [...alreadyListed, ...partnerBacked].map(shop => ({ ...shop, ...normalizeHostShopAddress(shop) })).filter((shop) =>
     isPubliclyListedHostShop(shop) && !archivedNames.has(businessKey(shop.name)),
   );
 

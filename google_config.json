@@ -7,7 +7,7 @@
   "vcsData": {
     "projectUrl": "https://github.com/elevate-for-humanity/Elevate-lms",
     "projectBranch": "main",
-    "dockerFilePath": "/Dockerfile.northflank-lms",
+    "dockerFilePath": "/Dockerfile.google-lms",
     "dockerWorkDir": "/"
   },
   "billing": {

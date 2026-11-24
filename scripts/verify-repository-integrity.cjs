@@ -9,7 +9,7 @@ const requiredFiles = [
   'pnpm-workspace.yaml',
   'Dockerfile.marketing',
   'Dockerfile.admin',
-  'Dockerfile.northflank-lms',
+  'Dockerfile.google-lms',
   'apps/marketing/package.json',
   'apps/admin/package.json',
   'apps/lms/package.json',

@@ -205,6 +205,21 @@ export default async function PhonePage() {
     system?.routing_mode === 'ai_receptionist'
       ? Boolean(system?.ai_enabled)
       : menuOptions.some((option: any) => option.enabled && option.destination_id);
+  // Live readiness is probed server-side on load (issue #2166): Twilio
+  // account + primary voice number, PBX config + PBX-verified SIP
+  // registrations. A failed or slow probe never blocks the page — it
+  // renders as unverified, never as ready. This must run before
+  // `setupSteps` below, which reads `liveReadiness` (declaring it after
+  // use was a TDZ error: TS2448, and a runtime ReferenceError).
+  let liveReadiness: Awaited<ReturnType<typeof probePhoneReadiness>> | null = null;
+  try {
+    liveReadiness = await Promise.race([
+      probePhoneReadiness(db),
+      new Promise<null>((resolve) => setTimeout(() => resolve(null), 12_000)),
+    ]);
+  } catch {
+    liveReadiness = null;
+  }
   const setupSteps = [
     {
       label: 'Assign PWA extensions',
@@ -230,19 +245,6 @@ export default async function PhonePage() {
   ];
   const phoneConfigured =
     Boolean(primaryNumber) && routingReady && extensions.some((entry: any) => entry.enabled);
-  // Live readiness is probed server-side on load (issue #2166): Twilio
-  // account + primary voice number, PBX config + PBX-verified SIP
-  // registrations. A failed or slow probe never blocks the page — it
-  // renders as unverified, never as ready.
-  let liveReadiness: Awaited<ReturnType<typeof probePhoneReadiness>> | null = null;
-  try {
-    liveReadiness = await Promise.race([
-      probePhoneReadiness(db),
-      new Promise<null>((resolve) => setTimeout(() => resolve(null), 12_000)),
-    ]);
-  } catch {
-    liveReadiness = null;
-  }
   const { data: onboarding } = workspaceResult.data?.id
     ? await db
         .from('communication_onboarding_progress')

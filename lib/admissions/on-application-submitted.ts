@@ -6,7 +6,6 @@ export const BASE_BINDER_DOCUMENTS: readonly BinderDocumentRequirement[] = [
   { documentType: 'government_id', name: 'Government-issued photo ID' },
   { documentType: 'ssn_card', name: 'Social Security card' },
   { documentType: 'hs_diploma_or_ged', name: 'High school diploma or GED' },
-  { documentType: 'resume', name: 'Resume' },
   { documentType: 'income_verification', name: 'Income verification' },
   { documentType: 'proof_of_residency', name: 'Proof of residency' },
 ];
@@ -15,12 +14,10 @@ export const CLINICAL_BINDER_DOCUMENTS: readonly BinderDocumentRequirement[] = [
   { documentType: 'cpr_card', name: 'CPR card' },
   { documentType: 'immunizations', name: 'Immunization records' },
   { documentType: 'physical', name: 'Physical exam' },
-  { documentType: 'background_check', name: 'Background check' },
-  { documentType: 'drug_screen', name: 'Drug screen' },
 ];
 
 const CLINICAL_PROGRAM_PATTERN =
-  /apprentice|barber|cosmetolog|esthetic|manicur|nail|health|medical|nurs|cna|phleb|ekg|pharm|patient|dental|clinical|caregiver|home-health|peer-recovery/;
+  /health|medical|nurs|cna|phleb|ekg|pharm|patient|dental|clinical|caregiver|home-health|peer-recovery/;
 
 export function escapeLikePattern(value: string): string {
   return value.replace(/[\\%_]/g, (c) => `\\${c}`);

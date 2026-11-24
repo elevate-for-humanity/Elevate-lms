@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { requireRole } from '@/lib/auth/require-role';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
-import { ChevronRight, TrendingUp, Users, CheckCircle, AlertTriangle, Calendar } from 'lucide-react';
+import { type LucideIcon, ChevronRight, TrendingUp, Users, CheckCircle, AlertTriangle, Calendar } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = { title: 'Completion Forecast | Admin' };
@@ -116,7 +116,7 @@ function StatCard({
   label: string;
   value: string | number;
   sub?: string;
-  icon: React.ElementType;
+  icon: LucideIcon;
   accent: string;
 }) {
   return (

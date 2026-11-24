@@ -3,6 +3,7 @@
 import { useState, useCallback } from 'react';
 import Link from 'next/link';
 import {
+  type LucideIcon,
   ArrowLeft, CheckCircle2, AlertTriangle, Edit3, X,
   Sparkles, ChevronRight, Loader2, PenLine, Database,
   FileText, User, Wand2,
@@ -34,7 +35,7 @@ type FieldDef = {
   sort_order: number;
 };
 
-const SOURCE_BADGE: Record<string, { label: string; cls: string; Icon: React.ElementType }> = {
+const SOURCE_BADGE: Record<string, { label: string; cls: string; Icon: LucideIcon }> = {
   repository_verified:  { label: 'Repository verified', cls: 'bg-green-50 text-green-700 border-green-200',   Icon: Database },
   uploaded_document:    { label: 'Uploaded document',   cls: 'bg-blue-50 text-blue-700 border-blue-200',      Icon: FileText },
   manual_admin_input:   { label: 'Admin input',         cls: 'bg-slate-50 text-slate-700 border-slate-200',   Icon: User },

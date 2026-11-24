@@ -38,6 +38,10 @@ export function absoluteRoleDestination(path: string): string {
 
   const normalized = path.startsWith('/') ? path : `/${path}`;
 
+  if (normalized.split(/[?#]/, 1)[0] === '/programs/hvac-technician/course') {
+    return `${siteUrls.lms}${normalized}`;
+  }
+
   if (ADMIN_PATH_PREFIXES.some((prefix) => matches(normalized, prefix))) {
     return `${siteUrls.admin}${normalized}`;
   }

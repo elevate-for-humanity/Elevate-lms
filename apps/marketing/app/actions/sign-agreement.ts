@@ -42,7 +42,10 @@ export async function signAgreement(data: {
     signingPaymentAddendum = Boolean(addendum && data.agreementVersion === addendum.version);
     if (!signingPaymentAddendum && data.agreementVersion !== `3.0-${context.holderId}`)
       return { success: false, error: 'The agreement changed. Reload and review the current terms before signing.' };
-    if (agreementHolder.features?.full_forms_status === 'review_pending') return { success: false, error: 'The full agreement requires completed legal entities and payment terms before signature.' };
+    // Program holders do not pay: there is no payment schedule for a program
+    // holder, and Schedule A payment terms are completed as part of the signed
+    // agreement rather than a precondition to signing. Do not gate the MOU
+    // signature on the full-forms review flag or on payment terms.
   }
   const requestHeaders = await headers();
   const ipAddress =

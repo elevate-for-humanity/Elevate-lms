@@ -19,10 +19,10 @@ export default async function SignMouPage() {
     .select('id,organization_name,status,approved_at,mou_signed,mou_final_pdf_url,features')
     .eq('id', context.holderId).maybeSingle();
   if (error || !holder) throw new Error('Program Holder agreement could not load.');
-  // Do not sign the summary while this holder's full contract details await review.
-  if (holder.id === 'acc9f5ab-8804-432e-9b12-aac1a6c86426' && holder.features?.full_forms_status === 'review_pending') {
-    redirect('/program-holder/agreements');
-  }
+  // Program holders do not pay, so no payment schedule gates signature: an
+  // approved holder reaches the signature block below. The MOU draft's
+  // contracting-entity details are an Elevate review item, tracked in
+  // lib/program-holder/achieve-onboarding-forms.json, not a signature gate.
   const executedUrl = typeof holder.mou_final_pdf_url === 'string' && /^https:\/\//i.test(holder.mou_final_pdf_url) ? holder.mou_final_pdf_url : null;
   const approvalReady = ['approved', 'active', 'approved_pending_mou'].includes(holder.status) && Boolean(holder.approved_at);
   const requirements: string[] = Array.isArray(holder.features?.custom_mou?.requirements) ? holder.features.custom_mou.requirements.filter((value: unknown): value is string => typeof value === 'string') : [];

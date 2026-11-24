@@ -16,6 +16,7 @@ import { ProgramHolderPaymentAddendum } from './ProgramHolderPaymentAddendum';
 import { filterHolderStudents } from '@/lib/program-holder/roster-filter';
 import { isApprovedDocument } from '@/lib/program-holder/document-review';
 import { programHolderDocumentStatus } from '@/lib/program-holder/document-requirements';
+import { isApprovedProgramHolderStatus } from '@/lib/program-holder/onboarding-status';
 import { requiredProgramHolderDocuments } from '@/lib/program-holder/onboarding-readiness';
 import { isEpaTestingProgram } from '@/lib/program-holder/enrollment-identity';
 import CourseSyllabus from '@/components/learner/CourseSyllabus';
@@ -162,7 +163,7 @@ export async function ProgramHolderWorkspaceView({
   }> = [
     {
       label: 'Program-holder approval',
-      complete: ['active', 'approved'].includes(data.holder?.status),
+      complete: isApprovedProgramHolderStatus(data.holder?.status, data.holder?.approved_at),
       required: true,
       owner: 'Elevate',
     },

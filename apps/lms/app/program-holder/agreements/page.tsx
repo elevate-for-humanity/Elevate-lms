@@ -25,7 +25,7 @@ export default async function FullOnboardingFormsPage() {
         <Link href="/program-holder/dashboard" className="font-bold text-blue-700 underline">Back to dashboard</Link>
         <PrintDocumentControl />
         <h1 className="mt-4 text-3xl font-bold">Full CNA onboarding forms</h1>
-        <p className="mt-3 leading-7">Your full MOU, NDA, and 12-month limited non-compete and non-solicitation forms are below. These drafts are available for review. Elevate must confirm the contracting legal entities and complete the payment schedule before enabling signature. No agreement is recorded as signed by viewing this page.</p>
+        <p className="mt-3 leading-7">Your full MOU, NDA, and 12-month limited non-compete and non-solicitation forms are below. These drafts are available for review. There is no payment schedule for a program holder — program holders do not pay to sign. No agreement is recorded as signed by viewing this page.</p>
         <Link href="/program-holder/documents" className="mt-3 inline-block font-bold text-blue-700 underline">Other onboarding documents</Link>
       </div>
       <article className="space-y-4 rounded-xl border bg-white p-5 sm:p-8 print:border-0 print:p-0">

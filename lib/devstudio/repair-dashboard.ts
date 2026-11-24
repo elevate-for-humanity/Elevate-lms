@@ -1,3 +1,5 @@
+import { isProviderConfirmationSnapshot } from './openhands/provider-confirmation.mjs';
+
 const repository = 'elevate-for-humanity/Elevate-lms';
 const identifier = /^[A-Za-z0-9_-]{1,128}$/;
 const uuid = /^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i;
@@ -34,6 +36,8 @@ export function repairDashboardReceipt(row: any, task: any, actorId: string) {
     area: row.source_job_id ? 'Course Builder' : 'Engineering', repository, operation: 'Source repair',
     engine: !candidate || candidate.provider === 'openhands' || candidate.kind === 'openhands-checkpoint' ? 'openhands' : 'internal',
     taskId, conversationId: owned ? scalar(task.tool_output?.conversation_id, identifier) : null,
+    providerConfirmationRequired: Boolean(owned && task.status === 'awaiting_approval' &&
+      task.requires_approval === true && isProviderConfirmationSnapshot(task)),
     approvalStatus, approvalRequired, approvalAuthority: approvalRequired ? 'Authorized human reviewer' : 'Protected GitHub review',
     blockerCode: scalar(row.error_code, /^[A-Z][A-Z0-9_]{0,119}$/),
     riskClassification: 'Unverified — review proposed changes',

@@ -1,3 +1,5 @@
+> **RETIRED — historical reference only (November 2026).** Production applications use Google Cloud Run and the Google HTTPS load balancer. Authoritative DNS is managed at the domain's delegated SystemDNS/Durable provider. **Do not apply the Northflank CNAME targets or run the Northflank domain-attachment commands below.** See [Production DNS and routing](./dns-configuration.md) and verify the current delegation and all authoritative answers before proposing a controlled change. This file is retained solely to preserve historical incident context.
+
 # Northflank + Durable DNS (no apex ALIAS)
 
 Durable **cannot** CNAME-flatten apex to Northflank. An apex **A** record to the Northflank IP serves the wrong TLS cert (`*.northflank.app`) and mobile browsers block the site.

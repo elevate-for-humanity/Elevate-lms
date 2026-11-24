@@ -588,17 +588,9 @@ async function _POST(request: NextRequest) {
         .limit(1)
         .maybeSingle();
       if (openShift) {
-        await notifyAdminsOfClockAttempt(db, {
-          userId: user.id,
-          apprenticeId: apprentice.id,
-          siteId: site_id,
-          siteName: site.name ?? null,
-          successful: true,
-          reason: 'Clock-in retry recognized; apprentice was already clocked in.',
-          code: 'ALREADY_CLOCKED_IN',
-          progressEntryId: openShift.id,
-          attemptedAt: serverNow,
-        });
+        if (openShift.site_id !== site_id) {
+          return NextResponse.json({ error: 'Already clocked in at another site.', code: 'ALREADY_CLOCKED_IN' }, { status: 409 });
+        }
         return NextResponse.json({
           success: true,
           action,
@@ -678,19 +670,22 @@ async function _POST(request: NextRequest) {
         ? db.from('progress_entries').update(clockInValues).eq('id', currentDraft.id).is('clock_in_at', null)
         : db.from('progress_entries').insert(clockInValues);
       const { data: newEntry, error: insertError } = await entryWrite
-        .select('id')
+        .select('id,clock_in_at')
         .single();
 
       if (insertError?.code === '23505' || (currentDraft && insertError?.code === 'PGRST116')) {
         const { data: existing } = await db.from('progress_entries')
-          .select('id,clock_in_at,clock_out_at').eq('apprentice_id', apprentice.id)
+          .select('id,site_id,clock_in_at,clock_out_at').eq('apprentice_id', apprentice.id)
           .eq('work_date', serverDate).not('clock_in_at', 'is', null)
           .order('clock_in_at', { ascending: false }).limit(1).maybeSingle();
         if (existing?.clock_out_at) return NextResponse.json({ error: 'Today’s shift is already complete.' }, { status: 409 });
-        if (existing) return NextResponse.json({ success: true, action, progress_entry_id: existing.id,
+        if (existing && existing.site_id !== site_id) {
+          return NextResponse.json({ error: 'Already clocked in at another site.', code: 'ALREADY_CLOCKED_IN' }, { status: 409 });
+        }
+        if (existing?.clock_in_at) return NextResponse.json({ success: true, action, progress_entry_id: existing.id,
           clock_in_at: existing.clock_in_at, already_clocked_in: true });
       }
-      if (insertError || !newEntry) {
+      if (insertError || !newEntry?.clock_in_at) {
         await writeComplianceAlert(db, 'timeclock_persistence_error', {
           apprentice_id: apprentice.id,
           site_id,
@@ -720,7 +715,7 @@ async function _POST(request: NextRequest) {
         radiusM,
         accepted: true,
       });
-      await notifyClockIn(db, { entryId: newEntry.id, userId: user.id, siteName: site.name ?? null, clockInAt: serverNow });
+      await notifyClockIn(db, { entryId: newEntry.id, userId: user.id, siteName: site.name ?? null, clockInAt: newEntry.clock_in_at });
       await notifyAdminsOfClockAttempt(db, {
         userId: user.id,
         apprenticeId: apprentice.id,
@@ -728,14 +723,14 @@ async function _POST(request: NextRequest) {
         siteName: site.name ?? null,
         successful: true,
         progressEntryId: newEntry.id,
-        attemptedAt: serverNow,
-      });
+        attemptedAt: newEntry.clock_in_at,
+      }).catch((error) => logger.warn('[Timeclock] clock-in notification failed after shift saved', error));
 
       return NextResponse.json({
         success: true,
         action,
         progress_entry_id: newEntry.id,
-        clock_in_at: serverNow,
+        clock_in_at: newEntry.clock_in_at,
         geofence_verified: true,
         distance_m: distanceM,
         radius_m: radiusM,

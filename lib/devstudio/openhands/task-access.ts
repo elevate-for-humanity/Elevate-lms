@@ -18,7 +18,7 @@ export async function findOwnedOpenHandsTask(input: {
   const db = await requireAdminClient();
   const { data, error } = await db
     .from('ai_tasks')
-    .select('id,user_id,tenant_id,tool_name,status,tool_output')
+    .select('id,user_id,tenant_id,tool_name,status,requires_approval,approval_status,tool_output')
     .eq('id', input.taskId)
     .eq('user_id', input.actorId)
     .eq('tool_name', 'openhands.execute')
@@ -33,6 +33,8 @@ export async function findOwnedOpenHandsTask(input: {
   return {
     taskId: data.id as string,
     status: String(data.status),
+    requiresApproval: data.requires_approval === true,
+    approvalStatus: typeof data.approval_status === 'string' ? data.approval_status : null,
     startTaskId: typeof external.start_task_id === 'string' ? external.start_task_id : null,
     conversationId: typeof external.conversation_id === 'string' ? external.conversation_id : null,
   };

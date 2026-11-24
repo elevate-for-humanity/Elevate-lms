@@ -88,6 +88,17 @@ export function resolveCanonicalSlug(input: string): string {
     SLUG_ALIASES[raw.replace(/-/g, ' ')] ?? raw.replace(/ /g, '-');
 }
 
+/** Prefer the stored catalog identity, with canonical matching for older records. */
+export function applicationMatchesProgram(
+  application: { program_id: string | null; program_slug: string | null; program_interest: string | null },
+  programId: string,
+  programSlug: string,
+): boolean {
+  if (application.program_id) return application.program_id === programId;
+  return [application.program_slug, application.program_interest]
+    .some(value => value !== null && resolveCanonicalSlug(value) === programSlug);
+}
+
 export function toDbSlug(input: string): string {
   const canonical = resolveCanonicalSlug(input);
   return canonical;

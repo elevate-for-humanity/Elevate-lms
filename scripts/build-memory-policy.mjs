@@ -55,5 +55,9 @@ export function boundedBuildEnvironment(env, memoryBytes) {
     ...env,
     NODE_OPTIONS: `${retained}${retained ? ' ' : ''}--max-old-space-size=${heapMiB}`,
     NEXT_TELEMETRY_DISABLED: '1',
+    // Ephemeral builders do not persist Next's filesystem cache. Retaining and
+    // serializing it can exceed the process budget even with a bounded V8 heap.
+    // An explicitly provisioned persistent-cache builder can opt in with 0.
+    DISABLE_WEBPACK_FILESYSTEM_CACHE: env.DISABLE_WEBPACK_FILESYSTEM_CACHE ?? '1',
   } };
 }

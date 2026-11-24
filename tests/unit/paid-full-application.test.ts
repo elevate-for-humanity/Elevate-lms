@@ -14,6 +14,7 @@ vi.mock('@/lib/supabase/admin', () => ({ requireAdminClient: async () => ({ from
     then: (resolve: any) => { fixture.writes.push({ table, value, filters }); return Promise.resolve({ error: null }).then(resolve); },
   }; return query;
 } }) }));
+vi.mock('@/lib/billing/activate-program-installments', () => ({ activateProgramInstallments: vi.fn(async () => {}) }));
 vi.mock('@/lib/enrollment/apprenticeship-welcome', () => ({ queuePaidProgramWelcome: vi.fn(async () => {}) }));
 import { verifyPaidApplication, activatePaidApplication } from '@/lib/enrollment/paid-application';
 import { getInitialProgramInvoiceCents } from '@/lib/programs/deposit-policy';
@@ -39,7 +40,7 @@ describe('paid full application gate', () => {
     });
     const proof = await verifyPaidApplication('nail-technician-apprenticeship', 'i');
     expect(await activatePaidApplication(proof!, 'original-application')).toBe('https://app.elevateforhumanity.org/lms/dashboard');
-    expect(fixture.writes).toEqual([]);
+    expect(fixture.writes.map(write => write.table)).not.toContain('program_enrollments');
   });
   it('never relinks an active enrollment to a different invoice', async () => {
     Object.assign(fixture.rows.program_enrollments, { status: 'active', payment_reference: 'other-invoice' });
@@ -47,10 +48,9 @@ describe('paid full application gate', () => {
     await expect(activatePaidApplication(proof!, 'original-application')).rejects.toThrow('administrator review');
     expect(fixture.writes).toEqual([]);
   });
-  it('does not grant access to an active enrollment lacking approval evidence on retry', async () => {
-    Object.assign(fixture.rows.program_enrollments, { status: 'active', payment_reference: 'i' });
-    const proof = await verifyPaidApplication('nail-technician-apprenticeship', 'i');
-    expect(await activatePaidApplication(proof!, 'original-application')).toBe('https://app.elevateforhumanity.org/lms/access-pending');
+  it('does not use self-pay activation for a state-funded enrollment', async () => {
+    fixture.rows.program_enrollments.funding_source = 'wioa';
+    expect(await verifyPaidApplication('nail-technician-apprenticeship', 'i')).toBeNull();
     expect(fixture.writes).toEqual([]);
   });
   it('verifies owned paid deposit without trusting a URL flag', async () => {
@@ -70,14 +70,13 @@ describe('paid full application gate', () => {
     expect(await verifyPaidApplication('nail-technician-apprenticeship', 'i')).toBeNull();
     expect(fixture.writes).toEqual([]);
   });
-  it('records payment but keeps enrollment pending until administrator approval', async () => {
+  it('releases a verified payment from manual approval and publishes enrolled after activating access', async () => {
+    fixture.rows.program_enrollments.status = 'pending_approval';
     const proof = await verifyPaidApplication('nail-technician-apprenticeship', 'i');
-    expect(await activatePaidApplication(proof!, 'original-application')).toBe('https://app.elevateforhumanity.org/lms/access-pending');
-    expect(fixture.writes[0]).toMatchObject({ table: 'applications', filters: { id: 'original-application' }, value: { enrollment_id: 'e', payment_status: 'paid' } });
-    expect(fixture.writes[1]).toMatchObject({ table: 'program_enrollments', filters: { id: 'e', student_id: 'u' }, value: { payment_status: 'paid', next_required_action: 'ADMIN_APPROVAL_REQUIRED' } });
-    expect(fixture.writes[1].value.access_granted_at).toBeUndefined();
-    expect(fixture.writes[1].value.approved_at).toBeUndefined();
-    expect(fixture.writes[2]).toMatchObject({ table: 'profiles', filters: { id: 'u' }, value: { enrollment_status: 'pending' } });
+    expect(await activatePaidApplication(proof!, 'original-application')).toBe('https://app.elevateforhumanity.org/lms/dashboard');
+    expect(fixture.writes[0]).toMatchObject({ table: 'profiles', filters: { id: 'u', is_active: true }, value: { enrollment_status: 'active', portal_type: 'apprentice' } });
+    expect(fixture.writes[1]).toMatchObject({ table: 'program_enrollments', filters: { id: 'e', student_id: 'u' }, value: { status: 'active' } });
+    expect(fixture.writes[2]).toMatchObject({ table: 'applications', filters: { id: 'original-application' }, value: { enrollment_id: 'e', payment_status: 'paid', status: 'enrolled' } });
   });
 });
 describe('standard deposit and validated promotional deposit', () => {

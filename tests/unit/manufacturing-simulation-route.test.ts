@@ -154,7 +154,7 @@ describe('manufacturing simulation API', () => {
     expect(interaction.data.initialAttempt).toMatchObject({ score: 80, completed: false });
     expect(interaction.data.initialAttempt.feedback.criticalMisses).toBe(1);
   });
-  it('does not reveal a revised key from an attempt submitted against an older grading version', async () => {
+  it('keeps accepted practice per grading version and restores the earlier pass after rollback', async () => {
     const fixture = databaseFixture();
     mocks.client.mockResolvedValue(fixture.db);
     await POST(request());
@@ -167,8 +167,20 @@ describe('manufacturing simulation API', () => {
     expect(interaction.data.initialAttempt).toBeNull();
     expect(interaction.completed).toBe(false);
     expect(JSON.stringify(body)).not.toContain('expected');
-    const retry = await POST(request());
-    expect((await retry.json()).attempt).toMatchObject({ spec_id: newKey, completed: true, attempts: 1 });
+    const retry = await POST(request({ ...requestBody, responses: { ...correctFixtureResponses, safety: 'go' } }));
+    expect((await retry.json()).attempt).toMatchObject({ spec_id: newKey, completed: false, attempts: 1 });
+    expect(fixture.tables.manufacturing_simulation_progress).toHaveLength(2);
+    expect(fixture.tables.manufacturing_simulation_progress.find(row => row.spec_id === fixtureGradingKey))
+      .toMatchObject({ completed: true, attempts: 1, answers: correctFixtureResponses });
+
+    fixture.tables.course_lessons[0].content_json.experience.manufacturingSimulation.gradingKeyId = fixtureGradingKey;
+    const restored = await GET(new NextRequest(`https://app.example.test/api/learner/interactions?courseId=${courseId}&lessonId=${lessonId}`));
+    const previous = (await restored.json()).interactions.find((item: any) => item.type === 'manufacturing-simulation');
+    expect(previous).toMatchObject({ score: 100, completed: true, attempts: 1 });
+    expect(previous.data.initialAttempt).toMatchObject({ score: 100, completed: true });
+    expect((await (await POST(request())).json()).attempt).toMatchObject({ spec_id: fixtureGradingKey, attempts: 2 });
+    expect(fixture.tables.manufacturing_simulation_progress.find(row => row.spec_id === newKey))
+      .toMatchObject({ completed: false, attempts: 1 });
   });
   it('fails closed when the protected spec is missing or does not match the public lesson', async () => {
     const fixture = databaseFixture();

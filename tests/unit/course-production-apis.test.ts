@@ -9,7 +9,16 @@ import {POST as run} from '@/apps/admin/app/api/admin/ultimate-course-builder/ru
 import {POST as pause} from '@/apps/admin/app/api/admin/ultimate-course-builder/pause/route';
 import {POST as review} from '@/apps/admin/app/api/admin/ultimate-course-builder/review/route';
 const id='11111111-1111-4111-8111-111111111111';
+const courseId='22222222-2222-4222-8222-222222222222';
 const request=(body:unknown)=>new NextRequest('https://admin.example/api',{method:'POST',body:JSON.stringify(body)});
+function permittedCourseDatabase(buildQuery: unknown) {
+ return {from(table:string){
+  if(table==='ultimate_course_builds')return buildQuery;
+  const data=table==='system_settings'?{value:false}:{id:courseId,status:'draft',generation_paused:false};
+  const query={select:()=>query,eq:()=>query,maybeSingle:async()=>({data,error:null})};
+  return query;
+ }};
+}
 beforeEach(()=>{vi.resetAllMocks();mocks.auth.mockResolvedValue({id:'admin'});});
 describe('authenticated production controls',()=>{
  it.each([pause,review])('denies unauthenticated writes before opening the database',async endpoint=>{
@@ -45,8 +54,8 @@ describe('authenticated production controls',()=>{
 
 it('Resume clears an explicit pause while preserving a freshly leased worker instead of launching a duplicate',async()=>{
  const update=vi.fn();
- const q={select:()=>q,eq:()=>q,in:()=>q,update:(v:unknown)=>{update(v);return q;},single:async()=>({data:{id,status:'running',updated_at:'2026-10-25T12:00:00.000Z',profile:{ownerPaused:true,competencies:[{id:'saved'}]}},error:null}),then:(resolve:(v:unknown)=>unknown)=>resolve({data:[{id}],error:null})};
- mocks.db.mockResolvedValue({from:()=>q});
+ const q={select:()=>q,eq:()=>q,in:()=>q,update:(v:unknown)=>{update(v);return q;},single:async()=>({data:{id,course_id:courseId,status:'running',updated_at:'2026-10-25T12:00:00.000Z',profile:{ownerPaused:true,competencies:[{id:'saved'}]}},error:null}),then:(resolve:(v:unknown)=>unknown)=>resolve({data:[{id}],error:null})};
+ mocks.db.mockResolvedValue(permittedCourseDatabase(q));
  mocks.enqueue.mockResolvedValue({id,status:'running',lease_owner:'assigned-worker',lease_expires_at:new Date(Date.now()+300000).toISOString(),heartbeat_at:new Date().toISOString()});
  const response=await run(request({buildId:id}));expect(response.status).toBe(200);
  expect(await response.json()).toMatchObject({alreadyRunning:true,executionVerified:true});
@@ -54,8 +63,8 @@ it('Resume clears an explicit pause while preserving a freshly leased worker ins
  expect(mocks.enqueue).toHaveBeenCalledTimes(1);
 });
 it('does not certify execution from an ownerless lease even when its heartbeat is fresh',async()=>{
- const q={select:()=>q,eq:()=>q,in:()=>q,single:async()=>({data:{id,status:'running',profile:{ownerPaused:false}},error:null})};
- mocks.db.mockResolvedValue({from:()=>q});
+ const q={select:()=>q,eq:()=>q,in:()=>q,single:async()=>({data:{id,course_id:courseId,status:'running',updated_at:'2026-10-25T12:00:00.000Z',profile:{ownerPaused:false}},error:null})};
+ mocks.db.mockResolvedValue(permittedCourseDatabase(q));
  mocks.enqueue.mockResolvedValue({id,status:'running',lease_owner:null,lease_expires_at:new Date(Date.now()+300000).toISOString(),heartbeat_at:new Date().toISOString()});
  const response=await run(request({buildId:id}));expect(response.status).toBe(409);
  expect(await response.json()).not.toHaveProperty('executionVerified');

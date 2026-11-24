@@ -6,6 +6,8 @@ import { UltimateJobQueue } from '@/lib/ultimate-course-builder/worker/job-queue
 import { requestCourseWorker } from '@/lib/gcp/course-worker-launch';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { safeInternalError } from '@/lib/api/safe-error';
+import { assertCourseBuilderGenerationEnabled } from '@/lib/ultimate-course-builder/core/generation-control';
+import { reactivateArchivedCourseForStart } from '@/lib/ultimate-course-builder/core/start-preconditions';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -16,15 +18,11 @@ export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => null);
   if (typeof body?.buildId !== 'string' || !/^[a-f0-9-]{36}$/i.test(body.buildId))
     return NextResponse.json({ error: 'A valid buildId is required' }, { status: 400 });
-  // Unrelated Studio requests must not consume this administrator's resume quota.
-  // Keep the strict limit and derive its scope only from the authenticated actor.
-  const limited = await applyRateLimit(req, 'strict', { key: `course-resume:${auth.id}` });
-  if (limited) return limited;
   try {
     const db = await requireAdminClient();
     const { data: build, error } = await db
       .from('ultimate_course_builds')
-      .select('id,status,profile,updated_at')
+      .select('id,course_id,status,profile,updated_at')
       .eq('id', body.buildId)
       .single();
     if (error || !build)
@@ -38,6 +36,25 @@ export async function POST(req: NextRequest) {
     // Record the real authenticated actor; the legacy flag alone proves no actor.
     if (typeof build.updated_at !== 'string')
       return NextResponse.json({ error: 'The saved revision is unavailable. Refresh before changing the build.' }, { status: 409 });
+    if (typeof build.course_id !== 'string' || !build.course_id)
+      return NextResponse.json({ error: 'The saved course mapping is unavailable. Refresh before starting.' }, { status: 409 });
+    // A build-level Resume cannot override system or course generation holds.
+    // Check the same policy as canonical Start before any persisted change.
+    await assertCourseBuilderGenerationEnabled(db, build.course_id);
+    const { data: course, error: courseError } = await db
+      .from('courses')
+      .select('id,status')
+      .eq('id', build.course_id)
+      .maybeSingle();
+    if (courseError) throw courseError;
+    if (!course)
+      return NextResponse.json({ error: 'The saved course is unavailable. No worker was queued.' }, { status: 409 });
+    // Unrelated or policy-blocked requests do not consume the resume quota.
+    // Keep the strict limit and derive its scope only from the authenticated actor.
+    const limited = await applyRateLimit(req, 'strict', { key: `course-resume:${auth.id}` });
+    if (limited) return limited;
+    await reactivateArchivedCourseForStart(db, course);
+
     const profile = build.profile as Record<string, unknown>;
     // Claims require an explicit ownerPaused:false. An explicit pause and a
     // missing/unknown flag both fail closed, so an authenticated Resume must
@@ -168,6 +185,17 @@ export async function POST(req: NextRequest) {
       { status: 202 },
     );
   } catch (error) {
+    if (error instanceof Error &&
+        ['COURSE_BUILDER_GENERATION_PAUSED', 'COURSE_GENERATION_PAUSED'].includes(error.message))
+      return NextResponse.json(
+        { error: 'Generation controls currently block this course. No worker was queued.', code: error.message },
+        { status: 409 },
+      );
+    if (error instanceof Error && error.message === 'COURSE_START_STATE_CHANGED')
+      return NextResponse.json(
+        { error: 'The course changed. Refresh before starting; no worker was queued.' },
+        { status: 409 },
+      );
     if (error instanceof Error && error.message === 'Google GitHub dispatch refused: HTTP 401')
       return safeInternalError(
         error,

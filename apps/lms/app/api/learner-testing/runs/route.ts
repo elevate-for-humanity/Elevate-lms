@@ -9,6 +9,7 @@ import {
 import { validTestCredential } from '@/lib/ultimate-course-builder/testing/learner-test-policy';
 import { logger } from '@/lib/logger';
 import { renderPlaybackUrl } from '@/lib/ultimate-course-builder/media/playback-source.mjs';
+import { learnerBlueprintFromArtifacts } from '@/lib/ultimate-course-builder/instructional/authored-experience';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -36,7 +37,6 @@ export async function POST(req: NextRequest) {
     const build: any = lesson.ultimate_course_builds;
     const a: any = lesson.artifacts;
     const render = a.lesson_film_render?.render;
-    const blueprint = a.learning_objectives?.blueprint;
     const competency = build.profile.competencies.find((c: any) => c.id === lesson.competency_id);
     if (
       build.course_id !== input.courseId ||
@@ -50,6 +50,7 @@ export async function POST(req: NextRequest) {
         { error: 'Lesson evidence changed; rerun with current artifacts' },
         { status: 409 },
       );
+    const blueprint = learnerBlueprintFromArtifacts(a, build.profile, lesson.competency_id);
     if (!blueprint?.assessment?.questions?.length || !render.captionsUrl)
       return NextResponse.json({ error: 'Authored lesson and captions required' }, { status: 409 });
     const id = randomUUID(),

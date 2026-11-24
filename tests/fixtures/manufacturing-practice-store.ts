@@ -21,12 +21,18 @@ export function manufacturingPracticeStore(courseId: string, lessonId: string, s
         if (role === 'learner' && table.startsWith('manufacturing_')) throw new Error('Learner accessed private grading storage');
         const conditions: Array<[string, unknown]> = [];
         let payload: Record<string, any> | null = null;
+        let conflictColumns: string[] = [];
         function execute(single = false) {
           if (errors[table]) return { data: null, error: errors[table] };
           if (!(table in tables)) throw new Error(`Unexpected table access ${table}`);
           if (payload) {
-            const existing = tables[table].find((row) => row.learner_id === payload?.learner_id &&
-              row.lesson_id === payload?.lesson_id && row.interaction_id === payload?.interaction_id);
+            const expectedIdentity = table === 'manufacturing_simulation_progress'
+              ? ['learner_id', 'lesson_id', 'interaction_id', 'spec_id']
+              : ['learner_id', 'lesson_id', 'interaction_id'];
+            if (conflictColumns.join(',') !== expectedIdentity.join(',')) {
+              return { data: null, error: new Error('Upsert target does not match the table identity') };
+            }
+            const existing = tables[table].find((row) => conflictColumns.every((column) => row[column] === payload?.[column]));
             if (existing) Object.assign(existing, payload);
             else tables[table].push({ ...payload });
             return { data: payload, error: null };
@@ -37,7 +43,9 @@ export function manufacturingPracticeStore(courseId: string, lessonId: string, s
         const query: any = {
           select: () => query,
           eq: (key: string, value: unknown) => { conditions.push([key, value]); filters.push([key, value]); return query; },
-          upsert: (row: Record<string, any>) => { payload = row; return query; },
+          upsert: (row: Record<string, any>, options: { onConflict: string }) => {
+            payload = row; conflictColumns = options.onConflict.split(','); return query;
+          },
           single: async () => execute(true),
           maybeSingle: async () => execute(true),
           then: (resolve: any, reject: any) => Promise.resolve(execute()).then(resolve, reject),

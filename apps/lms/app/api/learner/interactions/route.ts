@@ -380,7 +380,7 @@ async function saveManufacturingAttempt(
           completed_at: scored.completed ? now : null,
           updated_at: now,
         },
-        { onConflict: 'learner_id,lesson_id,interaction_id' },
+        { onConflict: 'learner_id,lesson_id,interaction_id,spec_id' },
       )
       .select('interaction_id,score,completed,attempts,answers,weak_objectives,feedback,updated_at')
       .single();

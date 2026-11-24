@@ -5,6 +5,7 @@ import { registeredInstructionalSources } from '../credential/registered-instruc
 import { getRegisteredProgramStandardByProfileId } from '@/lib/apprenticeship/registered-program-contract';
 import type { UltimateCredentialProfile } from './types';
 import { classifyCompetency } from '../instructional/competency-classification.mjs';
+import { bindAuthoredLessonPreservation } from '../instructional/authored-experience';
 
 type CompetencyRow = {
   competency_key?: string | null;
@@ -49,6 +50,15 @@ export async function hydrateUltimateProfileSources(
     .eq('course_id', courseId)
     .order('order_index');
   if (error) throw error;
+
+  if ((lessons ?? []).some((lesson: any) => typeof lesson.content_json?.authoredLessonId === 'string')) {
+    const authored = await db.from('course_lessons')
+      .select('id,content,content_json,quiz_questions,rendered_html,learning_objectives,duration_minutes,passing_score')
+      .eq('course_id', courseId)
+      .order('order_index');
+    if (authored.error) throw authored.error;
+    profile = bindAuthoredLessonPreservation(profile, authored.data ?? []);
+  }
 
   const competencyIds = new Set(profile.competencies.map((competency) => competency.id));
   const canonicalSources = (lessons ?? [])

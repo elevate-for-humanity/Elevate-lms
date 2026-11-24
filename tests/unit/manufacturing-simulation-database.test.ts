@@ -2,7 +2,7 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { readFile } from 'node:fs/promises';
 import { PGlite } from '@electric-sql/pglite';
-import { simulationFixture } from '../fixtures/manufacturing-simulation';
+import { simulationFixture, correctFixtureResponses } from '../fixtures/manufacturing-simulation';
 
 const course = '11111111-1111-4111-8111-111111111111';
 const copyCourse = '22222222-2222-4222-8222-222222222222';
@@ -16,6 +16,7 @@ let initialKey: string;
 let snapshotLesson: any;
 let migration: string;
 let replayMigration: string;
+let progressVersionMigration: string;
 const authored = () => ({ kept: 'unrelated lesson content', experience: { manufacturingSimulation: simulationFixture } });
 const problem = (row: any) => row.content_json?.experience?.manufacturingSimulation;
 async function row(id: string) { return (await db.query<any>('select * from course_lessons where id=$1', [id])).rows[0]; }
@@ -51,6 +52,7 @@ beforeAll(async () => {
   // Both versions were recorded by the provider when an interrupted tool wait
   // hid the first completion. Preserve the ledger rather than rewriting it.
   replayMigration = await readFile(new URL('../../supabase/migrations/20261124165523_protect_manufacturing_simulation_keys.sql', import.meta.url), 'utf8');
+  progressVersionMigration = await readFile(new URL('../../supabase/migrations/20261124171036_version_manufacturing_simulation_progress.sql', import.meta.url), 'utf8');
   await db.exec(migration);
   initialKey = problem(await row(lesson)).gradingKeyId;
   snapshotLesson = (await db.query<any>('select snapshot from course_versions where id=$1', [version])).rows[0].snapshot.lessons[0];
@@ -125,6 +127,39 @@ describe('protected manufacturing grading in PostgreSQL', () => {
     expect(replayMigration).toBe(migration);
     await db.exec(replayMigration);
     expect(await snapshot()).toEqual(before);
+  });
+
+  it('keeps earlier accepted practice when a newer key is attempted and the lesson is rolled back', async () => {
+    const before = (await db.query<any>('select * from manufacturing_simulation_progress')).rows;
+    await db.exec(progressVersionMigration);
+    expect((await db.query<any>('select * from manufacturing_simulation_progress')).rows).toEqual(before);
+    const previousLesson = await row(lesson);
+    const revised = { ...simulationFixture, brief: simulationFixture.brief + ' A revised grading version.' };
+    await db.query('update course_lessons set content_json=$1 where id=$2',
+      [JSON.stringify({ experience: { manufacturingSimulation: revised } }), lesson]);
+    const revisedKey = problem(await row(lesson)).gradingKeyId;
+    expect(revisedKey).not.toBe(initialKey);
+    await asRole('service_role', async () => {
+      await db.query('update manufacturing_simulation_progress set answers=$1, score=100, completed=true where spec_id=$2',
+        [JSON.stringify(correctFixtureResponses), initialKey]);
+      await db.query(`insert into manufacturing_simulation_progress
+        (learner_id,course_id,lesson_id,spec_id,lesson_slug,interaction_id,answers,score,completed,attempts,feedback)
+        values($1,$2,$3,$4,'inspection','inspection-manufacturing',$5,20,false,1,'{}')
+        on conflict (learner_id,lesson_id,interaction_id,spec_id)
+        do update set answers=excluded.answers,score=excluded.score,completed=excluded.completed,attempts=excluded.attempts`,
+      [learner, course, lesson, revisedKey, JSON.stringify({ safety: 'go' })]);
+    });
+    const versions = (await db.query<any>('select * from manufacturing_simulation_progress order by spec_id')).rows;
+    expect(versions).toHaveLength(2);
+    expect(versions.find(item => item.spec_id === initialKey)).toMatchObject({ score: 100, completed: true, attempts: 1, answers: correctFixtureResponses });
+    expect(versions.find(item => item.spec_id === revisedKey)).toMatchObject({ score: 20, completed: false, attempts: 1 });
+    await db.query('update course_lessons set content_json=$1 where id=$2', [JSON.stringify(previousLesson.content_json), lesson]);
+    expect(problem(await row(lesson)).gradingKeyId).toBe(initialKey);
+    await db.exec(progressVersionMigration);
+    expect((await db.query<any>('select * from manufacturing_simulation_progress order by spec_id')).rows).toEqual(versions);
+    for (const role of ['anon', 'authenticated']) {
+      expect((await db.query<any>("select has_table_privilege($1,'manufacturing_simulation_progress','select,insert,update,delete') as allowed", [role])).rows[0].allowed).toBe(false);
+    }
   });
 
   it('preserves authenticated non-manufacturing authoring without granting private helper access', async () => {

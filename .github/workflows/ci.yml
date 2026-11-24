@@ -419,6 +419,9 @@ jobs:
           ATTACHMENT_TEST_DATABASE_URL: postgresql://postgres@127.0.0.1:5432/postgres
         run: node --test tests/database/ultimate-lesson-attachment.node.test.mjs
 
+      - name: Verify authored curriculum survives accepted media and publication
+        run: node tests/database/ultimate-authored-experience-preservation.node.test.mjs
+
   website-database:
     name: Website edit transactions
     runs-on: ubuntu-24.04

@@ -5,6 +5,8 @@ import {stripTypeScriptTypes} from 'node:module';
 import {saveCourseEdit,validateCourseEdit,draftLessonHtml} from '../../lib/course-builder/workspace-edit.mjs';
 import {courseResultId,courseResultLessonId} from '../../lib/course-builder/workspace-receipt.mjs';
 import {loadCheckpointPage} from '../../lib/ultimate-course-builder/queries/checkpoint-page.mjs';
+import {simulationFixture} from '../fixtures/manufacturing-simulation.ts';
+import {publicManufacturingSimulation} from '../../lib/lms/manufacturing-simulation.ts';
 const id=n=>'00000000-0000-4000-8000-'+String(n).padStart(12,'0');
 function compile(path,names=[],values=[]){
  let source=readFileSync(new URL('../../'+path,import.meta.url),'utf8');
@@ -81,6 +83,12 @@ test('a partial draft copy cannot report success or modify the publication',asyn
  const f=revisionFixture({failLessons:true});
  await assert.rejects(saveCourseEdit(f),/COPY_FAILED/);
  assert.ok(!f.calls.some(c=>c.operation==='update'));
+});
+test('native Node revision preflights protected manufacturing references before any write',async()=>{
+ const f=revisionFixture();
+ f.sourceLessons[0].content_json.experience.manufacturingSimulation=publicManufacturingSimulation({...simulationFixture,gradingKeyId:id(50)});
+ await assert.rejects(saveCourseEdit(f),/grading does not match the current lesson/);
+ assert.equal(f.calls.filter(call=>call.operation==='insert'||call.operation==='update').length,0);
 });
 test('a lesson outside the selected course is rejected before any write',async()=>{
  const f=revisionFixture();f.lessonId=id(99);

@@ -1,5 +1,5 @@
 import { draftLessonHtml } from './workspace-edit.mjs';
-import { assertManufacturingLessonSpecs } from '../lms/manufacturing-simulation-store';
+import { assertManufacturingLessonSpecs } from '../lms/manufacturing-simulation-reference.ts';
 const pick = (row: any, keys: string[]) => Object.fromEntries(keys.filter(key => row[key] !== undefined).map(key => [key, row[key]]));
 
 export async function cloneCanonicalCourse(input: unknown) {

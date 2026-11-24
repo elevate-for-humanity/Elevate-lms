@@ -75,7 +75,15 @@ it.each(['authorization_failed','provider_request_failed','configuration_unavail
  expect(h.updates[0]).toMatchObject({values:{status:'dispatched',attempt_count:1}});
  expect(h.updates[0].filters).toEqual(expect.arrayContaining([['id','pending'],['status','queued'],['attempt_count',0]]));
 });
-it('an accepted OpenHands checkpoint still waits for OpenHands instead of switching engines',async()=>{
+it('an OpenHands checkpoint without the opt-in runs on the owned internal engine',async()=>{
+ h.candidate={kind:'openhands-checkpoint'};h.verified=true;
+ expect(await tickParisCodeRepairs({workflowOwnedDispatch:true})).toMatchObject({dispatchRequired:true,repairId:'pending'});
+ expect(h.openhands).not.toHaveBeenCalled();expect(h.probe).toHaveBeenCalledOnce();
+ expect(h.updates).toHaveLength(1);
+ expect(h.updates[0]).toMatchObject({values:{status:'dispatched',attempt_count:1}});
+});
+it('an OpenHands checkpoint with the opt-in still waits for OpenHands instead of switching engines',async()=>{
+ vi.stubEnv('PARIS_REPAIR_ENGINE','openhands');
  h.candidate={kind:'openhands-checkpoint'};h.verified=true;h.openhands.mockResolvedValueOnce({verified:false,status:'provider_request_failed'});
  expect(await tickParisCodeRepairs({workflowOwnedDispatch:true})).toMatchObject({dispatched:0,awaitingProvider:true,reason:'OPENHANDS_READINESS_UNVERIFIED'});
  expect(h.updates).toEqual([]);expect(h.probe).not.toHaveBeenCalled();

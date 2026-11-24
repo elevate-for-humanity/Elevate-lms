@@ -5,6 +5,7 @@
  * Only authenticated admins can read or write.
  */
 import { NextResponse } from 'next/server';
+import { probeOpenHandsReadiness } from '@/lib/devstudio/paris-openhands-readiness';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { apiRequireRoles } from '@/lib/admin/guards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -147,6 +148,12 @@ async function _PATCH(request: Request) {
         });
         status = r.ok ? 'ok' : 'error';
         message = `HTTP ${r.status}`;
+      } else if (key === 'OPENHANDS_API_KEY') {
+        // Live, read-only probe (PR3, #2524): one bounded Cloud read, no
+        // agent started. The update below records test_status/last_tested.
+        const probe = await probeOpenHandsReadiness();
+        status = probe.verified ? 'ok' : 'error';
+        message = `OpenHands readiness: ${probe.status}`;
       } else if (key === 'STRIPE_SECRET_KEY') {
         const r = await fetch('https://api.stripe.com/v1/balance', {
           headers: { Authorization: `Bearer ${value}` },

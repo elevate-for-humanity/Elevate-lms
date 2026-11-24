@@ -418,6 +418,11 @@ export const PROGRAM_IMAGES: Record<string, ProgramImageEntry> = {
     hero: '/images/programs/building-maintenance-hero.svg',
     alt: 'Building maintenance technician working on facility systems',
   },
+  'commercial-cleaning': {
+    card: '/images/refresh-20261014/trades.webp',
+    hero: '/images/refresh-20261014/trades.webp',
+    alt: 'Skilled-trades learner in hands-on training for the Commercial Cleaning Certification Program',
+  },
 };
 
 export function getProgramCardImage(slug: string): string {

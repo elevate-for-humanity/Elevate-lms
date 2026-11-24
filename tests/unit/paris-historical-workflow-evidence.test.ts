@@ -4,7 +4,7 @@ const h=vi.hoisted(()=>({actions:[] as any[],ancestry:'ahead',branch:'main',fail
 vi.mock('server-only',()=>({}));
 vi.mock('@/lib/logger',()=>({logger:{error:vi.fn(),warn:vi.fn(),info:vi.fn()}}));
 vi.mock('@/lib/secrets',()=>({hydrateProcessEnv:async()=>{}}));
-vi.mock('@/lib/devstudio/github-token',()=>({getGitHubHeaders:async()=>({Authorization:'Bearer fixture'}),githubApiErrorMessage:()=> 'fixture error'}));
+vi.mock('@/lib/devstudio/github-token',()=>({getGitHubHeaders:async()=>({Authorization:'Bearer fixture'}),getGitHubToken:async()=>'fixture-token',verifyGitHubBranchAuthority:async()=>{},githubApiErrorMessage:()=> 'fixture error'}));
 vi.mock('@/lib/supabase/admin',()=>({requireAdminClient:async()=>({from:()=>{const q:any={select:()=>q,eq:()=>q,maybeSingle:async()=>({data:{role:'admin'},error:null})};return q;}})}));
 vi.mock('@/lib/ai/paid-inference-gateway',()=>({paidArtifactFingerprint:()=> 'fixture',reservePaidInference:vi.fn(),executePaidInference:async({dispatch}:any)=>({decision:'approved',value:await dispatch()})}));
 vi.mock('@/lib/ai/ai-service',()=>({aiChat:async()=>({provider:'openai',content:JSON.stringify(h.actions.shift())})}));

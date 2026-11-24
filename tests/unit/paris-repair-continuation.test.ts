@@ -11,7 +11,7 @@ const h = vi.hoisted(() => ({
 vi.mock('server-only', () => ({}));
 vi.mock('@/lib/logger', () => ({ logger: { error: vi.fn(), warn: vi.fn(), info: vi.fn() } }));
 vi.mock('@/lib/secrets', () => ({ hydrateProcessEnv: async () => {} }));
-vi.mock('@/lib/devstudio/github-token', () => ({ getGitHubHeaders: async () => ({ Authorization: 'Bearer test-only' }), githubApiErrorMessage: (status: number) => `GitHub diagnostic ${status}` }));
+vi.mock('@/lib/devstudio/github-token', () => ({ getGitHubHeaders: async () => ({ Authorization: 'Bearer test-only' }), getGitHubToken: async () => 'fixture-token', verifyGitHubBranchAuthority: async () => {}, githubApiErrorMessage: (status: number) => `GitHub diagnostic ${status}` }));
 vi.mock('@/lib/supabase/admin', () => ({ requireAdminClient: async () => ({from:()=>{const q:any={select:()=>q,eq:()=>q,maybeSingle:async()=>({data:{role:'admin'},error:null})};return q;}}) }));
 vi.mock('@/lib/ai/paid-inference-gateway', () => ({
   paidArtifactFingerprint: () => 'test-fingerprint',

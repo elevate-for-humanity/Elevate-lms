@@ -25,6 +25,8 @@ import { findPhoneWorkspace, phoneWorkspaceTenant } from '@/lib/phone/workspace'
 import { scopePhoneProfileQuery, phoneNumberProfileChoices } from '@/lib/phone/profile-scope';
 import { PHONE_MANAGER_ROLES } from '@/lib/phone/access';
 import { hydrateProcessEnv } from '@/lib/secrets';
+import { probePhoneReadiness } from '@/lib/phone/readiness-probe';
+import { summarizePhoneReadiness } from '@/lib/phone/readiness';
 import {
   CapabilityGuide,
   NewSystemNotice,
@@ -203,6 +205,21 @@ export default async function PhonePage() {
     system?.routing_mode === 'ai_receptionist'
       ? Boolean(system?.ai_enabled)
       : menuOptions.some((option: any) => option.enabled && option.destination_id);
+  // Live readiness is probed server-side on load (issue #2166): Twilio
+  // account + primary voice number, PBX config + PBX-verified SIP
+  // registrations. A failed or slow probe never blocks the page — it
+  // renders as unverified, never as ready. This must run before
+  // `setupSteps` below, which reads `liveReadiness` (declaring it after
+  // use was a TDZ error: TS2448, and a runtime ReferenceError).
+  let liveReadiness: Awaited<ReturnType<typeof probePhoneReadiness>> | null = null;
+  try {
+    liveReadiness = await Promise.race([
+      probePhoneReadiness(db),
+      new Promise<null>((resolve) => setTimeout(() => resolve(null), 12_000)),
+    ]);
+  } catch {
+    liveReadiness = null;
+  }
   const setupSteps = [
     {
       label: 'Assign PWA extensions',
@@ -217,7 +234,14 @@ export default async function PhonePage() {
       label: 'Connect one PWA phone',
       complete: (devicesResult.count ?? 0) > 0,
     },
-    { label: 'Call history recorded', complete: (callsResult.count ?? 0) > 0 },
+    {
+      label: 'Call history recorded',
+      complete: (callsResult.count ?? 0) > 0,
+    },
+    {
+      label: 'Live carrier verified',
+      complete: liveReadiness?.ready === true,
+    },
   ];
   const phoneConfigured =
     Boolean(primaryNumber) && routingReady && extensions.some((entry: any) => entry.enabled);
@@ -311,15 +335,17 @@ export default async function PhonePage() {
         ))}
       </div>
       <div className="grid gap-3 md:grid-cols-2">
-        <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-950">
+        <div
+          className={`rounded-xl border p-4 text-sm ${liveReadiness?.ready ? 'border-emerald-200 bg-emerald-50 text-emerald-950' : 'border-amber-200 bg-amber-50 text-amber-950'}`}
+        >
           <div className="flex items-center gap-2 font-black">
             <Radio className="h-4 w-4" />
             Phone configuration: {phoneConfigured ? 'Saved' : 'Setup incomplete'}
           </div>
-          <p className="mt-1">
-            Live carrier status is unverified here. Saved numbers and routes do not confirm phone
-            registration, ringing, or two-way audio. Open the dial pad to check your connection.
-          </p>
+          <p className="mt-1">{summarizePhoneReadiness(liveReadiness)}</p>
+          {!liveReadiness?.ready ? (
+            <p className="mt-1">Open the dial pad to check your connection.</p>
+          ) : null}
         </div>
         <div
           className={`rounded-xl border p-4 text-sm ${meetingReady ? 'border-emerald-200 bg-emerald-50 text-emerald-950' : 'border-blue-200 bg-blue-50 text-blue-950'}`}

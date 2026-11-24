@@ -20,10 +20,12 @@ import {verifyProtectedParisMerge} from '@/lib/devstudio/openhands/paris-protect
 import {currentWorkflowGitHubToken} from '@/lib/devstudio/workflow-github-context';
 import {readRecentRepairEvents} from './repair-events';
 import {REPAIR_REPOSITORY,REPAIR_WORKFLOW,REPAIR_DEPLOYMENTS,eligibleRepairEvents,repairFingerprint,repairIncidentFingerprint,validationPassed,repairDeploymentState,canRetryRepair,canRetryHealthyProviderRepair,canRetryVerifiedGithubAppRepair,canResumeLegacyCpuEdit,canResumeContextBudgetRepair,canResumePlannerInspectionRepair,canResumeZeroWritePlannerRepair,nextRepairDeployment,unobservedRepairDeployment,courseDefectDisposition,canDispatchParisRepairAttempt,isParisAttemptConstraintMismatch,inFlightRepairTimedOut,repairRunsSettled,IN_FLIGHT_REPAIR_TIMEOUT_MINUTES} from './code-repair-policy.mjs';
+import { isOpenHandsOptedIn } from '@/lib/devstudio/openhands-opt-in';
 
 // Default new repairs to the owned internal engine; OpenHands requires an explicit opt-in.
-// Historical OpenHands checkpoints retain their original provider and approval gates.
-const internalEngineForced=()=>(process.env.PARIS_REPAIR_ENGINE??'internal').trim().toLowerCase()!=='openhands';
+// A historical OpenHands checkpoint resumes on OpenHands only with the opt-in;
+// without it, the repair runs on the owned internal engine instead of waiting.
+const internalEngineForced = () => !isOpenHandsOptedIn();
 
 /**
  * Read-only, cron-authenticated credential preflight. Returns only safe status
@@ -173,7 +175,10 @@ export async function prepareParisRepair(id:string,runId:number){
    if(!archived.data)throw Error('PARIS_REPAIR_CHECKPOINT_OWNERSHIP_LOST');
    candidate=null;
   }
-  let openHandsAvailable=candidate?.kind==='openhands-checkpoint';
+  // OpenHands is opt-in-only: a historical OpenHands checkpoint resumes on
+  // OpenHands only with PARIS_REPAIR_ENGINE=openhands. Without the opt-in
+  // it runs on the owned internal engine instead of waiting for OpenHands.
+  let openHandsAvailable=candidate?.kind==='openhands-checkpoint' && !internalEngineForced();
   if(!candidate && !internalEngineForced()){
    const {probeOpenHandsReadiness}=await import('@/lib/devstudio/paris-openhands-readiness');
    openHandsAvailable=(await probeOpenHandsReadiness().catch(()=>({verified:false}))).verified===true;
@@ -196,9 +201,12 @@ export async function prepareParisRepair(id:string,runId:number){
    });
    if(candidate.pending===true)return candidate;
   }
-  // Preserve historical provider checkpoints and their committed source. New
-  // repairs use the owned internal engine unless explicitly opted into OpenHands.
-  if(!candidate || candidate.kind==='planner-checkpoint') {
+  // Preserve historical provider checkpoints and their committed source when
+  // OpenHands is opted in. New repairs use the owned internal engine unless
+  // explicitly opted into OpenHands, and a historical OpenHands checkpoint
+  // without the opt-in is restaged on the owned engine rather than waiting.
+  if(!candidate || candidate.kind==='planner-checkpoint' ||
+   (candidate.kind==='openhands-checkpoint' && internalEngineForced())) {
    let sourceEvidence;
    if(claimed.source_job_id){
     const source=await db.from('ultimate_build_jobs').select('id,build_id,job_type,last_error,payload,monitor').eq('id',claimed.source_job_id).single();

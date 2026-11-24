@@ -31,6 +31,7 @@ import { PHARMACY_TECHNICIAN } from './pharmacy-technician';
 import { PROJECT_MANAGEMENT } from './project-management';
 import { SOFTWARE_DEV } from './software-development';
 import { WEB_DEVELOPMENT } from './web-development';
+import { COMMERCIAL_CLEANING } from './commercial-cleaning';
 import { CDL_TRAINING } from './cdl-training';
 import { MEDICAL_ASSISTANT } from './medical-assistant';
 import { COSMETOLOGY } from './cosmetology-apprenticeship';
@@ -81,6 +82,7 @@ const STATIC_PROGRAMS: ProgramSchema[] = [
   PROJECT_MANAGEMENT,
   SOFTWARE_DEV,
   WEB_DEVELOPMENT,
+  COMMERCIAL_CLEANING,
 ];
 
 export const STATIC_PROGRAM_MAP: ReadonlyMap<string, ProgramSchema> = new Map(

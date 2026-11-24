@@ -1,4 +1,5 @@
 import { draftLessonHtml } from './workspace-edit.mjs';
+import { assertManufacturingLessonSpecs } from '../lms/manufacturing-simulation-store';
 const pick = (row: any, keys: string[]) => Object.fromEntries(keys.filter(key => row[key] !== undefined).map(key => [key, row[key]]));
 
 export async function cloneCanonicalCourse(input: unknown) {
@@ -21,6 +22,15 @@ const cloneCourseSchema = z.object({
     .maybeSingle();
   if (sourceError) throw sourceError;
   if (!source) throw new Error('Course not found');
+
+  const { data: modules, error: moduleLoadError } = await db
+    .from('course_modules')
+    .select('*, course_lessons(*)')
+    .eq('course_id', body.courseId)
+    .order('order_index');
+  if (moduleLoadError) throw moduleLoadError;
+  await assertManufacturingLessonSpecs(db, body.courseId,
+    (modules ?? []).flatMap((module: any) => module.course_lessons ?? []));
 
   const newTitle = body.title?.trim() || `${source.title} (Copy)`;
   const baseSlug = body.slug?.trim() || `${source.slug}-copy`;
@@ -86,13 +96,6 @@ const cloneCourseSchema = z.object({
     .single();
   if (courseError) throw courseError;
 
-  const { data: modules, error: moduleLoadError } = await db
-    .from('course_modules')
-    .select('*, course_lessons(*)')
-    .eq('course_id', body.courseId)
-    .order('order_index');
-  if (moduleLoadError) throw moduleLoadError;
-
   for (const sourceModule of modules ?? []) {
     const { course_lessons: lessons, id: _moduleId, course_id: _courseId, created_at: _moduleCreated, updated_at: _moduleUpdated, ...moduleRest } = sourceModule as any;
     const { data: newModule, error: moduleError } = await db
@@ -143,6 +146,7 @@ export async function cloneEditedCourseRevision({db,sourceCourse,sourceLessons,s
     if(existing.data.metadata?.course_ai_edit_complete!==true)throw Error('DRAFT_REVISION_INCOMPLETE_REQUIRES_REVIEW');
     return {courseId:existing.data.id,lessonId:existing.data.metadata.ai_edited_lesson_id??null,reused:true};
   }
+  await assertManufacturingLessonSpecs(db, sourceCourse.id, sourceLessons);
   courseId=uuid();
   const courseFields=['program_id','description','short_description','org_id','compliance_profile_key','governing_body','governing_region','governing_standard_version','duration_hours','passing_score'];
   const created=await db.from('courses').insert({...pick(sourceCourse,courseFields),id:courseId,

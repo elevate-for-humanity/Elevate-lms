@@ -5,6 +5,7 @@ import { Phone, Mail, MapPin, Clock, MessageSquare, Users, Building2 } from 'luc
 import Link from 'next/link';
 import { ContactRequestForm } from '@/components/forms/ContactRequestForm';
 import { COURSE_BUILDER_REQUESTS } from '@/lib/course-builder/offer';
+import { getStaticProgram } from '@/data/programs/index';
 
 export const metadata: Metadata = {
   title: 'Contact | Workforce Development & Apprenticeship Programs',
@@ -26,12 +27,21 @@ export default async function ContactPage({ searchParams }: ContactPageProps) {
   const submitted = params.submitted === '1';
   const submitError = typeof params.error === 'string' ? params.error : '';
   const requestedItem = product || course;
+  const program = !requestedItem && typeof params.program === 'string'
+    ? getStaticProgram(params.program)
+    : undefined;
+  const employerTraining = Boolean(program) && params.interest === 'employer-training';
+  const requestedTitle = requestedItem ? titleFromSlug(requestedItem) : program?.title;
   const courseBuilderMessage = Object.hasOwn(COURSE_BUILDER_REQUESTS, product)
     ? COURSE_BUILDER_REQUESTS[product as keyof typeof COURSE_BUILDER_REQUESTS]
     : null;
-  const defaultSubject = courseBuilderMessage ? 'course-builder' : course ? 'enrollment' : requestedItem ? 'other' : '';
-  const defaultMessage = courseBuilderMessage ?? (requestedItem
-    ? `I would like current availability, delivery details, access terms, and final pricing for ${titleFromSlug(requestedItem)}.`
+  const defaultSubject = courseBuilderMessage ? 'course-builder'
+    : course ? 'enrollment'
+    : requestedItem ? 'other'
+    : employerTraining ? 'employer-partnership'
+    : program ? 'enrollment' : '';
+  const defaultMessage = courseBuilderMessage ?? (requestedTitle
+    ? `${employerTraining ? 'I am interested in employer training. ' : ''}I would like current availability, delivery details, access terms, and final pricing for ${requestedTitle}.`
     : '');
 
   return (
@@ -72,6 +82,8 @@ export default async function ContactPage({ searchParams }: ContactPageProps) {
                 
                 <ContactRequestForm>
                   {courseBuilderMessage && <input type="hidden" name="interest" value={product} />}
+                  {program && <input type="hidden" name="program" value={program.slug} />}
+                  {employerTraining && <input type="hidden" name="interest" value="employer-training" />}
                   {/* Name */}
                   <div>
                     <label htmlFor="name" className="block text-sm font-semibold text-slate-700 mb-2">

@@ -1,15 +1,18 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { NextRequest } from 'next/server';
-import { simulationFixture, correctFixtureResponses } from '../fixtures/manufacturing-simulation';
+import { correctFixtureResponses } from '../fixtures/manufacturing-simulation';
+import { manufacturingPracticeStore, fixtureGradingKey } from '../fixtures/manufacturing-practice-store';
 
 const mocks = vi.hoisted(() => ({
   auth: vi.fn(),
   access: vi.fn(),
   client: vi.fn(),
+  privateClient: vi.fn(),
   rate: vi.fn(),
 }));
 vi.mock('@/lib/auth/requireAuth', () => ({ requireAuth: mocks.auth }));
 vi.mock('@/lib/supabase/server', () => ({ createClient: mocks.client }));
+vi.mock('@/lib/supabase/admin', () => ({ requireAdminClient: mocks.privateClient }));
 vi.mock('@/lib/api/withRateLimit', () => ({ applyRateLimit: mocks.rate }));
 vi.mock('@/lib/lms/access-control', () => ({
   assertLessonAccess: mocks.access,
@@ -36,60 +39,9 @@ function request(body = requestBody) {
   });
 }
 function databaseFixture() {
-  const tables: Record<string, Array<Record<string, any>>> = {
-    course_lessons: [
-      {
-        id: lessonId,
-        course_id: courseId,
-        slug: 'fixture-inspection',
-        title: 'Inspection',
-        content_json: { experience: { manufacturingSimulation: simulationFixture } },
-      },
-    ],
-    interaction_progress: [],
-  };
-  const accesses: string[] = [];
-  const db = {
-    from(table: string) {
-      accesses.push(table);
-      const filters: Array<[string, unknown]> = [];
-      let payload: Record<string, any> | null = null;
-      function execute(single = false) {
-        if (!(table in tables)) throw new Error(`Unexpected table access ${table}`);
-        if (payload) {
-          const existing = tables[table].find(
-            (row) =>
-              row.learner_id === payload?.learner_id &&
-              row.lesson_id === payload?.lesson_id &&
-              row.interaction_id === payload?.interaction_id,
-          );
-          if (existing) Object.assign(existing, payload);
-          else tables[table].push({ ...payload });
-          return { data: payload, error: null };
-        }
-        const selected = tables[table].filter((row) =>
-          filters.every(([key, value]) => row[key] === value),
-        );
-        return { data: single ? (selected[0] ?? null) : selected, error: null };
-      }
-      const query: any = {
-        select: () => query,
-        eq: (key: string, value: unknown) => {
-          filters.push([key, value]);
-          return query;
-        },
-        upsert: (row: Record<string, any>) => {
-          payload = row;
-          return query;
-        },
-        single: async () => execute(true),
-        maybeSingle: async () => execute(true),
-        then: (resolve: any, reject: any) => Promise.resolve(execute()).then(resolve, reject),
-      };
-      return query;
-    },
-  };
-  return { tables, db, accesses };
+  const fixture = manufacturingPracticeStore(courseId, lessonId);
+  mocks.privateClient.mockResolvedValue(fixture.privateDb);
+  return { ...fixture, db: fixture.learnerDb };
 }
 beforeEach(() => {
   vi.clearAllMocks();
@@ -103,11 +55,13 @@ describe('manufacturing simulation API', () => {
     mocks.auth.mockResolvedValue({ user: null, error: new Error('Unauthorized') });
     expect((await POST(request())).status).toBe(401);
     expect(mocks.client).not.toHaveBeenCalled();
+    expect(mocks.privateClient).not.toHaveBeenCalled();
   });
   it('preserves the lesson enrollment gate before data reads or writes', async () => {
     mocks.access.mockRejectedValue(new Error('Denied'));
     expect((await POST(request())).status).toBe(403);
     expect(mocks.client).not.toHaveBeenCalled();
+    expect(mocks.privateClient).not.toHaveBeenCalled();
   });
   it('binds the posted lesson to the posted course', async () => {
     const fixture = databaseFixture();
@@ -150,10 +104,13 @@ describe('manufacturing simulation API', () => {
       attempts: 2,
       learner_id: learnerId,
     });
-    expect(fixture.tables.interaction_progress).toHaveLength(1);
-    expect(new Set(fixture.accesses)).toEqual(new Set(['course_lessons', 'interaction_progress']));
+    expect(fixture.tables.interaction_progress).toHaveLength(0);
+    expect(fixture.tables.manufacturing_simulation_progress).toHaveLength(1);
+    expect(fixture.tables.manufacturing_simulation_progress[0].spec_id).toBe(fixtureGradingKey);
+    expect(fixture.accesses.filter((entry) => entry.role === 'learner').every((entry) => entry.table === 'course_lessons')).toBe(true);
+    expect(new Set(fixture.accesses.map((entry) => entry.table))).toEqual(new Set(['course_lessons', 'manufacturing_simulation_specs', 'manufacturing_simulation_progress']));
   });
-  it('returns the public problem without answer keys and reconstructs saved feedback from responses', async () => {
+  it('ignores forged generic progress and returns no answer key before a server submission', async () => {
     const fixture = databaseFixture();
     mocks.client.mockResolvedValue(fixture.db);
     fixture.tables.interaction_progress.push({
@@ -180,7 +137,47 @@ describe('manufacturing simulation API', () => {
     );
     expect(interaction.data.tasks[0]).not.toHaveProperty('expected');
     expect(body.experience.manufacturingSimulation.tasks[0]).not.toHaveProperty('rationale');
+    expect(interaction.data.initialAttempt).toBeNull();
+    expect(interaction.completed).toBe(false);
+    expect(JSON.stringify(body)).not.toContain('expected');
+  });
+  it('restores only accepted server feedback and derives current interaction state from grading', async () => {
+    const fixture = databaseFixture();
+    mocks.client.mockResolvedValue(fixture.db);
+    await POST(request({ ...requestBody, responses: { ...correctFixtureResponses, safety: 'go' } }));
+    // Even a stale internal display flag must not replace canonical grading.
+    Object.assign(fixture.tables.manufacturing_simulation_progress[0], { score: 100, completed: true });
+    const response = await GET(new NextRequest(`https://app.example.test/api/learner/interactions?courseId=${courseId}&lessonId=${lessonId}`));
+    const body = await response.json();
+    const interaction = body.interactions.find((item: any) => item.type === 'manufacturing-simulation');
+    expect(interaction).toMatchObject({ score: 80, completed: false, attempts: 1 });
     expect(interaction.data.initialAttempt).toMatchObject({ score: 80, completed: false });
     expect(interaction.data.initialAttempt.feedback.criticalMisses).toBe(1);
   });
+  it('does not reveal a revised key from an attempt submitted against an older grading version', async () => {
+    const fixture = databaseFixture();
+    mocks.client.mockResolvedValue(fixture.db);
+    await POST(request());
+    const newKey = 'aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee';
+    fixture.tables.manufacturing_simulation_specs.push({ ...fixture.tables.manufacturing_simulation_specs[0], id: newKey });
+    fixture.tables.course_lessons[0].content_json.experience.manufacturingSimulation.gradingKeyId = newKey;
+    const response = await GET(new NextRequest(`https://app.example.test/api/learner/interactions?courseId=${courseId}&lessonId=${lessonId}`));
+    const body = await response.json();
+    const interaction = body.interactions.find((item: any) => item.type === 'manufacturing-simulation');
+    expect(interaction.data.initialAttempt).toBeNull();
+    expect(interaction.completed).toBe(false);
+    expect(JSON.stringify(body)).not.toContain('expected');
+    const retry = await POST(request());
+    expect((await retry.json()).attempt).toMatchObject({ spec_id: newKey, completed: true, attempts: 1 });
+  });
+  it('fails closed when the protected spec is missing or does not match the public lesson', async () => {
+    const fixture = databaseFixture();
+    mocks.client.mockResolvedValue(fixture.db);
+    fixture.tables.manufacturing_simulation_specs[0].spec.brief += ' Different scenario.';
+    expect((await POST(request())).status).toBe(500);
+    expect(fixture.tables.manufacturing_simulation_progress).toHaveLength(0);
+    fixture.tables.manufacturing_simulation_specs = [];
+    expect((await POST(request())).status).toBe(500);
+  });
+
 });

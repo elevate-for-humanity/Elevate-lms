@@ -7,6 +7,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { requireAuth } from '@/lib/auth/requireAuth';
 import { createClient } from '@/lib/supabase/server';
+import { requireAdminClient } from '@/lib/supabase/admin';
 import { assertLessonAccess, accessErrorResponse } from '@/lib/lms/access-control';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import {
@@ -22,6 +23,10 @@ import {
   parseManufacturingSimulation,
   publicManufacturingSimulation,
 } from '@/lib/lms/manufacturing-simulation';
+import {
+  loadManufacturingSimulationSpec,
+  loadManufacturingSimulationProgress,
+} from '@/lib/lms/manufacturing-simulation-store';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -112,7 +117,7 @@ export async function GET(request: NextRequest) {
       lesson.content_json && typeof lesson.content_json === 'object'
         ? (lesson.content_json as Record<string, any>)
         : {};
-    const authored = resolveStoredLessonExperience(contentJson, lesson.content);
+    let authored = resolveStoredLessonExperience(contentJson, lesson.content);
     // Interaction-specific persistence is optional; lesson completion remains canonical.
     // Do not fail the entire lesson when the optional interaction_progress table is absent.
     let progressRows: Array<Record<string, any>> = [];
@@ -123,15 +128,24 @@ export async function GET(request: NextRequest) {
       .eq('course_id', courseId)
       .eq('lesson_id', lessonId)
       .eq('lesson_slug', lessonSlug);
-    if (!progressError && progress) progressRows = progress;
+    if (!progressError && progress) {
+      // Generic learner-editable rows cannot establish a graded simulation attempt.
+      progressRows = progress.filter((row) => row.interaction_id !== `${lessonSlug}-manufacturing`);
+    }
 
     if (authored && Object.keys(authored).length > 0) {
-      const manufacturing =
-        authored.manufacturingSimulation === undefined
-          ? null
-          : parseManufacturingSimulation(authored.manufacturingSimulation);
-      if (authored.manufacturingSimulation !== undefined && !manufacturing)
-        throw new Error('Authored manufacturing simulation is incomplete');
+      let manufacturing = null;
+      if (authored.manufacturingSimulation !== undefined) {
+        const privateDb = await requireAdminClient();
+        manufacturing = await loadManufacturingSimulationSpec(
+          privateDb, courseId, lessonId, authored.manufacturingSimulation,
+        );
+        const saved = await loadManufacturingSimulationProgress(
+          privateDb, user.id, courseId, lessonId, `${lessonSlug}-manufacturing`, manufacturing.gradingKeyId!,
+        );
+        if (saved) progressRows.push(saved);
+        authored = { ...authored, manufacturingSimulation: manufacturing };
+      }
       const interactions = experienceToInteractions(lessonSlug, authored, progressRows);
       const storedObjects = Array.isArray(contentJson.learning_objects)
         ? (contentJson.learning_objects as LearningObject[])
@@ -315,8 +329,7 @@ async function saveManufacturingAttempt(
     if (lessonError) throw lessonError;
     if (!lesson) return privateJson({ error: 'Lesson not found' }, { status: 404 });
     const experience = resolveStoredLessonExperience(lesson.content_json, lesson.content);
-    const spec = parseManufacturingSimulation(experience?.manufacturingSimulation);
-    if (!spec)
+    if (experience?.manufacturingSimulation === undefined)
       return privateJson(
         { error: 'This lesson has no verified virtual practice specification' },
         { status: 409 },
@@ -326,6 +339,10 @@ async function saveManufacturingAttempt(
         { error: 'Virtual practice does not belong to this lesson' },
         { status: 400 },
       );
+    const privateDb = await requireAdminClient();
+    const spec = await loadManufacturingSimulationSpec(
+      privateDb, input.courseId, input.lessonId, experience.manufacturingSimulation,
+    );
     const scored = evaluateManufacturingSimulation(spec, input.responses);
     if (!scored)
       return privateJson(
@@ -333,22 +350,24 @@ async function saveManufacturingAttempt(
         { status: 400 },
       );
 
-    const { data: current, error: currentError } = await db
-      .from('interaction_progress')
+    const { data: current, error: currentError } = await privateDb
+      .from('manufacturing_simulation_progress')
       .select('attempts')
       .eq('learner_id', learnerId)
       .eq('lesson_id', input.lessonId)
       .eq('interaction_id', input.interactionId)
+      .eq('spec_id', spec.gradingKeyId)
       .maybeSingle();
     if (currentError) throw currentError;
     const now = new Date().toISOString();
-    const { data: saved, error: saveError } = await db
-      .from('interaction_progress')
+    const { data: saved, error: saveError } = await privateDb
+      .from('manufacturing_simulation_progress')
       .upsert(
         {
           learner_id: learnerId,
           course_id: input.courseId,
           lesson_id: input.lessonId,
+          spec_id: spec.gradingKeyId,
           lesson_slug: lesson.slug,
           interaction_id: input.interactionId,
           interaction_type: 'simulation',
@@ -547,8 +566,8 @@ function experienceToInteractions(
   const manufacturing = parseManufacturingSimulation(experience.manufacturingSimulation);
   if (manufacturing) {
     const saved = rows.find((row) => row.interaction_id === `${slug}-manufacturing`);
-    // Re-evaluate stored responses against current authoring rather than trusting
-    // a client-editable practice score or stale feedback.
+    // Only service-recorded simulation rows reach this function. Regrade them
+    // against current authoring rather than replaying stale scores or feedback.
     const scored = saved ? evaluateManufacturingSimulation(manufacturing, saved.answers) : null;
     add('manufacturing', 'manufacturing-simulation', manufacturing.title, {
       ...publicManufacturingSimulation(manufacturing),
@@ -562,6 +581,10 @@ function experienceToInteractions(
           }
         : null,
     });
+    const interaction = out[out.length - 1];
+    interaction.completed = scored?.completed === true;
+    interaction.score = scored?.score;
+    interaction.attempts = Number(saved?.attempts ?? 0);
   }
   if (Array.isArray(experience.knowledgeChecks) && experience.knowledgeChecks.length > 0) {
     add('kc', 'knowledge-check', 'Knowledge Check', {

@@ -1,4 +1,5 @@
 import { startCanonicalCourse } from '@/lib/ultimate-course-builder/core/start-course';
+import { prepareCanonicalCourse } from '@/lib/ultimate-course-builder/core/prepare-course';
 import { inheritCourseProductionPolicy } from '@/lib/ultimate-course-builder/core/production-policy.mjs';
 import {loadCheckpointPage} from '@/lib/ultimate-course-builder/queries/checkpoint-page.mjs';
 import { loadUltimateBuildPage, parseBuildListPage } from '@/lib/ultimate-course-builder/queries/build-list-page';
@@ -151,6 +152,13 @@ export async function POST(req: NextRequest) {
   }
 
   if (body.action === 'create') {
+    if (body.profile === undefined) {
+      try {
+        return await prepareCanonicalCourse(db, body, auth.id);
+      } catch (error) {
+        return databaseFailure(error);
+      }
+    }
     if (!body.courseId || !body.profile) {
       return NextResponse.json({ error: 'courseId and profile are required' }, { status: 400 });
     }

@@ -63,9 +63,13 @@
     const simulations = new Map(course.simulations.map(function (item) { return [item.lessonId,item.spec]; }));
     let storageAvailable = true;
     let exportUrl = null;
-    function blankState() { return {format:course.format,version:1,courseId:course.courseId,contentHash:course.contentHash,currentLesson:course.lessons[0].id,savedAt:null,lessons:{},simulations:{}}; }
+    function blankLesson() { return {notes:'',practice1:'',practice2:'',practice3:'',nextGoal:'',reviewed:false,knowledgeAnswers:{},knowledgeChecked:false,knowledgeCheckSignature:null,knowledgeAttempts:0}; }
+    function blankState() { return {format:course.format,version:1,courseId:course.courseId,contentHash:course.contentHash,currentLesson:course.lessons[0].id,savedAt:null,
+      lessons:Object.fromEntries(course.lessons.map(function (lesson) { return [lesson.id,blankLesson()]; })),
+      simulations:Object.fromEntries(course.simulations.map(function (wrapper) { return [wrapper.spec.id,{answers:{},checked:false,checkSignature:null,attempts:0}]; }))}; }
     function ownObject(value) { return value && typeof value === 'object' && !Array.isArray(value); }
-    function cleanState(raw) {
+    function responseSignature(answers,ids) { return JSON.stringify(ids.map(function (id) { return Object.prototype.hasOwnProperty.call(answers,id) ? answers[id] : null; })); }
+    function cleanState(raw,allowSnapshotRecheck) {
       if (!ownObject(raw) || raw.format !== course.format || raw.version !== 1 || raw.courseId !== course.courseId)
         throw new Error('This is not a compatible practice backup. Choose a JSON file exported from this companion.');
       const clean = blankState();
@@ -80,7 +84,10 @@
           const value = item.knowledgeAnswers && item.knowledgeAnswers[i];
           if (Number.isInteger(value) && value >= 0 && value < lesson.practiceQuestions[i].options.length) entry.knowledgeAnswers[i] = value;
         }
-        entry.knowledgeChecked = item.knowledgeChecked === true && Object.keys(entry.knowledgeAnswers).length === lesson.practiceQuestions.length;
+        const signature = responseSignature(entry.knowledgeAnswers,lesson.practiceQuestions.map(function (_question,index) { return index; }));
+        entry.knowledgeChecked = item.knowledgeChecked === true && Object.keys(entry.knowledgeAnswers).length === lesson.practiceQuestions.length &&
+          (allowSnapshotRecheck !== false || item.knowledgeCheckSignature === signature);
+        entry.knowledgeCheckSignature = entry.knowledgeChecked ? signature : null;
         entry.knowledgeAttempts = Number.isInteger(item.knowledgeAttempts) ? Math.max(0,Math.min(10000,item.knowledgeAttempts)) : 0;
         clean.lessons[lesson.id] = entry;
       }
@@ -96,37 +103,121 @@
           else if (task.type === 'sequence' && Array.isArray(value) && value.length === task.options.length &&
               new Set(value).size === value.length && value.every(function (v) { return task.options.some(function (option) { return option.value === v; }); })) answers[task.id] = value;
         }
+        const signature = responseSignature(answers,spec.tasks.map(function (task) { return task.id; }));
+        const checked = item.checked === true && SimulationEngine.evaluateManufacturingSimulation(spec,answers) !== null &&
+          (allowSnapshotRecheck !== false || item.checkSignature === signature);
         clean.simulations[spec.id] = {
           answers:answers,
-          checked:item.checked === true && SimulationEngine.evaluateManufacturingSimulation(spec,answers) !== null,
+          checked:checked,
+          checkSignature:checked ? signature : null,
           attempts:Number.isInteger(item.attempts) ? Math.max(0,Math.min(10000,item.attempts)) : 0,
         };
       }
       return clean;
     }
+    const fieldPrefix = key + ':field:';
+    const fieldPaths = [['currentLesson'],['savedAt']];
+    for (const lesson of course.lessons) {
+      for (const field of workbookFields.concat(['reviewed','knowledgeChecked','knowledgeCheckSignature','knowledgeAttempts'])) fieldPaths.push(['lessons',lesson.id,field]);
+      for (let index = 0; index < lesson.practiceQuestions.length; index += 1) fieldPaths.push(['lessons',lesson.id,'knowledgeAnswers',String(index)]);
+    }
+    for (const wrapper of course.simulations) {
+      for (const field of ['checked','checkSignature','attempts']) fieldPaths.push(['simulations',wrapper.spec.id,field]);
+      for (const task of wrapper.spec.tasks) fieldPaths.push(['simulations',wrapper.spec.id,'answers',task.id]);
+    }
+    function fieldValue(value,path) { return path.reduce(function (item,part) { return item && item[part]; },value); }
+    function setField(value,path,entry) {
+      let parent = value;
+      for (const part of path.slice(0,-1)) { if (!ownObject(parent[part])) parent[part] = {}; parent = parent[part]; }
+      if (entry.removed === true) delete parent[path[path.length - 1]];
+      else parent[path[path.length - 1]] = entry.value;
+    }
+    function storedFieldPrefix(raw) {
+      return ownObject(raw) && typeof raw.storageRevision === 'string' && /^[a-zA-Z0-9_-]{1,100}$/.test(raw.storageRevision)
+        ? fieldPrefix + raw.storageRevision + ':' : fieldPrefix;
+    }
+    function readSavedRecord() {
+      for (let attempt = 0; attempt < 3; attempt += 1) {
+        const raw = localStorage.getItem(key), base = raw ? JSON.parse(raw) : null;
+        const saved = base ? cleanState(base) : blankState(), prefix = storedFieldPrefix(base);
+        for (const path of fieldPaths) {
+          const rawField = localStorage.getItem(prefix + JSON.stringify(path));
+          if (rawField !== null) {
+            const entry = JSON.parse(rawField);
+            if (ownObject(entry)) setField(saved,path,entry);
+          }
+        }
+        if (localStorage.getItem(key) === raw) return {state:cleanState(saved,false),prefix:prefix,raw:raw};
+      }
+      throw new Error('Another tab is replacing the saved practice.');
+    }
     let state = blankState();
-    try { const saved = localStorage.getItem(key); if (saved) state = cleanState(JSON.parse(saved)); }
+    try { state = readSavedRecord().state; }
     catch (error) {
       storageAvailable = false;
       document.getElementById('storage-notice').textContent = 'Browser storage could not be restored. Your work is available in this session; export a backup before closing this page.';
     }
-    function save() {
+    let savedSnapshot = JSON.parse(JSON.stringify(state));
+    function save(options) {
+      options = options || {};
       state.savedAt = new Date().toISOString();
-      try { localStorage.setItem(key,JSON.stringify(state)); storageAvailable = true; }
+      try {
+        if (options.replace === true) {
+          // Switch generations with one atomic base write. An older open tab
+          // writes into the new generation, so cleanup cannot erase its new work.
+          let previousPrefix = null;
+          try { previousPrefix = storedFieldPrefix(JSON.parse(localStorage.getItem(key))); } catch (_error) { /* A valid backup can replace malformed old storage. */ }
+          const revision = globalThis.crypto?.randomUUID?.() || Date.now().toString(36) + '-' + Math.random().toString(36).slice(2);
+          localStorage.setItem(key,JSON.stringify(Object.assign({},state,{storageRevision:revision})));
+          if (previousPrefix) for (const path of fieldPaths) localStorage.removeItem(previousPrefix + JSON.stringify(path));
+        } else {
+          // Independent fields have independent storage keys. Ordinary edits never
+          // replace another tab's older whole-document snapshot, even concurrently.
+          const changed = fieldPaths.filter(function (path) { return JSON.stringify(fieldValue(state,path)) !== JSON.stringify(fieldValue(savedSnapshot,path)); });
+          const forced = new Set((options.fields || []).map(function (path) { return JSON.stringify(path); }));
+          for (const path of changed.concat(options.fields || [])) {
+            if (path[0] === 'simulations' && path[2] === 'answers') for (const field of ['checked','checkSignature']) forced.add(JSON.stringify(['simulations',path[1],field]));
+            if (path[0] === 'lessons' && path[2] === 'knowledgeAnswers') for (const field of ['knowledgeChecked','knowledgeCheckSignature']) forced.add(JSON.stringify(['lessons',path[1],field]));
+          }
+          if (options.resetSimulation) {
+            for (const path of fieldPaths) if (path[0] === 'simulations' && path[1] === options.resetSimulation && path[2] === 'answers') forced.add(JSON.stringify(path));
+            forced.add(JSON.stringify(['simulations',options.resetSimulation,'checked']));
+            forced.add(JSON.stringify(['simulations',options.resetSimulation,'checkSignature']));
+          }
+          const edits = fieldPaths.filter(function (path) { return forced.has(JSON.stringify(path)) || changed.includes(path); }).map(function (path) {
+            const value = fieldValue(state,path);
+            return {path:path,entry:JSON.stringify(value === undefined ? {removed:true} : {value:value})};
+          });
+          let persisted = false;
+          for (let attempt = 0; attempt < 3 && !persisted; attempt += 1) {
+            const stored = readSavedRecord();
+            for (const edit of edits) localStorage.setItem(stored.prefix + JSON.stringify(edit.path),edit.entry);
+            persisted = localStorage.getItem(key) === stored.raw;
+          }
+          if (!persisted) throw new Error('Another tab is replacing the saved practice.');
+        }
+        const current = state.currentLesson;
+        state = readSavedRecord().state;
+        state.currentLesson = current;
+        savedSnapshot = JSON.parse(JSON.stringify(state));
+        storageAvailable = true;
+        document.getElementById('storage-notice').textContent = '';
+      }
       catch (error) {
         storageAvailable = false;
         document.getElementById('storage-notice').textContent = 'Browser storage is unavailable or full. Export your practice before closing this page.';
       }
       const label = document.getElementById('workbook-save-state');
       if (label) label.textContent = storageAvailable ? 'Saved on this device at ' + new Date(state.savedAt).toLocaleTimeString() + '.' : 'Kept in this session. Export to keep a backup.';
+      syncVisibleState();
       updateProgress();
     }
     function lessonState(id) {
-      if (!state.lessons[id]) state.lessons[id] = {notes:'',practice1:'',practice2:'',practice3:'',nextGoal:'',reviewed:false,knowledgeAnswers:{},knowledgeChecked:false,knowledgeAttempts:0};
+      if (!state.lessons[id]) state.lessons[id] = blankLesson();
       return state.lessons[id];
     }
     function simulationState(spec) {
-      if (!state.simulations[spec.id]) state.simulations[spec.id] = {answers:{},attempts:0,checked:false};
+      if (!state.simulations[spec.id]) state.simulations[spec.id] = {answers:{},attempts:0,checked:false,checkSignature:null};
       return state.simulations[spec.id];
     }
     function currentLesson() { return course.lessons.find(function (lesson) { return lesson.id === state.currentLesson; }) || course.lessons[0]; }
@@ -231,11 +322,8 @@
     function updateSimulationAnswer(taskId,value) {
       const spec = simulations.get(currentLesson().id), item = simulationState(spec);
       if (value === undefined) delete item.answers[taskId]; else item.answers[taskId] = value;
-      item.checked = false;
-      const feedback = document.getElementById('simulation-feedback'); if (feedback) feedback.innerHTML = '';
-      const button = document.getElementById('check-simulation'); if (button) button.disabled = SimulationEngine.evaluateManufacturingSimulation(spec,item.answers) === null;
-      const count = document.getElementById('sim-task-count'); if (count) count.textContent = answeredTasks(spec,item) + ' of ' + spec.tasks.length + ' tasks answered';
-      save();
+      item.checked = false; item.checkSignature = null;
+      save({fields:[['simulations',spec.id,'answers',taskId]]});
     }
     function knowledgeFeedback(lesson,item) {
       if (!item.knowledgeChecked) return '';
@@ -249,6 +337,47 @@
       return '<section class="section" id="knowledge"><p class="section-label">04 · Explain and check</p><h2>Knowledge practice</h2><p>Answer every question, review the explanation, and revise any decision you need to correct.</p><div class="knowledge-block">' +
         lesson.practiceQuestions.map(function (question,index) { return '<fieldset class="task"><legend>' + (index + 1) + '. ' + esc(question.prompt) + '</legend>' + question.options.map(function (option,optionIndex) { return '<label class="choice"><input type="radio" name="knowledge-' + index + '" data-knowledge="' + index + '" value="' + optionIndex + '"' + (item.knowledgeAnswers[index] === optionIndex ? ' checked' : '') + '><span>' + esc(option) + '</span></label>'; }).join('') + '</fieldset>'; }).join('') +
         '<button class="button primary" type="button" data-action="check-knowledge" id="check-knowledge"' + (ready ? '' : ' disabled') + '>Check knowledge answers</button><div id="knowledge-feedback">' + knowledgeFeedback(lesson,item) + '</div></div></section>';
+    }
+    function syncVisibleState() {
+      const lesson = currentLesson(), item = lessonState(lesson.id);
+      // Update existing controls after merging other tabs without replacing the
+      // active writing field or moving its cursor on every keystroke.
+      for (const field of workbookFields) {
+        const input = document.getElementById('workbook-' + field);
+        if (input && input.value !== item[field]) input.value = item[field];
+      }
+      const reviewed = document.getElementById('workbook-reviewed'); if (reviewed) reviewed.checked = item.reviewed;
+      for (const input of document.querySelectorAll('[data-knowledge]')) input.checked = item.knowledgeAnswers[Number(input.dataset.knowledge)] === Number(input.value);
+      const knowledgeButton = document.getElementById('check-knowledge');
+      if (knowledgeButton) knowledgeButton.disabled = Object.keys(item.knowledgeAnswers).length !== lesson.practiceQuestions.length;
+      const knowledgeResult = document.getElementById('knowledge-feedback');
+      if (knowledgeResult) knowledgeResult.innerHTML = knowledgeFeedback(lesson,item);
+      const spec = simulations.get(lesson.id); if (!spec) return;
+      const simulation = simulationState(spec);
+      for (const input of document.querySelectorAll('[data-sim-choice]')) input.checked = simulation.answers[input.dataset.simChoice] === input.value;
+      for (const input of document.querySelectorAll('[data-sim-number]')) {
+        const answer = simulation.answers[input.dataset.simNumber], value = typeof answer === 'number' ? String(answer) : '';
+        if (input !== document.activeElement && input.value !== value) input.value = value;
+      }
+      for (const task of spec.tasks.filter(function (task) { return task.type === 'sequence'; })) {
+        const order = simulation.answers[task.id] || task.options.map(function (option) { return option.value; });
+        const nodes = order.map(function (value) { return document.getElementById('step-' + task.id + '-' + value); });
+        if (nodes.some(function (node) { return !node; })) continue;
+        const list = nodes[0].parentElement;
+        if (nodes.some(function (node,index) { return list.children[index] !== node; })) for (const node of nodes) list.appendChild(node);
+        nodes.forEach(function (node,index) {
+          node.querySelector('.step-number').textContent = String(index + 1);
+          for (const button of node.querySelectorAll('[data-action="move"]')) {
+            const up = button.dataset.direction === '-1';
+            button.dataset.position = String(index); button.disabled = up ? index === 0 : index === nodes.length - 1;
+            button.setAttribute('aria-label','Move step ' + (index + 1) + (up ? ' up' : ' down'));
+          }
+        });
+      }
+      const simulationButton = document.getElementById('check-simulation');
+      if (simulationButton) simulationButton.disabled = SimulationEngine.evaluateManufacturingSimulation(spec,simulation.answers) === null;
+      const count = document.getElementById('sim-task-count'); if (count) count.textContent = answeredTasks(spec,simulation) + ' of ' + spec.tasks.length + ' tasks answered';
+      const feedback = document.getElementById('simulation-feedback'); if (feedback) feedback.innerHTML = simulationFeedback(spec,simulation);
     }
     function renderLesson(focusHeading) {
       const lesson = currentLesson(), index = course.lessons.indexOf(lesson), hasSimulation = simulations.has(lesson.id);
@@ -269,26 +398,24 @@
     }
     function navigate(id) {
       if (!course.lessons.some(function (lesson) { return lesson.id === id; })) return;
-      state.currentLesson = id; save(); renderLesson(true);
+      state.currentLesson = id; save({fields:[['currentLesson']]}); renderLesson(true);
     }
     function message(text,error) {
       const target = document.getElementById('global-message'); target.textContent = text; target.classList.toggle('error',Boolean(error));
     }
     document.addEventListener('input',function (event) {
       const target = event.target;
-      if (target.dataset.workbook) { lessonState(state.currentLesson)[target.dataset.workbook] = target.value.slice(0,12000); save(); }
+      if (target.dataset.workbook) { lessonState(state.currentLesson)[target.dataset.workbook] = target.value.slice(0,12000); save({fields:[['lessons',state.currentLesson,target.dataset.workbook]]}); }
       if (target.dataset.simNumber) { updateSimulationAnswer(target.dataset.simNumber,target.value === '' ? undefined : Number(target.value)); }
     });
     document.addEventListener('change',function (event) {
       const target = event.target;
       if (target.id === 'lesson-select') navigate(target.value);
-      if (target.id === 'workbook-reviewed') { lessonState(state.currentLesson).reviewed = target.checked; save(); }
+      if (target.id === 'workbook-reviewed') { lessonState(state.currentLesson).reviewed = target.checked; save({fields:[['lessons',state.currentLesson,'reviewed']]}); }
       if (target.dataset.simChoice) updateSimulationAnswer(target.dataset.simChoice,target.value);
       if (target.dataset.knowledge !== undefined) {
-        const item = lessonState(state.currentLesson); item.knowledgeAnswers[Number(target.dataset.knowledge)] = Number(target.value); item.knowledgeChecked = false;
-        document.getElementById('knowledge-feedback').innerHTML = '';
-        document.getElementById('check-knowledge').disabled = Object.keys(item.knowledgeAnswers).length !== currentLesson().practiceQuestions.length;
-        save();
+        const item = lessonState(state.currentLesson); item.knowledgeAnswers[Number(target.dataset.knowledge)] = Number(target.value); item.knowledgeChecked = false; item.knowledgeCheckSignature = null;
+        save({fields:[['lessons',state.currentLesson,'knowledgeAnswers',String(Number(target.dataset.knowledge))]]});
       }
     });
     document.addEventListener('click',function (event) {
@@ -297,18 +424,20 @@
       if (action === 'navigate') return navigate(button.dataset.lesson);
       if (action === 'previous' || action === 'next') { const next = course.lessons[course.lessons.indexOf(lesson) + (action === 'next' ? 1 : -1)]; if (next) navigate(next.id); return; }
       if (action === 'check-knowledge') {
+        save();
         const item = lessonState(lesson.id); if (Object.keys(item.knowledgeAnswers).length !== lesson.practiceQuestions.length) return;
-        item.knowledgeChecked = true; item.knowledgeAttempts += 1; save();
-        document.getElementById('knowledge-feedback').innerHTML = knowledgeFeedback(lesson,item);
-        document.getElementById('knowledge-result').focus(); return;
+        item.knowledgeChecked = true; item.knowledgeCheckSignature = responseSignature(item.knowledgeAnswers,lesson.practiceQuestions.map(function (_question,index) { return index; })); item.knowledgeAttempts += 1; save();
+        document.getElementById('knowledge-feedback').innerHTML = knowledgeFeedback(lesson,lessonState(lesson.id));
+        document.getElementById('knowledge-result')?.focus(); return;
       }
       const spec = simulations.get(lesson.id); if (!spec) return;
+      if (action === 'check-simulation') save();
       const item = simulationState(spec);
       if (action === 'check-simulation') {
         if (!SimulationEngine.evaluateManufacturingSimulation(spec,item.answers)) return;
-        item.checked = true; item.attempts += 1; save(); renderSimulation(); document.getElementById('simulation-result').focus();
+        item.checked = true; item.checkSignature = responseSignature(item.answers,spec.tasks.map(function (task) { return task.id; })); item.attempts += 1; save(); renderSimulation(); document.getElementById('simulation-result')?.focus();
       } else if (action === 'reset-simulation') {
-        item.answers = {}; item.checked = false; save(); renderSimulation(); document.getElementById('simulation-host').scrollIntoView({block:'start'});
+        item.answers = {}; item.checked = false; item.checkSignature = null; save({resetSimulation:spec.id}); renderSimulation(); document.getElementById('simulation-host').scrollIntoView({block:'start'});
       } else if (action === 'move' || action === 'confirm-sequence') {
         const task = spec.tasks.find(function (candidate) { return candidate.id === button.dataset.task; });
         if (!task || task.type !== 'sequence') return;
@@ -338,7 +467,7 @@
       try {
         if (file.size > 5 * 1024 * 1024) throw new Error('This file is too large for a practice backup. The limit is 5 MB.');
         const restored = cleanState(JSON.parse(await file.text()));
-        state = restored; save(); renderLesson(true);
+        state = restored; save({replace:true}); renderLesson(true);
         message('Practice restored. Scenario and knowledge results are checked against the current lesson answers. No LMS records were changed.');
       } catch (error) { message(error instanceof Error ? error.message : 'That backup could not be restored. Your current entries were kept.',true); }
       event.target.value = '';

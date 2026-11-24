@@ -1,4 +1,5 @@
 import type { SupabaseClient } from '@/lib/supabase';
+import { assertManufacturingLessonSpecs } from '@/lib/lms/manufacturing-simulation-store';
 
 export type CourseSnapshot = {
   course: Record<string, any>;
@@ -108,6 +109,7 @@ export async function publishCourseVersion(
   const snapshot = await loadSnapshot(db, courseId);
   const blockers = readinessBlockers(snapshot);
   if (blockers.length) return { ok: false, blockers, error: 'Course readiness blockers must be resolved before publishing.' };
+  await assertManufacturingLessonSpecs(db, courseId, snapshot.lessons);
 
   const { data: latest, error: versionError } = await db
     .from('course_versions')
@@ -228,6 +230,9 @@ export async function rollbackCourseVersion(
   if (!snapshot?.course || !Array.isArray(snapshot.modules) || !Array.isArray(snapshot.lessons)) {
     return { ok: false, error: `Version ${version} contains an invalid snapshot.` };
   }
+  // Immutable grading references survive lesson edits/deletion. Verify every
+  // reference before changing the course, modules, or lesson publication state.
+  await assertManufacturingLessonSpecs(db, courseId, snapshot.lessons);
 
   const now = new Date().toISOString();
   const { error: courseError } = await db.from('courses').update(courseRestorePayload(snapshot.course, now)).eq('id', courseId);

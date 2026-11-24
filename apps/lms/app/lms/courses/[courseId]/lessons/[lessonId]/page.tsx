@@ -29,9 +29,9 @@ import { loadLessonWorkbook } from '@/lib/lms/lesson-workbook';
 import { BOOKKEEPING_COURSE_ID } from '@/lib/lms/bookkeeping-workbook-contract';
 import ManufacturingSimulation from '@/components/lms/ManufacturingSimulation';
 import {
-  parseManufacturingSimulation,
   publicManufacturingSimulation,
 } from '@/lib/lms/manufacturing-simulation';
+import { loadManufacturingSimulationSpec } from '@/lib/lms/manufacturing-simulation-store';
 
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
@@ -301,8 +301,8 @@ export default async function LessonPage({
   const keyTerms = lessonKeyTerms(lesson.key_terms);
   const lessonHtml = htmlFromContent(lesson.content, lesson.rendered_html);
   const experience = lessonExperience(lesson.content_json, lesson.content);
-  const previewManufacturingSimulation = preview.active
-    ? parseManufacturingSimulation(experience?.manufacturingSimulation)
+  const previewManufacturingSimulation = preview.active && experience?.manufacturingSimulation
+    ? await loadManufacturingSimulationSpec(preview.db, course.id, lesson.id, experience.manufacturingSimulation)
     : null;
   const interactiveVideo = experience?.interactiveVideo as Record<string, any> | undefined;
   const instructionalTimeline = experience?.instructionalTimeline as

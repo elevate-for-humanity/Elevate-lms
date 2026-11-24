@@ -21,7 +21,7 @@ export default async function EnrollPage() {
     name: p.title,
     slug: p.slug,
     description: p.description,
-    duration_weeks: p.duration ? parseInt(p.duration, 10) || null : null,
+    duration: p.duration,
     is_free: p.funding_eligible,
     tuition: p.tuition ?? null,
     price_label: p.price_label ?? 'Contact admissions',
@@ -75,9 +75,9 @@ export default async function EnrollPage() {
                           {program.description}
                         </p>
                       )}
-                      {program.duration_weeks && (
+                      {program.duration && (
                         <p className="text-sm text-slate-500 mt-2">
-                          Duration: {program.duration_weeks} weeks
+                          Duration: {program.duration}
                         </p>
                       )}
                     </div>

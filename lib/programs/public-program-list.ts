@@ -50,7 +50,6 @@ const SUPPRESSED = new Set([
   'cpr-cert',
   'health-safety',
   'forklift-operator',
-  'forklift',
   'plumbing',
   'tax-prep',
   'it-support',

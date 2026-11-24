@@ -31,6 +31,8 @@ export interface SimulationExhibit {
 }
 export interface ManufacturingSimulationSpec {
   version: 1;
+  /** Public reference only; the referenced key is service-only and immutable. */
+  gradingKeyId?: string;
   id: string;
   title: string;
   kind: SimulationKind;
@@ -84,11 +86,16 @@ const kinds: SimulationKind[] = [
   'traceability',
 ];
 
-/** Reject incomplete or ambiguous authoring instead of inventing an answer key. */
-export function parseManufacturingSimulation(value: unknown): ManufacturingSimulationSpec | null {
+function parseSimulation(
+  value: unknown,
+  requireAnswers: boolean,
+): ManufacturingSimulationSpec | PublicManufacturingSimulation | null {
   if (
     !record(value) ||
     value.version !== 1 ||
+    (value.gradingKeyId !== undefined &&
+      (typeof value.gradingKeyId !== 'string' ||
+        !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value.gradingKeyId))) ||
     !text(value.id, 200) ||
     !text(value.title, 300) ||
     !text(value.brief) ||
@@ -139,7 +146,8 @@ export function parseManufacturingSimulation(value: unknown): ManufacturingSimul
       !record(task) ||
       !text(task.id, 150) ||
       !text(task.prompt) ||
-      !text(task.rationale) ||
+      (requireAnswers && !text(task.rationale)) ||
+      (!requireAnswers && ('expected' in task || 'rationale' in task)) ||
       !['choice', 'number', 'sequence'].includes(String(task.type)) ||
       (task.critical !== undefined && typeof task.critical !== 'boolean') ||
       (task.unit !== undefined && !text(task.unit, 60))
@@ -147,8 +155,8 @@ export function parseManufacturingSimulation(value: unknown): ManufacturingSimul
       return null;
     if (task.type === 'number') {
       if (
-        typeof task.expected !== 'number' ||
-        !Number.isFinite(task.expected) ||
+        (requireAnswers &&
+          (typeof task.expected !== 'number' || !Number.isFinite(task.expected))) ||
         (task.tolerance !== undefined &&
           (typeof task.tolerance !== 'number' ||
             !Number.isFinite(task.tolerance) ||
@@ -169,12 +177,12 @@ export function parseManufacturingSimulation(value: unknown): ManufacturingSimul
       const values = task.options.map((option: SimulationOption) => option.value);
       if (!unique(values)) return null;
       if (
-        task.type === 'choice' &&
+        requireAnswers && task.type === 'choice' &&
         (typeof task.expected !== 'string' || !values.includes(task.expected))
       )
         return null;
       if (
-        task.type === 'sequence' &&
+        requireAnswers && task.type === 'sequence' &&
         (!Array.isArray(task.expected) ||
           task.expected.length !== values.length ||
           task.expected.some(
@@ -198,12 +206,25 @@ export function parseManufacturingSimulation(value: unknown): ManufacturingSimul
   return value as unknown as ManufacturingSimulationSpec;
 }
 
+/** Reject incomplete or ambiguous authoring instead of inventing an answer key. */
+export function parseManufacturingSimulation(value: unknown): ManufacturingSimulationSpec | null {
+  return parseSimulation(value, true) as ManufacturingSimulationSpec | null;
+}
+
+/** Public lesson data must contain the problem only, with no grading key. */
+export function parsePublicManufacturingSimulation(
+  value: unknown,
+): PublicManufacturingSimulation | null {
+  return parseSimulation(value, false) as PublicManufacturingSimulation | null;
+}
+
 /** Only the authored problem reaches the first-load simulator response. */
 export function publicManufacturingSimulation(
-  spec: ManufacturingSimulationSpec,
+  spec: ManufacturingSimulationSpec | PublicManufacturingSimulation,
 ): PublicManufacturingSimulation {
   return {
     version: spec.version,
+    ...(spec.gradingKeyId ? { gradingKeyId: spec.gradingKeyId } : {}),
     id: spec.id,
     title: spec.title,
     kind: spec.kind,
@@ -211,7 +232,13 @@ export function publicManufacturingSimulation(
     exhibits: spec.exhibits,
     masteryThreshold: spec.masteryThreshold,
     sourceUrls: spec.sourceUrls,
-    tasks: spec.tasks.map(({ expected: _expected, rationale: _rationale, ...task }) => task),
+    tasks: spec.tasks.map((task) => ({
+      id: task.id, type: task.type, prompt: task.prompt,
+      ...(task.options ? { options: task.options.map(({ value, label }) => ({ value, label })) } : {}),
+      ...(task.unit !== undefined ? { unit: task.unit } : {}),
+      ...(task.tolerance !== undefined ? { tolerance: task.tolerance } : {}),
+      ...(task.critical !== undefined ? { critical: task.critical } : {}),
+    })),
   };
 }
 

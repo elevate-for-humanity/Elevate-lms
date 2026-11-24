@@ -51,7 +51,7 @@ async function provision() {
   const approvalAdmin = approvalAdmins?.[0];
   if (!approvalAdmin?.id)
     throw new Error('No authorized isolated-QA approval administrator is available');
-  let state = { runId, marker, learner: null, programHolder: null, qaProgramId: null, holderId: null, holderProgramId: null, hvacEnrollmentId: null };
+  let state = { runId, marker, learner: null, programHolder: null, qaProgramId: null, holderId: null, holderProgramId: null, hvacEnrollmentId: null, holderStudent: null, holderEnrollmentId: null };
   try {
     const learner = await createQaUser('learner', 'student', '[QA E2E] Learner', anchor.tenant_id); state.learner = learner;
     // A disposable learner has real enrolled-course access for the live HVAC
@@ -95,6 +95,29 @@ async function provision() {
     await must(db.from('profiles').update({ program_holder_id: holder.id }).eq('id', programHolder.id), 'link QA profile to program holder');
     const holderProgram = await must(db.from('program_holder_programs').insert({ program_holder_id: holder.id, program_id: qaProgram.id, program_slug: qaProgram.slug, role_in_program: 'owner', is_primary: true, status: 'active' }).select('id').single(), 'associate isolated QA program'); state.holderProgramId = holderProgram.id;
     await writePrivateQaState(statePath, state);
+    // One enrolled student under the QA holder, so the holder portal's
+    // roster and student progress report form have a real row to work with.
+    // Without it the report form's submit button is disabled (no students)
+    // and the roster is always empty. The enrollment is scoped to the holder
+    // (program_holder_id) because the report API verifies ownership against
+    // the holder before inserting a report.
+    const holderStudent = await createQaUser('holder-student', 'student', '[QA E2E] Holder Student', anchor.tenant_id); state.holderStudent = holderStudent;
+    const holderEnrollment = await must(db.from('program_enrollments').insert({
+      user_id: holderStudent.id, student_id: holderStudent.id, email: holderStudent.email,
+      full_name: '[QA E2E] Holder Student', program_id: qaProgram.id, program_slug: qaProgram.slug,
+      program_holder_id: holder.id,
+      status: 'active', enrollment_state: 'active',
+      payment_status: 'paid', approved_at: new Date().toISOString(),
+      approved_by: approvalAdmin.id,
+      funding_source: 'qa-e2e', funding_status: 'unfunded_self_continuing',
+      funding_verified: false, amount_paid_cents: 0,
+      source: 'qa-e2e', tenant_id: anchor.tenant_id,
+      training_start_date: new Date().toISOString().slice(0, 10),
+    }).select('id').single(), 'enroll isolated QA student under program holder');
+    state.holderEnrollmentId = holderEnrollment.id;
+    await writePrivateQaState(statePath, state);
+    // A two-student roster under the same holder, so roster filtering can
+    // distinguish an active enrollment from a completed one.
     const roster = [
       { kind: 'holder-active-student', name: 'QA Holder Active Student', status: 'active' },
       { kind: 'holder-completed-student', name: 'QA Holder Completed Student', status: 'completed' },
@@ -175,6 +198,12 @@ async function cleanup() {
     await must(db.from('program_enrollments').delete().eq('id', state.apprenticeEnrollmentId).eq('user_id', state.apprentice.id), 'remove isolated apprentice enrollment');
     await must(db.from('course_enrollments').delete().eq('student_id', state.apprentice.id), 'remove isolated apprentice course enrollments');
   }
+  if (state.holderEnrollmentId && state.holderStudent?.id) {
+    const { data, error } = await db.from('program_enrollments').delete()
+      .eq('id', state.holderEnrollmentId).eq('user_id', state.holderStudent.id).select('id');
+    if (error || data?.length !== 1)
+      throw new Error('QA holder-student enrollment cleanup was not independently confirmed: ' + (error?.message || 'row count mismatch'));
+  }
   for (const student of state.holderRoster ?? []) {
     if (student.enrollmentId) {
       await must(db.from('program_enrollments').delete().eq('id', student.enrollmentId).eq('user_id', student.id), 'remove isolated holder roster enrollment');
@@ -183,7 +212,7 @@ async function cleanup() {
   if (state.holderProgramId) await must(db.from('program_holder_programs').delete().eq('id', state.holderProgramId), 'remove isolated holder program association');
   if (state.holderId) await must(db.from('program_holders').delete().eq('id', state.holderId), 'remove isolated holder and reports');
   if (state.qaProgramId) await db.from('programs').delete().eq('id', state.qaProgramId);
-  for (const userId of [state.learner?.id, state.apprentice?.id, state.programHolder?.id, ...(state.holderRoster ?? []).map((student) => student.id)].filter(Boolean)) {
+  for (const userId of [state.learner?.id, state.apprentice?.id, state.programHolder?.id, state.holderStudent?.id, ...(state.holderRoster ?? []).map((student) => student.id)].filter(Boolean)) {
     await db.from('profiles').delete().eq('id', userId);
     const { error } = await db.auth.admin.deleteUser(userId, true);
     if (error && !/not found/i.test(error.message)) console.error(`soft-delete auth user ${userId}: ${error.message}`);

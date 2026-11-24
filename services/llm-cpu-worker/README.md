@@ -24,9 +24,14 @@ A production release must:
 1. Verify fresh regional quota with the existing regional-capacity checker.
    Prefer the already approved secondary region `us-east1` to preserve primary
    web rollout headroom. Reserve 4 vCPU / 8 GiB alongside active course jobs.
-2. Use an immutable image digest, maximum one instance, concurrency one, and
-   minimum zero. Keep the service private with Cloud Run IAM; do not add
-   `allUsers` or disable application authentication.
+2. Use an immutable image digest, maximum two instances, concurrency one, and
+   minimum one warm instance. Scale-to-zero is not compatible with user-facing
+   PARIS chat: a cold 7B CPU model takes minutes to load, while the live chat
+   route gives up after 45s and the health probe after 15s, so the first turn
+   after any idle period failed and the apps reported the model "unavailable"
+   (2026-11-23). One warm instance is an always-on 4 CPU / 8 GiB cost. Keep
+   the service private with Cloud Run IAM; do not add `allUsers` or disable
+   application authentication.
 3. Verify the existing model runtime identity and existing secret-reader
    binding. Missing credentials or grants are an explicit blocker, not
    permission to create them automatically.

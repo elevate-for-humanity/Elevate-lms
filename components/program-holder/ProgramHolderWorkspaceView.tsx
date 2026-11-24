@@ -16,6 +16,7 @@ import { ProgramHolderPaymentAddendum } from './ProgramHolderPaymentAddendum';
 import { filterHolderStudents } from '@/lib/program-holder/roster-filter';
 import { isApprovedDocument } from '@/lib/program-holder/document-review';
 import { programHolderDocumentStatus } from '@/lib/program-holder/document-requirements';
+import { isApprovedProgramHolderStatus } from '@/lib/program-holder/onboarding-status';
 import { requiredProgramHolderDocuments } from '@/lib/program-holder/onboarding-readiness';
 import { isEpaTestingProgram } from '@/lib/program-holder/enrollment-identity';
 import CourseSyllabus from '@/components/learner/CourseSyllabus';
@@ -42,6 +43,7 @@ import { getProgramHolderWorkspace, programTitle } from '@/lib/program-holder/wo
 import { ProgramHolderDocumentUpload } from './ProgramHolderDocumentUpload';
 import { ProgramHolderTrainingLogForm } from './ProgramHolderTrainingLogForm';
 import { ProgramHolderStudentCloseoutForm } from './ProgramHolderStudentCloseoutForm';
+import { ACHIEVE_HOLDER_ID } from '@/lib/program-holder/achieve-holder';
 import { ProgramHolderAcknowledgements } from './ProgramHolderAcknowledgements';
 import { ProgramHolderNotificationPreferences } from './ProgramHolderNotificationPreferences';
 import { WorkOneOutreachButton } from './WorkOneOutreachButton';
@@ -163,7 +165,7 @@ export async function ProgramHolderWorkspaceView({
   }> = [
     {
       label: 'Program-holder approval',
-      complete: ['active', 'approved'].includes(data.holder?.status),
+      complete: isApprovedProgramHolderStatus(data.holder?.status, data.holder?.approved_at),
       required: true,
       owner: 'Elevate',
     },
@@ -466,6 +468,7 @@ export async function ProgramHolderWorkspaceView({
         isHvac={isHvac}
         requiresEnchantedHeartsTerms={data.requiresEnchantedHeartsTerms}
         insuranceRequired={holderFeatures.insurance_required !== false}
+        requiresSeparateNda={data.holder?.id === ACHIEVE_HOLDER_ID}
       />
     );
   if (section === 'reports')
@@ -1765,6 +1768,7 @@ function Documents({
   isHvac,
   requiresEnchantedHeartsTerms,
   insuranceRequired,
+  requiresSeparateNda,
 }: {
   students: any[];
   rows: any[];
@@ -1772,6 +1776,7 @@ function Documents({
   isHvac: boolean;
   requiresEnchantedHeartsTerms: boolean;
   insuranceRequired: boolean;
+  requiresSeparateNda: boolean;
 }) {
   const onFile = [...new Set(rows
     .filter((row) => programHolderDocumentStatus(row) !== 'rejected')
@@ -1789,7 +1794,7 @@ function Documents({
       <ProgramHolderDocumentUpload isHvac={isHvac} insuranceRequired={insuranceRequired} onFile={onFile} />
       <SyllabusUploadStatus documents={rows} courseAssignments={courseAssignments} />
       <ProgramHolderDocumentUpload materialsOnly students={students} />
-      <ProgramHolderAcknowledgements requiresEnchantedHeartsTerms={requiresEnchantedHeartsTerms} />
+      <ProgramHolderAcknowledgements requiresEnchantedHeartsTerms={requiresEnchantedHeartsTerms} requiresSeparateNda={requiresSeparateNda} />
       <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
         <h2 className="text-xl font-black">Document register</h2>
         <div className="mt-4 space-y-3">

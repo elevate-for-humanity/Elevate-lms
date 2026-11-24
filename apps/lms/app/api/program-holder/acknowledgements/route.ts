@@ -2,6 +2,7 @@
 import { headers } from 'next/headers';
 import { NextResponse } from 'next/server';
 import { requireProgramHolder } from '@/lib/auth/require-program-holder';
+import { ACHIEVE_HOLDER_ID } from '@/lib/program-holder/achieve-holder';
 import { checkAndSendOnboardingCompleteEmail } from '@/lib/program-holder/onboarding-complete';
 
 export async function POST(request: Request) {
@@ -10,16 +11,13 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Program Holder session required.' }, { status: 403 });
   const body = await request.json().catch(() => ({}));
   const allowedTypes = ['handbook', 'rights', 'nda', 'non_compete', 'enchanted_hearts_referral_terms'];
-  const types = allowedTypes.filter((type) => body[type] === true);
+  const requiresSeparateNda = ctx.holderId === ACHIEVE_HOLDER_ID;
+  const types = allowedTypes.filter((type) => body?.[type] === true && !(requiresSeparateNda && type === 'nda'));
+  if (requiresSeparateNda && body?.nda === true && !types.length) {
+    return NextResponse.json({ error: 'Sign your separate CNA NDA on the Agreements page.' }, { status: 409 });
+  }
   if (!types.length)
     return NextResponse.json({ error: 'Select at least one agreement to sign.' }, { status: 400 });
-  if (types.some(type => ['nda', 'non_compete'].includes(type))) {
-    const { data: holder, error } = await ctx.db.from('program_holders')
-      .select('features').eq('id', ctx.holderId).maybeSingle();
-    if (error || !holder) return NextResponse.json({ error: 'Agreement readiness could not be checked. Please retry.' }, { status: 503 });
-    if (holder.features?.full_forms_status === 'review_pending')
-      return NextResponse.json({ error: 'Review your full MOU, NDA, and 12-month restriction forms. Signature is pending completed agreement details.', reviewUrl: '/program-holder/agreements' }, { status: 409 });
-  }
   const requestHeaders = await headers();
   for (const documentType of types) {
     const { data: existing, error: lookupError } = await ctx.db

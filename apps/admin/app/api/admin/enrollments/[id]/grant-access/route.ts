@@ -16,7 +16,7 @@ import { safeError, safeInternalError } from '@/lib/api/safe-error';
 import { sendEmail } from '@/lib/email';
 import { logger } from '@/lib/logger';
 import { logAdminAudit, AdminAction } from '@/lib/admin/audit-log';
-import { resolveCourseId } from '@/lib/course-builder/schema';
+import { resolveCourseIdFromDb } from '@/lib/course-builder/program-resolver';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const runtime = 'nodejs';
@@ -51,12 +51,15 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   // Fetch enrollment + student profile
   const { data: enrollment, error: fetchError } = await db
     .from('program_enrollments')
-    .select('id, user_id, program_id, program_slug, full_name, email, access_granted_at, payment_status, funding_source, funding_verified, eligibility_status, revoked_at, cancelled_at, suspended_at, refunded_at')
+    .select('id, user_id, program_id, program_slug, full_name, email, access_granted_at, access_status, payment_status, funding_source, funding_verified, eligibility_status, revoked_at, cancelled_at, suspended_at, refunded_at')
     .eq('id', enrollmentId)
     .maybeSingle();
 
   if (fetchError || !enrollment) return safeError('Enrollment not found', 404);
-  if (enrollment.access_granted_at) return safeError('Access already granted', 409);
+  // Re-grant is allowed when access was recorded but never became active
+  // (access_status null): the old guard 409'd those rows, so they could
+  // never be repaired through this route.
+  if (enrollment.access_granted_at && ['active', 'granted'].includes(String(enrollment.access_status ?? '').toLowerCase())) return safeError('Access already granted', 409);
   if (enrollment.revoked_at || enrollment.cancelled_at || enrollment.suspended_at || enrollment.refunded_at) {
     return safeError('Enrollment is not eligible for activation', 409);
   }
@@ -77,8 +80,12 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
 
   // Resolve course_id for programs that have a canonical LMS course.
   // Without this, the learner dashboard routes to the marketing page instead of the LMS.
+  // Resolve from program_courses (real data): the old static fallback
+  // pointed at a barber course id that does not exist in the courses
+  // table, so the update below failed its FK check for every barber
+  // learner. A null result simply leaves course_id unset.
   const resolvedCourseId = enrollment.program_slug
-    ? resolveCourseId(enrollment.program_slug)
+    ? await resolveCourseIdFromDb(db, enrollment.program_slug)
     : null;
 
   // Grant access — move to active and record who granted it and when

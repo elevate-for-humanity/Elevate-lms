@@ -39,6 +39,7 @@ const SPECS: Record<E2EApp, string[]> = {
     'hvac-hero-playback.spec.ts',
     'platform-design-repair.spec.ts',
     'program-e2e-flows.spec.ts',
+    'program-holder-apply.spec.ts',
     'public-site.spec.ts',
   ],
   admin: [

@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
 import { setAuditContext } from '@/lib/audit-context';
 import { ensureDigitalBinder } from './ensure-digital-binder';
+import { grantPaidEnrollmentAccess } from './paid-access.mjs';
 
 export interface EnrollmentData {
   userId: string;
@@ -12,6 +13,12 @@ export interface EnrollmentData {
   paymentStatus?: 'pending' | 'completed' | 'failed';
   paymentAmount?: number;
   paymentMethod?: string;
+  /** Payment reference (invoice / checkout session id) — required for the
+   *  approved-paid login gate to recognise a self-pay payment. */
+  paymentReference?: string;
+  /** Canonical funding source ('self_pay', 'wioa', 'wrg', ...). When
+   *  omitted, paymentMethod is used as before. */
+  fundingSource?: string;
   startDate?: Date;
   endDate?: Date;
   /** When true, enrollment is created as pending_approval instead of active */
@@ -85,7 +92,17 @@ export async function completeEnrollment(data: EnrollmentData): Promise<Enrollme
       .maybeSingle();
 
     if (existing) {
-      // Idempotent: already enrolled — return success with existing ID
+      // Idempotent: already enrolled — return success with existing ID.
+      // If payment was verified for this call and the row predates the
+      // access fields, repair it now (oracle-gated: only a row that would
+      // then pass the approved-paid gate gets access fields). Non-fatal.
+      if (data.paymentStatus === 'completed' && !data.requireApproval) {
+        try {
+          await grantPaidEnrollmentAccess(supabase, existing.id);
+        } catch (repairError) {
+          logger.warn('[completeEnrollment] Paid access repair failed', repairError);
+        }
+      }
       return {
         success: true,
         enrollmentId: existing.id,
@@ -111,6 +128,19 @@ export async function completeEnrollment(data: EnrollmentData): Promise<Enrollme
     // Step 6: Create enrollment — canonical table
     await setAuditContext(supabase, { actorUserId: data.userId, systemActor: 'enrollment_flow' });
     const enrollmentStatus = data.requireApproval ? 'pending_approval' : 'active';
+    // A verified completed payment creates a paid enrollment, not an
+    // access-pending one: the approved-paid login gate needs payment_status
+    // 'paid' + access_status + access_granted_at, and for self-pay rows
+    // also self_pay_application_verified_at + payment_reference. Without
+    // them the learner signs in and bounces to /lms/access-pending.
+    // requireApproval rows get none of this — approval is their gate.
+    const paidEnrollment = data.paymentStatus === 'completed' && !data.requireApproval;
+    const now = new Date().toISOString();
+    const fundingSource = data.fundingSource ?? data.paymentMethod ?? null;
+    const isVerifiedSelfPay =
+      paidEnrollment &&
+      String(fundingSource ?? '').trim().toLowerCase().replace('-', '_') === 'self_pay' &&
+      Boolean(data.paymentReference);
     const { data: enrollment, error: enrollError } = await supabase
       .from('program_enrollments')
       .insert({
@@ -121,8 +151,21 @@ export async function completeEnrollment(data: EnrollmentData): Promise<Enrollme
         course_version_id: version?.id ?? null,
         status: enrollmentStatus,
         progress_percent: 0,
-        enrolled_at: new Date().toISOString(),
-        funding_source: data.paymentMethod ?? null,
+        enrolled_at: now,
+        funding_source: fundingSource,
+        ...(paidEnrollment
+          ? {
+              payment_status: 'paid',
+              access_status: 'active',
+              access_granted_at: now,
+            }
+          : {}),
+        ...(isVerifiedSelfPay
+          ? {
+              self_pay_application_verified_at: now,
+              payment_reference: data.paymentReference,
+            }
+          : {}),
       })
       .select('id')
       .maybeSingle();

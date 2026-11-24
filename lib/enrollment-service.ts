@@ -19,6 +19,7 @@ import { logger } from '@/lib/logger';
 import type { SupabaseClient } from '@/lib/supabase';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import { ensureDigitalBinder } from '@/lib/enrollment/ensure-digital-binder';
+import { paidAccessGrantFields } from '@/lib/enrollment/paid-access.mjs';
 
 export type EnrollmentInput = {
   userId: string;
@@ -57,12 +58,32 @@ export async function ensurePaidEnrollmentAccess(
   enrollmentId: string,
 ): Promise<void> {
   const now = new Date().toISOString();
+  // Read the row first so the access fields are only stamped when the row
+  // would then pass the approved-paid login gate (lib/learner/
+  // approved-paid-admission.mjs): a verified self-pay payment (paid +
+  // payment_reference) or an already-approved row. Deposit-paid, unpaid,
+  // agency-pending and state-funded-without-approval rows keep the base
+  // activation below and stay grantable through the admin grant-access
+  // route — they must not be stamped as if access were granted.
+  const { data: enrollmentRow, error: lookupError } = await supabase
+    .from('program_enrollments')
+    .select('status,payment_status,payment_reference,funding_source,funding_verified,eligibility_status,self_pay_application_verified_at,approved_at,approved_by,access_granted_at,access_status,revoked_at,cancelled_at,suspended_at,refunded_at')
+    .eq('id', enrollmentId)
+    .eq('user_id', userId)
+    .maybeSingle();
+  if (lookupError) throw new Error(`ENROLLMENT_ACTIVATION_FAILED: ${lookupError.message}`);
+  // The base update below moves the row to active, so evaluate the gate
+  // against the post-update status.
+  const accessPatch = enrollmentRow
+    ? paidAccessGrantFields({ ...enrollmentRow, status: 'active' }, now)
+    : null;
   const [{ error: enrollmentError }, { error: profileError }, binder] = await Promise.all([
     supabase.from('program_enrollments').update({
       status: 'active',
       enrollment_state: 'enrolled',
       enrollment_confirmed_at: now,
       updated_at: now,
+      ...(accessPatch ?? {}),
     }).eq('id', enrollmentId).eq('user_id', userId),
     supabase.from('profiles').update({
       enrollment_status: 'active',
@@ -130,7 +151,7 @@ export async function createOrUpdateEnrollment(
   try {
     const { data: existing } = await supabase
       .from('program_enrollments')
-      .select('id, status')
+      .select('id, status, access_granted_at, self_pay_application_verified_at')
       .eq('user_id', userId)
       .eq('program_id', programId)
       .maybeSingle();
@@ -148,6 +169,29 @@ export async function createOrUpdateEnrollment(
 
     const now = new Date().toISOString();
 
+    // Record the payment reference on the row: the approved-paid login gate
+    // requires payment_reference for a self-pay row, and the previous code
+    // only kept the Stripe session/intent in their own columns, so a
+    // paid self-pay row still failed the gate.
+    const paymentReference = stripeCheckoutSessionId ?? stripePaymentIntentId ?? null;
+    // A verified paid self-pay enrollment (paid + reference) gets the
+    // access fields in the same write, so the learner is not bounced to
+    // /lms/access-pending. Deposit-paid rows deliberately get none: the
+    // gate treats a deposit as not-yet-paid, and a deposit must not be
+    // stamped as a verified self-pay payment. Existing grant timestamps
+    // are preserved on retry/update so a repair is never undone.
+    const isVerifiedPaidSelfPay =
+      resolvedFundingSource === 'self_pay' &&
+      ['paid', 'paid_in_full'].includes(resolvedPaymentStatus) &&
+      Boolean(paymentReference);
+    const accessFields = isVerifiedPaidSelfPay
+      ? {
+          access_status: 'active',
+          access_granted_at: existing?.access_granted_at ?? now,
+          self_pay_application_verified_at: existing?.self_pay_application_verified_at ?? now,
+        }
+      : {};
+
     const payload: Record<string, unknown> = {
       user_id: userId,
       program_id: programId,
@@ -161,11 +205,13 @@ export async function createOrUpdateEnrollment(
       next_required_action: nextRequiredAction,
       stripe_checkout_session_id: stripeCheckoutSessionId ?? null,
       stripe_payment_intent_id: stripePaymentIntentId ?? null,
+      ...(paymentReference ? { payment_reference: paymentReference } : {}),
       amount_paid_cents: amountPaidCents,
       updated_at: now,
       ...(email ? { email } : {}),
       ...(fullName ? { full_name: fullName } : {}),
       ...(!existing ? { enrolled_at: now } : {}),
+      ...accessFields,
     };
 
     const { data: enrollment, error } = await supabase

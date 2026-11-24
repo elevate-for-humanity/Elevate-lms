@@ -30,6 +30,12 @@ def operator_route(system,owner):
     # only explicit Do Not Disturb goes straight to voicemail.
     if owner.get('ring_mode')=='do_not_disturb':
         return OPERATOR
+    # The forwarded leg keeps the business number as From on purpose.
+    # Twilio is retiring Transit Caller ID: an unverified non-Twilio number
+    # as From fails with error 32204 on Elastic SIP Trunking once a market
+    # shuts down, and the supported forwarding path is Immutable Call
+    # Forwarding (X-Twilio-CallToken header). Passing the original caller
+    # number through raw would risk the forwarded call never ringing at all.
     return OPERATOR.replace('?voicemail)', '?cellular)').replace(
         ' same => n(voicemail),VoiceMail(0@elevate,u)',
         ' same => n(cellular),Set(ELEVATE_ORIGINAL_NAME=${CALLERID(name)})\n'
@@ -37,13 +43,13 @@ def operator_route(system,owner):
         ' same => n,Set(CALLERID(name)=Elevate for Humanity)\n'
         ' same => n,Set(CALLERID(num)=+14632401404)\n'
         ' same => n,Set(ELEVATE_OWNER_ACCEPTED=0)\n'
-        ' same => n,Dial(PJSIP/'+FORWARD_NUMBER+'@twilio,25,U(elevate-owner-accept))\n'
+        ' same => n,Dial(PJSIP/'+FORWARD_NUMBER+'@twilio,20,U(elevate-owner-accept))\n'
         ' same => n,Set(CALLERID(name)=${ELEVATE_ORIGINAL_NAME})\n'
         ' same => n,Set(CALLERID(num)=${ELEVATE_ORIGINAL_NUMBER})\n'
         ' same => n,GotoIf($["${ELEVATE_OWNER_ACCEPTED}"="1"]?done)\n'
         ' same => n(voicemail),VoiceMail(0@elevate,u)') + (
         '[elevate-owner-accept]\n'
-        'exten => s,1,Read(ELEVATE_ACCEPT,custom/elevate-owner-call,1,,1,8)\n'
+        'exten => s,1,Read(ELEVATE_ACCEPT,custom/elevate-owner-call,1,,1,15)\n'
         ' same => n,GotoIf($["${ELEVATE_ACCEPT}"="1"]?accepted)\n'
         ' same => n,Set(GOSUB_RESULT=CONTINUE)\n'
         ' same => n,Return()\n'
@@ -216,7 +222,7 @@ def configure():
         if route!=OPERATOR:
             forwarding=run(['docker','exec','pbx_asterisk_1','asterisk','-rx','dialplan show s@elevate-operator'])
             whisper=run(['docker','exec','pbx_asterisk_1','asterisk','-rx','dialplan show s@elevate-owner-accept'])
-            if 'Dial(PJSIP/'+FORWARD_NUMBER+'@twilio,25,U(elevate-owner-accept))' not in forwarding or 'custom/elevate-owner-call' not in whisper or 'MASTER_CHANNEL(ELEVATE_OWNER_ACCEPTED)' not in whisper:
+            if 'Dial(PJSIP/'+FORWARD_NUMBER+'@twilio,20,U(elevate-owner-accept))' not in forwarding or 'custom/elevate-owner-call' not in whisper or 'MASTER_CHANNEL(ELEVATE_OWNER_ACCEPTED)' not in whisper:
                 raise ValueError('operator_forwarding_readback_failed')
     except Exception:
         main.write_text(prior);modules.write_text(prior_modules)

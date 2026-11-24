@@ -8,9 +8,9 @@ class Registration(unittest.TestCase):
   owner={'profile_id':v.OWNER,'extension':'0','enabled':True,'admin_external_fallback':True,'external_fallback_number':v.FORWARD_NUMBER,'ring_mode':'ring'}
   plan=v.operator_route(system,owner)
   self.assertLess(plan.index('Gosub(elevate-pwa-extensions,0,1)'),plan.index('Dial(PJSIP/'))
-  self.assertIn('Dial(PJSIP/+13179562748@twilio,25,U(elevate-owner-accept))',plan)
+  self.assertIn('Dial(PJSIP/+13179562748@twilio,20,U(elevate-owner-accept))',plan)
   self.assertIn('CALLERID(name)=Elevate for Humanity',plan)
-  self.assertIn('Read(ELEVATE_ACCEPT,custom/elevate-owner-call,1,,1,8)',plan)
+  self.assertIn('Read(ELEVATE_ACCEPT,custom/elevate-owner-call,1,,1,15)',plan)
   self.assertIn('Set(GOSUB_RESULT=CONTINUE)',plan)
   self.assertIn('GotoIf($["${ELEVATE_OWNER_ACCEPTED}"="1"]?done)',plan)
   self.assertIn('VoiceMail(0@elevate,u)',plan)
@@ -21,7 +21,7 @@ class Registration(unittest.TestCase):
    with self.assertRaises(ValueError):v.operator_route(bad,owner)
   self.assertEqual(v.operator_route(system,{**owner,'ring_mode':'do_not_disturb'}),v.OPERATOR)
   offline=v.operator_route(system,{**owner,'ring_mode':'offline'})
-  self.assertIn('Dial(PJSIP/+13179562748@twilio,25,U(elevate-owner-accept))',offline)
+  self.assertIn('Dial(PJSIP/+13179562748@twilio,20,U(elevate-owner-accept))',offline)
   self.assertLess(offline.index('Dial(PJSIP/'),offline.index('VoiceMail(0@elevate,u)'))
   self.assertEqual(v.operator_route(system,{**owner,'admin_external_fallback':False}),v.OPERATOR)
  def test_module_running_and_mailbox_definitions_do_not_prove_application_registration(self):

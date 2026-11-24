@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Image from 'next/image';
 import { Bot } from 'lucide-react';
 
-export const PARIS_AVATAR_SRC = '/images/paris/paris-avatar.svg';
+export const PARIS_AVATAR_SRC = '/images/paris/paris-avatar.webp';
 
 interface ParisAvatarProps {
   /** Rendered pixel size of the avatar image (width and height). */
@@ -16,7 +16,7 @@ interface ParisAvatarProps {
 }
 
 /**
- * PARIS brand-mark avatar: the red "P" brand mark in Elevate brand colors.
+ * PARIS portrait avatar: a photorealistic portrait of PARIS.
  * Falls back to the Bot icon if the image asset fails to load, so the chat
  * never renders an empty avatar.
  */

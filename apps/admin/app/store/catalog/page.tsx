@@ -20,6 +20,11 @@ function fmt(cents: number) {
   return `$${(cents / 100).toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
 }
 
+// Hardcoded catalog prices are in dollars, not cents — render without dividing.
+function fmtDollars(dollars: number) {
+  return `$${dollars.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
+}
+
 function StatusBadge({ ok }: { ok: boolean }) {
   return ok ? (
     <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-brand-green-100 text-brand-green-800">
@@ -52,7 +57,8 @@ export default async function CatalogSanityPage() {
   const rows = allSlugs.map((slug) => {
     const db = dbBySlug.get(slug);
     const hc = hardcodedBySlug.get(slug);
-    const priceMatch = db && hc ? db.price === hc.price : false;
+    // db.price is in cents (CatalogProduct.price); hc.price is in dollars.
+    const priceMatch = db && hc ? db.price === hc.price * 100 : false;
     const nameMatch = db && hc ? db.name === hc.name : false;
     return { slug, db, hc, priceMatch, nameMatch, inDb: !!db, inHardcoded: !!hc };
   });
@@ -186,7 +192,7 @@ export default async function CatalogSanityPage() {
                   <td className="px-4 py-3 text-sm font-mono">{r.slug}</td>
                   <td className="px-4 py-3 text-sm">{r.db?.name || r.hc?.name || '—'}</td>
                   <td className="px-4 py-3 text-sm">{r.db ? fmt(r.db.price) : '—'}</td>
-                  <td className="px-4 py-3 text-sm">{r.hc ? fmt(r.hc.price) : '—'}</td>
+                  <td className="px-4 py-3 text-sm">{r.hc ? fmtDollars(r.hc.price) : '—'}</td>
                   <td className="px-4 py-3 text-sm">
                     {r.inDb && r.inHardcoded ? (
                       <StatusBadge ok={r.priceMatch} />

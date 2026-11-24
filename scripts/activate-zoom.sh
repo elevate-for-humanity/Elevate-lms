@@ -19,7 +19,8 @@ fi
 PROJECT_ID="prj_mqHr6z23gRSqM5In6bLXtEo9cMGI"
 ORG_ID="team_wnZ7iyQz1kUNni7yIDVUnhZf"
 
-echo "📋 Project: fix2"
+echo "📋 Project: elevate-for-humanity/Elevate-lms (admin)"
+echo "⚠️  NOTE: Vercel project fix2 is retired/archived. Vercel is not the deploy target for Elevate-lms (Northflank / Cloud Run). Confirm the target project before adding secrets."
 echo "🆔 Project ID: $PROJECT_ID"
 echo ""
 

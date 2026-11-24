@@ -615,16 +615,16 @@ jobs:
          || github.event.inputs.job == 'lesson-pace-check'
       ))
     steps:
-      - name: Generate and email apprentice invoice fallback batch
+      - name: Reconcile apprentice automatic payments
         run: |
-          curl -sf -X POST "$ADMIN_URL/api/cron/generate-apprentice-invoices" \
+          curl -sf -X POST "$ADMIN_URL/api/cron/reconcile-apprentice-payments" \
             -H "Authorization: Bearer $CRON_SECRET" \
             -H "Content-Type: application/json" \
             --max-time 180
 
-      - name: Reconcile apprentice automatic payments
+      - name: Generate and email apprentice invoice fallback batch
         run: |
-          curl -sf -X POST "$ADMIN_URL/api/cron/reconcile-apprentice-payments" \
+          curl -sf -X POST "$ADMIN_URL/api/cron/generate-apprentice-invoices" \
             -H "Authorization: Bearer $CRON_SECRET" \
             -H "Content-Type: application/json" \
             --max-time 180

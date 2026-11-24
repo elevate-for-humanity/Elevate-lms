@@ -502,8 +502,8 @@ grep "max-old-space-size" Dockerfile.*
 
 ### FILES TO ALWAYS CHECK FOR SYNC
 
-- Dockerfile.northflank-lms
-- Dockerfile.northflank-admin
+- Dockerfile.google-lms
+- Dockerfile.admin
 - package.json (workspace structure)
 - pnpm-lock.yaml
 - apps/admin/server.js

@@ -16,7 +16,7 @@ cd "$ROOT"
 # Use portable grep checks on GitHub runner images without ripgrep.
 
 # 1) The separate Google container images must serve their own applications.
-LMS_DOCKERFILE="Dockerfile.northflank-lms"
+LMS_DOCKERFILE="Dockerfile.google-lms"
 ADMIN_DOCKERFILE="Dockerfile.admin"
 for file in "$LMS_DOCKERFILE" "$ADMIN_DOCKERFILE"; do
   [[ -f "$file" ]] || fail "$file missing"

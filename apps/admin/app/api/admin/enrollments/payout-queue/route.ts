@@ -41,6 +41,7 @@ export async function GET(request: NextRequest) {
     `,
     )
     .neq('payout_status', 'not_triggered')
+    .neq('payout_status', 'voided')
     .order('payout_due_date', { ascending: true });
 
   if (status && status !== 'all') {

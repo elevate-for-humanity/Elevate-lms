@@ -5,6 +5,12 @@
 
 import { currentWorkflowGitHubToken } from './workflow-github-context';
 import { getGitHubAppToken } from './github-app-token';
+import {
+  GITHUB_APP_403_BRANCH,
+  GITHUB_BRANCH_AUTHORITY_UNKNOWN,
+  classifyRepoBranchPermission,
+  githubBranchAuthorityError,
+} from './github-branch-authority';
 import { getDecryptedPlatformSecret } from '@/lib/secrets';
 
 function normalizeToken(value: string | undefined | null): string | null {
@@ -48,6 +54,42 @@ async function acceptedByGitHub(token: string, signal?: AbortSignal): Promise<bo
   throw new Error(`GITHUB_CREDENTIAL_CHECK_UNAVAILABLE_HTTP_${response.status}`);
 }
 
+/**
+ * Read-only branch-authority probe (PR1, #2070). GET /repos/... reports the
+ * authenticated token/App's `permissions`; branch creation needs `push`.
+ * This proves authority before POST /git/refs is attempted, so a missing
+ * Contents: write permission surfaces as GITHUB_APP_403_BRANCH instead of a
+ * generic GitHub failure after a failed branch create. It creates nothing.
+ */
+export async function verifyGitHubBranchAuthority(
+  token: string,
+  signal?: AbortSignal,
+): Promise<void> {
+  const response = await fetch(
+    'https://api.github.com/repos/elevate-for-humanity/Elevate-lms',
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: 'application/vnd.github+json',
+        'X-GitHub-Api-Version': '2022-11-28',
+      },
+      redirect: 'error',
+      cache: 'no-store',
+      signal: signal ? AbortSignal.any([signal, AbortSignal.timeout(8000)]) : AbortSignal.timeout(8000),
+    },
+  );
+  if (!response.ok) {
+    if (response.status === 403) throw githubBranchAuthorityError(`GitHub returned HTTP 403 for the repository read.`);
+    throw new Error(`GITHUB_BRANCH_AUTHORITY_CHECK_HTTP_${response.status}`);
+  }
+  const payload = await response.json().catch(() => ({}));
+  const authority = classifyRepoBranchPermission(
+    (payload as { permissions?: unknown }).permissions,
+  );
+  if (authority === 'no-push') throw githubBranchAuthorityError('GitHub reports permissions.push is false for this credential.');
+  if (authority === 'unknown') throw new Error(`${GITHUB_BRANCH_AUTHORITY_UNKNOWN}: GitHub did not report repository permissions for this credential; branch authority cannot be confirmed.`);
+}
+
 export async function getGitHubToken(options: { signal?: AbortSignal } = {}): Promise<string | null> {
   options.signal?.throwIfAborted();
   const workflowToken=currentWorkflowGitHubToken();
@@ -83,11 +125,16 @@ export async function getGitHubHeaders(): Promise<HeadersInit> {
   };
 }
 
-export function githubApiErrorMessage(status: number): string {
+export function githubApiErrorMessage(status: number, path?: string): string {
   if (status === 401) {
     return 'GitHub token rejected (401). Check the configured GitHub App installation or legacy GITHUB_TOKEN.';
   }
   if (status === 403) {
+    // A 403 on branch creation is a distinct, actionable failure (#2070):
+    // the App/token lacks Contents: write, not a generic API denial.
+    if (path && path.includes('/git/refs')) {
+      return `${GITHUB_APP_403_BRANCH}: GitHub App cannot create branches in elevate-for-humanity/Elevate-lms. Grant the App installation Contents: write permission on the repository.`;
+    }
     return 'GitHub API forbidden (403). Check the App installation or legacy token permissions on elevate-for-humanity/Elevate-lms.';
   }
   if (status === 404) {

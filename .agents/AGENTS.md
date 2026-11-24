@@ -4,15 +4,23 @@
 
 Open Studio is Elevate for Humanity's AI-powered development environment built on OpenHands SDK concepts. It provides an integrated workspace for coding, deployment, and LMS management.
 
+> Correction 2026-11-23: this file previously documented `/api/devstudio/*`
+> routes and `lib/dev-studio/agent.ts` / `lib/dev-studio/skills-loader.ts`.
+> None of those exist at HEAD. The canonical Dev Studio API namespace is
+> `/api/admin/dev-studio/*` (86 routes), enforced by
+> `scripts/dev-studio-integration-gate.sh`; Dev Studio runtime code lives
+> under `lib/devstudio/`. The sections below are corrected to the
+> canonical paths. Anything marked "not present" was verified absent.
+
 ## Core Features
 
-### 1. Agent System (`lib/dev-studio/agent.ts`)
-- **OpenStudioAgent class**: Handles conversation management, tool execution
+### 1. Agent System (`lib/devstudio/` — `lib/dev-studio/agent.ts` does NOT exist)
+- **OpenHands agent**: `lib/devstudio/openhands/` (client, runtime, task access)
 - **Message types**: user, assistant, system, tool
-- **Session persistence**: localStorage with Supabase backup
-- **Skill detection**: Automatic trigger detection based on keywords
+- **Session persistence**: Supabase `studio_conversations` table
+- **Skill detection**: see Skills System below
 
-### 2. Skills System (`lib/dev-studio/skills-loader.ts`)
+### 2. Skills System (`lib/dev-studio/skills-loader.ts` does NOT exist)
 Built-in skills with trigger keywords:
 - **skill-creator**: Create new skills
 - **github**: PRs, issues, repos
@@ -61,16 +69,20 @@ Open Studio
     └── Model configuration
 ```
 
-## API Endpoints
+## API Endpoints (canonical — `/api/admin/dev-studio/*`)
 
 | Endpoint | Purpose |
 |----------|---------|
-| `/api/devstudio/chat` | AI chat with skill awareness |
-| `/api/devstudio/skills` | List available skills |
-| `/api/devstudio/conversations` | CRUD for conversations |
-| `/api/devstudio/workflows` | Workflow management |
-| `/api/devstudio/health` | System health status |
-| `/api/devstudio/env` | Container environment |
+| `/api/admin/dev-studio/chat` | AI chat (Dev Studio) |
+| `/api/admin/dev-studio/openhands/chat` | OpenHands chat (needs `access_dev_tools`) |
+| `/api/admin/dev-studio/openhands/agent` | OpenHands agent dispatch |
+| `/api/admin/dev-studio/muse-loop` | Muse-style loop: branch → PR → CI check (no OpenHands) |
+| `/api/admin/dev-studio/workflows` | Workflow management |
+| `/api/admin/dev-studio/system-health` | System health status |
+| `/api/admin/dev-studio/env` | Container environment |
+
+The legacy `/api/devstudio/*` endpoints listed here before 2026-11-23 do
+not exist at HEAD.
 
 ## Database Tables
 

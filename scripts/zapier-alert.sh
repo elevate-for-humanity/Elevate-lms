@@ -27,7 +27,7 @@ fi
 # Gather system information
 TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 HOSTNAME=$(hostname)
-REPO="elevateforhumanity/fix2"
+REPO="elevate-for-humanity/Elevate-lms"
 BRANCH=$(git branch --show-current 2>/dev/null || echo "unknown")
 COMMIT=$(git rev-parse --short HEAD 2>/dev/null || echo "unknown")
 
@@ -57,10 +57,9 @@ PAYLOAD=$(cat <<EOF
     "commit": "$COMMIT"
   },
   "urls": {
-    "bridge_script": "https://elevateforhumanityfix2.netlify.app/efh-bridge.js",
-    "config": "https://elevateforhumanityfix2.netlify.app/api/efh-config.json",
+    "bridge_script": "https://www.elevateforhumanity.org/efh-bridge.js",
+    "config": "https://www.elevateforhumanity.org/api/efh-config.json",
     "github_actions": "https://github.com/$REPO/actions",
-    "netlify_dashboard": "https://app.netlify.com/sites/elevateforhumanityfix2"
   },
   "bridge_status": $BRIDGE_STATUS,
   "test_report": $TEST_REPORT

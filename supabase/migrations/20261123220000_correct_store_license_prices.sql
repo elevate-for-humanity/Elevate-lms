@@ -47,8 +47,8 @@ VALUES
    'Full workforce-ready LMS, enrollment, payments, and admin system.',
    'The complete Elevate For Humanity platform with everything you need to launch and manage workforce training programs. Includes LMS, student enrollment, payment processing, admin dashboard, and mobile app.',
    499900, 'one_time', 'single', 'store',
-   '["Unlimited students and courses", "SCORM and xAPI support", "Stripe payment integration", "Mobile-responsive design", "Progress tracking and certificates", "Email notifications", "Basic reporting and analytics", "1 year of updates and support"]'::jsonb,
-   '["Small training providers", "Nonprofits starting workforce programs", "Individual instructors", "Pilot programs"]'::jsonb,
+   ARRAY['Unlimited students and courses', 'SCORM and xAPI support', 'Stripe payment integration', 'Mobile-responsive design', 'Progress tracking and certificates', 'Email notifications', 'Basic reporting and analytics', '1 year of updates and support'],
+   'Small training providers, nonprofits starting workforce programs, individual instructors, and pilot programs.',
    '["lms", "enrollment", "admin", "payments", "mobile-app"]'::jsonb,
    0, 10, true, true, 'license', 'platform',
    'prod_ToOZIXY6zYbhRB', 'price_1SqlmaIRNf5vPH3ACHgpKmel'),
@@ -57,8 +57,8 @@ VALUES
    'White-label license for schools, nonprofits, and workforce providers.',
    'Full platform access with white-labeling, partner dashboard, case management, and compliance tools. Perfect for schools and training providers serving multiple programs and funding sources.',
    1500000, 'one_time', 'school', 'store',
-   '["Everything in Core Platform", "White-label branding", "Partner dashboard for instructors", "Case management tools", "WIOA and grant compliance reporting", "Multi-program management", "Advanced analytics", "Priority support", "Lifetime updates"]'::jsonb,
-   '["Community colleges", "Workforce development boards", "Training providers with WIOA contracts", "Nonprofits with multiple programs"]'::jsonb,
+   ARRAY['Everything in Core Platform', 'White-label branding', 'Partner dashboard for instructors', 'Case management tools', 'WIOA and grant compliance reporting', 'Multi-program management', 'Advanced analytics', 'Priority support', 'Lifetime updates'],
+   'Community colleges, workforce development boards, training providers with WIOA contracts, and nonprofits with multiple programs.',
    '["lms", "enrollment", "admin", "payments", "partner-dashboard", "case-management", "compliance", "mobile-app"]'::jsonb,
    0, 20, true, true, 'license', 'platform',
    'prod_ToOZBAQ4kvlKKk', 'price_1SqlmbIRNf5vPH3AAK1dIDMK'),
@@ -67,8 +67,8 @@ VALUES
    'Full enterprise deployment with employer portal, AI tutor, and custom integrations.',
    'The complete workforce ecosystem with employer partnerships, AI-powered learning, custom integrations, and dedicated support. Built for large-scale workforce initiatives.',
    5000000, 'one_time', 'enterprise', 'store',
-   '["Everything in School License", "Employer portal and job matching", "AI tutor and personalized learning", "Custom integrations (API access)", "Multi-tenant architecture", "Dedicated account manager", "Custom training and onboarding", "SLA with 99.9% uptime", "Lifetime updates and priority support"]'::jsonb,
-   '["State workforce agencies", "Large workforce boards", "Multi-state training networks", "Enterprise employers with training programs"]'::jsonb,
+   ARRAY['Everything in School License', 'Employer portal and job matching', 'AI tutor and personalized learning', 'Custom integrations (API access)', 'Multi-tenant architecture', 'Dedicated account manager', 'Custom training and onboarding', 'SLA with 99.9% uptime', 'Lifetime updates and priority support'],
+   'State workforce agencies, large workforce boards, multi-state training networks, and enterprise employers with training programs.',
    '["lms", "enrollment", "admin", "payments", "partner-dashboard", "case-management", "employer-portal", "compliance", "mobile-app", "ai-tutor"]'::jsonb,
    0, 30, true, false, 'license', 'platform',
    'prod_ToOZ6fD0L8CUyV', 'price_1SqlmbIRNf5vPH3AAxjxhPYN'),
@@ -77,8 +77,8 @@ VALUES
    'Pay-as-you-go access to the core platform with monthly billing.',
    'Get started with no upfront cost. Monthly subscription includes the core platform with LMS, enrollment, and admin tools. Cancel anytime.',
    49900, 'subscription', 'single', 'store',
-   '["All core platform features", "Up to 100 active students", "Basic support", "Monthly updates", "Cancel anytime"]'::jsonb,
-   '["New training providers testing the platform", "Seasonal programs", "Small cohorts", "Budget-conscious organizations"]'::jsonb,
+   ARRAY['All core platform features', 'Up to 100 active students', 'Basic support', 'Monthly updates', 'Cancel anytime'],
+   'New training providers testing the platform, seasonal programs, small cohorts, and budget-conscious organizations.',
    '["lms", "enrollment", "admin", "payments", "mobile-app"]'::jsonb,
    0, 40, true, false, 'subscription', 'platform',
    'prod_ToOZPCv9vGYJgc', 'price_1SqlmcIRNf5vPH3AtcLZ9zYR')
@@ -101,8 +101,7 @@ ON CONFLICT (slug) DO UPDATE SET
   type = EXCLUDED.type,
   category = EXCLUDED.category,
   stripe_product_id = EXCLUDED.stripe_product_id,
-  stripe_price_id = EXCLUDED.stripe_price_id,
-  updated_at = NOW();
+  stripe_price_id = EXCLUDED.stripe_price_id;
 
 -- ============ COMMUNITY_ADDONS ============
 
@@ -111,28 +110,28 @@ VALUES
   ('community-hub', 'Community Hub Add-On',
    'Complete community platform with discussions, groups, leaderboards, and events.',
    249900, 'one_time', 'single', 'addon',
-   '["Discussion forums with categories", "Member groups and networking", "Leaderboards and gamification", "Points, badges, and achievements", "Events calendar and RSVPs", "Member directory and profiles", "Real-time activity feed", "Classroom integration", "Mobile-responsive design", "Moderation tools"]'::jsonb,
+   ARRAY['Discussion forums with categories', 'Member groups and networking', 'Leaderboards and gamification', 'Points, badges, and achievements', 'Events calendar and RSVPs', 'Member directory and profiles', 'Real-time activity feed', 'Classroom integration', 'Mobile-responsive design', 'Moderation tools'],
    50, true, 'addon', 'community',
    NULL, NULL),
 
   ('community-basic', 'Community Edition - Basic',
    'Add community marketplace features to your platform.',
    9900, 'subscription', 'single', 'addon',
-   '["1 program owner account", "Create unlimited courses", "Community marketplace listing", "Up to 100 community members", "Discussion forums", "Basic analytics"]'::jsonb,
+   ARRAY['1 program owner account', 'Create unlimited courses', 'Community marketplace listing', 'Up to 100 community members', 'Discussion forums', 'Basic analytics'],
    51, true, 'addon', 'community',
    'prod_ToOcx8FkIywNrw', 'price_1SqlpMIRNf5vPH3AuvVYn1Qa'),
 
   ('community-pro', 'Community Edition - Pro',
    'Full community platform with multiple program owners.',
    19900, 'subscription', 'school', 'addon',
-   '["Up to 5 program owner accounts", "Unlimited courses and products", "Community marketplace", "Up to 500 community members", "Discussion forums with moderation", "Shop marketplace", "Advanced analytics", "Priority support"]'::jsonb,
+   ARRAY['Up to 5 program owner accounts', 'Unlimited courses and products', 'Community marketplace', 'Up to 500 community members', 'Discussion forums with moderation', 'Shop marketplace', 'Advanced analytics', 'Priority support'],
    52, true, 'addon', 'community',
    'prod_ToOcdTkz2xafSu', 'price_1SqlpMIRNf5vPH3A7FsVZBeC'),
 
   ('community-enterprise', 'Community Edition - Enterprise',
    'Unlimited community features for large organizations.',
    29900, 'subscription', 'enterprise', 'addon',
-   '["Unlimited program owners", "Unlimited courses and products", "Unlimited community members", "White-label community branding", "Advanced moderation tools", "Shop marketplace with revenue sharing", "Custom integrations", "Dedicated account manager", "SLA with 99.9% uptime"]'::jsonb,
+   ARRAY['Unlimited program owners', 'Unlimited courses and products', 'Unlimited community members', 'White-label community branding', 'Advanced moderation tools', 'Shop marketplace with revenue sharing', 'Custom integrations', 'Dedicated account manager', 'SLA with 99.9% uptime'],
    53, true, 'addon', 'community',
    'prod_ToOcgzaU2klz7V', 'price_1SqlpNIRNf5vPH3AqltrUPSP')
 
@@ -149,5 +148,5 @@ ON CONFLICT (slug) DO UPDATE SET
   type = EXCLUDED.type,
   category = EXCLUDED.category,
   stripe_product_id = COALESCE(EXCLUDED.stripe_product_id, products.stripe_product_id),
-  stripe_price_id = COALESCE(EXCLUDED.stripe_price_id, products.stripe_price_id),
-  updated_at = NOW();
+  stripe_price_id = COALESCE(EXCLUDED.stripe_price_id, products.stripe_price_id);
+

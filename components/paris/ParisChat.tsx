@@ -44,6 +44,48 @@ function plainTextForSpeech(content: string): string {
     .trim();
 }
 
+/** Yield parsed `data:` payloads from a text/event-stream response body. */
+async function* readServerSentEvents(
+  response: Response,
+): AsyncGenerator<Record<string, unknown>> {
+  const reader = response.body?.getReader();
+  if (!reader) throw new Error('PARIS unavailable');
+  const decoder = new TextDecoder();
+  let buffer = '';
+  try {
+    for (;;) {
+      const { done, value } = await reader.read();
+      if (value) buffer += decoder.decode(value, { stream: !done });
+      let boundary = buffer.indexOf('\n\n');
+      while (boundary !== -1) {
+        const rawEvent = buffer.slice(0, boundary);
+        buffer = buffer.slice(boundary + 2);
+        const dataLine = rawEvent.split('\n').find((line) => line.startsWith('data:'));
+        if (dataLine) {
+          try {
+            yield JSON.parse(dataLine.slice(5).trim()) as Record<string, unknown>;
+          } catch {
+            // A malformed event must not kill the reply; the stream ends with done/error.
+          }
+        }
+        boundary = buffer.indexOf('\n\n');
+      }
+      if (done) break;
+    }
+    // A final event may arrive without the trailing blank line.
+    const tail = buffer.trim();
+    if (tail.startsWith('data:')) {
+      try {
+        yield JSON.parse(tail.slice(5).trim()) as Record<string, unknown>;
+      } catch {
+        // Ignore a malformed trailing event.
+      }
+    }
+  } finally {
+    reader.releaseLock();
+  }
+}
+
 interface ParisChatProps {
   onComplete?: (recommendations: string[]) => void;
   showHeader?: boolean;
@@ -195,6 +237,16 @@ export default function ParisChat({
     };
   }, []);
 
+  const unreachableReply = useCallback(() => {
+    if (portalSurface)
+      return 'I cannot reach live portal guidance right now. Use the red to-do list and student records on this dashboard, or contact an administrator. I will not submit official records without your review.';
+    if (learnerSurface)
+      return 'I cannot retrieve your course guidance right now. Please continue from your learner dashboard or contact your instructor. I will not guess about your progress or graded work.';
+    if (storeSurface)
+      return 'I cannot reach the live advisor right now. You can still compare current plans at /store/plans or explore the interactive demos at /store/demos.';
+    return 'I cannot retrieve a verified answer right now. Please use the Program Directory at https://www.elevateforhumanity.org/programs or contact Admissions at https://www.elevateforhumanity.org/contact.';
+  }, [learnerSurface, portalSurface, storeSurface]);
+
   const toggleListening = useCallback(() => {
     const recognition = recognitionRef.current;
     if (!recognition) {
@@ -316,6 +368,7 @@ export default function ParisChat({
           cache: 'no-store',
           body: JSON.stringify({
             messages: requestMessages,
+            stream: true,
             context: {
               surface,
               courseTitle: courseTitle || null,
@@ -333,12 +386,83 @@ export default function ParisChat({
           }),
         });
 
-        const data = await response.json().catch(() => ({}));
-        if (!response.ok && response.status === 503 && typeof data.error === 'string') {
-          setMessages((previous) => [...previous, { role: 'assistant', content: data.error }]);
+        if (!response.ok) {
+          const data = (await response.json().catch(() => ({}))) as Record<string, unknown>;
+          if (response.status === 503 && typeof data.error === 'string') {
+            setMessages((previous) => [...previous, { role: 'assistant', content: data.error }]);
+            return;
+          }
+          throw new Error('PARIS unavailable');
+        }
+
+        if ((response.headers.get('content-type') ?? '').includes('text/event-stream')) {
+          // Streamed reply: append tokens to one assistant message as they
+          // arrive so the first words show in seconds. The route may serve
+          // this component from an app whose /api/ai-chat still answers JSON
+          // (for example the LMS portal route), so this branch only runs when
+          // the response is actually an event stream.
+          setMessages((previous) => [...previous, { role: 'assistant', content: '' }]);
+          let reply = '';
+          let mode = 'ai';
+          let liveAiAvailable = true;
+          let completed = false;
+          let failed = false;
+          try {
+            for await (const event of readServerSentEvents(response)) {
+              if (typeof event.token === 'string' && event.token) {
+                reply += event.token;
+                const text = reply;
+                setMessages((previous) => {
+                  const next = [...previous];
+                  next[next.length - 1] = { role: 'assistant', content: text };
+                  return next;
+                });
+              } else if (event.done) {
+                completed = true;
+                if (typeof event.mode === 'string') mode = event.mode;
+                if (typeof event.liveAiAvailable === 'boolean')
+                  liveAiAvailable = event.liveAiAvailable;
+              } else if (typeof event.error === 'string') {
+                failed = true;
+                break;
+              }
+            }
+          } catch {
+            failed = true;
+          }
+          if (failed || !completed) {
+            setMessages((previous) => {
+              const next = [...previous];
+              next[next.length - 1] = { role: 'assistant', content: unreachableReply() };
+              return next;
+            });
+            return;
+          }
+          // Guided navigation is useful during an outage, but it is not an AI reply.
+          // Do not present canned guidance as successful live PARIS inference.
+          const streamedReply =
+            mode === 'guided' || liveAiAvailable === false
+              ? `Live AI is temporarily unavailable. This is basic program guidance, not a live AI answer.\n\n${reply}`
+              : reply;
+          setMessages((previous) => {
+            const next = [...previous];
+            next[next.length - 1] = { role: 'assistant', content: streamedReply };
+            return next;
+          });
+          if (autoSpeak) {
+            void voice.play(plainTextForSpeech(streamedReply), {
+              voice: 'coral',
+              style: storeSurface ? 'commercial' : 'assistant',
+              rate: 1,
+              allowBrowserFallback: false,
+            });
+          }
+          onComplete?.([]);
           return;
         }
-        if (!response.ok || typeof data.reply !== 'string') {
+
+        const data = await response.json().catch(() => ({}));
+        if (typeof data.reply !== 'string') {
           throw new Error('PARIS unavailable');
         }
 
@@ -360,16 +484,7 @@ export default function ParisChat({
       } catch {
         setMessages((previous) => [
           ...previous,
-          {
-            role: 'assistant',
-            content: portalSurface
-              ? 'I cannot reach live portal guidance right now. Use the red to-do list and student records on this dashboard, or contact an administrator. I will not submit official records without your review.'
-              : learnerSurface
-                ? 'I cannot retrieve your course guidance right now. Please continue from your learner dashboard or contact your instructor. I will not guess about your progress or graded work.'
-                : storeSurface
-                  ? 'I cannot reach the live advisor right now. You can still compare current plans at /store/plans or explore the interactive demos at /store/demos.'
-                  : 'I cannot retrieve a verified answer right now. Please use the Program Directory at https://www.elevateforhumanity.org/programs or contact Admissions at https://www.elevateforhumanity.org/contact.',
-          },
+          { role: 'assistant', content: unreachableReply() },
         ]);
       } finally {
         setIsLoading(false);
@@ -381,7 +496,6 @@ export default function ParisChat({
       courseProgress,
       courseTitle,
       isLoading,
-      learnerSurface,
       messages,
       nextLessonTitle,
       onComplete,
@@ -392,6 +506,7 @@ export default function ParisChat({
       router,
       storeSurface,
       surface,
+      unreachableReply,
       voice,
     ],
   );
@@ -407,6 +522,12 @@ export default function ParisChat({
       void sendToApi(input);
     }
   }
+
+  const lastMessage = messages[messages.length - 1];
+  // While a streamed reply is already showing words, the working spinner
+  // below it is noise — hide it once the live reply has content.
+  const streamingReplyVisible =
+    isLoading && lastMessage?.role === 'assistant' && lastMessage.content.length > 0;
 
   return (
     <div className={`flex h-full min-w-0 max-w-full flex-col overflow-hidden ${className}`}>
@@ -494,7 +615,7 @@ export default function ParisChat({
           </div>
         ))}
 
-        {isLoading && (
+        {isLoading && !streamingReplyVisible && (
           <div className="flex gap-3">
             <div className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-950 text-white">
               <Bot className="h-4 w-4" aria-hidden="true" />

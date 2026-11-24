@@ -8,7 +8,8 @@ import { PARIS_SYSTEM_IDENTITY } from '@/lib/ai/paris-identity';
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { aiChat, isAIAvailable } from '@/lib/ai/ai-service';
+import { aiChat, aiChatStream, getActiveProviderName, isAIAvailable } from '@/lib/ai/ai-service';
+import { studioTextStreamResponse } from '@/lib/devstudio/studio-text-stream';
 import { findSiteFacts, formatProgramIndex, formatSiteFacts } from '@/lib/ai/paris-site-facts';
 import { hydrateProcessEnv } from '@/lib/secrets';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
@@ -169,6 +170,10 @@ export async function POST(req: NextRequest) {
     const context: ParisContext = body.context && typeof body.context === 'object' ? body.context : {};
     const messages = validMessages(body.messages);
     const lastUserMessage = [...messages].reverse().find((message) => message.role === 'user')?.content;
+    // Streaming is opt-in: other /api/ai-chat callers (SuperChat, LiveChat,
+    // AIAdvisor, UnifiedChatAssistant) read one JSON reply and must keep
+    // getting it. ParisChat sends stream: true.
+    const wantsStream = body.stream === true;
 
     if (!lastUserMessage) {
       return NextResponse.json({ error: 'No message provided' }, { status: 400 });
@@ -210,15 +215,53 @@ export async function POST(req: NextRequest) {
           ? '\n\nSITE FACTS — retrieved from Elevate\u2019s own program catalog for this question. Use these exact facts; do not invent prices, durations, credentials, or funding beyond what is written here:\n' +
             siteFacts
           : '');
-      const result = await aiChat({
+      const chatInput = {
         messages: [{ role: 'system', content: systemContent }, ...messages],
         temperature: context.surface === 'store' ? 0.45 : 0.25,
         maxTokens: 700,
         signal,
-      });
+      };
+      if (!wantsStream) {
+        const result = await aiChat(chatInput);
+        return NextResponse.json({ reply: result.content, provider: result.provider, mode: 'ai', liveAiAvailable: true },
+          { headers: { 'Cache-Control': 'no-store' } });
+      }
 
-      return NextResponse.json({ reply: result.content, provider: result.provider, mode: 'ai', liveAiAvailable: true },
-        { headers: { 'Cache-Control': 'no-store' } });
+      // Streamed replies: the first tokens reach the visitor in seconds while
+      // the CPU worker is still generating the rest of the answer. When live
+      // inference fails before any token arrives, the guided fallback is
+      // streamed instead and the done event marks it guided, so the client
+      // prefixes the same "temporarily unavailable" notice as the JSON path.
+      // A failure after tokens have already streamed rethrows instead, so a
+      // partial live reply is never silently completed with canned guidance.
+      let guided = false;
+      return studioTextStreamResponse({
+        signal,
+        tokens: async function* (streamSignal) {
+          let streamedAny = false;
+          try {
+            for await (const token of aiChatStream({ ...chatInput, signal: streamSignal })) {
+              streamedAny = true;
+              yield token;
+            }
+          } catch (error) {
+            console.error('Canonical PARIS gateway error:', error);
+            if (!streamedAny) {
+              guided = true;
+              yield fallbackReply(lastUserMessage, context);
+              return;
+            }
+            throw error;
+          }
+        },
+        complete: async () => ({
+          provider: getActiveProviderName(),
+          mode: guided ? 'guided' : 'ai',
+          liveAiAvailable: !guided,
+        }),
+        onError: (error) => console.error('Canonical PARIS stream error:', error),
+        errorMessage: 'PARIS could not complete this response. Please try again shortly.',
+      });
     } catch (error) {
       console.error('Canonical PARIS gateway error:', error);
       return NextResponse.json({ reply: fallbackReply(lastUserMessage, context), mode: 'guided', liveAiAvailable: false },

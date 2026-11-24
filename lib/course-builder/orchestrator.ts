@@ -1,5 +1,17 @@
 /**
- * Canonical Course Builder server orchestration.
+ * Canonical Course Builder server orchestration — the ONE Course Builder.
+ *
+ * There used to be two builders: a "classic" Course Builder
+ * (lib/course-builder template + orchestrator) and the Ultimate Course
+ * Builder (lib/ultimate-course-builder). Generation already ran through
+ * Ultimate (requestCanonicalGeneration, below), but the classic template
+ * could never carry government job-feed data and the feed loader
+ * (buildCourseEvidenceContext) was dead code. This module is now the single
+ * surface: one template (ProgramBuilderTemplate, with socCode + funding +
+ * workforceEvidence), one generation path (courseFactory ->
+ * requestCanonicalGeneration), one job-feed loader
+ * (attachJobFeedEvidence in ./workforce-evidence.ts), one gate
+ * (auditCourseGovernance -> runGovernmentProcurementGate).
  *
  * Application generation delegates to the Ultimate execution engine. Studio controls this layer; LMS only consumes published
  * courses and learner state.
@@ -16,6 +28,8 @@ import type { ProgramBuilderTemplate } from './schema';
 import { adaptProgramTemplateToBlueprint } from './publish-adapter';
 import { requireAdminClient } from '../supabase/admin';
 import { assertCourseBuilderGenerationEnabled } from '@/lib/ultimate-course-builder/core/generation-control';
+import { attachJobFeedEvidence } from './workforce-evidence';
+import { logger } from '@/lib/logger';
 import { evaluatePersistedCredentialCourse } from '../course-factory/canonical-course-gate';
 import { REQUIRED_COURSE_GATES, type CourseGate } from '../course-package/readiness';
 import { instructionalLessonSteps, assertInstructionalLessonPipeline, type InstructionalLessonStep } from './instructional-lesson-pipeline';
@@ -131,6 +145,25 @@ const courseProgramConfigSchema = z.object({
     auditNotes: z.string().nullable().optional(),
   }),
   status: z.enum(['draft', 'published']).default('draft'),
+  /** O*NET-SOC code; resolved from the slug map when omitted. */
+  socCode: z.string().trim().optional(),
+  /**
+   * Funding / program types. JAG is Jobs for America's Graduates — a funding
+   * type only (see public/docs/PROGRAM_HOLDER_ONBOARDING_PACKET.md); there
+   * is no JAG API or feed.
+   */
+  funding: z
+    .object({
+      wioaEligible: z.boolean().optional(),
+      wrgEligible: z.boolean().optional(),
+      wexEligible: z.boolean().optional(),
+      etplApproved: z.boolean().optional(),
+      jagEligible: z.boolean().optional(),
+      fundingNotes: z.string().optional(),
+    })
+    .optional(),
+  /** Government job-feed evidence, when already attached to the template. */
+  workforceEvidence: z.record(z.string(), z.unknown()).nullable().optional(),
 });
 
 /** Existing library callers share Ultimate production contracts and execution. */
@@ -167,6 +200,9 @@ export async function saveCourseProgramConfiguration(input: unknown) {
       finalExam: body.finalExam,
       certificateRequirements: body.certificateRequirements,
       regulatory: body.regulatory,
+      socCode: body.socCode ?? null,
+      funding: body.funding ?? null,
+      workforceEvidence: body.workforceEvidence ?? null,
     },
   };
 
@@ -188,7 +224,50 @@ export async function publishGovernedCourse(
   template: ProgramBuilderTemplate,
   progress?: ProgressCallback,
 ) {
-  const gate = auditCourseGovernance(template);
+  // Single builder: every governed publication first attaches the government
+  // job feed (O*NET, CareerOneStop, USAJobs, BLS) to the template and
+  // persists it on the course row (courses.metadata, no migration), so the
+  // course carries real job data — postings, wages, outlook — instead of
+  // prompt-only context. The gate below then fails a credentialed course
+  // that has a SOC mapping but no evidence.
+  const { template: withEvidence, warnings } = await attachJobFeedEvidence(template);
+  if (warnings.length) {
+    logger.warn('[course-builder] Job-feed evidence warnings at publication', {
+      programSlug: template.slug,
+      warnings,
+    });
+  }
+  if (withEvidence.courseId) {
+    try {
+      const db = await requireAdminClient();
+      const { data: existing } = await db
+        .from('courses')
+        .select('metadata')
+        .eq('id', withEvidence.courseId)
+        .maybeSingle();
+      const metadata = {
+        ...((existing?.metadata as Record<string, unknown> | null) ?? {}),
+        socCode: withEvidence.socCode ?? null,
+        funding: withEvidence.funding ?? null,
+        workforceEvidence: withEvidence.workforceEvidence ?? null,
+      };
+      const { error } = await db
+        .from('courses')
+        .update({ metadata })
+        .eq('id', withEvidence.courseId);
+      if (error) throw error;
+    } catch (error) {
+      // Evidence persistence is best-effort: the gate still enforces
+      // evidence on the template below, and generation still receives it
+      // via the blueprint. Never fail publication on a metadata write.
+      logger.warn('[course-builder] Could not persist job-feed evidence on course row', {
+        courseId: withEvidence.courseId,
+        error: error instanceof Error ? error.message : String(error),
+      });
+    }
+  }
+
+  const gate = auditCourseGovernance(withEvidence);
   if (!gate.ok) {
     return {
       ok: false,
@@ -199,7 +278,7 @@ export async function publishGovernedCourse(
     };
   }
 
-  const blueprint = adaptProgramTemplateToBlueprint(template);
+  const blueprint = adaptProgramTemplateToBlueprint(withEvidence);
   const result = await courseFactory(
     {
       programId: template.programId,

@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { stripTypeScriptTypes } from 'node:module';
+import { classifySearchFailure } from '../lib/devstudio/github-search-fallback.ts';
 
 const source = async path => readFile(new URL('../' + path, import.meta.url), 'utf8');
 const compile = text => stripTypeScriptTypes(text).replace(/^import[\s\S]*?;\n/gm, '').replaceAll('export ', '');
@@ -51,16 +52,16 @@ function engineer(statuses) {
   // strips imports, so inject the same published numeric contract explicitly
   // instead of failing during module evaluation before testing GitHub search.
   const factory=new Function('fetch','getGitHubHeaders','REPAIR_INFERENCE_TIMEOUT_MS',
-    'REPAIR_MODEL_PROBE_TIMEOUT_MS',compile(engineerSource)+'\nreturn {blockedPath,searchCode};');
+    'REPAIR_MODEL_PROBE_TIMEOUT_MS','classifySearchFailure',compile(engineerSource)+'\nreturn {blockedPath,searchCode};');
   const api=factory(async(url,init)=>{
     requests.push({url,init});
     return Response.json({}, {status:statuses.shift()??200});
-  },async()=>({Authorization:'Bearer workflow-fixture'}),210000,55000);
+  },async()=>({Authorization:'Bearer workflow-fixture'}),210000,55000,classifySearchFailure);
   return {...api,requests};
 }
 test('Search 401 falls back to directory discovery only after exact repository authorization succeeds',async()=>{
   const e=engineer([401,200]);
-  assert.deepEqual(await e.searchCode('route failure'),[]);
+  assert.deepEqual(await e.searchCode('route failure'),{matches:[],searchFallback:'SEARCH_FORBIDDEN_FALLBACK'});
   assert.equal(e.requests.length,2);
   assert.equal(e.requests[1].url,'https://api.github.com/repos/elevate-for-humanity/Elevate-lms/git/ref/heads/main');
   assert.equal(e.requests[1].init.redirect,'error');

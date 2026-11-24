@@ -358,6 +358,7 @@ export default function TestingCheckoutClient({
                 ) : null}
                 <label className="mt-4 flex cursor-pointer items-center gap-3 rounded-xl bg-white p-3 font-bold text-slate-900">
                   <input
+                    id="testing-add-on"
                     type="checkbox"
                     checked={addOn}
                     onChange={(event) => setAddOn(event.target.checked)}

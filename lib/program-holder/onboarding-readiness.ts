@@ -1,3 +1,4 @@
+import { ACHIEVE_HOLDER_ID, achieveCnaAgreements, hasCurrentAchieveSignature } from './achieve-cna-agreements';
 import media from './onboarding-media.json';
 import { isApprovedDocument } from './document-review';
 
@@ -131,8 +132,14 @@ export async function getProgramHolderPaymentReadiness(
   const acknowledgedTypes = new Set(
     (acknowledgements || []).map((item: any) => String(item.document_type)),
   );
+  const isAchieve = holderId === ACHIEVE_HOLDER_ID;
+  const packet = isAchieve ? achieveCnaAgreements(holder.features) : null;
+  const ndaSigned = isAchieve
+    ? hasCurrentAchieveSignature(holder.features, 'nda', packet?.digest)
+    : acknowledgedTypes.has('nda');
   const mouSigned =
     holder.mou_signed === true &&
+    (!isAchieve || hasCurrentAchieveSignature(holder.features, 'mou', packet?.digest)) &&
     ['signed', 'fully_executed'].includes(String(holder.mou_status || 'signed'));
   const handbookAcknowledged = acknowledgedTypes.has('handbook');
   const rightsAcknowledged = acknowledgedTypes.has('rights');
@@ -155,7 +162,7 @@ export async function getProgramHolderPaymentReadiness(
     ...(!mouSigned ? ['Signed current Program Holder MOU'] : []),
     ...(!handbookAcknowledged ? ['Program Holder handbook acknowledgement'] : []),
     ...(!rightsAcknowledged ? ['Rights and responsibilities acknowledgement'] : []),
-    ...(!acknowledgedTypes.has('nda') ? ['Confidentiality acknowledgement'] : []),
+    ...(!ndaSigned ? [isAchieve ? 'Signed current Achieve CNA NDA' : 'Confidentiality acknowledgement'] : []),
     ...(!acknowledgedTypes.has('non_compete') ? ['Non-compete and non-solicitation acknowledgement'] : []),
     ...(!acknowledgedTypes.has(media.version) ? ['PARIS onboarding video and signed understanding acknowledgement'] : []),
     ...required.filter((item) => !approvedTypes.has(item.type)).map((item) => item.label),

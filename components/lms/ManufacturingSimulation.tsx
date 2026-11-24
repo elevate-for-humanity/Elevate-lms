@@ -252,7 +252,7 @@ export default function ManufacturingSimulation({
                   </label>
                   <input
                     id={`${interactionId}-${task.id}`}
-                    aria-label={task.prompt}
+                    aria-label={`${task.prompt}${task.unit ? ` (${task.unit})` : ''}`}
                     type="number"
                     step="any"
                     inputMode="decimal"

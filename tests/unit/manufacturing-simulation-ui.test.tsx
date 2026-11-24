@@ -29,6 +29,12 @@ function answerTasks() {
   fireEvent.click(screen.getByRole('radio', { name: 'Lot identifier' }));
 }
 
+it('announces the numeric prompt and its displayed unit while leaving unitless counts clear', () => {
+  render(<ManufacturingSimulation {...props} />);
+  expect(screen.getByRole('spinbutton', { name: 'Enter the measured length. (mm)' })).toBeInTheDocument();
+  expect(screen.getByRole('spinbutton', { name: 'How many known defects may be released?' })).toBeInTheDocument();
+});
+
 it('requires real task answers, posts responses only, and shows the saved server result', async () => {
   const scored = evaluateManufacturingSimulation(simulationFixture, correctFixtureResponses)!;
   const fetchMock = vi

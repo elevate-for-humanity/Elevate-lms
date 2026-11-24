@@ -280,7 +280,7 @@ it('uses actual simulation controls and staged server scoring through denial, cr
   fireEvent.click(screen.getByRole('button', { name: 'Complete lesson' }));
   expect(await screen.findByRole('alert')).toHaveTextContent('Pass the required virtual workplace practice');
   fireEvent.click(screen.getByRole('radio', { name: 'Continue', exact: true }));
-  fireEvent.change(screen.getByRole('spinbutton', { name: 'Enter the measured length.' }), { target: { value: '25' } });
+  fireEvent.change(screen.getByRole('spinbutton', { name: 'Enter the measured length. (mm)' }), { target: { value: '25' } });
   fireEvent.change(screen.getByRole('spinbutton', { name: 'How many known defects may be released?' }), { target: { value: '0' } });
   fireEvent.click(screen.getByRole('button', { name: 'Move step 2 up' }));
   fireEvent.click(screen.getByRole('button', { name: 'Confirm this sequence' }));

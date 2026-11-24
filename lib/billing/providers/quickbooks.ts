@@ -253,6 +253,7 @@ export function createQuickBooksBillingProvider(db: Database): BillingProviderAd
             .from('billing_invoices')
             .update({
               status: 'draft',
+              billing_schedule_id: input.billingScheduleId || null,
               customer_external_key: input.customer.externalKey,
               customer_email: input.customer.email,
               total_cents: totalCents,
@@ -271,6 +272,7 @@ export function createQuickBooksBillingProvider(db: Database): BillingProviderAd
               provider: 'quickbooks',
               provider_invoice_id: null,
               idempotency_key: input.idempotencyKey,
+              billing_schedule_id: input.billingScheduleId || null,
               customer_external_key: input.customer.externalKey,
               customer_email: input.customer.email,
               total_cents: totalCents,
@@ -377,15 +379,32 @@ export function createQuickBooksBillingProvider(db: Database): BillingProviderAd
  */
 export async function recordQuickBooksExternalPayment(
   db: Database,
-  input: ExternalPaymentInput,
+  input: ExternalPaymentInput & {
+    /**
+     * Apply the payment to this local invoice row instead of looking it up by
+     * idempotency key. Used by reconcile when a PayPal payment belongs to an
+     * already-created invoice for the same schedule + amount + week (usually
+     * the fallback invoice): the payment is recorded against that invoice
+     * rather than creating a second invoice for the same week.
+     */
+    billingInvoiceId?: string;
+  },
 ): Promise<{ providerPaymentId: string; quickBooksPaymentId?: string }> {
-  const existing = await db
-    .from('billing_invoices')
-    .select(
-      'id,provider_invoice_id,provider_payload,provider_payment_id,provider_payment_status,status',
-    )
-    .eq('idempotency_key', input.idempotencyKey)
-    .maybeSingle();
+  const existing = input.billingInvoiceId
+    ? await db
+        .from('billing_invoices')
+        .select(
+          'id,provider_invoice_id,provider_payload,provider_payment_id,provider_payment_status,status',
+        )
+        .eq('id', input.billingInvoiceId)
+        .maybeSingle()
+    : await db
+        .from('billing_invoices')
+        .select(
+          'id,provider_invoice_id,provider_payload,provider_payment_id,provider_payment_status,status',
+        )
+        .eq('idempotency_key', input.idempotencyKey)
+        .maybeSingle();
   if (existing.error || !existing.data?.provider_invoice_id) {
     throw new Error(
       existing.error?.message ||

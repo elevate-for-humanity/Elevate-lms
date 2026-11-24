@@ -19,9 +19,57 @@ test('only a healthy exact live revision can explicitly dispatch E2E and non-del
  assert.equal(JSON.stringify(result).includes('private-token'),false);
 });
 test('stale or unhealthy live services cannot start acceptance',async()=>{
- for(const live of [{...health,commit:'b'.repeat(40)},{...health,ready:false},{...health,dependencies:{}}]) {
-  const f=fixture({live});await assert.rejects(dispatchAcceptance(env,f.request),/LIVE_REVISION_MISMATCH/);assert.equal(f.calls.length,1);
+ for(const [live,expected] of [
+  [{...health,commit:'b'.repeat(40)},{status:200,service:'admin',expectedCommit:env.ACCEPTANCE_SHA,returnedCommit:'b'.repeat(40),ready:true,healthy:true,supabaseOk:true}],
+  [{...health,ready:false},{status:200,service:'admin',expectedCommit:env.ACCEPTANCE_SHA,returnedCommit:env.ACCEPTANCE_SHA,ready:false,healthy:true,supabaseOk:true}],
+  [{...health,dependencies:{}},{status:200,service:'admin',expectedCommit:env.ACCEPTANCE_SHA,returnedCommit:env.ACCEPTANCE_SHA,ready:true,healthy:true,supabaseOk:null}],
+ ]) {
+  const f=fixture({live});const delays=[];
+  await assert.rejects(dispatchAcceptance(env,f.request,async(ms)=>{delays.push(ms);}),error=>{
+   assert.match(error.message,/ACCEPTANCE_LIVE_REVISION_MISMATCH /);
+   assert.ok(error.message.includes(JSON.stringify(expected)),`diagnostics must name the mismatch: ${error.message}`);
+   assert.deepEqual(error.diagnostics,expected);
+   return true;
+  });
+  // A stale or unhealthy revision is retried across the ~60s window before the gate fails.
+  assert.equal(f.calls.filter(c=>c.url.includes('/api/health')).length,3);
+  assert.deepEqual(delays,[20000,20000]);
  }
+});
+test('live health retries HTTP 503 and a stale revision that catches up instead of failing a good release',async()=>{
+ const f=fixture();let healthCalls=0;const delays=[];
+ const result=await dispatchAcceptance(env,async(url,options)=>{
+  if(url.includes('/api/health')){healthCalls++;if(healthCalls===1)return new Response(null,{status:503});}
+  return f.request(url,options);
+ },async(ms)=>{delays.push(ms);});
+ assert.equal(result.acceptanceDispatched,true);
+ assert.equal(healthCalls,2);
+ assert.deepEqual(delays,[20000]);
+ const g=fixture();let staleCalls=0;const staleDelays=[];
+ const staleResult=await dispatchAcceptance(env,async(url,options)=>{
+  if(url.includes('/api/health')){staleCalls++;return Response.json(staleCalls===1?{...health,commit:'b'.repeat(40)}:health);}
+  return g.request(url,options);
+ },async(ms)=>{staleDelays.push(ms);});
+ assert.equal(staleResult.acceptanceDispatched,true);
+ assert.equal(staleCalls,2);
+ assert.deepEqual(staleDelays,[20000]);
+});
+test('persistent HTTP 503 exhausts live retries with status diagnostics and never dispatches',async()=>{
+ const f=fixture();let healthCalls=0;const delays=[];
+ await assert.rejects(dispatchAcceptance(env,async(url,options)=>{
+  if(url.includes('/api/health')){healthCalls++;return new Response(null,{status:503});}
+  return f.request(url,options);
+ },async(ms)=>{delays.push(ms);}),error=>{
+  assert.match(error.message,/ACCEPTANCE_LIVE_REVISION_MISMATCH /);
+  assert.ok(error.message.includes('"status":503'),`diagnostics must carry the HTTP status: ${error.message}`);
+  assert.equal(error.diagnostics.status,503);
+  assert.equal(error.diagnostics.returnedCommit,null);
+  assert.equal(error.diagnostics.supabaseOk,null);
+  return true;
+ });
+ assert.equal(healthCalls,3);
+ assert.deepEqual(delays,[20000,20000]);
+ assert.equal(f.calls.filter(c=>c.options.method==='POST').length,0);
 });
 test('receivers reject push dispatchers, wrong branches, unrelated workflows and failed releases',async()=>{
  for(const run of [{...source,event:'push'},{...source,head_branch:'other'},{...source,path:'.github/workflows/ci.yml'},{...source,conclusion:'failure'}]) {

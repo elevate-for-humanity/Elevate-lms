@@ -43,3 +43,32 @@ export function isLearnerRosterProfile(
     (LEARNER_ROSTER_ROLES as readonly string[]).includes(String(profile.role || '').toLowerCase())
   );
 }
+
+/** Admit only the holder's disposable student while exercising the isolated QA database. */
+export function isIsolatedQaHolderRosterProfile(
+  profile: Parameters<typeof isProductionRosterProfile>[0],
+  context: {
+    supabaseUrl?: string;
+    holderFeatures?: { qa_e2e?: unknown; isolated?: unknown; qa_run_id?: unknown } | null;
+  },
+): boolean {
+  try {
+    const url = new URL(context.supabaseUrl || '');
+    if (url.origin !== 'https://isdgjcdabhxxozarmxta.supabase.co' || url.username || url.password)
+      return false;
+  } catch {
+    return false;
+  }
+  const features = context.holderFeatures;
+  const runId = features?.qa_run_id;
+  if (features?.qa_e2e !== true || features.isolated !== true ||
+      typeof runId !== 'string' || !/^[a-zA-Z0-9-]{1,100}$/.test(runId)) return false;
+  return (
+    typeof profile.id === 'string' &&
+    /^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/i.test(profile.id) &&
+    (LEARNER_ROSTER_ROLES as readonly string[]).includes(String(profile.role || '').toLowerCase()) &&
+    /^\[QA E2E\]/i.test(String(profile.full_name || '').trim()) &&
+    String(profile.email || '').trim().toLowerCase() ===
+      `qa-portal-e2e-${runId.toLowerCase()}-holder-student@qa.invalid`
+  );
+}

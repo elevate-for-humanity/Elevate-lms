@@ -3,6 +3,7 @@ import { randomBytes } from 'node:crypto';
 import { readFile, writeFile } from 'node:fs/promises';
 import { createQaAuthUser } from './supabase-auth-fixtures.mjs';
 import { writePrivateQaState } from './write-private-state.mjs';
+import { isApprovedPaidEnrollment } from '../../lib/learner/approved-paid-admission.mjs';
 
 const action = process.argv[2] || 'provision';
 const statePath = process.env.QA_E2E_STATE_PATH || '.qa-apprenticeship-e2e-state.json';
@@ -22,7 +23,6 @@ if (qaHostname !== 'isdgjcdabhxxozarmxta.supabase.co') {
   throw new Error('This fixture may run only against the isolated QA project');
 }
 
-const tenantId = '6ba71334-58f4-4104-9b2a-5114f2a7614c';
 // The desktop-chrome workflow runs shards in parallel against the same QA
 // project: QA_PORTAL_E2E_RUN_ID is per-shard (run-attempt-shard), while
 // GITHUB_RUN_ID is shared, so a shared marker would collide on the
@@ -57,7 +57,7 @@ async function must(resultPromise, label) {
   throw new Error(`${label}: exhausted retry policy`);
 }
 
-async function createQaUser(kind, role, fullName) {
+async function createQaUser(kind, role, fullName, tenantId) {
   const email = `${marker}-${kind}@qa.invalid`;
   const pass = password();
   const user = await createQaAuthUser({
@@ -88,20 +88,26 @@ async function provision() {
   let state = { runId, marker, host: null, apprentice: null, partnerId: null, shopId: null, hostShopId: null, enrollmentId: null, placementId: null };
 
   try {
-    const host = await createQaUser('host', 'host_shop', '[QA E2E] Host Shop Supervisor');
-    state.host = host;
-    // Persist every completed resource immediately so interrupted QA can clean it.
-    await writePrivateQaState(statePath, state);
-    const apprentice = await createQaUser('apprentice', 'apprentice', '[QA E2E] Barber Apprentice');
-    state.apprentice = apprentice;
-    // Persist every completed resource immediately so interrupted QA can clean it.
-    await writePrivateQaState(statePath, state);
-
     const program = await must(
       db.from('programs').select('id,slug,organization_id,tenant_id').eq('slug', 'barber-apprenticeship').maybeSingle(),
       'load barber apprenticeship program',
     );
-    if (!program?.id) throw new Error('Canonical barber-apprenticeship program is missing');
+    if (!program?.id || !program.tenant_id) throw new Error('Canonical QA barber-apprenticeship program is missing');
+    const tenant = await must(
+      db.from('tenants').select('id,slug').eq('id', program.tenant_id).eq('slug', 'elevate-lms-qa').maybeSingle(),
+      'verify isolated QA program tenant',
+    );
+    if (!tenant?.id) throw new Error('Barber apprenticeship fixture requires the isolated QA tenant');
+    const tenantId = tenant.id;
+
+    const host = await createQaUser('host', 'host_shop', '[QA E2E] Host Shop Supervisor', tenantId);
+    state.host = host;
+    // Persist every completed resource immediately so interrupted QA can clean it.
+    await writePrivateQaState(statePath, state);
+    const apprentice = await createQaUser('apprentice', 'apprentice', '[QA E2E] Barber Apprentice', tenantId);
+    state.apprentice = apprentice;
+    // Persist every completed resource immediately so interrupted QA can clean it.
+    await writePrivateQaState(statePath, state);
 
     const standard = await must(
       db.from('apprenticeship_standard_versions')
@@ -265,6 +271,16 @@ async function provision() {
     state.enrollmentId = enrollment.id;
     // Persist every completed resource immediately so interrupted QA can clean it.
     await writePrivateQaState(statePath, state);
+    const savedEnrollment = await must(
+      db.from('program_enrollments')
+        .select('id,user_id,student_id,status,payment_status,payment_reference,funding_source,funding_verified,eligibility_status,self_pay_application_verified_at,approved_at,approved_by,access_granted_at,access_status,revoked_at,cancelled_at,suspended_at,refunded_at,tenant_id')
+        .eq('id', enrollment.id).single(),
+      'verify saved apprentice admission',
+    );
+    if (savedEnrollment.user_id !== apprentice.id || savedEnrollment.student_id !== apprentice.id
+      || savedEnrollment.tenant_id !== tenantId || !isApprovedPaidEnrollment(savedEnrollment)) {
+      throw new Error('Saved QA apprentice enrollment does not satisfy the canonical learner admission contract');
+    }
 
     const placement = await must(
       db.from('apprentice_placements').insert({

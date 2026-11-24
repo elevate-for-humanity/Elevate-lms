@@ -334,8 +334,11 @@ test.describe('Program Holder Portal', () => {
       await loginAsProgramHolder(page);
 
       const startTime = Date.now();
-      await page.goto('/program-holder/dashboard');
-      await page.waitForLoadState('networkidle');
+      await page.goto('/program-holder/dashboard', { waitUntil: 'domcontentloaded' });
+      // Measure the usable dashboard, not unrelated background communications
+      // polling or Next development reload traffic. Keep the three-second budget.
+      await expect(page.getByRole('heading', { name: 'To-dos', exact: true })).toBeVisible();
+      await expect(page.getByRole('heading', { name: 'Alerts', exact: true })).toBeVisible();
       const loadTime = Date.now() - startTime;
 
       expect(loadTime).toBeLessThan(3000);

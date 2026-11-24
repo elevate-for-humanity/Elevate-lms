@@ -55,6 +55,20 @@ export function auditE2EServiceConfiguration(env = process.env) {
   return {ok:failures.length===0,missing,failures};
 }
 
+/** Read schema only; limit(0) never fetches applicant or document records. */
+export async function auditE2EApplicationDocumentSchema(db) {
+  const contracts = {
+    documents: 'id,user_id,owner_type,owner_id,document_type,file_name,file_size,file_size_bytes,file_url,file_path,mime_type,status,verification_status,verified,rejection_reason,title,requirement_id,metadata,created_at,updated_at',
+    document_requirements: 'id,role,document_type,name,description,instructions,is_required,required,accepted_formats,max_file_size,due_stage,program_id',
+  };
+  const results = await Promise.all(Object.entries(contracts).map(async ([table, columns]) => {
+    const { error } = await db.from(table).select(columns).limit(0);
+    return error ? `E2E_APPLICATION_DOCUMENT_SCHEMA_INVALID: ${table} (${error.code || 'query failed'})` : null;
+  }));
+  const failures = results.filter(Boolean);
+  return { ok: failures.length === 0, failures };
+}
+
 if (process.argv[1] && import.meta.url === new URL('file://' + process.argv[1]).href) {
   const result = auditE2EServiceConfiguration();
   if (!result.ok) {
@@ -63,5 +77,16 @@ if (process.argv[1] && import.meta.url === new URL('file://' + process.argv[1]).
     process.exitCode = 1;
   } else {
     console.info('[e2e-preflight] Isolated QA origin, credentials, and local three-service routing: configured.');
+    const { createClient } = await import('@supabase/supabase-js');
+    const db = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY, {
+      auth: { persistSession: false, autoRefreshToken: false },
+    });
+    const schema = await auditE2EApplicationDocumentSchema(db);
+    if (!schema.ok) {
+      for (const issue of schema.failures) console.error('[e2e-preflight] ' + issue);
+      process.exitCode = 1;
+    } else {
+      console.info('[e2e-preflight] Application document list and upload schema: verified without reading records.');
+    }
   }
 }

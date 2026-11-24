@@ -112,6 +112,18 @@ function transferHours(value: string | undefined) {
   return Number.isFinite(parsed) ? Math.max(0, parsed) : 0;
 }
 
+async function requestInterview(body: Record<string, unknown>): Promise<InterviewResponse> {
+  const response = await fetch('/api/paris/application-interview', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    cache: 'no-store',
+    body: JSON.stringify(body),
+  });
+  const data = (await response.json().catch(() => ({}))) as InterviewResponse;
+  if (!response.ok || !data.ok) throw new Error(data.error || 'PARIS could not continue the interview.');
+  return data;
+}
+
 export default function ParisApplicationWorkspace({
   programs,
   initialProgram,
@@ -135,6 +147,7 @@ export default function ParisApplicationWorkspace({
   const [speechEnabled, setSpeechEnabled] = useState(false);
   const [transferEvidence, setTransferEvidence] = useState<File | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const initialSessionRequest = useRef<Promise<InterviewResponse> | null>(null);
   const initializedProgram = useRef(false);
   const spokenMessageId = useRef('');
   const parisVoice = useNaturalVoice();
@@ -183,29 +196,20 @@ export default function ParisApplicationWorkspace({
   );
 
   async function callInterview(body: Record<string, unknown>) {
-    const response = await fetch('/api/paris/application-interview', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      cache: 'no-store',
-      body: JSON.stringify(body),
-    });
-    const data = (await response.json().catch(() => ({}))) as InterviewResponse;
-    if (!response.ok || !data.ok) throw new Error(data.error || 'PARIS could not continue the interview.');
+    const data = await requestInterview(body);
     setSession(data);
     return data;
   }
 
   useEffect(() => {
     let alive = true;
+    // Start already resumes an authorized existing interview. Reuse this
+    // request across Strict Mode's effect replay instead of creating twice.
+    const pending = initialSessionRequest.current ?? requestInterview({ action: 'start', locale: 'en' });
+    initialSessionRequest.current = pending;
     (async () => {
       try {
-        const resume = await fetch('/api/paris/application-interview', { cache: 'no-store' });
-        if (resume.ok) {
-          const data = (await resume.json()) as InterviewResponse;
-          if (alive && data.ok) setSession(data);
-          return;
-        }
-        const data = await callInterview({ action: 'start', locale: 'en' });
+        const data = await pending;
         if (alive) setSession(data);
       } catch (err) {
         if (alive) setError(err instanceof Error ? err.message : 'Unable to start the application interview.');

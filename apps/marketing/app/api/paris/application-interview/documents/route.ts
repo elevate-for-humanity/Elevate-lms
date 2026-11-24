@@ -1,8 +1,10 @@
 // pre-auth-registry: exempt - applicant document uploads are authorized by the opaque PARIS application resume session before insert; user_id may remain null until account reconciliation.
 import crypto from 'node:crypto';
 import { NextRequest, NextResponse } from 'next/server';
-import { loadAgenticProject } from '@/lib/agentic/project-service';
+import { loadAgenticProject, loadLatestAgenticProjectForUser } from '@/lib/agentic/project-service';
 import { requireAdminClient } from '@/lib/supabase/admin';
+import { createClient } from '@/lib/supabase/server';
+import { parseApplicationSessionCookie } from '@/lib/paris/admissions/application-session-cookie';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -18,11 +20,7 @@ const ALLOWED_MIME_TYPES = new Set([
 ]);
 
 function sessionFromCookie(request: NextRequest) {
-  const raw = request.cookies.get(COOKIE_NAME)?.value;
-  if (!raw) return null;
-  const separator = raw.indexOf('.');
-  if (separator <= 0) return null;
-  return { projectId: raw.slice(0, separator), resumeToken: raw.slice(separator + 1) };
+  return parseApplicationSessionCookie(request.cookies.get(COOKIE_NAME)?.value);
 }
 
 function safeName(name: string) {
@@ -31,16 +29,36 @@ function safeName(name: string) {
 
 async function authorizedProject(request: NextRequest) {
   const session = sessionFromCookie(request);
-  if (!session) return null;
-  const project = await loadAgenticProject(session);
-  if (!project || project.target_type !== 'application') return null;
-  return project;
+  if (session) {
+    const project = await loadAgenticProject(session);
+    if (project?.target_type === 'application') return project;
+  }
+
+  // The interview can resume an attached application after sign-in on a new
+  // browser. Resolve that same owned project only after verifying the user;
+  // a caller-supplied project id is never sufficient to access its documents.
+  const auth = await createClient();
+  const { data, error } = await auth.auth.getUser();
+  if (error || !data.user) return null;
+  const project = await loadLatestAgenticProjectForUser({ userId: data.user.id, targetType: 'application' });
+  return project?.target_type === 'application' ? project : null;
+}
+
+function logDocumentError(event: string, error: unknown) {
+  const detail = error && typeof error === 'object' ? error as { message?: unknown; code?: unknown } : null;
+  // Supabase returns plain objects, not Error instances. Preserve the useful
+  // diagnostic fields internally without logging request data or opaque tokens.
+  console.error(event, JSON.stringify({
+    message: typeof detail?.message === 'string' ? detail.message : error instanceof Error ? error.message : 'Unknown document error',
+    ...(typeof detail?.code === 'string' ? { code: detail.code } : {}),
+  }));
 }
 
 async function resolveProgramId(programSlug: string | undefined) {
   if (!programSlug) return null;
   const db = await requireAdminClient();
-  const { data } = await db.from('programs').select('id').eq('slug', programSlug).maybeSingle();
+  const { data, error } = await db.from('programs').select('id').eq('slug', programSlug).maybeSingle();
+  if (error) throw error;
   return data?.id ?? null;
 }
 
@@ -64,7 +82,7 @@ export async function GET(request: NextRequest) {
       ? requirementQuery.or(`program_id.is.null,program_id.eq.${programId}`)
       : requirementQuery.is('program_id', null);
 
-    const [{ data: requirements }, { data: documents, error: documentError }] = await Promise.all([
+    const [{ data: requirements, error: requirementError }, { data: documents, error: documentError }] = await Promise.all([
       requirementQuery,
       db
         .from('documents')
@@ -73,6 +91,7 @@ export async function GET(request: NextRequest) {
         .eq('owner_id', project.id)
         .order('created_at', { ascending: false }),
     ]);
+    if (requirementError) throw requirementError;
     if (documentError) throw documentError;
 
     return NextResponse.json({
@@ -81,7 +100,7 @@ export async function GET(request: NextRequest) {
       documents: documents ?? [],
     }, { headers: { 'Cache-Control': 'no-store' } });
   } catch (error) {
-    console.error('paris.application.documents.list.failed', error instanceof Error ? error.message : String(error));
+    logDocumentError('paris.application.documents.list.failed', error);
     return NextResponse.json({ ok: false, error: 'Unable to load application documents' }, { status: 500 });
   }
 }
@@ -157,7 +176,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ ok: true, document }, { status: 201, headers: { 'Cache-Control': 'no-store' } });
   } catch (error) {
-    console.error('paris.application.documents.upload.failed', error instanceof Error ? error.message : String(error));
+    logDocumentError('paris.application.documents.upload.failed', error);
     return NextResponse.json({ ok: false, error: 'Unable to upload application document' }, { status: 500 });
   }
 }

@@ -9,15 +9,20 @@ vi.mock('@/lib/auth/require-program-holder', () => ({ requireProgramHolder: asyn
   from: () => ({ select: () => ({ eq: () => ({ maybeSingle: async () => ({ data: mocks.holder, error: mocks.error }) }) }) }),
 } }) }));
 vi.mock('@/lib/legal/recordAgreementAcceptance', () => ({ recordAgreementAcceptance: mocks.record }));
-vi.mock('@/lib/supabase/admin', () => ({ requireAdminClient: vi.fn() }));
+vi.mock('@/lib/supabase/admin', () => ({ requireAdminClient: async () => ({ from: () => ({ update: () => ({ eq: async () => ({ error: null }) }) }) }) }));
 vi.mock('@/lib/program-holder/onboarding-complete', () => ({ checkAndSendOnboardingCompleteEmail: vi.fn() }));
 import { signAgreement } from '@/apps/marketing/app/actions/sign-agreement';
 import { paymentAddendum } from '@/lib/program-holder/payment-addendum';
 beforeEach(() => { vi.clearAllMocks(); mocks.error = null; mocks.holder = { features: { full_forms_status: 'review_pending' } }; });
-it.each(['checkbox','typed','drawn'] as const)('blocks %s acceptance while full contract details are incomplete', async method => {
+it.each(['checkbox','typed','drawn'] as const)('records %s MOU acceptance even while full contract details are pending review', async method => {
+  // Program holders do not pay: there is no payment schedule for a program holder,
+  // and Schedule A payment terms are completed as part of the signed agreement,
+  // not a precondition to signing. A pending full-forms review must not block
+  // the MOU signature.
+  mocks.record.mockResolvedValue({ success: true, id: 'mou-acceptance' });
   const result = await signAgreement({ agreementType: 'program_holder_mou', agreementVersion: '3.0-holder-id', method, typedName: 'Holder Signer' });
-  expect(result).toMatchObject({ success: false, error: expect.stringContaining('payment terms') });
-  expect(mocks.record).not.toHaveBeenCalled();
+  expect(result).toMatchObject({ success: true, id: 'mou-acceptance' });
+  expect(mocks.record).toHaveBeenCalledWith(expect.objectContaining({ documentVersion: '3.0-holder-id', userId: 'holder-user' }));
 });
 it('fails closed if agreement readiness cannot be read', async () => {
   mocks.error = { message: 'database unavailable' }; mocks.holder = null;

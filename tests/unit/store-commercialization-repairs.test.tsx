@@ -34,6 +34,6 @@ describe('capability demo pricing', () => {
   it('uses the available learning bundle instead of a retired standalone LMS add-on', async () => {
     const { default: CapabilityDemoPage } = await import('@/apps/marketing/app/store/demo/capability/[key]/page');
     const page = await CapabilityDemoPage({ params: Promise.resolve({ key: 'lms' }) });
-    expect(page.props.children.props.priceLabel).toBe('$79/month add-on');
+    expect(page.props.children.props.priceLabel).toBe('Included from $99/month');
   });
 });

@@ -40,7 +40,7 @@ const PROGRAM_TITLES: Record<string, string> = {
   'welding': 'Welding Technology',
   'electrical': 'Electrical Technician',
   'plumbing': 'Plumbing Technician',
-  'forklift': 'Forklift Operator Certification',
+  'forklift': 'Forklift and Manufacturing Operations',
   'barber-apprenticeship': 'Barber Apprenticeship',
   'cosmetology-apprenticeship': 'Cosmetology Apprenticeship',
   'esthetician': 'Professional Esthetician & Client Services',

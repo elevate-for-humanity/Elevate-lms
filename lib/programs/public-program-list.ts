@@ -118,6 +118,7 @@ function fromProgramSchema(program: ProgramSchema, fallbackTuition: number | nul
     category: verified?.category ?? SECTOR_TO_CATEGORY[normalized.sector] ?? 'other',
     duration:
       verified?.duration ??
+      normalized.durationDisplay ??
       (normalized.durationWeeks
         ? `${normalized.durationWeeks} ${normalized.durationWeeks === 1 ? 'week' : 'weeks'}`
         : (normalized.schedule ?? null)),

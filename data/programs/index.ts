@@ -47,8 +47,10 @@ import { PHLEBOTOMY } from './phlebotomy';
 import { HOSPITALITY } from './hospitality';
 import { TECHNOLOGY } from './technology';
 import { QMA } from './qma';
+import { FORKLIFT_MANUFACTURING_PROGRAM } from './forklift';
 
 const STATIC_PROGRAMS: ProgramSchema[] = [
+  FORKLIFT_MANUFACTURING_PROGRAM,
   BARBER_APPRENTICESHIP,
   HVAC_TECHNICIAN,
   CDL_TRAINING,

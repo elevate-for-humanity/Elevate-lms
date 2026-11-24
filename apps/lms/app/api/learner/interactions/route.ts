@@ -17,6 +17,11 @@ import {
   buildLessonLearningObjects,
   type LearningObject,
 } from '@/lib/course-factory/learning-objects';
+import {
+  evaluateManufacturingSimulation,
+  parseManufacturingSimulation,
+  publicManufacturingSimulation,
+} from '@/lib/lms/manufacturing-simulation';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -30,11 +35,18 @@ function privateJson(body: unknown, init?: ResponseInit) {
 
 async function authorizeLesson(request: Request, userId: string, lessonId: string) {
   const limited = await applyRateLimit(request, 'api', { key: `lesson-interactions:${userId}` });
-  if (limited) { limited.headers.set('Cache-Control', 'private, no-store'); return limited; }
-  try { await assertLessonAccess(userId, lessonId); return null; }
-  catch (error) { const denied = accessErrorResponse(error); return privateJson(denied.body, { status: denied.status }); }
+  if (limited) {
+    limited.headers.set('Cache-Control', 'private, no-store');
+    return limited;
+  }
+  try {
+    await assertLessonAccess(userId, lessonId);
+    return null;
+  } catch (error) {
+    const denied = accessErrorResponse(error);
+    return privateJson(denied.body, { status: denied.status });
+  }
 }
-
 
 const AttemptSchema = z.object({
   courseId: z.string().uuid(),
@@ -49,6 +61,27 @@ const LearningObjectCompletionSchema = z.object({
   lessonId: z.string().uuid(),
   learningObjectId: z.string().min(1).max(300),
 });
+
+const ManufacturingAttemptSchema = z
+  .object({
+    courseId: z.string().uuid(),
+    lessonId: z.string().uuid(),
+    interactionId: z.string().min(1).max(240),
+    interactionType: z.literal('manufacturing-simulation'),
+    responses: z
+      .record(
+        z.string().min(1).max(150),
+        z.union([
+          z.string().min(1).max(150),
+          z.number().finite(),
+          z.array(z.string().min(1).max(150)).min(2).max(30),
+        ]),
+      )
+      .refine(
+        (responses) => Object.keys(responses).length > 0 && Object.keys(responses).length <= 50,
+      ),
+  })
+  .strict();
 
 export async function GET(request: NextRequest) {
   const { user, error: authError } = await requireAuth(request);
@@ -93,6 +126,12 @@ export async function GET(request: NextRequest) {
     if (!progressError && progress) progressRows = progress;
 
     if (authored && Object.keys(authored).length > 0) {
+      const manufacturing =
+        authored.manufacturingSimulation === undefined
+          ? null
+          : parseManufacturingSimulation(authored.manufacturingSimulation);
+      if (authored.manufacturingSimulation !== undefined && !manufacturing)
+        throw new Error('Authored manufacturing simulation is incomplete');
       const interactions = experienceToInteractions(lessonSlug, authored, progressRows);
       const storedObjects = Array.isArray(contentJson.learning_objects)
         ? (contentJson.learning_objects as LearningObject[])
@@ -121,7 +160,9 @@ export async function GET(request: NextRequest) {
         practicalTask: authored.practicalTask ?? null,
         interactiveVideo: authored.interactiveVideo ?? null,
         instructionalTimeline: authored.instructionalTimeline ?? null,
-        experience: authored,
+        experience: manufacturing
+          ? { ...authored, manufacturingSimulation: publicManufacturingSimulation(manufacturing) }
+          : authored,
         masteryPolicy: resolveLessonMasteryPolicy(authored),
         meta: {
           totalInteractions: interactions.length,
@@ -148,6 +189,14 @@ export async function POST(request: NextRequest) {
   if (authError || !user) return privateJson({ error: 'Unauthorized' }, { status: 401 });
 
   const body = await request.json().catch(() => null);
+  if (body?.interactionType === 'manufacturing-simulation') {
+    const parsedSimulation = ManufacturingAttemptSchema.safeParse(body);
+    if (!parsedSimulation.success)
+      return privateJson({ error: 'Invalid virtual practice attempt' }, { status: 400 });
+    const denied = await authorizeLesson(request, user.id, parsedSimulation.data.lessonId);
+    if (denied) return denied;
+    return saveManufacturingAttempt(user.id, parsedSimulation.data);
+  }
   const objectCompletion = LearningObjectCompletionSchema.safeParse(body);
   if (objectCompletion.success) {
     const denied = await authorizeLesson(request, user.id, objectCompletion.data.lessonId);
@@ -198,10 +247,7 @@ export async function POST(request: NextRequest) {
           ? `${lesson.slug}-case`
           : `${lesson.slug}-scenario`;
     if (interactionId !== expectedId) {
-      return privateJson(
-        { error: 'Interaction does not belong to this lesson' },
-        { status: 400 },
-      );
+      return privateJson({ error: 'Interaction does not belong to this lesson' }, { status: 400 });
     }
 
     const scored = scoreAttempt(
@@ -212,10 +258,7 @@ export async function POST(request: NextRequest) {
         : experience,
     );
     if (!scored) {
-      return privateJson(
-        { error: 'Interaction is not configured for scoring' },
-        { status: 409 },
-      );
+      return privateJson({ error: 'Interaction is not configured for scoring' }, { status: 409 });
     }
 
     const { data: current } = await db
@@ -257,6 +300,84 @@ export async function POST(request: NextRequest) {
   }
 }
 
+async function saveManufacturingAttempt(
+  learnerId: string,
+  input: z.infer<typeof ManufacturingAttemptSchema>,
+) {
+  try {
+    const db = await createClient();
+    const { data: lesson, error: lessonError } = await db
+      .from('course_lessons')
+      .select('id,slug,course_id,content_json,content')
+      .eq('id', input.lessonId)
+      .eq('course_id', input.courseId)
+      .maybeSingle();
+    if (lessonError) throw lessonError;
+    if (!lesson) return privateJson({ error: 'Lesson not found' }, { status: 404 });
+    const experience = resolveStoredLessonExperience(lesson.content_json, lesson.content);
+    const spec = parseManufacturingSimulation(experience?.manufacturingSimulation);
+    if (!spec)
+      return privateJson(
+        { error: 'This lesson has no verified virtual practice specification' },
+        { status: 409 },
+      );
+    if (input.interactionId !== `${lesson.slug}-manufacturing`)
+      return privateJson(
+        { error: 'Virtual practice does not belong to this lesson' },
+        { status: 400 },
+      );
+    const scored = evaluateManufacturingSimulation(spec, input.responses);
+    if (!scored)
+      return privateJson(
+        { error: 'Answer every task using the choices and units shown' },
+        { status: 400 },
+      );
+
+    const { data: current, error: currentError } = await db
+      .from('interaction_progress')
+      .select('attempts')
+      .eq('learner_id', learnerId)
+      .eq('lesson_id', input.lessonId)
+      .eq('interaction_id', input.interactionId)
+      .maybeSingle();
+    if (currentError) throw currentError;
+    const now = new Date().toISOString();
+    const { data: saved, error: saveError } = await db
+      .from('interaction_progress')
+      .upsert(
+        {
+          learner_id: learnerId,
+          course_id: input.courseId,
+          lesson_id: input.lessonId,
+          lesson_slug: lesson.slug,
+          interaction_id: input.interactionId,
+          interaction_type: 'simulation',
+          answers: input.responses,
+          score: scored.score,
+          completed: scored.completed,
+          attempts: Number(current?.attempts ?? 0) + 1,
+          weak_objectives: scored.weakObjectives,
+          feedback: scored.feedback,
+          completed_at: scored.completed ? now : null,
+          updated_at: now,
+        },
+        { onConflict: 'learner_id,lesson_id,interaction_id' },
+      )
+      .select('interaction_id,score,completed,attempts,answers,weak_objectives,feedback,updated_at')
+      .single();
+    if (saveError) throw saveError;
+    // This endpoint writes practice only, never lesson completion, timeclock,
+    // practical signoff, employer approval, or certification records.
+    return privateJson({ success: true, attempt: saved });
+  } catch (error) {
+    console.error('[learner/interactions/manufacturing]', error);
+    return privateJson(
+      { error: 'Virtual practice could not be saved. Please retry.' },
+      { status: 500 },
+    );
+  }
+}
+
 async function completeLearningObject(
   learnerId: string,
   input: z.infer<typeof LearningObjectCompletionSchema>,
@@ -274,8 +395,7 @@ async function completeLearningObject(
 
     const contentJson = (lesson.content_json ?? {}) as Record<string, any>;
     const experience = resolveStoredLessonExperience(contentJson, lesson.content);
-    if (!experience)
-      return privateJson({ error: 'Lesson is not publishable' }, { status: 409 });
+    if (!experience) return privateJson({ error: 'Lesson is not publishable' }, { status: 409 });
     const objects = Array.isArray(contentJson.learning_objects)
       ? (contentJson.learning_objects as LearningObject[])
       : buildLessonLearningObjects({
@@ -424,6 +544,25 @@ function experienceToInteractions(
       data: typeof data === 'object' ? data : { value: data },
     });
   };
+  const manufacturing = parseManufacturingSimulation(experience.manufacturingSimulation);
+  if (manufacturing) {
+    const saved = rows.find((row) => row.interaction_id === `${slug}-manufacturing`);
+    // Re-evaluate stored responses against current authoring rather than trusting
+    // a client-editable practice score or stale feedback.
+    const scored = saved ? evaluateManufacturingSimulation(manufacturing, saved.answers) : null;
+    add('manufacturing', 'manufacturing-simulation', manufacturing.title, {
+      ...publicManufacturingSimulation(manufacturing),
+      initialAttempt: scored
+        ? {
+            score: scored.score,
+            completed: scored.completed,
+            attempts: Number(saved?.attempts ?? 0),
+            answers: saved?.answers,
+            feedback: scored.feedback,
+          }
+        : null,
+    });
+  }
   if (Array.isArray(experience.knowledgeChecks) && experience.knowledgeChecks.length > 0) {
     add('kc', 'knowledge-check', 'Knowledge Check', {
       questions: experience.knowledgeChecks,

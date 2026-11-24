@@ -48,7 +48,7 @@ export interface TradesProgramData {
   reportFormat: string;
   workBasedLearning: string;
   retentionTracking: string;
-  costPerParticipant: number;
+  costPerParticipant: number | string;
   examFeesIncluded: boolean;
   materialsIncluded: string[];
   paymentTerms: string;
@@ -112,7 +112,7 @@ export default function TradesProgramPage({ data }: { data: TradesProgramData })
             </div>
             <div>
               <div className="font-bold text-lg">
-                ${data.costPerParticipant.toLocaleString('en-US')}
+                {typeof data.costPerParticipant === 'number' ? `$${data.costPerParticipant.toLocaleString('en-US')}` : data.costPerParticipant}
               </div>
               <div className="text-slate-500">Per Participant</div>
             </div>
@@ -311,7 +311,7 @@ export default function TradesProgramPage({ data }: { data: TradesProgramData })
             <tbody className="divide-y divide-slate-200">
               <Row
                 label="Cost Per Participant"
-                value={`$${data.costPerParticipant.toLocaleString('en-US')}`}
+                value={typeof data.costPerParticipant === 'number' ? `$${data.costPerParticipant.toLocaleString('en-US')}` : data.costPerParticipant}
               />
               <Row label="Exam Fees" value={data.examFeesIncluded ? 'Included' : 'Not included'} />
               <Row label="Payment Terms" value={data.paymentTerms} />
@@ -402,7 +402,7 @@ export default function TradesProgramPage({ data }: { data: TradesProgramData })
           <div>
             <h2 className="text-xl font-bold text-slate-900">{data.name}</h2>
             <p className="text-slate-500 text-sm">
-              {data.duration} · ${data.costPerParticipant.toLocaleString('en-US')}/participant
+              {data.duration} · {typeof data.costPerParticipant === 'number' ? `$${data.costPerParticipant.toLocaleString('en-US')}/participant` : data.costPerParticipant}
             </p>
           </div>
           <div className="flex gap-3">

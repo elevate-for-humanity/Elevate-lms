@@ -4,6 +4,11 @@ import { HVAC_COURSE_ID, HVAC_WORKBOOK_SLUG, HVAC_RESPONSE_FIELDS } from './hvac
 import content from './hvac-workbook-content.json';
 import type { Workbook, WorkbookSection, WorkbookResponse } from './digital-workbooks';
 import { BOOKKEEPING_COURSE_ID, BOOKKEEPING_WORKBOOK_SLUG } from './bookkeeping-workbook-contract';
+import {
+  MANUFACTURING_COURSE_ID,
+  MANUFACTURING_WORKBOOK_SLUG,
+  MANUFACTURING_RESPONSE_FIELDS,
+} from './manufacturing-workbook-contract';
 
 export async function loadLessonWorkbook(
   db: SupabaseClient,
@@ -13,13 +18,21 @@ export async function loadLessonWorkbook(
   preview = false,
 ) {
   const bookkeeping = courseId === BOOKKEEPING_COURSE_ID;
-  if (courseId !== HVAC_COURSE_ID && !bookkeeping) return null;
+  const manufacturing = courseId === MANUFACTURING_COURSE_ID;
+  if (courseId !== HVAC_COURSE_ID && !bookkeeping && !manufacturing) return null;
   const chapter = content.chapters.find((chapter) => chapter.lesson_id === lessonId);
-  if (!bookkeeping && !chapter) return null; // Separate HVAC practice exams have no writing chapter.
+  if (!bookkeeping && !manufacturing && !chapter) return null; // Separate HVAC practice exams have no writing chapter.
   const book = await db
     .from('digital_workbooks')
     .select('id,slug,title,program_id,cover_image')
-    .eq('slug', bookkeeping ? BOOKKEEPING_WORKBOOK_SLUG : HVAC_WORKBOOK_SLUG)
+    .eq(
+      'slug',
+      manufacturing
+        ? MANUFACTURING_WORKBOOK_SLUG
+        : bookkeeping
+          ? BOOKKEEPING_WORKBOOK_SLUG
+          : HVAC_WORKBOOK_SLUG,
+    )
     .eq('is_active', true)
     .maybeSingle();
   if (book.error || !book.data) throw new Error('Matching workbook could not be loaded.');
@@ -28,10 +41,10 @@ export async function loadLessonWorkbook(
     .select('id,workbook_id,section_number,title,unit,pdf_page,prompts,lesson_id')
     .eq('workbook_id', book.data.id)
     .eq('lesson_id', lessonId);
-  if (chapter && !bookkeeping) sectionQuery = sectionQuery.eq('id', chapter.section_id);
+  if (chapter && !bookkeeping && !manufacturing)
+    sectionQuery = sectionQuery.eq('id', chapter.section_id);
   const section = await sectionQuery.maybeSingle();
-  if (section.error)
-    throw new Error('Matching workbook chapter could not be loaded.');
+  if (section.error) throw new Error('Matching workbook chapter could not be loaded.');
   if (!section.data) {
     if (bookkeeping) return null;
     throw new Error('Matching workbook chapter could not be loaded.');
@@ -67,6 +80,17 @@ export async function hasRequiredLessonWorkbook(
   lessonId: string,
   userId: string,
 ) {
+  if (courseId === MANUFACTURING_COURSE_ID) {
+    const workbook = await loadLessonWorkbook(db, courseId, lessonId, userId);
+    const response = workbook?.response;
+    return (
+      response?.reviewed === true &&
+      MANUFACTURING_RESPONSE_FIELDS.every(
+        (key) =>
+          typeof response.answers?.[key] === 'string' && response.answers[key].trim().length >= 10,
+      )
+    );
+  }
   if (
     courseId !== HVAC_COURSE_ID ||
     !content.chapters.some((chapter) => chapter.lesson_id === lessonId)

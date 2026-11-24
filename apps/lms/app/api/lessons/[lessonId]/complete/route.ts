@@ -16,6 +16,7 @@ import { checkCompetencyGate } from '@/lib/lms/competency-gate';
 import { resolveCourseEnrollment } from '@/lib/enrollment/resolve-course-enrollment';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import { hasRequiredLessonWorkbook } from '@/lib/lms/lesson-workbook';
+import { hasRequiredManufacturingSimulation } from '@/lib/lms/manufacturing-simulation-progress';
 
 export const runtime = 'nodejs';
 export const maxDuration = 60;
@@ -95,7 +96,24 @@ async function _POST(request: NextRequest, { params }: { params: Promise<{ lesso
     }
 
     if (!(await hasRequiredLessonWorkbook(db, lesson.course_id, lessonId, user.id))) {
-      return NextResponse.json({ error: 'Complete and save the matching workbook activities and chapter review beneath this lesson, then try again.', code: 'LESSON_WORKBOOK_REQUIRED' }, { status: 403 });
+      return NextResponse.json(
+        {
+          error:
+            'Complete and save the matching workbook activities and chapter review beneath this lesson, then try again.',
+          code: 'LESSON_WORKBOOK_REQUIRED',
+        },
+        { status: 403 },
+      );
+    }
+    if (!(await hasRequiredManufacturingSimulation(db, lesson.course_id, lessonId, user.id))) {
+      return NextResponse.json(
+        {
+          error:
+            'Complete and save the virtual workplace practice beneath this lesson, including every critical decision, then try again.',
+          code: 'LESSON_SIMULATION_REQUIRED',
+        },
+        { status: 403 },
+      );
     }
 
     try {

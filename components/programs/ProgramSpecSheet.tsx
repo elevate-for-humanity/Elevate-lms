@@ -54,7 +54,7 @@ export interface LOCProgramSpec {
   employerPartners: string[];
   placementRate?: string;
   retentionTracking: string;
-  costPerParticipant: number;
+  costPerParticipant: number | string;
   costPerCohort?: number;
   examFeesIncluded: boolean;
   materialsIncluded: string[];
@@ -274,7 +274,7 @@ export default function ProgramSpecSheet({ spec }: { spec: LOCProgramSpec }) {
           <Section icon={DollarSign} title="Pricing & Payment" id="spec-pricing">
             <DataRow
               label="Cost Per Participant"
-              value={`$${spec.costPerParticipant.toLocaleString('en-US')}`}
+              value={typeof spec.costPerParticipant === 'number' ? `$${spec.costPerParticipant.toLocaleString('en-US')}` : spec.costPerParticipant}
             />
             {spec.costPerCohort && (
               <DataRow

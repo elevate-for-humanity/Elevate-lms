@@ -26,7 +26,7 @@ export const PROGRAM_OG_IMAGES: Record<string, string> = {
   welding: '/images/pages/programs-welding-apply-hero.webp',
   'cdl-training': '/images/pages/programs-cdl-hero.webp',
   'diesel-mechanic': '/images/pages/programs-hvac-hero.webp',
-  forklift: '/images/pages/programs-hvac-hero.webp',
+  forklift: '/images/refresh-20261014/forklift.webp',
   'construction-trades-certification': '/images/pages/programs-welding-apply-hero.webp',
 
   // ── Healthcare ────────────────────────────────────────────────────────────

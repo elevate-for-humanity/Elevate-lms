@@ -14,7 +14,10 @@ import InteractiveVideoPlayer, { type Checkpoint } from '@/components/lms/Intera
 import { resolveCoursePreview } from '@/lib/admin/course-preview';
 import { assertLessonAccess } from '@/lib/lms/access-control';
 import { requireAdminClient } from '@/lib/supabase/admin';
-import { canonicalBeautyApprenticeshipSlug, loadBeautyPaymentGate } from '@/lib/apprenticeship/beauty-payment-gate.mjs';
+import {
+  canonicalBeautyApprenticeshipSlug,
+  loadBeautyPaymentGate,
+} from '@/lib/apprenticeship/beauty-payment-gate.mjs';
 import { managedLessonPlaybackUrl } from '@/lib/storage/lesson-playback';
 import { measuredLessonCues } from '@/lib/video/measured-lesson-assets';
 import { TheoryWindowNotice } from '@/components/apprenticeship/TheoryWindowNotice';
@@ -24,6 +27,11 @@ import { lessonKeyTerms } from '@/lib/lms/lesson-key-terms';
 import LessonWorkbook from '@/components/lms/LessonWorkbook';
 import { loadLessonWorkbook } from '@/lib/lms/lesson-workbook';
 import { BOOKKEEPING_COURSE_ID } from '@/lib/lms/bookkeeping-workbook-contract';
+import ManufacturingSimulation from '@/components/lms/ManufacturingSimulation';
+import {
+  parseManufacturingSimulation,
+  publicManufacturingSimulation,
+} from '@/lib/lms/manufacturing-simulation';
 
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
@@ -293,6 +301,9 @@ export default async function LessonPage({
   const keyTerms = lessonKeyTerms(lesson.key_terms);
   const lessonHtml = htmlFromContent(lesson.content, lesson.rendered_html);
   const experience = lessonExperience(lesson.content_json, lesson.content);
+  const previewManufacturingSimulation = preview.active
+    ? parseManufacturingSimulation(experience?.manufacturingSimulation)
+    : null;
   const interactiveVideo = experience?.interactiveVideo as Record<string, any> | undefined;
   const instructionalTimeline = experience?.instructionalTimeline as
     | Record<string, any>
@@ -416,15 +427,23 @@ export default async function LessonPage({
           ) : null}
           {course.id === BOOKKEEPING_COURSE_ID ? (
             <p className="rounded-xl border border-teal-300 bg-teal-50 p-4 leading-relaxed">
-              Start your theory timeclock when prompted. Use 1. Lesson video to watch, then
-              2. Reading &amp; workbook to read, write, save, and complete the lesson assessment.
-              You can switch views without losing your writing.
+              Start your theory timeclock when prompted. Use 1. Lesson video to watch, then 2.
+              Reading &amp; workbook to read, write, save, and complete the lesson assessment. You
+              can switch views without losing your writing.
             </p>
           ) : null}
           <LearningWorkspace
-            initialView={handsOnClockOnly || course.id === BOOKKEEPING_COURSE_ID ? 'preview' : 'split'}
-            instructionLabel={course.id === BOOKKEEPING_COURSE_ID ? '2. Reading & workbook' : 'Workbook & lesson activities'}
-            previewLabel={course.id === BOOKKEEPING_COURSE_ID ? '1. Lesson video' : 'Theory lesson & video'}
+            initialView={
+              handsOnClockOnly || course.id === BOOKKEEPING_COURSE_ID ? 'preview' : 'split'
+            }
+            instructionLabel={
+              course.id === BOOKKEEPING_COURSE_ID
+                ? '2. Reading & workbook'
+                : 'Workbook & lesson activities'
+            }
+            previewLabel={
+              course.id === BOOKKEEPING_COURSE_ID ? '1. Lesson video' : 'Theory lesson & video'
+            }
             instructions={
               <>
                 <LessonPicker courseId={course.id} lessonId={lesson.id} lessons={lessonList} />
@@ -458,7 +477,10 @@ export default async function LessonPage({
                   </section>
                 ) : null}
                 {lessonHtml ? (
-                  <section id="lesson-reading" className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                  <section
+                    id="lesson-reading"
+                    className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
+                  >
                     <h2 className="text-xl font-bold text-slate-950">Lesson reading</h2>
                     <p className="mt-1 text-sm text-slate-600">
                       Read the instructions here, then complete the activities below.
@@ -478,6 +500,15 @@ export default async function LessonPage({
                   </section>
                 )}
                 {lessonWorkbook && <LessonWorkbook {...lessonWorkbook} />}
+                {previewManufacturingSimulation ? (
+                  <ManufacturingSimulation
+                    simulation={publicManufacturingSimulation(previewManufacturingSimulation)}
+                    readOnlyPreviewSpec={previewManufacturingSimulation}
+                    courseId={course.id}
+                    lessonId={lesson.id}
+                    interactionId={`${lesson.slug}-manufacturing`}
+                  />
+                ) : null}
                 <WorkbookLessonInstruction resources={lesson.resources} />
                 {keyTerms.length ? (
                   <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">

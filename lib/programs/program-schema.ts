@@ -149,6 +149,8 @@ export interface ProgramSchema {
   deliveryMode: 'online' | 'hybrid' | 'in-person';
   deliveredBy?: 'Elevate' | 'Partner' | 'Elevate or Partner';
   durationWeeks: number;
+  /** Explicit phase-aware duration when weekly arithmetic covers only online learning. */
+  durationDisplay?: string;
   hoursPerWeekMin: number;
   hoursPerWeekMax: number;
   hoursBreakdown: HoursBreakdown;

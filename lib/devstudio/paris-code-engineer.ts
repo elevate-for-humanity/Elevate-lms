@@ -102,7 +102,7 @@ export function blockedPathReason(path: string): BlockedPathReason {
   }
   if (/(?:^|\/)(?:\.env(?:\.[^/]*)?|[^/]*\.(?:pem|key|p12|pfx)|id_(?:rsa|ed25519)[^/]*)$/i.test(path)) return 'DENIED_SECRET';
   if (
-    /^(?:apps\/admin\/app\/api\/(?:cron\/paris-code-repair|dev-studio|internal)(?:\/|$)|lib\/ai\/paid-inference[^/]*|\.github(?:\/|$)|scripts(?:\/|$)|lib\/(?:devstudio|ai\/runtime|auth|rbac|supabase|secrets)(?:\/|.|$)|lib\/paris-workflow-identity\.ts$|AGENTS\.md$|Dockerfile(?:\.|$)|(?:package(?:-lock)?\.json|pnpm-lock\.yaml|pnpm-workspace\.yaml)$)/.test(path) ||
+    /^(?:apps\/admin\/app\/api\/(?:cron\/paris-code-repair|dev-studio|internal)(?:\/|$)|lib\/ai\/paid-inference[^/]*|\.github(?:\/|$)|scripts(?:\/|$)|lib\/(?:devstudio|ai\/runtime|auth|rbac|supabase|secrets)(?:\/|\.|$)|lib\/paris-workflow-identity\.ts$|AGENTS\.md$|Dockerfile(?:\.|$)|(?:package(?:-lock)?\.json|pnpm-lock\.yaml|pnpm-workspace\.yaml)$)/.test(path) ||
     /(?:^|\/)(?:tsconfig[^/]*\.json|vitest\.config\.[^/]+|eslint\.config\.[^/]+|\.npmrc|AGENTS\.md)$/.test(path) ||
     /^(?:tests\/unit\/(?:course-builder-live-preview|course-builder-assessment-preview|paris-course-integration)\.test\.tsx?|tests\/worker\/approved-picture-timeline\.test\.mjs)$/.test(path)
   ) {

@@ -76,8 +76,8 @@ requireText(
 );
 requireText(
   'lib/ai/tools/planner.ts',
-  'isOpenHandsOptedIn()',
-  'explicit OpenHands opt-in guard',
+  'return /\\bopenhands\\b/.test(lower) && isOpenHandsOptedIn()',
+  'engineering routing coupled to explicit OpenHands opt-in',
 );
 requireText(
   'lib/ai/tools/planner.ts',

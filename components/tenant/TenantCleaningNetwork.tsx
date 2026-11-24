@@ -1,6 +1,7 @@
 'use client';
 import { useEffect,useState,useRef,type FormEvent } from 'react';
 import { money,parseHourlyRate } from '@/lib/cleaning/pricing';
+import { siteUrls } from '@/lib/utils/site-urls';
 import { TenantProviderRate } from './TenantProviderRate';
 import { useTenantRequestHeaders,useReadOnlyTenantPreview } from './TenantPreviewContext';
 const services=['standard','deep','moveout','commercial','event','carpet','valet-trash'];
@@ -16,7 +17,15 @@ function useCleaningApi(){
   const result=await response.json();if(!response.ok)throw new Error(result.error||'Unable to complete this request.');return result;
  };
 }
-function SignIn(){return <p className="mt-4 leading-7"><a href="/login" className="font-bold underline">Sign in</a> with the verified email used for your membership, request or provider application, then return to this page.</p>;}
+const cleaningSiteUrl = `${siteUrls.site}/sites/2exclusive-platinum-cleaning`;
+function SignIn({ path = '/book-cleaning' }: { path?: '/book-cleaning' | '/provider' }) {
+  const next = encodeURIComponent(`${cleaningSiteUrl}${path}`);
+  return <p className="mt-4 leading-7">
+    <a href={`${siteUrls.login}?next=${next}`} className="font-bold underline">Sign in</a>
+    {' or '}<a href={`${siteUrls.lms}/signup?next=${next}`} className="font-bold underline">Create an account</a>
+    {' with the email used for your application or request. Verify that email to continue here.'}
+  </p>;
+}
 export function TenantCleaningBooking(){
  const api=useCleaningApi();const [jobs,setJobs]=useState<any[]>([]);const [notice,setNotice]=useState('');const [busy,setBusy]=useState(false);const key=useRef('');
  async function load(){try{setJobs((await api('jobs')).jobs||[]);}catch(e){setNotice(e instanceof Error?e.message:'Unable to load bookings.');}}
@@ -44,11 +53,126 @@ export function TenantCleaningBooking(){
    <p className="mt-3 text-sm">Reference: {job.id}</p></article>)}</div>
  </section>;
 }
-export function TenantCleaningProvider(){
- const api=useCleaningApi();const [provider,setProvider]=useState<any>(null);const [assigned,setAssigned]=useState<any[]>([]);const [rate,setRate]=useState('');const [notice,setNotice]=useState('');const [busy,setBusy]=useState(false);
- useEffect(()=>{void api('provider').then(r=>{setProvider(r.provider);setAssigned(r.jobs||[]);if(r.provider)setRate((r.provider.hourly_cents/100).toFixed(2));else setNotice('Your application must be added to the company directory before you can manage your rate here.');}).catch(e=>setNotice(e.message));},[]); // eslint-disable-line react-hooks/exhaustive-deps
- async function save(event:FormEvent){event.preventDefault();const cents=parseHourlyRate(rate);if(cents===null||busy)return;setBusy(true);try{await api('provider',{hourlyCents:cents});setNotice('Rate saved for future opportunities. Payments on accepted jobs stay unchanged.');}catch(e){setNotice(e instanceof Error?e.message:'Unable to save rate.');}finally{setBusy(false);}}
- return <section className="mx-auto max-w-4xl px-5 py-14"><h2 className="text-3xl font-black">Your cleaning business</h2><SignIn/>{provider?<><p className="mt-5 leading-7">{provider.name} · Review status: {provider.eligibility}. Job offers arrive by email when your reviewed services, ZIP coverage and rate match an opportunity.</p><form onSubmit={save} className="mt-6 space-y-5"><TenantProviderRate value={rate} onChange={setRate} required/><button disabled={busy||parseHourlyRate(rate)===null} className={button}>Save hourly rate</button></form><h3 className="mt-8 text-2xl font-bold">Your assignments</h3>{assigned.map(job=><article key={job.id} className="mt-5 rounded-xl border p-5"><p className="font-bold">{job.service} · {new Date(job.starts_at).toLocaleString()} · {statusLabels[job.status]||job.status}</p><p className="mt-3">{job.customer_name} · {job.customer_email} · Your business payment: {money(job.provider_pay_cents)}</p><p className="mt-3 whitespace-pre-wrap leading-7">{job.private_details}</p></article>)}</>:null}{notice?<p role="status" className="mt-5 leading-7">{notice}</p>:null}</section>;
+type CleaningProvider = {
+  name: string;
+  hourly_cents: number;
+  zips: string[];
+  services: string[];
+  opted_in: boolean;
+  eligibility: 'pending' | 'eligible' | 'suspended';
+};
+
+export function TenantCleaningProvider() {
+  const api = useCleaningApi();
+  const [provider, setProvider] = useState<CleaningProvider | null>(null);
+  const [applicantName, setApplicantName] = useState<string | null>(null);
+  const [assigned, setAssigned] = useState<any[]>([]);
+  const [rate, setRate] = useState('');
+  const [zips, setZips] = useState('');
+  const [selectedServices, setSelectedServices] = useState<string[]>([]);
+  const [optedIn, setOptedIn] = useState(false);
+  const [jobOffersEnabled, setJobOffersEnabled] = useState(false);
+  const [loaded, setLoaded] = useState(false);
+  const [notice, setNotice] = useState('');
+  const [busy, setBusy] = useState(false);
+  const pending = !provider || provider.eligibility === 'pending';
+
+  function showProvider(value: CleaningProvider | null) {
+    setProvider(value);
+    if (!value) return;
+    setRate((value.hourly_cents / 100).toFixed(2));
+    setZips(value.zips.join(', '));
+    setSelectedServices(value.services);
+    setOptedIn(value.opted_in);
+  }
+
+  useEffect(() => {
+    void api('provider').then(result => {
+      showProvider(result.provider);
+      setApplicantName(result.application?.name || null);
+      setAssigned(result.jobs || []);
+      setJobOffersEnabled(result.jobOffersEnabled === true);
+      setLoaded(true);
+    }).catch(error => setNotice(error instanceof Error ? error.message : 'Unable to load your profile.'));
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  async function save(event: FormEvent) {
+    event.preventDefault();
+    const cents = parseHourlyRate(rate);
+    if (cents === null || busy) return;
+    const submittedZips = [...new Set(zips.split(/[\s,]+/).filter(Boolean))];
+    if (pending && (!submittedZips.length || submittedZips.some(zip => !/^\d{5}$/.test(zip)) || !selectedServices.length)) {
+      setNotice('Enter five-digit ZIP codes and select at least one cleaning service.');
+      return;
+    }
+    setBusy(true);
+    setNotice('');
+    try {
+      const result = await api('provider', pending
+        ? { action: 'onboard', hourlyCents: cents, zips: submittedZips, services: selectedServices, optedIn }
+        : { hourlyCents: cents });
+      if (result.provider) showProvider(result.provider);
+      setNotice(result.alreadySubmitted
+        ? 'Your profile already exists. Review the saved details shown here.'
+        : pending
+          ? 'Provider profile saved for review. Job offers require eligibility approval and an open network.'
+          : 'Rate saved for future opportunities. Payments on accepted jobs stay unchanged.');
+    } catch (error) {
+      setNotice(error instanceof Error ? error.message : 'Unable to save your provider profile.');
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return <section className="mx-auto max-w-4xl px-5 py-14">
+    <h2 className="text-3xl font-black">Your cleaning business</h2>
+    <SignIn path="/provider" />
+    <div className="mt-5 flex flex-wrap gap-5 leading-7">
+      <a href={`${cleaningSiteUrl}/join-network`} className="font-bold underline">Cleaning network application</a>
+      <a href={`${siteUrls.lms}/community`} className="font-bold underline">Open the community</a>
+    </div>
+    {loaded && !provider && !applicantName ? <p className="mt-5 leading-7">Submit the cleaning network application with your verified account email, then return here to finish your provider profile.</p> : null}
+    {provider || applicantName ? <>
+      <p className="mt-6 font-bold">{provider?.name || applicantName}</p>
+      <p className="mt-2 leading-7">Review status: {provider?.eligibility === 'eligible' ? 'Approved' : provider?.eligibility === 'suspended' ? 'Paused' : 'Pending review'}.</p>
+      {pending ? <p className="mt-3 leading-7">Tell us your requested rate, service area, and services. The network team reviews your qualifications before approving job offers.</p>
+        : provider?.eligibility === 'eligible' ? <p className="mt-3 leading-7">When the network is open, opted-in providers receive matching opportunities by email. Review the scope, payment, and stated time before choosing to accept a job.</p>
+          : <p className="mt-3 leading-7">Contact the network team to review your paused status. Updating your rate does not restore eligibility.</p>}
+      {!jobOffersEnabled ? <p className="mt-3 rounded-xl bg-slate-100 p-4 leading-7">Provider profiles are being prepared for review. Online job offers are not open yet; saving your profile does not confirm work.</p> : null}
+      <form onSubmit={save} className="mt-6 space-y-6">
+        <TenantProviderRate value={rate} onChange={setRate} required />
+        {pending ? <>
+          <label className="block font-bold">ZIP codes you can serve
+            <input value={zips} onChange={event => setZips(event.target.value)} required maxLength={600} placeholder="46204, 46201" className={input} />
+            <span className="mt-2 block text-sm font-normal">Separate five-digit ZIP codes with commas or spaces.</span>
+          </label>
+          <fieldset>
+            <legend className="font-bold">Cleaning services you can provide</legend>
+            <div className="mt-3 grid gap-3 sm:grid-cols-2">{services.map(service => <label key={service} className="flex gap-3 rounded-xl border p-3">
+              <input type="checkbox" checked={selectedServices.includes(service)} onChange={event => setSelectedServices(current => event.target.checked ? [...current, service] : current.filter(value => value !== service))} />
+              <span>{serviceLabels[service]}</span>
+            </label>)}</div>
+          </fieldset>
+          <label className="flex gap-3 rounded-xl border p-4 leading-7">
+            <input type="checkbox" checked={optedIn} onChange={event => setOptedIn(event.target.checked)} className="mt-2" />
+            <span>I want job-opportunity emails after my provider profile is approved and the network opens. Each job requires my separate acceptance.</span>
+          </label>
+          <p className="text-sm leading-7">You may save a profile without email opt-in. Job emails require your permission, approval, and a matching opportunity. Work is not guaranteed.</p>
+        </> : null}
+        <button disabled={busy || parseHourlyRate(rate) === null} className={button}>{busy ? 'Saving…' : pending ? 'Save provider profile for review' : 'Save hourly rate'}</button>
+      </form>
+      {provider?.eligibility === 'eligible' ? <>
+        <h3 className="mt-8 text-2xl font-bold">Your assignments</h3>
+        {!assigned.length ? <p className="mt-3 leading-7">No accepted assignments are listed.</p> : null}
+        {assigned.map(job => <article key={job.id} className="mt-5 rounded-xl border p-5">
+          <p className="font-bold">{job.service} · {new Date(job.starts_at).toLocaleString()} · {statusLabels[job.status] || job.status}</p>
+          <p className="mt-3">{job.customer_name} · {job.customer_email} · Your business payment: {money(job.provider_pay_cents)}</p>
+          <p className="mt-3 whitespace-pre-wrap leading-7">{job.private_details}</p>
+        </article>)}
+      </> : null}
+    </> : null}
+    {notice ? <p role="status" className="mt-5 leading-7">{notice}</p> : null}
+  </section>;
 }
 export function TenantCleaningOffer(){
  const api=useCleaningApi();const [job,setJob]=useState<any>(null);const [credentials,setCredentials]=useState({id:'',token:''});const [accepted,setAccepted]=useState(false);const [notice,setNotice]=useState('');const [busy,setBusy]=useState(false);

@@ -17,7 +17,11 @@ export const reply = (body: unknown, status = 200) => NextResponse.json(body, { 
 export function sameOrigin(request: NextRequest) {
   if (request.headers.get('origin') !== new URL(request.url).origin) throw new CleaningError('Use this website to continue.',403);
 }
-export async function cleaningContext(request: NextRequest, owner = false) {
+export async function cleaningContext(
+  request: NextRequest,
+  owner = false,
+  capability: 'commerce' | 'provider-onboarding' = 'commerce',
+) {
   const limited = await applyRateLimit(request, 'contact');
   if (limited) throw new CleaningError('Please wait before trying again.',429);
   const db = await requireAdminClient();
@@ -25,8 +29,14 @@ export async function cleaningContext(request: NextRequest, owner = false) {
   if (error || !site?.is_published) throw new CleaningError('Cleaning website unavailable.',503);
   if (!owner) {
     const tenant = await resolvePublishedTenantFromRequest(request);
-    if (tenant?.websiteId !== CLEANING_SITE || site.site_config?.meta?.cleaningNetworkEnabled !== true)
-      throw new CleaningError('Online cleaning booking is not enabled.',503);
+    const commerceEnabled = site.site_config?.meta?.cleaningNetworkEnabled === true;
+    const enabled = capability === 'provider-onboarding'
+      ? commerceEnabled || site.site_config?.meta?.cleaningProviderOnboardingEnabled === true
+      : commerceEnabled;
+    if (tenant?.websiteId !== CLEANING_SITE || !enabled)
+      throw new CleaningError(capability === 'provider-onboarding'
+        ? 'Cleaning provider enrollment is not enabled.'
+        : 'Online cleaning booking is not enabled.',503);
   }
   const session = await createClient();
   const { data: { user } } = await session.auth.getUser();

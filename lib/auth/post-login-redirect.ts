@@ -12,8 +12,12 @@ function firstPathSegment(path: string): string {
 }
 
 const STORE_ORIGIN = 'https://store.elevateforhumanity.org';
+const CLEANING_ACCOUNT_PATHS = new Set([
+  '/sites/2exclusive-platinum-cleaning/provider',
+  '/sites/2exclusive-platinum-cleaning/book-cleaning',
+]);
 
-/** Shared tools enforce their own subscription and site ownership after login. */
+/** Shared routes enforce their own verified identity, ownership and eligibility. */
 export function isSharedPostLoginDestination(destination: string): boolean {
   try {
     const url = new URL(destination);
@@ -24,7 +28,8 @@ export function isSharedPostLoginDestination(destination: string): boolean {
         (url.pathname === '/store' || url.pathname.startsWith('/store/'))) ||
       (url.origin === new URL(siteUrls.site).origin &&
         (url.pathname === '/apps/website-builder' ||
-          url.pathname.startsWith('/apps/website-builder/')))
+          url.pathname.startsWith('/apps/website-builder/') ||
+          CLEANING_ACCOUNT_PATHS.has(url.pathname)))
     );
   } catch {
     return false;
@@ -61,9 +66,9 @@ export function resolveRoleCompatiblePostLoginUrl(
     const requestedUrl = new URL(absoluteRoleDestination(requestedPath));
     const canonical = new URL(canonicalUrl);
 
-    // The Store is a trusted shared buyer surface, not a role-owned portal.
-    // A validated sign-in may return any role to a Store route without granting
-    // access to a different role's dashboard.
+    // Shared account routes are not role-owned portals. Returning a verified
+    // account to one of these exact surfaces grants no operating role or
+    // access to another role's dashboard.
     if (isSharedPostLoginDestination(requestedUrl.toString())) {
       return requestedUrl.toString();
     }

@@ -3,6 +3,7 @@ import Link from 'next/link';
 import ProgramHolderForm from './ProgramHolderForm';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { getActivePrograms } from '@/lib/program-registry';
+import { programHolderInterest } from '@/lib/program-holder/program-interest';
 
 export const dynamic = 'force-dynamic';
 
@@ -46,9 +47,9 @@ export default async function ProgramHolderApplicationPage({
   const value = (key: string) => typeof query[key] === 'string' ? String(query[key]).trim() : '';
   const requestedProgram = value('program');
   const programOptions = getActivePrograms().map(({ slug, name }) => ({ slug, name }));
-  const initialProgram = programOptions.some((program) => program.slug === requestedProgram)
+  const initialProgram = programHolderInterest(value('interest'))?.selection || (programOptions.some((program) => program.slug === requestedProgram)
     ? requestedProgram
-    : '';
+    : '');
 
   return (
     <div className="min-h-screen bg-white">
@@ -64,8 +65,8 @@ export default async function ProgramHolderApplicationPage({
           <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-3">Partner with Elevate</h1>
           <p className="text-base sm:text-lg text-slate-700 max-w-3xl">
             Use this form if your organization will operate apprenticeship or training programs on
-            the platform (shop owner, school, or workforce partner). After you submit, you can
-            upload compliance documents in the program holder portal.
+            the platform (shop owner, school, or workforce partner). We review your application,
+            confirm the program scope, and send the required document and onboarding instructions.
           </p>
         </div>
       </section>

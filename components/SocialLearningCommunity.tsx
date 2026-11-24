@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import {
   AlertTriangle,
   FileText,
@@ -56,7 +57,12 @@ type LeaderboardRow = { user_id: string; points: number };
 type Tab = 'feed' | 'groups' | 'discussions' | 'leaders';
 type ReportTarget = { type: 'post' | 'comment' | 'topic' | 'reply' | 'group' | 'member'; id: string } | null;
 
-type Props = { userId: string; userName?: string | null; readOnly?: boolean };
+type Props = {
+  userId: string;
+  userName?: string | null;
+  readOnly?: boolean;
+  navigationContext?: 'learner' | 'community';
+};
 
 function relativeTime(value?: string | null) {
   if (!value) return '';
@@ -83,7 +89,10 @@ function safeFileName(name: string) {
   return name.toLowerCase().replace(/[^a-z0-9._-]+/g, '-').replace(/^-+|-+$/g, '').slice(-100) || 'upload';
 }
 
-export function SocialLearningCommunity({ userId, userName, readOnly = false }: Props) {
+export function SocialLearningCommunity({ userId, userName, readOnly = false, navigationContext }: Props) {
+  const pathname = usePathname();
+  const learnerNavigation = navigationContext === 'learner' ||
+    (navigationContext !== 'community' && Boolean(pathname?.startsWith('/lms/')));
   const supabase = useMemo(() => createClient(), []);
   const [activeTab, setActiveTab] = useState<Tab>('feed');
   const [search, setSearch] = useState('');
@@ -360,8 +369,23 @@ export function SocialLearningCommunity({ userId, userName, readOnly = false }: 
       <section className="rounded-3xl bg-slate-950 p-6 text-white md:p-8">
         <p className="text-xs font-black uppercase tracking-[0.2em] text-cyan-300">Elevate Community</p>
         <h1 className="mt-2 text-3xl font-black">Learn together. Build your network. Move your career forward.</h1>
-        <p className="mt-2 max-w-3xl text-slate-300">Feed, study groups, discussions, events, member networking, points, achievements, private messaging, career opportunities, and the AI Team all stay inside the same authenticated learner experience.</p>
-        <div className="mt-5 flex flex-wrap gap-2"><Link href="/lms/members" className="rounded-xl bg-white px-4 py-2 text-sm font-black text-slate-950">Members</Link><Link href="/lms/events" className="rounded-xl border border-white/30 px-4 py-2 text-sm font-black text-white">Events</Link><Link href="/lms/jobs" className="rounded-xl border border-white/30 px-4 py-2 text-sm font-black text-white">Career opportunities</Link><Link href="/lms/ai-team" className="rounded-xl border border-white/30 px-4 py-2 text-sm font-black text-white">AI Team</Link></div>
+        <p className="mt-2 max-w-3xl text-slate-300">
+          {learnerNavigation
+            ? 'Share updates, join study groups, discuss your training, and connect with the people in your learning community.'
+            : 'Share your work, join groups, ask questions, and discuss training and business opportunities with the Elevate community.'}
+        </p>
+        <div className="mt-5 flex flex-wrap gap-2">
+          {learnerNavigation ? <>
+            <Link href="/lms/members" className="rounded-xl bg-white px-4 py-2 text-sm font-black text-slate-950">Members</Link>
+            <Link href="/lms/events" className="rounded-xl border border-white/30 px-4 py-2 text-sm font-black text-white">Events</Link>
+            <Link href="/lms/jobs" className="rounded-xl border border-white/30 px-4 py-2 text-sm font-black text-white">Career opportunities</Link>
+            <Link href="/lms/ai-team" className="rounded-xl border border-white/30 px-4 py-2 text-sm font-black text-white">AI Team</Link>
+          </> : <>
+            <button onClick={() => setActiveTab('groups')} className="rounded-xl bg-white px-4 py-2 text-sm font-black text-slate-950">Explore groups</button>
+            <button onClick={() => setActiveTab('discussions')} className="rounded-xl border border-white/30 px-4 py-2 text-sm font-black text-white">Join a discussion</button>
+            <button onClick={() => setActiveTab('feed')} className="rounded-xl border border-white/30 px-4 py-2 text-sm font-black text-white">Share an update</button>
+          </>}
+        </div>
       </section>
 
       {error && <div className="flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 p-4 text-sm font-semibold text-red-800"><AlertTriangle className="mt-0.5 h-4 w-4 flex-shrink-0" /><span>{error}</span><button onClick={() => setError('')} className="ml-auto"><X className="h-4 w-4" /></button></div>}
@@ -374,7 +398,7 @@ export function SocialLearningCommunity({ userId, userName, readOnly = false }: 
       {activeTab === 'feed' && <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_300px]">
         <div className="space-y-4">
           <div id="community-post-composer" className="scroll-mt-24 rounded-2xl border border-slate-200 bg-white p-5">
-            <p className="mb-3 text-sm font-black text-slate-800">Post as {userName || members[userId]?.full_name || 'Learner'}</p>
+            <p className="mb-3 text-sm font-black text-slate-800">Post as {userName || members[userId]?.full_name || 'Community member'}</p>
             <textarea value={postDraft} onChange={(e) => setPostDraft(e.target.value)} maxLength={4000} rows={3} className="w-full rounded-xl border border-slate-300 p-3 outline-none focus:border-brand-blue-500" placeholder="Share an update, question, milestone, resource, or opportunity…" />
             <div className="mt-3 grid gap-2 md:grid-cols-2"><input value={tagDraft} onChange={(e) => setTagDraft(e.target.value)} className="rounded-xl border border-slate-300 px-3 py-2 text-sm" placeholder="Tags, comma separated" /><select value={mentionId} onChange={(e) => setMentionId(e.target.value)} className="rounded-xl border border-slate-300 px-3 py-2 text-sm"><option value="">Mention a member (optional)</option>{memberList.map((m) => <option key={m.id} value={m.id}>@{m.full_name ?? 'Member'}</option>)}</select></div>
             <div className="mt-3 flex flex-col gap-3 rounded-xl bg-slate-50 p-3 sm:flex-row sm:items-center">
@@ -397,7 +421,27 @@ export function SocialLearningCommunity({ userId, userName, readOnly = false }: 
             </article>;
           })}
         </div>
-        <aside className="space-y-4"><div className="rounded-2xl border border-slate-200 bg-white p-5"><h2 className="font-black text-slate-900">Community shortcuts</h2><div className="mt-3 space-y-2 text-sm font-bold"><Link href="/lms/members" className="flex items-center gap-2 rounded-lg p-2 hover:bg-slate-50"><Users className="h-4 w-4" />Member directory</Link><Link href="/lms/messages" className="flex items-center gap-2 rounded-lg p-2 hover:bg-slate-50"><MessageSquare className="h-4 w-4" />Messages</Link><Link href="/lms/events" className="flex items-center gap-2 rounded-lg p-2 hover:bg-slate-50"><UserPlus className="h-4 w-4" />Events & networking</Link></div></div><div className="rounded-2xl border border-slate-200 bg-white p-5"><h2 className="font-black text-slate-900">Your privacy</h2><p className="mt-2 text-sm leading-6 text-slate-600">The member directory is opt-in. Workforce, funding, eligibility, case-management, and compliance data never appear in the social profile.</p><Link href="/lms/settings/privacy" className="mt-3 inline-block text-sm font-black text-brand-blue-600">Manage privacy →</Link></div></aside>
+        <aside className="space-y-4">
+          <div className="rounded-2xl border border-slate-200 bg-white p-5">
+            <h2 className="font-black text-slate-900">Community shortcuts</h2>
+            <div className="mt-3 space-y-2 text-sm font-bold">
+              {learnerNavigation ? <>
+                <Link href="/lms/members" className="flex items-center gap-2 rounded-lg p-2 hover:bg-slate-50"><Users className="h-4 w-4" />Member directory</Link>
+                <Link href="/lms/messages" className="flex items-center gap-2 rounded-lg p-2 hover:bg-slate-50"><MessageSquare className="h-4 w-4" />Messages</Link>
+                <Link href="/lms/events" className="flex items-center gap-2 rounded-lg p-2 hover:bg-slate-50"><UserPlus className="h-4 w-4" />Events & networking</Link>
+              </> : <>
+                <button onClick={() => setActiveTab('groups')} className="flex w-full items-center gap-2 rounded-lg p-2 text-left hover:bg-slate-50"><Users className="h-4 w-4" />Browse groups</button>
+                <button onClick={() => setActiveTab('discussions')} className="flex w-full items-center gap-2 rounded-lg p-2 text-left hover:bg-slate-50"><MessageSquare className="h-4 w-4" />Open discussions</button>
+                <Link href="https://www.elevateforhumanity.org/business-network" className="flex items-center gap-2 rounded-lg p-2 hover:bg-slate-50"><UserPlus className="h-4 w-4" />Business network</Link>
+              </>}
+            </div>
+          </div>
+          <div className="rounded-2xl border border-slate-200 bg-white p-5">
+            <h2 className="font-black text-slate-900">Your privacy</h2>
+            <p className="mt-2 text-sm leading-6 text-slate-600">The member directory is opt-in. Workforce, funding, eligibility, case-management, and compliance data never appear in the social profile.</p>
+            {learnerNavigation && <Link href="/lms/settings/privacy" className="mt-3 inline-block text-sm font-black text-brand-blue-600">Manage privacy →</Link>}
+          </div>
+        </aside>
       </div>}
 
       {activeTab === 'groups' && <div className="space-y-5"><div className="flex justify-end"><button onClick={() => setShowGroupForm(!showGroupForm)} className="inline-flex items-center gap-2 rounded-xl bg-brand-blue-600 px-4 py-2.5 text-sm font-black text-white"><Plus className="h-4 w-4" />Create group</button></div>{showGroupForm && <div className="grid gap-3 rounded-2xl border border-slate-200 bg-white p-5"><input value={groupDraft.name} onChange={(e) => setGroupDraft({ ...groupDraft, name: e.target.value })} maxLength={120} placeholder="Group name" className="rounded-xl border p-3" /><input value={groupDraft.topic} onChange={(e) => setGroupDraft({ ...groupDraft, topic: e.target.value })} maxLength={160} placeholder="Topic/program" className="rounded-xl border p-3" /><textarea value={groupDraft.description} onChange={(e) => setGroupDraft({ ...groupDraft, description: e.target.value })} maxLength={1000} placeholder="Description" className="rounded-xl border p-3" /><button onClick={createGroup} disabled={busy || !groupDraft.name.trim()} className="justify-self-start rounded-xl bg-slate-950 px-5 py-2.5 font-black text-white">Create group</button></div>}<div className="grid gap-4 md:grid-cols-2">{visibleGroups.map((group) => { const joined = joinedGroupIds.has(group.id); return <article key={group.id} className="rounded-2xl border border-slate-200 bg-white p-5"><div className="flex items-start justify-between gap-3"><div><h2 className="font-black text-slate-900">{group.name}</h2><p className="mt-1 text-sm text-brand-blue-700">{group.topic ?? 'General'}</p></div><Users className="h-5 w-5 text-slate-400" /></div>{group.description && <p className="mt-3 text-sm leading-6 text-slate-600">{group.description}</p>}<div className="mt-4 flex items-center justify-between"><span className="text-xs font-bold text-slate-500">{group.member_count ?? 0} members</span><button onClick={() => toggleGroup(group.id)} className={`rounded-xl px-4 py-2 text-sm font-black ${joined ? 'border border-slate-300 bg-white text-slate-700' : 'bg-brand-blue-600 text-white'}`}>{joined ? <span className="inline-flex items-center gap-1"><LogOut className="h-3.5 w-3.5" />Leave</span> : 'Join'}</button></div></article>; })}</div>{!visibleGroups.length && <Empty icon={Users} title="No matching groups" text="Create a study group for your program, certification, or career goal." />}</div>}

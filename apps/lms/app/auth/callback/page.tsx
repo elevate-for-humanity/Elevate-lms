@@ -8,6 +8,7 @@ import { validateRedirect } from '@/lib/auth/validate-redirect';
 export default function AuthCallbackPage() {
   const [message, setMessage] = useState('Completing your secure sign-in…');
   const [failed, setFailed] = useState(false);
+  const [loginHref, setLoginHref] = useState('/login');
 
   useEffect(() => {
     let active = true;
@@ -21,7 +22,13 @@ export default function AuthCallbackPage() {
         fragment.get('error_description') || url.searchParams.get('error_description');
       const requested =
         url.searchParams.get('redirect') || url.searchParams.get('next') || '/lms/dashboard';
-      const destination = validateRedirect(requested, '/lms/dashboard');
+      let destination = '/lms/dashboard';
+      try {
+        destination = validateRedirect(requested, destination);
+      } catch {
+        // Malformed URL encoding must not interrupt session completion.
+      }
+      setLoginHref(`/login?redirect=${encodeURIComponent(destination)}`);
 
       if (errorCode) {
         const expired = errorCode === 'otp_expired' || /expired|invalid/i.test(errorDescription || '');
@@ -88,7 +95,7 @@ export default function AuthCallbackPage() {
         </p>
         {failed ? (
           <Link
-            href="/host-shop/login"
+            href={loginHref}
             className="mt-6 inline-flex min-h-12 w-full items-center justify-center rounded-xl bg-blue-700 px-5 py-3 font-bold text-white hover:bg-blue-800"
           >
             Return to secure login

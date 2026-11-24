@@ -7,20 +7,21 @@ import { createBrowserClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
 import { useSafeSearchParams } from '@/hooks/useSafeSearchParams';
 import Link from 'next/link';
-import Turnstile from '@/components/Turnstile';
 import { validateRedirect } from '@/lib/auth/validate-redirect';
 import { validatePassword } from '@/lib/auth/password-validation';
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import { isSupabaseAuthConfigured } from '@/lib/supabase/public-config';
 
 export const dynamic = 'force-dynamic';
 
 function SignupFormContent() {
   const searchParams = useSafeSearchParams();
-  const next = validateRedirect(
-    searchParams.get('next') || searchParams.get('redirect'),
-    '/lms/dashboard',
-  );
+  let next = '/lms/dashboard';
+  try {
+    next = validateRedirect(searchParams.get('next') || searchParams.get('redirect'), next);
+  } catch {
+    // Malformed percent-encoding must not prevent account creation.
+  }
+  const loginUrl = `/login?redirect=${encodeURIComponent(next)}`;
   const router = useRouter();
   const [formData, setFormData] = useState({
     email: '',
@@ -28,15 +29,23 @@ function SignupFormContent() {
     confirmPassword: '',
     firstName: '',
     lastName: '',
-    role: 'student',
+    role: next === '/community' ? 'community' : 'student',
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
-  const [turnstileToken, setTurnstileToken] = useState<string>('');
+  const [needsVerification, setNeedsVerification] = useState(true);
   const [passwordErrors, setPasswordErrors] = useState<string[]>([]);
   const [resendLoading, setResendLoading] = useState(false);
   const [resendSent, setResendSent] = useState(false);
+
+  function authReturnUrl() {
+    // The LMS callback handles both verification links and OAuth sessions.
+    // Keep the same host and the validated destination through each handoff.
+    const url = new URL('/auth/callback', window.location.origin);
+    url.searchParams.set('next', next);
+    return url.toString();
+  }
 
   const handlePasswordChange = (value: string) => {
     setFormData((prev) => ({ ...prev, password: value }));
@@ -50,12 +59,18 @@ function SignupFormContent() {
 
   const handleResendVerification = async () => {
     setResendLoading(true);
+    setError(null);
     try {
       const supabase = createBrowserClient();
-      await supabase.auth.resend({ type: 'signup', email: formData.email });
+      const { error: resendError } = await supabase.auth.resend({
+        type: 'signup',
+        email: formData.email,
+        options: { emailRedirectTo: authReturnUrl() },
+      });
+      if (resendError) throw resendError;
       setResendSent(true);
     } catch {
-      // best-effort — don't surface errors to avoid email enumeration
+      setError('We could not resend the verification email. Please try again.');
     } finally {
       setResendLoading(false);
     }
@@ -96,14 +111,15 @@ function SignupFormContent() {
             first_name: formData.firstName,
             last_name: formData.lastName,
             full_name: `${formData.firstName} ${formData.lastName}`,
-            role: formData.role,
+            requested_role: formData.role,
           },
-          emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || PLATFORM_DEFAULTS.siteUrl}/auth/callback`,
+          emailRedirectTo: authReturnUrl(),
         },
       });
 
       if (signUpError) throw signUpError;
 
+      setNeedsVerification(!data.session);
       setSuccess(true);
 
       // If email confirmation is disabled, redirect immediately
@@ -126,7 +142,7 @@ function SignupFormContent() {
       const { error } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
-          redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || PLATFORM_DEFAULTS.siteUrl}/auth/callback`,
+          redirectTo: authReturnUrl(),
         },
       });
 
@@ -157,20 +173,23 @@ function SignupFormContent() {
           </div>
           <h2 className="text-2xl font-bold text-black mb-2">Account Created!</h2>
           <p className="text-black mb-2">
-            Check your email for a verification link and click it to activate your account.
+            {needsVerification
+              ? 'Check your email for a verification link and follow it to continue.'
+              : 'Your account is ready. Continuing to your requested page…'}
           </p>
           <p className="text-sm text-slate-700 mb-6">
-            Once verified, you will be taken directly to your onboarding portal based on your
-            selected role.
+            Employer, staff, and Program Holder operating access requires Elevate approval.
+            Creating an account does not enroll you in a course or approve a business application.
           </p>
+          {error && <p role="alert" className="mb-4 text-sm text-red-800">{error}</p>}
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Link
-              href="/login"
+              href={loginUrl}
               className="inline-block px-6 py-2 bg-brand-red-600 text-white rounded-lg hover:bg-brand-red-700"
             >
               Already verified? Go to Login
             </Link>
-            <button
+            {needsVerification && <button
               onClick={handleResendVerification}
               disabled={resendLoading || resendSent}
               className="px-6 py-2 border border-slate-300 rounded-lg text-sm text-slate-900 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -180,7 +199,7 @@ function SignupFormContent() {
                 : resendLoading
                   ? 'Sending…'
                   : 'Resend verification email'}
-            </button>
+            </button>}
           </div>
         </div>
       </div>
@@ -315,7 +334,7 @@ function SignupFormContent() {
 
         <div>
           <label htmlFor="role" className="block text-sm font-medium text-black mb-2">
-            I am signing up as a
+            I am interested in
           </label>
           <select
             id="role"
@@ -324,13 +343,15 @@ function SignupFormContent() {
             required
             className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent bg-white"
           >
+            <option value="community">Community / Business Network</option>
             <option value="student">Student / Learner</option>
             <option value="staff">Staff / Employee</option>
             <option value="partner">Program Partner / Instructor</option>
             <option value="employer">Employer</option>
           </select>
           <p className="mt-1 text-xs text-slate-700">
-            Select the role that best describes why you are creating this account.
+            Tell us why you are creating an account. Business, partner, and staff access is
+            activated only after review and approval.
           </p>
         </div>
 
@@ -420,7 +441,7 @@ function SignupFormContent() {
 
       <p className="mt-6 text-center text-sm text-black">
         Already have an account?{' '}
-        <Link href="/login" className="text-brand-blue-600 hover:text-brand-blue-700 font-medium">
+        <Link href={loginUrl} className="text-brand-blue-600 hover:text-brand-blue-700 font-medium">
           Sign in
         </Link>
       </p>

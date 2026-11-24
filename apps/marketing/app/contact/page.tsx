@@ -1,3 +1,4 @@
+// Branch refreshed to pick up main (71e31a22): /apply/student E2E fix + Dockerfile.google-lms.
 import HeroPicture from '@/components/marketing/HeroPicture';
 import { siteConfig } from '@/lib/config/site';
 import { Metadata } from 'next';

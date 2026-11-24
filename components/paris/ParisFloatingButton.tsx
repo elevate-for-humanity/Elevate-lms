@@ -4,6 +4,7 @@ import { lazy, Suspense, useCallback, useEffect, useRef, useState, type ReactNod
 import { createPortal } from 'react-dom';
 import { usePathname } from 'next/navigation';
 import { X, MessageCircle, Mic } from 'lucide-react';
+import ParisAvatar from './ParisAvatar';
 import type { ParisLearnerContext } from './ParisFloatingWrapper';
 import { PARIS_PORTAL_ISSUE_EVENT, reportPortalWorkflowIssue, type PortalIssueReceipt, type PortalSupportIssue } from '@/lib/paris/portal-support';
 import { useHvacVideoDock } from '@/hooks/useHvacVideoDock';
@@ -115,8 +116,8 @@ export function ParisFloatingButton({
           <div className="pointer-events-auto relative z-10 ml-auto flex h-[100dvh] min-h-0 min-w-0 w-full max-w-[100vw] flex-col overflow-hidden bg-white pb-[env(safe-area-inset-bottom)] shadow-2xl animate-in slide-in-from-right-0 fade-in duration-200 sm:h-[min(680px,calc(100dvh-8rem))] sm:w-[min(480px,calc(100vw-3rem))] sm:rounded-2xl sm:border sm:border-slate-200 sm:pb-0">
             <div className="flex min-w-0 max-w-full items-center justify-between overflow-hidden px-4 sm:px-6 py-3 sm:py-4 border-b border-slate-100 shrink-0 bg-white">
               <div className="min-w-0 flex items-center gap-3">
-                <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-brand-red-600 flex items-center justify-center text-white text-sm sm:text-base font-bold shrink-0">
-                  P
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-brand-red-600 text-white sm:h-10 sm:w-10">
+                  <ParisAvatar size={40} className="h-9 w-9 sm:h-10 sm:w-10" fallbackIconClassName="h-5 w-5" />
                 </div>
                 <div>
                   <span className="block font-bold text-slate-800 text-base sm:text-lg">
@@ -246,7 +247,7 @@ export function ParisFloatingButton({
           }
           className={`${videoDock ? 'relative' : 'fixed bottom-[calc(5.5rem+env(safe-area-inset-bottom))] right-3 sm:right-4 md:bottom-6 md:right-6'} z-50 inline-flex min-h-12 items-center gap-2 rounded-full bg-brand-red-600 px-3 py-3 font-bold text-white shadow-xl transition-all hover:bg-brand-red-700 active:scale-95 sm:px-4`}
         >
-          <MessageCircle className="h-5 w-5 shrink-0" aria-hidden="true" />
+          <ParisAvatar size={24} className="h-6 w-6 shrink-0 ring-2 ring-white/80" fallbackIconClassName="h-5 w-5" />
           <Mic className={learnerSurface ? "hidden h-5 w-5 shrink-0 sm:block" : "h-5 w-5 shrink-0"} aria-hidden="true" />
           <span className="hidden sm:inline">
             {learnerSurface

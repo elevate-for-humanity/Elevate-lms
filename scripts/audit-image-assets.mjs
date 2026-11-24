@@ -29,8 +29,8 @@ const SERVICE_PUBLIC_ROOTS = {
 };
 
 // These are the canonical Dockerfiles configured/validated for each deployed
-// service. Marketing uses Dockerfile.marketing; LMS/Admin use their Northflank
-// service Dockerfiles.
+// service. Marketing uses Dockerfile.marketing; LMS uses Dockerfile.google-lms
+// and Admin uses Dockerfile.admin.
 const PACKAGING_CONTRACTS = [
   {
     service: 'marketing',
@@ -40,7 +40,7 @@ const PACKAGING_CONTRACTS = [
   },
   {
     service: 'lms',
-    dockerfile: 'Dockerfile.northflank-lms',
+    dockerfile: 'Dockerfile.google-lms',
     requiredSource: '/app/public',
     runtimeTarget: 'apps/lms/public',
   },

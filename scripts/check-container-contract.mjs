@@ -7,7 +7,7 @@ const read = (path) => readFileSync(path, 'utf8');
 const services = [
   {
     name: 'marketing',
-    configPath: 'northflank_marketing.json',
+    configPath: 'google_marketing.json',
     dockerPath: 'Dockerfile.marketing',
     expectedServiceName: 'elevate-marketing',
     expectedDockerfile: '/Dockerfile.marketing',
@@ -15,18 +15,18 @@ const services = [
   },
   {
     name: 'admin',
-    configPath: 'northflank_admin.json',
-    dockerPath: 'Dockerfile.northflank-admin',
+    configPath: 'google_admin.json',
+    dockerPath: 'Dockerfile.admin',
     expectedServiceName: 'elevate-admin',
-    expectedDockerfile: '/Dockerfile.northflank-admin',
+    expectedDockerfile: '/Dockerfile.admin',
     expectedPort: 3000,
   },
   {
     name: 'lms',
-    configPath: 'northflank_config.json',
-    dockerPath: 'Dockerfile.northflank-lms',
+    configPath: 'google_config.json',
+    dockerPath: 'Dockerfile.google-lms',
     expectedServiceName: 'elevate-lms',
-    expectedDockerfile: '/Dockerfile.northflank-lms',
+    expectedDockerfile: '/Dockerfile.google-lms',
     expectedPort: 3000,
   },
 ];
@@ -54,7 +54,7 @@ for (const service of services) {
   const docker = read(service.dockerPath);
 
   if (config.name !== service.expectedServiceName) {
-    fail(`${service.name}: Northflank service name is ${config.name ?? 'missing'}, expected ${service.expectedServiceName}.`);
+    fail(`${service.name}: service name is ${config.name ?? 'missing'}, expected ${service.expectedServiceName}.`);
   }
   if (config.vcsData?.projectBranch !== 'main') {
     fail(`${service.name}: production config must deploy main.`);
@@ -91,7 +91,7 @@ for (const service of services) {
   }
 
   if (!docker.includes('NF_GIT_SHA')) {
-    fail(`${service.name}: Dockerfile is not tied to Northflank NF_GIT_SHA build identity.`);
+    fail(`${service.name}: Dockerfile is not tied to the NF_GIT_SHA build identity.`);
   }
 
   pass(`${service.name}: deployment contract inspected.`);

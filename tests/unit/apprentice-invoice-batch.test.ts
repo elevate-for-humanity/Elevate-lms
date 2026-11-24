@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import {
   apprenticeInvoiceEmail,
   apprenticeInvoiceIdempotencyKey,
+  billingWeekEnd,
   billingWeekStart,
   nextWeeklyInvoiceDateAfter,
 } from '@/lib/billing/apprentice-invoice-batch';
@@ -20,6 +21,26 @@ describe('apprentice invoice fallback batch', () => {
 
   it('advances a stale schedule beyond the current processing date', () => {
     expect(nextWeeklyInvoiceDateAfter('2026-09-14', '2026-09-22')).toBe('2026-09-28');
+  });
+
+  it('computes the Sunday end of a billing week', () => {
+    expect(billingWeekEnd('2026-09-21')).toBe('2026-09-27');
+    expect(billingWeekEnd('2026-11-23')).toBe('2026-11-29');
+  });
+
+  it('states plainly that a PayPal payment is applied to the fallback invoice, never charged twice', () => {
+    const email = apprenticeInvoiceEmail({
+      customerName: 'Learner',
+      productName: 'Apprenticeship Tuition',
+      invoiceNumber: 'INV-1',
+      amountCents: 10000,
+      dueDate: '2026-11-23',
+    });
+    expect(email.html).toContain('applied to this invoice instead of creating a second charge');
+    expect(email.html).toContain('you will not be charged twice for the same week');
+    expect(email.text).toContain('applied to this invoice instead of creating a second charge');
+    expect(email.html).not.toContain('It does not create a duplicate automatic charge');
+    expect(email.text).not.toContain('It does not create a duplicate automatic charge');
   });
 
   it('emails every open invoice and its Pay Now link without threatening portal access', () => {

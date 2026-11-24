@@ -17,8 +17,14 @@ test('legacy paid enrollment requires approval and active access',()=>{
   for (const field of ['revoked_at','cancelled_at','suspended_at','refunded_at']) {
     assert.equal(isApprovedPaidEnrollment({...valid,[field]:'2026-11-18T02:00:00Z'}),false,field);
   }
-  for (const payment_status of [null,'pending','failed','waived','qa_test','funded']) {
+  for (const payment_status of [null,'pending','failed','qa_test','funded']) {
     assert.equal(isApprovedPaidEnrollment({...valid,payment_status}),false,String(payment_status));
+  }
+  // An active payment plan and a waived (free) course both mean payment is
+  // settled or arranged, so they pass the payment prong; approval is still
+  // required (see the approved_at/approved_by checks above).
+  for (const payment_status of ['active','waived']) {
+    assert.equal(isApprovedPaidEnrollment({...valid,payment_status}),true,String(payment_status));
   }
   for (const status of ['pending','unassigned','suspended','withdrawn','revoked']) {
     assert.equal(isApprovedPaidEnrollment({...valid,status}),false,status);
@@ -96,7 +102,22 @@ test('verified self-pay and manually approved state funding grant access indepen
     const paidFunded = { ...stateFunded, funding_source, payment_status: 'paid' };
     assert.equal(hasAdmissionPaymentOrFunding(paidFunded), true);
     assert.equal(hasAdmissionPaymentOrFunding({ ...paidFunded, funding_verified: false }), false);
-    assert.equal(hasAdmissionPaymentOrFunding({ ...paidFunded, eligibility_status: null }), false);
+    // program_enrollments.eligibility_status is never populated (the
+    // eligibility review writes to the applications table), so a missing
+    // value does not block verified funding — only an explicitly recorded
+    // non-'eligible' value does.
+    assert.equal(hasAdmissionPaymentOrFunding({ ...paidFunded, eligibility_status: null }), true);
+    assert.equal(hasAdmissionPaymentOrFunding({ ...paidFunded, eligibility_status: 'ineligible' }), false);
   }
   assert.equal(isApprovedPaidEnrollment({ ...stateFunded, funding_verified: false, payment_status: 'paid' }), false);
+});
+
+test('state funding matches recorded funding-source spellings', () => {
+  for (const funding_source of ['WIOA ITA', 'WIOA_ITA', 'wioa ita', 'WIOA', 'wrg']) {
+    const row = { ...valid, funding_source, funding_verified: true, eligibility_status: null, payment_status: 'pending' };
+    assert.equal(hasAdmissionPaymentOrFunding(row), true, funding_source);
+    assert.equal(isApprovedPaidEnrollment(row), true, funding_source);
+  }
+  assert.equal(hasAdmissionPaymentOrFunding({ ...valid, funding_source: 'WIOA ITA', funding_verified: false, payment_status: 'pending' }), false);
+  assert.equal(hasAdmissionPaymentOrFunding({ ...valid, funding_source: 'SELF_PAY', funding_verified: true, payment_status: 'pending' }), false);
 });

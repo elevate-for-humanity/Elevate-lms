@@ -30,6 +30,8 @@ import { getPushNotificationClient } from '@/lib/notifications/push-client';
 import { installAudioUnlock, startRingtone, stopRingtone } from '@/lib/notifications/audio-unlock';
 import { PhoneRecordingPlayer } from '@/components/communications/PhoneRecordingPlayer';
 import { ProgramHolderPhoneIntroduction } from '@/components/program-holder/ProgramHolderPhoneIntroduction';
+import { TextWorkspace } from '@/components/communications/TextWorkspace';
+import { PwaInstallButton } from '@/components/pwa/PwaInstallButton';
 import { phonePresenceDisplay } from '@/lib/phone/presence-display';
 
 type RingMode = 'ring' | 'vibrate' | 'silent' | 'do_not_disturb' | 'offline';
@@ -140,6 +142,7 @@ export function ProgramHolderPhone({
   const [held, setHeld] = useState(false);
   const [returnNumber, setReturnNumber] = useState('');
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+  const [tab, setTab] = useState<'texts' | 'voicemail' | 'inbox' | 'settings'>('texts');
   const clientRef = useRef<PhoneClient | null>(null);
   const outboundClientRef = useRef<PhoneClient | null>(null);
   const callRef = useRef<BrowserPhoneCall | null>(null);
@@ -174,6 +177,9 @@ export function ProgramHolderPhone({
   useEffect(() => {
     // Launcher shortcuts may arrive before the asynchronous phone data renders.
     if (!loading && window.location.hash === '#incoming-call-alert-mode') {
+      // The ring controls live in the Settings tab now; open it first so the
+      // anchor target is visible before scrolling to it.
+      setTab('settings');
       document.getElementById('incoming-call-alert-mode')?.scrollIntoView({ block: 'center' });
     }
   }, [loading, data?.extension.id]);
@@ -747,95 +753,163 @@ export function ProgramHolderPhone({
     );
 
   const presence = phonePresenceDisplay(data.readOnly, connected, data.extension.presenceStatus);
+  const openInboxCount = data.inbox.filter((item) => item.status !== 'resolved').length;
 
   return (
-    <main className="mx-auto w-full min-w-0 max-w-4xl space-y-6 p-4 sm:p-6">
+    <main className="flex min-h-dvh w-full flex-col bg-slate-100">
       <audio ref={remoteAudioRef} autoPlay playsInline />
-      <AudioOutputControl audio={remoteAudioRef} />
-      <nav aria-label="Phone communication tools" className="flex gap-2 overflow-x-auto">
-        <a href="#incoming-call-alert-mode" className="shrink-0 rounded-lg border bg-white p-3 font-bold text-blue-900">Ringer &amp; alerts</a>
-        <a
-          href={textsHref}
-          className="shrink-0 rounded-lg border bg-white p-3 font-bold text-blue-900"
-        >
-          Text messages
-        </a>
-        <a
-          href={emailHref}
-          className="shrink-0 rounded-lg border bg-white p-3 font-bold text-blue-900"
-        >
-          Interoffice email
-        </a>
-        <a
-          href={calendarHref}
-          className="shrink-0 rounded-lg border bg-white p-3 font-bold text-blue-900"
-        >
-          Calendar
-        </a>
-      </nav>
-      {data.readOnly && (
-        <p className="rounded-2xl border border-blue-200 bg-blue-50 p-4 font-bold text-blue-950">
-          Administrator preview: this {roleLabel} extension, settings, and PARIS call inbox are
-          shown read-only. Sign in as the {roleLabel} to connect the PWA, change settings, return
-          calls, or update callback status.
-        </p>
-      )}
-      <header className="rounded-3xl bg-gradient-to-br from-blue-950 via-blue-800 to-cyan-700 p-6 text-white shadow-xl sm:p-8">
-        <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <p className="text-xs font-black uppercase tracking-[0.2em] text-cyan-200">
+      <header className="sticky top-0 z-30 border-b border-blue-900 bg-blue-950 text-white shadow-lg">
+        <div className="mx-auto flex w-full max-w-7xl flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3 sm:px-6">
+          <div className="min-w-0 flex-1">
+            <p className="text-[11px] font-black uppercase tracking-[0.2em] text-cyan-300">
               Elevate Phone
             </p>
-            <h1 className="mt-2 text-3xl font-black">{data.extension.displayName}</h1>
-            <p className="mt-2 text-blue-100">
-              Extension {data.extension.extension} · {data.extension.department || roleLabel}
-            </p>
-            <p className="mt-1 text-lg font-bold">
+            <h1 className="truncate text-xl font-black leading-tight">
+              {data.extension.displayName}
+            </h1>
+            <p className="truncate text-sm text-blue-100">
+              Extension {data.extension.extension} · {data.extension.department || roleLabel} ·
               Business caller ID {friendlyNumber(data.phoneNumber)}
             </p>
           </div>
-          <div
-            className={`rounded-2xl border px-5 py-4 ${presence.online ? 'border-emerald-300 bg-emerald-500/20' : 'border-white/30 bg-white/10'}`}
+          <p
+            className={`flex items-center gap-2 rounded-full border px-3 py-2 text-sm font-black ${presence.online ? 'border-emerald-300 bg-emerald-500/20' : 'border-white/30 bg-white/10'}`}
           >
-            <p className="flex items-center gap-2 font-black">
-              <span
-                className={`h-3 w-3 rounded-full ${presence.online ? 'bg-emerald-300' : 'bg-slate-300'}`}
-              />
-              {presence.label}
-            </p>
-            <button
-              onClick={connected ? disconnect : connect}
-              disabled={
-                data.readOnly ||
-                connecting ||
-                ['offline', 'do_not_disturb'].includes(data.extension.ringMode)
-              }
-              className="mt-3 min-h-11 rounded-xl bg-white px-5 font-black text-blue-900 disabled:opacity-50"
-            >
-              {connecting ? 'Connecting…' : connected ? 'Disconnect' : 'Connect phone'}
-            </button>
-          </div>
+            <span
+              className={`h-2.5 w-2.5 rounded-full ${presence.online ? 'bg-emerald-300' : 'bg-slate-300'}`}
+            />
+            {presence.label}
+          </p>
+          <PwaInstallButton
+            label="Install Elevate Phone"
+            installedLabel="Phone installed"
+            className="min-h-11 rounded-xl bg-white px-4 font-black text-blue-900"
+          />
+          <button
+            onClick={connected ? disconnect : connect}
+            disabled={
+              data.readOnly ||
+              connecting ||
+              ['offline', 'do_not_disturb'].includes(data.extension.ringMode)
+            }
+            className="min-h-11 rounded-xl bg-cyan-500 px-5 font-black text-blue-950 disabled:opacity-50"
+          >
+            {connecting ? 'Connecting…' : connected ? 'Disconnect' : 'Connect phone'}
+          </button>
         </div>
       </header>
 
-      {error && (
-        <p
-          role="alert"
-          className="rounded-xl border border-red-200 bg-red-50 p-4 font-bold text-red-900"
-        >
-          {error}
-        </p>
-      )}
-      {message && (
-        <p
-          role="status"
-          className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 font-bold text-emerald-900"
-        >
-          {message}
-        </p>
-      )}
+      <div className="mx-auto w-full max-w-7xl px-4 pt-4 sm:px-6">
+        {data.readOnly && (
+          <p className="rounded-2xl border border-blue-200 bg-blue-50 p-4 font-bold text-blue-950">
+            Administrator preview: this {roleLabel} extension, settings, and PARIS call inbox are
+            shown read-only. Sign in as the {roleLabel} to connect the PWA, change settings, return
+            calls, or update callback status.
+          </p>
+        )}
+        {error && (
+          <p
+            role="alert"
+            className="mt-3 rounded-xl border border-red-200 bg-red-50 p-4 font-bold text-red-900"
+          >
+            {error}
+          </p>
+        )}
+        {message && (
+          <p
+            role="status"
+            className="mt-3 rounded-xl border border-emerald-200 bg-emerald-50 p-4 font-bold text-emerald-900"
+          >
+            {message}
+          </p>
+        )}
+        <nav aria-label="Phone communication tools" className="mt-3 flex flex-wrap gap-2">
+          <a
+            href="#incoming-call-alert-mode"
+            onClick={() => setTab('settings')}
+            className="rounded-lg border bg-white px-3 py-2 text-sm font-bold text-blue-900"
+          >
+            Ringer &amp; alerts
+          </a>
+          <a
+            href={textsHref}
+            className="rounded-lg border bg-white px-3 py-2 text-sm font-bold text-blue-900"
+          >
+            Text messages
+          </a>
+          <a
+            href={emailHref}
+            className="rounded-lg border bg-white px-3 py-2 text-sm font-bold text-blue-900"
+          >
+            Interoffice email
+          </a>
+          <a
+            href={calendarHref}
+            className="rounded-lg border bg-white px-3 py-2 text-sm font-bold text-blue-900"
+          >
+            Calendar
+          </a>
+        </nav>
+      </div>
 
-      <section className="mx-auto w-full min-w-0 max-w-[26rem] rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
+      <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col gap-6 px-4 py-4 sm:px-6 lg:flex-row">
+        <div className="w-full shrink-0 space-y-6 lg:w-[26rem]">
+          {callState !== 'idle' && (
+            <section className="w-full rounded-3xl border-2 border-cyan-300 bg-slate-950 p-5 text-center text-white shadow-2xl">
+              <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-cyan-500/20">
+                <PhoneCall className="h-10 w-10 text-cyan-300" />
+              </div>
+              <p className="mt-4 text-sm font-black uppercase tracking-widest text-cyan-300">
+                {callState === 'ringing'
+                  ? 'Elevate for Humanity — incoming call'
+                  : callState === 'calling'
+                    ? 'Calling'
+                    : 'Call connected'}
+              </p>
+              <h2 className="mt-2 text-3xl font-black">{friendlyNumber(incomingNumber)}</h2>
+              <div className="mt-6 flex flex-wrap justify-center gap-3">
+                {callState === 'ringing' && (
+                  <button
+                    onClick={answer}
+                    className="min-h-12 rounded-full bg-emerald-500 px-7 font-black text-white"
+                  >
+                    <Phone className="mr-2 inline h-5 w-5" />
+                    Answer
+                  </button>
+                )}
+                {callState === 'active' && (
+                  <button
+                    onClick={toggleMute}
+                    className="min-h-12 rounded-full bg-slate-700 px-6 font-black"
+                  >
+                    {muted ? (
+                      <MicOff className="mr-2 inline h-5 w-5" />
+                    ) : (
+                      <Mic className="mr-2 inline h-5 w-5" />
+                    )}
+                    {muted ? 'Unmute' : 'Mute'}
+                  </button>
+                )}
+                <button
+                  onClick={hangup}
+                  className="min-h-12 rounded-full bg-red-600 px-7 font-black text-white"
+                >
+                  <PhoneOff className="mr-2 inline h-5 w-5" />
+                  {callState === 'ringing' ? 'Decline' : 'Hang up'}
+                </button>
+                {callState === 'active' && callRef.current?.hold && (
+                  <button
+                    onClick={toggleHold}
+                    className="min-h-12 rounded-full bg-slate-700 px-6 font-black"
+                  >
+                    {held ? 'Resume call' : 'Hold'}
+                  </button>
+                )}
+              </div>
+            </section>
+          )}
+
+          <section className="w-full rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
         <h2 className="text-xl font-black text-slate-950">Dial pad</h2>
         <p className="mt-1 text-sm text-slate-600">
           {data.extension.provider === 'asterisk'
@@ -848,7 +922,7 @@ export function ProgramHolderPhone({
               key={digit}
               type="button"
               onClick={() => void pressDialDigit(digit)}
-              className="min-h-12 rounded-xl border border-slate-300 bg-slate-50 text-xl font-black text-slate-950 active:bg-slate-200"
+              className="min-h-14 rounded-xl border border-slate-300 bg-slate-50 text-2xl font-black text-slate-950 active:bg-slate-200"
             >
               {digit}
             </button>
@@ -922,63 +996,51 @@ export function ProgramHolderPhone({
           ))}
         </div>
       </section>
-
-      {callState !== 'idle' && (
-        <section className="mx-auto w-full max-w-md rounded-3xl border-2 border-cyan-300 bg-slate-950 p-5 text-center text-white shadow-2xl">
-          <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-cyan-500/20">
-            <PhoneCall className="h-10 w-10 text-cyan-300" />
-          </div>
-          <p className="mt-4 text-sm font-black uppercase tracking-widest text-cyan-300">
-            {callState === 'ringing'
-              ? 'Elevate for Humanity — incoming call'
-              : callState === 'calling'
-                ? 'Calling'
-                : 'Call connected'}
-          </p>
-          <h2 className="mt-2 text-3xl font-black">{friendlyNumber(incomingNumber)}</h2>
-          <div className="mt-6 flex flex-wrap justify-center gap-3">
-            {callState === 'ringing' && (
-              <button
-                onClick={answer}
-                className="min-h-12 rounded-full bg-emerald-500 px-7 font-black text-white"
-              >
-                <Phone className="mr-2 inline h-5 w-5" />
-                Answer
-              </button>
-            )}
-            {callState === 'active' && (
-              <button
-                onClick={toggleMute}
-                className="min-h-12 rounded-full bg-slate-700 px-6 font-black"
-              >
-                {muted ? (
-                  <MicOff className="mr-2 inline h-5 w-5" />
-                ) : (
-                  <Mic className="mr-2 inline h-5 w-5" />
-                )}
-                {muted ? 'Unmute' : 'Mute'}
-              </button>
-            )}
-            <button
-              onClick={hangup}
-              className="min-h-12 rounded-full bg-red-600 px-7 font-black text-white"
-            >
-              <PhoneOff className="mr-2 inline h-5 w-5" />
-              {callState === 'ringing' ? 'Decline' : 'Hang up'}
-            </button>
-            {callState === 'active' && callRef.current?.hold && (
-              <button
-                onClick={toggleHold}
-                className="min-h-12 rounded-full bg-slate-700 px-6 font-black"
-              >
-                {held ? 'Resume call' : 'Hold'}
-              </button>
-            )}
-          </div>
-        </section>
-      )}
-
-      <div className="grid gap-6">
+      <AudioOutputControl audio={remoteAudioRef} />
+    </div>
+    <div className="min-w-0 flex-1">
+      <div role="tablist" aria-label="Phone panels" className="flex gap-2 overflow-x-auto">
+        <button
+          type="button"
+          role="tab"
+          aria-selected={tab === 'texts'}
+          onClick={() => setTab('texts')}
+          className={`min-h-11 shrink-0 rounded-xl border px-4 font-black ${tab === 'texts' ? 'border-blue-700 bg-blue-700 text-white' : 'border-slate-300 bg-white text-slate-900'}`}
+        >
+          Text messages
+        </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={tab === 'voicemail'}
+          onClick={() => setTab('voicemail')}
+          className={`min-h-11 shrink-0 rounded-xl border px-4 font-black ${tab === 'voicemail' ? 'border-blue-700 bg-blue-700 text-white' : 'border-slate-300 bg-white text-slate-900'}`}
+        >
+          Voicemail
+        </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={tab === 'inbox'}
+          onClick={() => setTab('inbox')}
+          className={`min-h-11 shrink-0 rounded-xl border px-4 font-black ${tab === 'inbox' ? 'border-blue-700 bg-blue-700 text-white' : 'border-slate-300 bg-white text-slate-900'}`}
+        >
+          Calls to return{openInboxCount > 0 ? ` (${openInboxCount} open)` : ''}
+        </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={tab === 'settings'}
+          onClick={() => setTab('settings')}
+          className={`min-h-11 shrink-0 rounded-xl border px-4 font-black ${tab === 'settings' ? 'border-blue-700 bg-blue-700 text-white' : 'border-slate-300 bg-white text-slate-900'}`}
+        >
+          Settings
+        </button>
+      </div>
+      <section hidden={tab !== 'texts'} aria-label="Text messages" className="mt-4">
+        <TextWorkspace embedded />
+      </section>
+      <section hidden={tab !== 'settings'} aria-label="Availability and ringing" className="mt-4">
         <section id="phone-settings" className="scroll-mt-24 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
           <h2 className="flex items-center gap-2 text-xl font-black text-slate-950">
             <Headphones className="h-5 w-5 text-blue-700" />
@@ -1217,8 +1279,11 @@ export function ProgramHolderPhone({
             and sends a secure missed-call alert.
           </p>
         </section>
-      </div>
-
+        <div className="mt-6">
+          <ProgramHolderPhoneIntroduction roleLabel={roleLabel} />
+        </div>
+      </section>
+      <section hidden={tab !== 'voicemail'} aria-label="Voicemail" className="mt-4">
       <section id="phone-voicemail" className="scroll-mt-24 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
         <h2 className="text-xl font-black">Voicemail</h2>
         {data.voicemail?.items?.length ? (
@@ -1242,7 +1307,8 @@ export function ProgramHolderPhone({
           <p className="mt-3 text-sm text-slate-600">No voicemail messages.</p>
         )}
       </section>
-
+      </section>
+      <section hidden={tab !== 'inbox'} aria-label="Calls to return" className="mt-4">
       <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
         <div className="flex items-center justify-between gap-3">
           <div>
@@ -1336,7 +1402,9 @@ export function ProgramHolderPhone({
           ))}
         </div>
       </section>
-      <ProgramHolderPhoneIntroduction roleLabel={roleLabel} />
-    </main>
+      </section>
+    </div>
+  </div>
+</main>
   );
 }

@@ -119,7 +119,11 @@ describe('phone connection lifecycle',()=>{
   });
   it('opens to the dial pad before availability settings',async()=>{
     await connected();
-    const dial=screen.getByRole('heading',{name:'Dial pad'});const settings=screen.getByRole('heading',{name:'Availability and ringing'});
+    const dial=screen.getByRole('heading',{name:'Dial pad'});
+    // Availability settings live in the Settings tab; the dial pad stays
+    // first in the document and the ring mode is reachable from the tab.
+    fireEvent.click(screen.getByRole('tab',{name:'Settings'}));
+    const settings=screen.getByRole('heading',{name:'Availability and ringing'});
     expect(Boolean(dial.compareDocumentPosition(settings)&Node.DOCUMENT_POSITION_FOLLOWING)).toBe(true);
     expect(screen.getByRole('button',{name:'Ring on'}).getAttribute('aria-pressed')).toBe('true');
     expect(screen.getByRole('button',{name:'Vibrate'})).toBeTruthy();

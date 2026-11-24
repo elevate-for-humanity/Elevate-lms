@@ -1,6 +1,6 @@
 'use client';
 import { useCallback, useEffect, useState } from 'react';
-export function TextWorkspace() {
+export function TextWorkspace({ embedded = false }: { embedded?: boolean } = {}) {
   const [data, setData] = useState<any>(null),
     [to, setTo] = useState(''),
     [body, setBody] = useState(''),
@@ -49,9 +49,8 @@ export function TextWorkspace() {
       setBusy(false);
     }
   }
-  return (
-    <main className="mx-auto max-w-5xl space-y-5 p-4">
-      <h1 className="text-3xl font-black text-slate-950">Text messages</h1>
+  const content = (
+    <>
       <p className="text-sm text-slate-700">
         Send and reply using your assigned Elevate business number.
       </p>
@@ -145,6 +144,19 @@ export function TextWorkspace() {
           </article>
         ))}
       </section>
+    </>
+  );
+  if (embedded)
+    return (
+      <section className="space-y-5 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+        <h2 className="text-2xl font-black text-slate-950">Text messages</h2>
+        {content}
+      </section>
+    );
+  return (
+    <main className="mx-auto max-w-5xl space-y-5 p-4">
+      <h1 className="text-3xl font-black text-slate-950">Text messages</h1>
+      {content}
     </main>
   );
 }

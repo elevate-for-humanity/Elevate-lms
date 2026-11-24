@@ -30,6 +30,7 @@ import {
   type IndustryStandards,
 } from '@/lib/industry/standards-loader';
 import { fetchCareerOneStopData, isCareerOneStopConfigured } from '@/lib/industry/careeronestop';
+import { fetchUsaJobs, type JobRow } from '@/lib/industry/usajobs';
 import { logger } from '@/lib/logger';
 import { adaptProgramTemplateToBlueprint } from './publish-adapter';
 import type { JobFeedEvidence, ProgramBuilderTemplate } from './schema';
@@ -65,6 +66,7 @@ export function buildJobFeedEvidence(args: {
               ? 'US-DOL-CareerOneStop'
               : source,
       ),
+      ...(careerOneStop ? ['US-DOL-CareerOneStop'] : []),
       ...(usaJobs.length ? ['USAJOBS'] : []),
     ]),
   );

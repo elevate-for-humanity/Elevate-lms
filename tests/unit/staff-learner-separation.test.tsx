@@ -57,6 +57,8 @@ describe('separate staff and learner workspaces', () => {
     );
     expect(resolveRoleCompatiblePostLoginUrl('https://example.org' + guide, 'instructor')).toBe(
       getRoleDestinationUrl('instructor'),
+    );
+  });
   it('preserves the exact enrolled HVAC workspace without rerouting Admin program pages', () => {
     const lms = new URL(getRoleDestinationUrl('student'));
     const path = '/programs/hvac-technician/course';

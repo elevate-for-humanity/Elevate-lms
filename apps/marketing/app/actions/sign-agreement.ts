@@ -9,6 +9,12 @@ import {
 import { requireProgramHolder } from '@/lib/auth/require-program-holder';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { checkAndSendOnboardingCompleteEmail } from '@/lib/program-holder/onboarding-complete';
+import {
+  ACHIEVE_HOLDER_ID,
+  achieveCnaAgreements,
+  achieveDocumentVersion,
+  type AchieveDocument,
+} from '@/lib/program-holder/achieve-cna-agreements';
 import { paymentAddendum } from '@/lib/program-holder/payment-addendum';
 
 export async function signAgreement(data: {
@@ -32,20 +38,46 @@ export async function signAgreement(data: {
     .eq('id', user.id)
     .maybeSingle();
 
+  const signingMou = data.agreementType === 'program_holder_mou';
+  const signingAchieveNda = data.agreementType === 'nda' && data.agreementVersion?.startsWith('achieve-cna-');
   let signingPaymentAddendum = false;
-  if (data.agreementType === 'program_holder_mou') {
+  let holderId: string | undefined;
+  let achieveSignature: {
+    kind: AchieveDocument;
+    features: Record<string, unknown>;
+    packet: Record<string, unknown>;
+    updatedAt: string | null;
+  } | undefined;
+  if (signingMou || signingAchieveNda) {
     const context = await requireProgramHolder();
-    if (context.mode !== 'holder' || context.user.id !== user.id) return { success: false, error: 'Sign the current Program Holder agreement from your own portal.' };
-    const { data: agreementHolder, error: agreementError } = await context.db.from('program_holders').select('features').eq('id', context.holderId).maybeSingle();
-    if (agreementError || !agreementHolder) return { success: false, error: 'Agreement readiness could not be checked. Please retry.' };
-    const addendum = paymentAddendum(agreementHolder.features, context.holderId);
-    signingPaymentAddendum = Boolean(addendum && data.agreementVersion === addendum.version);
-    if (!signingPaymentAddendum && data.agreementVersion !== `3.0-${context.holderId}`)
+    if (context.mode !== 'holder' || context.user.id !== user.id) {
+      return { success: false, error: 'Sign the current agreement from your own Program Holder portal.' };
+    }
+    holderId = context.holderId;
+    const { data: holder, error } = await context.db.from('program_holders')
+      .select('features,status,approved_at,updated_at').eq('id', holderId).maybeSingle();
+    if (error || !holder) return { success: false, error: 'Agreement readiness could not be checked. Please retry.' };
+
+    const addendum = paymentAddendum(holder.features, holderId);
+    signingPaymentAddendum = Boolean(signingMou && addendum && data.agreementVersion === addendum.version);
+    if (holderId === ACHIEVE_HOLDER_ID && !signingPaymentAddendum) {
+      if (!holder.approved_at || !['active', 'approved', 'approved_pending_mou'].includes(holder.status)) {
+        return { success: false, error: 'Your agreement will be available after approval.' };
+      }
+      const approved = achieveCnaAgreements(holder.features);
+      const kind = signingAchieveNda ? 'nda' : 'mou';
+      if (!approved || data.agreementVersion !== achieveDocumentVersion(kind, approved.digest)) {
+        return { success: false, error: 'The finalized CNA agreement is unavailable or changed. Open the current agreement before signing.' };
+      }
+      if (!['checkbox', 'typed', 'drawn'].includes(data.method) ||
+          (data.method === 'typed' && (data.typedName?.trim().length ?? 0) < 2) ||
+          (data.method === 'drawn' && !data.signature?.startsWith('data:image/png;base64,'))) {
+        return { success: false, error: 'Enter a valid signature for the current agreement.' };
+      }
+      achieveSignature = { kind, features: holder.features, packet: approved.packet, updatedAt: holder.updated_at };
+    } else if (signingAchieveNda || (!signingPaymentAddendum && data.agreementVersion !== `3.0-${holderId}`)) {
       return { success: false, error: 'The agreement changed. Reload and review the current terms before signing.' };
-    // Program holders do not pay: there is no payment schedule for a program
-    // holder, and Schedule A payment terms are completed as part of the signed
-    // agreement rather than a precondition to signing. Do not gate the MOU
-    // signature on the full-forms review flag or on payment terms.
+    }
   }
   const requestHeaders = await headers();
   const ipAddress =
@@ -57,7 +89,7 @@ export async function signAgreement(data: {
   const signerName = String(data.typedName || profile?.full_name || user.email).trim();
 
   const result = await recordAgreementAcceptance({
-    supabase,
+    supabase: achieveSignature ? await requireAdminClient() : supabase,
     userId: user.id,
     userEmail: user.email,
     userRole: String(profile?.role || 'student'),
@@ -70,7 +102,7 @@ export async function signAgreement(data: {
     signatureData: data.method === 'drawn' ? data.signature : undefined,
     ipAddress,
     userAgent,
-    context: 'onboarding',
+    context: achieveSignature ? `achieve-cna-${achieveSignature.kind}` : 'onboarding',
     organizationId: profile?.organization_id || undefined,
     tenantId: profile?.tenant_id || undefined,
   });
@@ -78,27 +110,42 @@ export async function signAgreement(data: {
   if (!result.success)
     return { success: false, error: result.error || 'Agreement could not be recorded.' };
 
-  if (data.agreementType === 'program_holder_mou' && !signingPaymentAddendum && profile?.program_holder_id) {
+  if (holderId && (achieveSignature || (signingMou && !signingPaymentAddendum))) {
     const db = await requireAdminClient();
     const signedAt = new Date().toISOString();
-    const { error: holderError } = await db
-      .from('program_holders')
-      .update({
+    if (achieveSignature && !result.id) return { success: false, error: 'The signature receipt could not be verified.' };
+    const updates = {
+      updated_at: signedAt,
+      ...(signingMou ? {
         mou_signed: true,
         mou_signed_at: signedAt,
         mou_holder_signed_at: signedAt,
         mou_holder_name: signerName,
         mou_status: 'signed',
         status: 'active',
-        updated_at: signedAt,
-      })
-      .eq('id', profile.program_holder_id);
-    if (holderError)
-      return {
-        success: false,
-        error:
-          'The signature was recorded, but the Program Holder record could not be activated. Please contact support.',
-      };
+      } : {}),
+      ...(achieveSignature ? {
+        features: {
+          ...achieveSignature.features,
+          [`achieve_cna_signed_${achieveSignature.kind}`]: {
+            packet: achieveSignature.packet,
+            version: data.agreementVersion,
+            acceptance_id: result.id,
+            signed_at: signedAt,
+          },
+        },
+      } : {}),
+    };
+    let update = db.from('program_holders').update(updates).eq('id', holderId);
+    if (achieveSignature) {
+      update = achieveSignature.updatedAt === null
+        ? update.is('updated_at', null)
+        : update.eq('updated_at', achieveSignature.updatedAt);
+    }
+    const { data: saved, error: holderError } = await update.select('id').maybeSingle();
+    if (holderError || !saved) {
+      return { success: false, error: 'The signature receipt was recorded. Reload the agreement to finish updating your holder record.' };
+    }
     await checkAndSendOnboardingCompleteEmail(db, user.id);
   }
 

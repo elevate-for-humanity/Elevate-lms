@@ -2,6 +2,7 @@
 import { headers } from 'next/headers';
 import { NextResponse } from 'next/server';
 import { requireProgramHolder } from '@/lib/auth/require-program-holder';
+import { ACHIEVE_HOLDER_ID } from '@/lib/program-holder/achieve-holder';
 import { checkAndSendOnboardingCompleteEmail } from '@/lib/program-holder/onboarding-complete';
 
 export async function POST(request: Request) {
@@ -10,14 +11,13 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Program Holder session required.' }, { status: 403 });
   const body = await request.json().catch(() => ({}));
   const allowedTypes = ['handbook', 'rights', 'nda', 'non_compete', 'enchanted_hearts_referral_terms'];
-  const types = allowedTypes.filter((type) => body[type] === true);
+  const requiresSeparateNda = ctx.holderId === ACHIEVE_HOLDER_ID;
+  const types = allowedTypes.filter((type) => body?.[type] === true && !(requiresSeparateNda && type === 'nda'));
+  if (requiresSeparateNda && body?.nda === true && !types.length) {
+    return NextResponse.json({ error: 'Sign your separate CNA NDA on the Agreements page.' }, { status: 409 });
+  }
   if (!types.length)
     return NextResponse.json({ error: 'Select at least one agreement to sign.' }, { status: 400 });
-  // Program holders do not pay, so no payment schedule gates these
-  // acknowledgements: the NDA and non-compete are recorded as the holder accepts
-  // them, like the handbook and rights acknowledgements. (Previously this route
-  // rejected the whole batch with 409 while the full-forms review flag was set,
-  // which also discarded the handbook/rights acceptances in the same request.)
   const requestHeaders = await headers();
   for (const documentType of types) {
     const { data: existing, error: lookupError } = await ctx.db

@@ -41,7 +41,7 @@ vi.mock('@/lib/supabase/admin', () => ({
       const query: any = {
         then: (resolve: any) => Promise.resolve({ data, error: null }).then(resolve),
       };
-      for (const method of ['select', 'eq', 'in', 'order', 'limit', 'maybeSingle', 'overrideTypes'])
+      for (const method of ['select', 'eq', 'or', 'in', 'is', 'order', 'limit', 'maybeSingle', 'overrideTypes'])
         query[method] = (...args: unknown[]) => {
           state.calls.push({ table, method, args });
           return query;

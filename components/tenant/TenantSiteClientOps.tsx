@@ -1,5 +1,7 @@
 'use client';
 
+import { TenantProviderRate } from './TenantProviderRate';
+import { parseHourlyRate } from '@/lib/cleaning/pricing';
 import { useEffect, useMemo, useState } from 'react';
 import type { CSSProperties, FormEvent, ReactNode } from 'react';
 import { useTenantRequestHeaders, useReadOnlyTenantPreview } from './TenantPreviewContext';
@@ -55,7 +57,7 @@ export function TenantTrackedLink({ href, eventName, children, className, style,
   return <a href={href} onClick={track} className={className} style={style} {...(external ? { target: '_blank', rel: 'noreferrer' } : {})}>{children}</a>;
 }
 
-async function submitLead(payload: { name: string; email: string; phone?: string; message: string }, previewHeaders: Record<string, string>) {
+async function submitLead(payload: { name: string; email: string; phone?: string; message: string; providerHourlyRate?: string }, previewHeaders: Record<string, string>) {
   const response = await fetch('/api/tenant-sites/lead', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...previewHeaders },
@@ -107,7 +109,7 @@ export function TenantLeadForm({ accent }: { accent: string }) {
 export type TenantCustomFormField = {
   name: string;
   label: string;
-  type?: 'text' | 'email' | 'tel' | 'textarea' | 'select';
+  type?: 'text' | 'email' | 'tel' | 'textarea' | 'select' | 'provider_rate';
   required?: boolean;
   options?: string[];
 };
@@ -123,7 +125,7 @@ export function TenantCustomLeadForm({ accent, title = 'Send a message', fields 
   function value(name: string) { return values[name] || ''; }
   function set(name: string, next: string) { setValues((current) => ({ ...current, [name]: next })); }
 
-  const canSubmit = normalized.every((field) => !field.required || value(field.name).trim());
+  const canSubmit = normalized.every((field) => (!field.required && !value(field.name).trim()) || (field.type === 'provider_rate' ? parseHourlyRate(value(field.name)) !== null : Boolean(value(field.name).trim())));
 
   async function submit(event: FormEvent) {
     event.preventDefault();
@@ -140,7 +142,9 @@ export function TenantCustomLeadForm({ accent, title = 'Send a message', fields 
         .map((field) => `${field.label}: ${value(field.name).trim()}`);
       const primaryMessage = value('message') || value('notes') || value('details');
       const message = [primaryMessage, details.length ? `Additional answers:\n${details.join('\n')}` : ''].filter(Boolean).join('\n\n') || `Submission from ${title}`;
-      await submitLead({ name, email, phone, message }, previewHeaders);
+      const rateField = normalized.find(field => field.type === 'provider_rate');
+      const providerHourlyRate = rateField && value(rateField.name).trim() || undefined;
+      await submitLead({ name, email, phone, message, providerHourlyRate }, previewHeaders);
       setValues({}); setStatus('success');
     } catch (err) {
       setStatus('error'); setError(err instanceof Error ? err.message : 'Could not submit form');
@@ -152,6 +156,7 @@ export function TenantCustomLeadForm({ accent, title = 'Send a message', fields 
       <h3 className="text-xl font-black text-slate-950">{title}</h3>
       <div className="mt-5 grid gap-4 sm:grid-cols-2">
         {normalized.map((field) => {
+          if (field.type === 'provider_rate') return <TenantProviderRate key={field.name} value={value(field.name)} onChange={next => set(field.name, next)} required={field.required} />;
           const common = { value: value(field.name), onChange: (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => set(field.name, event.target.value), required: field.required, className: 'w-full rounded-xl border border-slate-300 px-3 py-3 text-slate-950' };
           return <label key={field.name} className={field.type === 'textarea' ? 'block sm:col-span-2' : 'block'}><span className="mb-1 block text-sm font-bold text-slate-700">{field.label}{field.required ? ' *' : ''}</span>{field.type === 'textarea' ? <textarea {...common} rows={5} /> : field.type === 'select' ? <select {...common}><option value="">Select…</option>{(field.options || []).slice(0, 30).map((option) => <option key={option} value={option}>{option}</option>)}</select> : <input {...common} type={field.type || 'text'} />}</label>;
         })}

@@ -1,15 +1,5 @@
 import { logger } from '@/lib/logger';
 
-// Forward map: local-part of recipient address → destination Gmail
-export const FORWARD_MAP: Record<string, string> = {
-  info: 'elevate4humanityedu@gmail.com',
-  support: 'elevate4humanityedu@gmail.com',
-  admissions: 'elevate4humanityedu@gmail.com',
-  enrollment: 'elevate4humanityedu@gmail.com',
-  contact: 'elevate4humanityedu@gmail.com',
-};
-export const DEFAULT_FORWARD = 'elevate4humanityedu@gmail.com';
-
 /**
  * SendGrid Inbound Parse delivers a multipart/form-data POST.
  * This parses the relevant fields from the FormData.
@@ -17,6 +7,8 @@ export const DEFAULT_FORWARD = 'elevate4humanityedu@gmail.com';
 export interface ParsedInboundEmail {
   from: string;
   to: string;
+  cc?: string;
+  providerMessageId?: string;
   subject: string;
   html: string;
   text: string;
@@ -24,13 +16,16 @@ export interface ParsedInboundEmail {
   eventId: string; // Stable message identity for per-mailbox deduplication
   deliveryId?: string; // Includes the normalized SMTP envelope for delivery claims
   envelopeRecipients: string[];
+  hasEnvelope?: boolean;
   attachments: File[];
   headers?: string;
 }
 
 /** SMTP envelope is authoritative; display headers must not add deliveries. */
-export function inboundDeliveryRecipients(parsed: Pick<ParsedInboundEmail, 'envelopeRecipients' | 'to'>): string[] {
-  return parsed.envelopeRecipients.length
+export function inboundDeliveryRecipients(
+  parsed: Pick<ParsedInboundEmail, 'envelopeRecipients' | 'hasEnvelope' | 'to'>,
+): string[] {
+  return parsed.hasEnvelope || parsed.envelopeRecipients.length
     ? parseEnvelopeAddresses(JSON.stringify({ to: parsed.envelopeRecipients }))
     : parseEnvelopeAddresses(parsed.to);
 }
@@ -79,14 +74,27 @@ export async function parseInboundEmail(request: Request): Promise<ParsedInbound
 
     const from = String(formData.get('from') ?? '');
     const to = String(formData.get('to') ?? '');
+    const cc = String(formData.get('cc') ?? '');
     const subject = String(formData.get('subject') ?? '(no subject)');
     const html = String(formData.get('html') ?? '');
     const text = String(formData.get('text') ?? '');
-    const replyTo = String(formData.get('reply-to') ?? from);
     const headers = String(formData.get('headers') || '');
+    const replyTo = String(formData.get('reply-to') ?? headers.match(/^Reply-To:[ \t]*([^\r\n]+)/im)?.[1] ?? from);
     const providerId = headers.match(/^Message-ID:\s*(.+)$/im)?.[1]?.trim();
     const timestamp = String(formData.get('timestamp') || providerId || '');
-    const envelopeRecipients = parseEnvelopeAddresses(formData.get('envelope') ?? to);
+    const rawEnvelope = formData.get('envelope');
+    let envelopeRecipients: string[] = [];
+    if (typeof rawEnvelope === 'string') {
+      try {
+        const envelope: unknown = JSON.parse(rawEnvelope);
+        if (envelope && typeof envelope === 'object' && 'to' in envelope && Array.isArray(envelope.to)) {
+          envelopeRecipients = parseEnvelopeAddresses(envelope.to.filter((address) => typeof address === 'string').join(','));
+        }
+      } catch {
+        // An invalid envelope must go to routing review rather than display-header delivery.
+      }
+    }
+    const hasEnvelope = rawEnvelope !== null;
     const attachments = inboundAttachmentEntries(formData);
 
     // Stable dedup key — SendGrid doesn't provide a unique event ID in Inbound Parse
@@ -97,37 +105,27 @@ export async function parseInboundEmail(request: Request): Promise<ParsedInbound
       .slice(0, 32);
 
     const deliveryId = createHash('sha256')
-      .update(JSON.stringify([eventId, [...inboundDeliveryRecipients({ envelopeRecipients, to })].sort()]))
+      .update(JSON.stringify([eventId, [...inboundDeliveryRecipients({ envelopeRecipients, hasEnvelope, to })].sort()]))
       .digest('hex').slice(0, 32);
 
     return {
       deliveryId,
       from,
       to,
+      cc,
+      providerMessageId: providerId,
       subject,
       html,
       text,
       replyTo,
       eventId,
       envelopeRecipients,
+      hasEnvelope,
       attachments,
       headers,
     };
-  } catch (err) {
-    logger.error('[SendGrid Inbound] Failed to parse form data:', err);
+  } catch {
+    logger.error('[SendGrid Inbound] Failed to parse form data');
     return null;
   }
-}
-
-/**
- * Resolve the forwarding destination from the To address.
- * Matches on the local-part prefix against FORWARD_MAP; falls back to DEFAULT_FORWARD.
- */
-export function resolveForwardTarget(toAddress: string): string {
-  // toAddress may be "Name <email>" or just "email"
-  const emailMatch = toAddress.match(/<(.+?)>/) ?? toAddress.match(/(\S+@\S+)/);
-  const email = emailMatch?.[1] ?? toAddress;
-  const prefix = email.split('@')[0]?.toLowerCase();
-  if (prefix && FORWARD_MAP[prefix]) return FORWARD_MAP[prefix];
-  return DEFAULT_FORWARD;
 }

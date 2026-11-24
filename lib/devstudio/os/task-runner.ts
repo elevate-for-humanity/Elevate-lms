@@ -1,4 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
+import { isOpenHandsManagedTask } from '@/lib/devstudio/openhands/studio-timeout-policy.mjs';
 import { approvalReason, detectRiskTags, requiresApproval } from './risk';
 import { newTraceId, writeDevAuditLog } from './audit';
 import type { CreateTaskInput, TaskPlanStep } from './types';
@@ -6,6 +7,7 @@ import { executeAICommand } from '@/lib/ai/runtime/command-executor';
 import { getAITool, type AIAgentId } from '@/lib/ai/tools/registry';
 import { planAIToolFromCommand } from '@/lib/ai/tools/planner';
 import { reconcileStudioRunFromTask } from '@/lib/devstudio/studio-run-reconciler';
+import { isProviderConfirmationSnapshot } from '@/lib/devstudio/openhands/provider-confirmation.mjs';
 
 export type TaskExecutionRuntimeContext = {
   actorRoles: readonly string[];
@@ -734,6 +736,22 @@ export async function approveTask(
   if (!task) throw new Error('Task not found');
   const isInteractive = task.tool_input?.__executionMode === 'interactive';
 
+  // PARIS already has an accepted OpenHands conversation. Cloud's
+  // waiting_for_confirmation is a provider-side decision on pending actions,
+  // not approval of a new local command. Approve it in the original OpenHands
+  // conversation. Never invoke runTaskExecution or fabricate a local approval.
+  if (task.tool_name === 'openhands.execute' &&
+      typeof task.correlation_id === 'string' && task.correlation_id.startsWith('paris-repair:')) {
+    if (task.user_id !== reviewerId || (task.tenant_id ?? null) !== null ||
+        task.status !== 'awaiting_approval' ||
+        !isProviderConfirmationSnapshot(task) ||
+        task.tool_input?.repository !== 'elevate-for-humanity/Elevate-lms' ||
+        !/^studio\/[a-zA-Z0-9/_-]+$/.test(task.tool_input?.branch ?? '')) {
+      throw new Error('OPENHANDS_APPROVAL_RECEIPT_OR_OWNER_MISMATCH');
+    }
+    throw new Error('OPENHANDS_PROVIDER_CONFIRMATION_REQUIRED');
+  }
+
   await db
     .from('ai_approvals')
     .update({
@@ -798,12 +816,17 @@ export async function recoverStaleAiTasks(
       'id,status,studio_run_id,studio_run_step_id,tool_name,result_json,tool_output,error_message,tenant_id,user_id,started_at,created_at',
     )
     .eq('status', 'running')
+    .or('tool_name.is.null,tool_name.neq.openhands.execute')
     .or(`started_at.lt.${cutoff},and(started_at.is.null,created_at.lt.${cutoff})`)
     .limit(50);
   if (error) throw new Error(`Unable to load stale Studio tasks: ${error.message}`);
 
   let recovered = 0;
   for (const task of stale ?? []) {
+    // OpenHands has its own provider-aware reconciler. Age alone is not a
+    // terminal signal when paid execution or human confirmation is pending.
+    // Do not let generic Studio recovery destroy the original provider receipt.
+    if (isOpenHandsManagedTask(task)) continue;
     const timeoutMessage = `Studio task exceeded the ${boundedTimeout}-minute runtime limit and was closed instead of remaining stuck.`;
     const { data: closed, error: closeError } = await db
       .from('ai_tasks')
@@ -815,6 +838,7 @@ export async function recoverStaleAiTasks(
       })
       .eq('id', task.id)
       .eq('status', 'running')
+      .or('tool_name.is.null,tool_name.neq.openhands.execute')
       .select(
         'id,status,studio_run_id,studio_run_step_id,tool_name,result_json,tool_output,error_message',
       )

@@ -106,6 +106,8 @@ async function _POST(request: NextRequest) {
 
   const fallback = buildDefaultSiteConfig({ organizationName: businessName, industry, contactEmail: contactEmail || undefined });
   let config: TenantSiteConfig = fallback;
+  const credit = await consumeWebsiteBuilderCredits(supabase, user.id, 'initial_site_generation', { deferDebitUntilCommit: true });
+  if (!credit.allowed) return NextResponse.json({ error: credit.error || 'Not enough Website Builder credits', creditsRemaining: credit.balance, upgradeUrl: credit.upgradeUrl || '/store/apps/website-builder' }, { status: 402 });
 
   const responseShape = {
     navigationGroups: [{ label: 'Explore', pageIds: ['home'] }],
@@ -171,9 +173,6 @@ async function _POST(request: NextRequest) {
       { status: 422 },
     );
   }
-
-  const credit = await consumeWebsiteBuilderCredits(supabase, user.id, 'initial_site_generation', { deferDebitUntilCommit: true });
-  if (!credit.allowed) return NextResponse.json({ error: credit.error || 'Not enough Website Builder credits', creditsRemaining: credit.balance, upgradeUrl: credit.upgradeUrl || '/store/apps/website-builder' }, { status: 402 });
 
   const admin = await requireAdminClient();
   const { data: committed, error, requestId } = await commitWebsiteDraft(admin, {

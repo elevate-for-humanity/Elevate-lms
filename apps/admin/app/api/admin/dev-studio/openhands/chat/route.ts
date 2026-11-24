@@ -50,6 +50,16 @@ export async function POST(request: NextRequest) {
           error: 'This OpenHands task is not active; a new approved run is required',
         }, { status: 409 });
       }
+      // `status=running` does not mean a provider confirmation was approved.
+      // A paused Cloud sandbox can still have a running canonical ai_tasks row.
+      // Fail closed on pending/unknown approvals before any send-message call.
+      const continuationAuthorized = task.approvalStatus === 'approved' ||
+        (task.requiresApproval === false && task.approvalStatus === 'not_required');
+      if (!continuationAuthorized) {
+        return NextResponse.json({
+          error: 'OpenHands confirmation must be resolved before continuation',
+        }, { status: 409 });
+      }
       const result = await sendOpenHandsMessage(conversationId, message);
       return NextResponse.json({
         success: true,

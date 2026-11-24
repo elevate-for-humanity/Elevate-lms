@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useFormStatus } from 'react-dom';
 import { saveHiringNeeds } from './actions';
 
@@ -22,6 +22,8 @@ const fields: { name: keyof HiringNeedsFields; label: string; required: boolean 
  * it enforces employer identity and validates persisted values. */
 export function HiringNeedsForm({ initial, saved = false }: { initial: HiringNeedsFields; saved?: boolean }) {
   const [values, setValues] = useState(initial);
+  const [ready, setReady] = useState(false);
+  useEffect(() => setReady(true), []);
   const dirty = fields.some(({ name }) => values[name] !== initial[name]);
   return (
     <form action={saveHiringNeeds} className="space-y-5 rounded-xl border bg-white p-5">
@@ -31,23 +33,26 @@ export function HiringNeedsForm({ initial, saved = false }: { initial: HiringNee
           <textarea
             name={name}
             required={required}
+            disabled={!ready}
             maxLength={4000}
             value={values[name]}
-            onChange={event => setValues(previous => ({
-              ...previous,
-              [name]: event.target.value,
-            }))}
+            onChange={event => {
+              // Read the DOM value during the event, before React can defer
+              // the updater or restore the controlled textarea's old value.
+              const value = event.currentTarget.value;
+              setValues(previous => ({ ...previous, [name]: value }));
+            }}
             rows={3}
             className="mt-2 block w-full rounded-lg border p-3 font-normal"
           />
         </label>
       ))}
-      <SaveStatus saved={saved && !dirty} />
+      <SaveStatus saved={saved && !dirty} ready={ready} />
     </form>
   );
 }
 
-function SaveStatus({ saved }: { saved: boolean }) {
+function SaveStatus({ saved, ready }: { saved: boolean; ready: boolean }) {
   const { pending } = useFormStatus();
   return (
     <>
@@ -56,7 +61,7 @@ function SaveStatus({ saved }: { saved: boolean }) {
           Your hiring and training needs are saved.
         </p>
       )}
-      <button type="submit" disabled={pending} aria-busy={pending}
+      <button type="submit" disabled={!ready || pending} aria-busy={pending}
         className="rounded-lg bg-blue-700 px-5 py-3 font-semibold text-white disabled:opacity-60">
         {pending ? 'Saving hiring and training needs…' : 'Save hiring and training needs'}
       </button>

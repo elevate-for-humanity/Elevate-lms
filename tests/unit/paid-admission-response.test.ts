@@ -9,8 +9,8 @@ import {
   isExternalStudentApplicationNextStep,
 } from '../../lib/enrollment/paid-admission-response';
 
-describe('paid application requires administrator approval before LMS access', () => {
-  it('never describes a paid-but-unapproved application as enrolled', () => {
+describe('admissions responses distinguish pending review from active enrollment', () => {
+  it('never describes pending access as active enrollment', () => {
     expect(paidApplicationStatusForUrl(PENDING_LEARNER_ACCESS_URL)).toBe('pending_approval');
     expect(paidApplicationStatusForUrl('/apply/success')).toBe('pending_approval');
     expect(paidApplicationStatusForUrl(APPROVED_LEARNER_DASHBOARD_URL)).toBe('enrolled');
@@ -46,14 +46,15 @@ describe('paid application requires administrator approval before LMS access', (
       'activate my enrollment and dashboard',
       'Your enrollment and dashboard activate automatically',
       'Dashboard activation follows verified payment and complete submission',
-      'Enrollment activated. Opening your dashboard.',
     ];
     for (const path of affected) {
       const content = readFileSync(join(process.cwd(), path), 'utf8');
       for (const phrase of obsolete) expect(content, `${path}: ${phrase}`).not.toContain(phrase);
     }
     const api = readFileSync(join(process.cwd(), affected[0]), 'utf8');
-    expect(api).toContain('applicationStatus: paidApplicationStatusForUrl(dashboardUrl)');
+    expect(api).toContain("applicationStatus: dashboardUrl ? 'enrolled' : applicationStatus");
+    expect(api).toContain("applicationStatus = 'pending_admin_review'");
+    expect(api).toContain('Activate verified self-pay enrollment');
     const form = readFileSync(join(process.cwd(), affected[1]), 'utf8');
     expect(form).toContain("activated: data.applicationStatus === 'enrolled'");
     expect(form).toContain('safeStudentApplicationNextStep(data.nextStepUrl');

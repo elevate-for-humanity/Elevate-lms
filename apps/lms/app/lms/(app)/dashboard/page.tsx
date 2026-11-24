@@ -516,14 +516,14 @@ export default async function StudentDashboard() {
     },
     {
       href: '/communications/email',
-      label: 'Interoffice Email',
-      text: 'Access your interoffice staff communications and program messages.',
+      label: 'Messages',
+      text: 'Read your inbox and reply to your instructor or Elevate staff.',
       image: '/images/pages/admin-live-chat-detail.webp',
     },
     {
       href: '/lms/messages',
-      label: 'Messages',
-      text: 'Open learner communications and program messages.',
+      label: 'Community Messages',
+      text: 'Open private conversations with your Elevate community.',
       image: '/images/pages/contact-hero.jpg',
     },
     {
@@ -732,7 +732,7 @@ export default async function StudentDashboard() {
               <Link href="/lms/documents" className="font-bold underline">
                 Review documents & agreements
               </Link>
-              <Link href="/lms/messages" className="font-bold underline">
+              <Link href="/communications/email" className="font-bold underline">
                 Contact your instructor
               </Link>
             </div>

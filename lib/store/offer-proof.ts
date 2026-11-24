@@ -262,6 +262,8 @@ export const STORE_FEATURE_PROOFS: Partial<Record<PlatformFeatureKey, StoreFeatu
     evidenceLabel: 'Review the Course Builder product',
     access: 'public-product',
     sourcePaths: ['apps/admin/app/studio/courses/page.tsx', 'lib/course-builder/orchestrator.ts'],
+    limitation:
+      'Beta: staff-only builder; AI generation is metered at 2,500 credits per month and drafts use credits based on lesson count.',
   },
   [PlatformFeature.COURSE_FACTORY]: {
     title: 'AI Course Factory',
@@ -270,6 +272,8 @@ export const STORE_FEATURE_PROOFS: Partial<Record<PlatformFeatureKey, StoreFeatu
     evidenceLabel: 'Review the AI course workflow',
     access: 'public-product',
     sourcePaths: ['lib/ultimate-course-builder/core/generation-request.ts', 'lib/course-factory/canonical-course-gate.ts'],
+    limitation:
+      'Beta: AI generation is metered by credits and outputs pass staged validation before publishing.',
   },
   [PlatformFeature.STUDENT_MANAGEMENT]: {
     title: 'Student Management',

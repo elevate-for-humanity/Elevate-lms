@@ -1,6 +1,7 @@
 // Server component — no "use client"
 import Link from "next/link";
 import {
+  type LucideIcon,
   XCircle, AlertTriangle, Info,
   Wifi, Key, Clock, FileText, Award, Flag, CreditCard,
 } from "lucide-react";
@@ -30,7 +31,7 @@ const SEVERITY_STYLES = {
   },
 } as const;
 
-const CODE_ICONS: Record<string, React.ElementType> = {
+const CODE_ICONS: Record<string, LucideIcon> = {
   missing_env_vars:              Key,
   quickbooks_webhook_config_missing: Wifi,
   quickbooks_billing_not_ready:    CreditCard,
@@ -157,7 +158,7 @@ export function SystemHealthPanel({ health }: Props) {
               const styles = SEVERITY_STYLES[severity as keyof typeof SEVERITY_STYLES] ?? defaultStyles;
               const code = typeof alert.code === 'string' ? alert.code : 'unknown';
               const defaultIcon = styles?.Icon ?? Info;
-              const IconComponent: React.ElementType = CODE_ICONS[code] ?? defaultIcon;
+              const IconComponent: LucideIcon = CODE_ICONS[code] ?? defaultIcon;
               if (!IconComponent) return null;
               return (
                 <div

@@ -383,7 +383,12 @@ export async function ProgramHolderWorkspaceView({
     );
   if (section === 'pending')
     return (
-      <>
+      <div className="space-y-6">
+        <Hero
+          eyebrow="Assigned applications"
+          title="Pending Students"
+          description="Review school applications assigned to your Program Holder workspace. Accepted students appear in your training roster."
+        />
         <SchoolApplicantRoster
           pending
           rows={(data.schoolApplicants || []).filter(
@@ -398,7 +403,7 @@ export async function ProgramHolderWorkspaceView({
             your training roster.
           </p>
         )}
-      </>
+      </div>
     );
   if (section === 'ready-to-test')
     return (

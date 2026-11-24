@@ -330,12 +330,22 @@ test.describe('Program Holder Portal', () => {
   });
 
   test.describe('Performance', () => {
-    test('should load dashboard within 3 seconds', async ({ page }) => {
+    test('should show a usable dashboard within 3 seconds after navigation', async ({ page }) => {
       await loginAsProgramHolder(page);
 
+      // Finish the login navigation and initial dev compilation before timing
+      // a fresh page load. Notification polling and Next dev transport do not
+      // define when the dashboard's actual tools are ready for the holder.
+      await expect(page.getByRole('heading', { name: 'To-dos', level: 1, exact: true })).toBeVisible();
+      await expect(page.getByRole('heading', { name: 'Alerts', level: 2, exact: true })).toBeVisible();
+
       const startTime = Date.now();
-      await page.goto('/program-holder/dashboard');
-      await page.waitForLoadState('networkidle');
+      await page.goto('/program-holder/dashboard', { waitUntil: 'domcontentloaded' });
+      await expect(page.getByRole('heading', { name: 'To-dos', level: 1, exact: true })).toBeVisible();
+      await expect(page.getByRole('heading', { name: 'Alerts', level: 2, exact: true })).toBeVisible();
+      const reportLink = page.getByRole('link', { name: 'Weekly progress reports are due each Friday' });
+      await expect(reportLink).toBeVisible();
+      await expect(reportLink).toHaveAttribute('href', '/program-holder/reports');
       const loadTime = Date.now() - startTime;
 
       expect(loadTime).toBeLessThan(3000);

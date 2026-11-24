@@ -15,13 +15,12 @@ export const dynamic = 'force-dynamic';
 
 function SignupFormContent() {
   const searchParams = useSafeSearchParams();
-  let next = '/lms/dashboard';
+  let explicitNext = '';
   try {
-    next = validateRedirect(searchParams.get('next') || searchParams.get('redirect'), next);
+    explicitNext = validateRedirect(searchParams.get('next') || searchParams.get('redirect'), '');
   } catch {
     // Malformed percent-encoding must not prevent account creation.
   }
-  const loginUrl = `/login?redirect=${encodeURIComponent(next)}`;
   const router = useRouter();
   const [formData, setFormData] = useState({
     email: '',
@@ -29,8 +28,12 @@ function SignupFormContent() {
     confirmPassword: '',
     firstName: '',
     lastName: '',
-    role: next === '/community' ? 'community' : 'student',
+    role: explicitNext === '/community' ? 'community' : 'student',
   });
+  // Keep a trusted requested destination. Without one, follow the selected
+  // signup interest through every verification, OAuth, login and session path.
+  const next = explicitNext || (formData.role === 'community' ? '/community' : '/lms/dashboard');
+  const loginUrl = `/login?redirect=${encodeURIComponent(next)}`;
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);

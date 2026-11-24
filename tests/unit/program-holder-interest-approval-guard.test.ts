@@ -12,11 +12,14 @@ import { POST } from '@/apps/admin/app/api/program-holder/applications/[id]/appr
 
 it('stops unresolved janitorial approval before creating accounts, granting roles, payments, or sending a message', async () => {
   const application = { id: 'application-1', organization_name: 'Fixture Company', contact_name: 'Fixture Contact', email: 'owner@fixture.test', status: 'pending', data: { requested_program_interest: 'janitorial', requested_program_slugs: [] } };
-  state.from.mockReturnValue({ select: () => ({ eq: () => ({ maybeSingle: async () => ({ data: application, error: null }) }) }) });
+  state.from.mockImplementation((table) => {
+    const query: any = { select: () => query, eq: () => query, maybeSingle: async () => ({ data: table === 'program_holder_applications' ? application : null, error: null }) };
+    return query;
+  });
   const response = await POST(new NextRequest('https://admin.elevateforhumanity.org/api/program-holder/applications/application-1/approve', { method: 'POST' }), { params: Promise.resolve({ id: 'application-1' }) });
   expect(response.status).toBe(409);
   expect((await response.json()).error).toContain('program scope review');
-  expect(state.from).toHaveBeenCalledTimes(1);
+  expect(state.from).toHaveBeenCalledTimes(2);
   expect(state.createUser).not.toHaveBeenCalled();
   expect(state.sendEmail).not.toHaveBeenCalled();
   expect(state.contractor).not.toHaveBeenCalled();

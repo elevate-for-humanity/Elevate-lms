@@ -5,7 +5,7 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import { sendEmail } from '@/lib/email/sendgrid';
 import { logger } from '@/lib/logger';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
-import { unresolvedProgramHolderInterest } from '@/lib/program-holder/program-interest';
+import { isActiveProgramHolderScopeProgram, programHolderApplicationScope, programHolderProgramSlugs, programHolderScopeReview, unresolvedProgramHolderInterest, PROGRAM_HOLDER_SCOPE_INTAKE_FIELDS } from '@/lib/program-holder/program-interest';
 import { buildProgramHolderApprovalMessage, isGaryRegionalCoordinator } from '@/lib/program-holder/approval-message';
 
 // Program Holder pages are served by the LMS app, not the public marketing site.
@@ -185,10 +185,18 @@ export async function POST(_request: NextRequest, { params }: { params: Promise<
     if (!email)
       return NextResponse.json({ error: 'Application has no email address.' }, { status: 400 });
 
-    const existingData =
+    const applicationData =
       application.data && typeof application.data === 'object' && !Array.isArray(application.data)
         ? (application.data as Record<string, unknown>)
         : {};
+    // Always consult protected intake: application.data can be applicant-writable,
+    // including removal of the original interest or injection of a fake review.
+    const { data: intake, error: intakeError } = await db.from('application_intake')
+      .select(PROGRAM_HOLDER_SCOPE_INTAKE_FIELDS)
+      .eq('application_type', 'program_holder').eq('destination_table', 'program_holder_applications')
+      .eq('destination_id', id).maybeSingle();
+    if (intakeError) throw intakeError;
+    const existingData = programHolderApplicationScope(id, applicationData, intake);
     const accountRole = accountRoleForApprovedRole(existingData.approved_role);
     if (unresolvedProgramHolderInterest(existingData)) {
       return NextResponse.json(
@@ -196,15 +204,8 @@ export async function POST(_request: NextRequest, { params }: { params: Promise<
         { status: 409 },
       );
     }
-    const requestedProgramSlugs = Array.isArray(existingData.requested_program_slugs)
-      ? [
-          ...new Set(
-            existingData.requested_program_slugs
-              .map((value) => String(value || '').trim())
-              .filter(Boolean),
-          ),
-        ]
-      : [];
+    const scopeReview = programHolderScopeReview(existingData);
+    const requestedProgramSlugs = programHolderProgramSlugs(existingData);
 
     let activePrograms: Array<{ id: string; slug: string }> = [];
     if (requestedProgramSlugs.length > 0) {
@@ -216,8 +217,10 @@ export async function POST(_request: NextRequest, { params }: { params: Promise<
 
       activePrograms = (requestedPrograms ?? []).filter(
         (program) =>
-          program.is_active !== false &&
-          !['archived', 'inactive'].includes(String(program.status || '').toLowerCase()),
+          scopeReview
+            ? program.id === scopeReview.program_id && isActiveProgramHolderScopeProgram(program)
+            : program.is_active !== false &&
+              !['archived', 'inactive'].includes(String(program.status || '').toLowerCase()),
       );
       const resolvedSlugs = new Set(activePrograms.map((program) => String(program.slug)));
       const missingSlugs = requestedProgramSlugs.filter((slug) => !resolvedSlugs.has(slug));

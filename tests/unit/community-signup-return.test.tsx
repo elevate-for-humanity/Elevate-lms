@@ -21,13 +21,13 @@ beforeEach(() => {
 });
 afterEach(() => { cleanup(); vi.useRealTimers(); });
 
-function fillAndSubmit() {
+function fillAndSubmit(role = 'employer') {
   fireEvent.change(screen.getByLabelText('First Name'), { target: { value: 'Network' } });
   fireEvent.change(screen.getByLabelText('Last Name'), { target: { value: 'Member' } });
   fireEvent.change(screen.getByLabelText('Email Address'), { target: { value: 'network@fixture.test' } });
   fireEvent.change(screen.getByLabelText('Password', { exact: true }), { target: { value: 'lantern-river-meadow' } });
   fireEvent.change(screen.getByLabelText('Confirm Password'), { target: { value: 'lantern-river-meadow' } });
-  fireEvent.change(screen.getByLabelText('I am interested in'), { target: { value: 'employer' } });
+  fireEvent.change(screen.getByLabelText('I am interested in'), { target: { value: role } });
   fireEvent.click(screen.getByRole('checkbox'));
   fireEvent.submit(screen.getByRole('button', { name: 'Create Account', exact: true }).closest('form')!);
 }
@@ -119,4 +119,68 @@ it('continues an immediately authenticated signup to community without claiming 
   expect(screen.queryByRole('button', { name: 'Resend verification email' })).not.toBeInTheDocument();
   await act(async () => { await vi.advanceTimersByTimeAsync(2000); });
   expect(state.push).toHaveBeenCalledWith('/community');
+});
+
+it('uses selected community interest on bare signup for verification, resend and login without granting authority', async () => {
+  state.params = new URLSearchParams();
+  render(<SignupForm />);
+  fillAndSubmit('community');
+  await screen.findByText('Account Created!');
+  const request = state.signUp.mock.calls[0][0];
+  expectCallback(request.options.emailRedirectTo);
+  expect(request.options.data.requested_role).toBe('community');
+  expect(request.options.data).not.toHaveProperty('role');
+  expect(request).not.toHaveProperty('app_metadata');
+  expect(screen.getByRole('link', { name: 'Already verified? Go to Login' })).toHaveAttribute('href', '/login?redirect=%2Fcommunity');
+  fireEvent.click(screen.getByRole('button', { name: 'Resend verification email' }));
+  await screen.findByText('Email resent ✓');
+  expectCallback(state.resend.mock.calls[0][0].options.emailRedirectTo);
+});
+
+it('continues an immediate session from bare signup to the selected community', async () => {
+  vi.useFakeTimers();
+  state.params = new URLSearchParams();
+  state.signUp.mockResolvedValue({ data: { session: { user: { id: 'new-network-member' } } }, error: null });
+  render(<SignupForm />);
+  await act(async () => { fillAndSubmit('community'); });
+  await act(async () => { await vi.advanceTimersByTimeAsync(2000); });
+  expect(state.push).toHaveBeenCalledWith('/community');
+});
+
+it.each(['Google', 'GitHub'])('uses selected community interest from bare signup through %s OAuth', async provider => {
+  state.params = new URLSearchParams();
+  render(<SignupForm />);
+  fireEvent.change(screen.getByLabelText('I am interested in'), { target: { value: 'community' } });
+  expect(screen.getByRole('link', { name: 'Sign in' })).toHaveAttribute('href', '/login?redirect=%2Fcommunity');
+  fireEvent.click(screen.getByRole('button', { name: `Sign up with ${provider}` }));
+  await waitFor(() => expect(state.oauth).toHaveBeenCalled());
+  expectCallback(state.oauth.mock.calls[0][0].options.redirectTo);
+});
+
+it.each(['https://untrusted.invalid/community', '/%malformed'])('uses selected community as a safe fallback for invalid return %s', async next => {
+  state.params = new URLSearchParams({ next });
+  render(<SignupForm />);
+  fillAndSubmit('community');
+  await screen.findByText('Account Created!');
+  expectCallback(state.signUp.mock.calls[0][0].options.emailRedirectTo);
+});
+
+it.each(['/lms/dashboard', 'https://www.elevateforhumanity.org/sites/2exclusive-platinum-cleaning/provider'])('preserves explicit trusted return %s when Community is selected', async next => {
+  state.params = new URLSearchParams({ next });
+  render(<SignupForm />);
+  fillAndSubmit('community');
+  await screen.findByText('Account Created!');
+  expectCallback(state.signUp.mock.calls[0][0].options.emailRedirectTo, next);
+});
+
+it('updates the bare-signup fallback when the selected interest changes back to student', async () => {
+  state.params = new URLSearchParams();
+  render(<SignupForm />);
+  fireEvent.change(screen.getByLabelText('I am interested in'), { target: { value: 'community' } });
+  expect(screen.getByRole('link', { name: 'Sign in' })).toHaveAttribute('href', '/login?redirect=%2Fcommunity');
+  fireEvent.change(screen.getByLabelText('I am interested in'), { target: { value: 'student' } });
+  expect(screen.getByRole('link', { name: 'Sign in' })).toHaveAttribute('href', '/login?redirect=%2Flms%2Fdashboard');
+  fireEvent.click(screen.getByRole('button', { name: 'Sign up with Google' }));
+  await waitFor(() => expect(state.oauth).toHaveBeenCalled());
+  expectCallback(state.oauth.mock.calls[0][0].options.redirectTo, '/lms/dashboard');
 });

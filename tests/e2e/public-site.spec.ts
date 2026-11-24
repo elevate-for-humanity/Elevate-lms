@@ -288,6 +288,30 @@ test.describe('application entry audit', () => {
   for (const route of ['/apply', '/apply/student', '/programs/barber-apprenticeship/apply']) {
     test(`${route} exposes an actionable application experience`, async ({ page }) => {
       await assertNoRuntimeFailure(page, route);
+      if (route === '/apply') {
+        // /apply is the approved application chooser. Follow its real business
+        // application path and require a working form at the destination.
+        await expect(page.getByRole('heading', { name: 'Choose your application', exact: true })).toBeVisible();
+        const holderApplication = page.getByRole('link', { name: /^Program Holder/ });
+        await expect(holderApplication).toHaveAttribute('href', '/apply/program-holder');
+        await expect(page.getByRole('link', { name: /^Employer/ })).toHaveAttribute('href', '/apply/employer');
+        await expect(page.getByRole('link', { name: /^Intake Application/ })).toHaveAttribute('href', '/apply/student?intent=inquiry');
+        await holderApplication.click();
+        await expect(page).toHaveURL(/\/apply\/program-holder$/);
+        await expect(page.getByLabel('Email *', { exact: true })).toBeVisible();
+        await expect(page.getByRole('button', { name: 'Submit Program Holder Application', exact: true })).toBeEnabled();
+      }
+      if (route === '/programs/barber-apprenticeship/apply') {
+        await expect(page.getByRole('heading', { name: 'Choose the correct Barber application', exact: true })).toBeVisible();
+        const hostApplication = page.getByRole('link', { name: 'Start Host Site Application', exact: true });
+        await expect(hostApplication).toHaveAttribute('href', '/partners/host-shop/apply?program=barber');
+        await expect(page.getByRole('link', { name: 'Submit Free Inquiry', exact: true })).toHaveAttribute('href', '/programs/barber-apprenticeship/request-info');
+        await expect(page.getByRole('link', { name: 'Start Enrollment', exact: true })).toHaveAttribute('href', '/apply/student/interview?program=barber-apprenticeship&intent=enrollment');
+        await hostApplication.click();
+        await expect(page).toHaveURL(/\/partners\/host-shop\/apply\?program=barber$/);
+        await expect(page.getByRole('textbox', { name: 'Legal business name *', exact: true })).toBeVisible();
+        await expect(page.getByRole('button', { name: 'Submit Host Site Application', exact: true })).toBeEnabled();
+      }
       const control = page.locator('form, input, select, textarea, button[type="submit"]').first();
       await expect(control, `${route} has no actionable application control`).toBeVisible();
     });
@@ -295,7 +319,31 @@ test.describe('application entry audit', () => {
 
   test('student application has a submission control', async ({ page }) => {
     await page.goto('/apply/student', { waitUntil: 'domcontentloaded' });
-    await expect(page.getByRole('button', { name: /submit application/i })).toBeVisible();
+    // The canonical entry opens PARIS; its accessible standard-form path is a
+    // five-step intake. Verify the final control through the actual workflow,
+    // without submitting a test record or starting paid enrollment.
+    await page.getByRole('link', { name: 'Use standard form instead', exact: true }).click();
+    await expect(page).toHaveURL(/\/apply\/student\/form\?intent=inquiry$/);
+    await page.getByRole('textbox', { name: 'First Name', exact: true }).fill('Browser');
+    await page.getByRole('textbox', { name: 'Last Name', exact: true }).fill('QA');
+    await page.getByLabel('Date of Birth', { exact: true }).fill('1990-01-01');
+    await page.getByRole('textbox', { name: 'Email', exact: true }).fill('browser-control-check@qa.invalid');
+    await page.getByRole('textbox', { name: 'Phone', exact: true }).fill('317-555-0100');
+    await page.getByRole('textbox', { name: 'Street Address', exact: true }).fill('100 QA Test Way');
+    await page.getByRole('textbox', { name: 'City', exact: true }).fill('Indianapolis');
+    await page.getByRole('textbox', { name: 'State', exact: true }).fill('IN');
+    await page.getByRole('textbox', { name: 'ZIP Code', exact: true }).fill('46201');
+    const next = page.getByRole('button', { name: 'Continue', exact: true });
+    await next.click();
+    await page.getByLabel(/Program of Interest/).selectOption('hvac-technician');
+    await next.click();
+    await page.getByLabel(/How do you plan to pay/).selectOption('not_sure');
+    await next.click();
+    await next.click();
+    const submit = page.getByRole('button', { name: 'Submit Intake Application', exact: true });
+    await expect(submit).toBeVisible();
+    await expect(submit).toHaveAttribute('type', 'submit');
+    await expect(submit).toBeEnabled();
   });
 
   test('application status page accepts tracking information', async ({ page }) => {

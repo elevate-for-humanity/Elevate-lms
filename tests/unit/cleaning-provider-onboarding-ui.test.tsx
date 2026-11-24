@@ -8,7 +8,13 @@ vi.mock('@/components/tenant/TenantPreviewContext', () => ({ useTenantRequestHea
 const fetchMock = vi.fn();
 const success = (body: unknown) => ({ ok: true, json: async () => body });
 const verificationRequired = () => ({ ok: false, json: async () => ({ error: 'Open a secure email sign-in link to access your cleaning provider profile.', code: 'provider_email_verification_required' }) });
-const pendingProvider = { id: 'provider', name: 'Cleaning Company', eligibility: 'pending', hourly_cents: 3500, zips: ['46204'], services: ['commercial'], opted_in: true };
+const application = { id: '00000000-0000-4000-8000-000000000001', name: 'Cleaning Company', contactName: 'Applicant', createdAt: null, identityRevision: 'a'.repeat(64) };
+const pendingProvider = { id: 'provider', lead_id: application.id, name: application.name, identityRevision: application.identityRevision, eligibility: 'pending', hourly_cents: 3500, zips: ['46204'], services: ['commercial'], opted_in: true };
+const identityBody = { applicationId: application.id, confirmedBusinessName: application.name, identityRevision: application.identityRevision, identityConfirmed: true };
+async function selectApplication(id = application.id) {
+  fireEvent.change(await screen.findByRole('combobox', { name: 'Choose the network application you submitted' }), { target: { value: id } });
+}
+function confirmIdentity() { fireEvent.click(screen.getByRole('checkbox', { name: /I submitted this application and confirm/ })); }
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -17,7 +23,7 @@ beforeEach(() => {
   auth.getUser.mockResolvedValue({ data: { user: { id: 'current-user', email: 'account@example.invalid', user_metadata: { email: 'spoofed@example.invalid' } } }, error: null });
   auth.signInWithOtp.mockResolvedValue({ error: null });
   auth.createClient.mockReturnValue({ auth: { getUser: auth.getUser, signInWithOtp: auth.signInWithOtp } });
-  fetchMock.mockResolvedValue(success({ provider: null, application: { name: 'Applicant' }, jobs: [], jobOffersEnabled: false }));
+  fetchMock.mockResolvedValue(success({ provider: null, applications: [application], jobs: [], jobOffersEnabled: false }));
 });
 afterEach(() => { cleanup(); vi.unstubAllGlobals(); });
 
@@ -87,7 +93,7 @@ describe('cleaning provider profile workflow', () => {
 
   it('keeps the trusted full provider return URL for sign-in and signup and links the existing network and community', async () => {
     render(<TenantCleaningProvider />);
-    await screen.findByRole('button', { name: 'Save provider profile for review' });
+    await screen.findByRole('combobox', { name: 'Choose the network application you submitted' });
     const destination = 'https://www.elevateforhumanity.org/sites/2exclusive-platinum-cleaning/provider';
     for (const name of ['Sign in', 'Create an account']) {
       const url = new URL(screen.getByRole('link', { name }).getAttribute('href')!);
@@ -99,9 +105,10 @@ describe('cleaning provider profile workflow', () => {
   });
 
   it('lets an existing applicant explicitly choose rate, coverage, services and email consent without claiming approval', async () => {
-    fetchMock.mockResolvedValueOnce(success({ provider: null, application: { name: 'Applicant' }, jobs: [], jobOffersEnabled: false }))
+    fetchMock.mockResolvedValueOnce(success({ provider: null, applications: [application], jobs: [], jobOffersEnabled: false }))
       .mockResolvedValueOnce(success({ provider: pendingProvider, saved: true }));
     render(<TenantCleaningProvider />);
+    await selectApplication();
     const save = await screen.findByRole('button', { name: 'Save provider profile for review' });
     const consent = screen.getByRole('checkbox', { name: /I want job-opportunity emails/ });
     expect((consent as HTMLInputElement).checked).toBe(false);
@@ -109,18 +116,20 @@ describe('cleaning provider profile workflow', () => {
     fireEvent.change(screen.getByRole('textbox', { name: /ZIP codes you can serve/i }), { target: { value: '46204, 46201' } });
     fireEvent.click(screen.getByRole('checkbox', { name: 'Commercial janitorial' }));
     fireEvent.click(consent);
+    expect((save as HTMLButtonElement).disabled).toBe(true);
+    confirmIdentity();
     fireEvent.submit(save.closest('form')!);
     await screen.findByText(/Provider profile saved for review/);
     const writes = fetchMock.mock.calls.filter(([, options]) => options?.method === 'POST');
     expect(writes).toHaveLength(1);
-    expect(JSON.parse(writes[0][1].body)).toEqual({ action: 'onboard', hourlyCents: 3500, zips: ['46204', '46201'], services: ['commercial'], optedIn: true });
+    expect(JSON.parse(writes[0][1].body)).toEqual({ action: 'onboard', ...identityBody, hourlyCents: 3500, zips: ['46204', '46201'], services: ['commercial'], optedIn: true });
     expect(screen.getByText('Review status: Pending review.')).toBeTruthy();
     expect(screen.getByText(/Online job offers are not open yet/)).toBeTruthy();
     expect(screen.queryByRole('button', { name: /accept.*job/i })).toBeNull();
   });
 
   it('does not show a provider form before a matching network application exists', async () => {
-    fetchMock.mockResolvedValue(success({ provider: null, application: null, jobs: [], jobOffersEnabled: false }));
+    fetchMock.mockResolvedValue(success({ provider: null, applications: [], jobs: [], jobOffersEnabled: false }));
     render(<TenantCleaningProvider />);
     await screen.findByText(/Submit the cleaning network application with your verified account email/);
     expect(screen.queryByRole('button', { name: 'Save provider profile for review' })).toBeNull();
@@ -146,5 +155,64 @@ describe('cleaning provider profile workflow', () => {
     await waitFor(() => expect(screen.getByRole('status').textContent).toContain('Sign in with a verified email'));
     expect(screen.getByRole('link', { name: 'Sign in' })).toBeTruthy();
     expect(screen.queryByRole('button', { name: /Save/ })).toBeNull();
+  });
+
+  it('does not automatically select a public application, including a newer same-email submission', async () => {
+    const other = { ...application, id: '00000000-0000-4000-8000-000000000003', name: 'Other Company', contactName: 'Other Contact', identityRevision: 'b'.repeat(64) };
+    fetchMock.mockResolvedValue(success({ provider: null, applications: [other, application], jobs: [], jobOffersEnabled: false }));
+    render(<TenantCleaningProvider />);
+    const choice = await screen.findByRole('combobox', { name: 'Choose the network application you submitted' });
+    expect((choice as HTMLSelectElement).value).toBe('');
+    expect(screen.queryByRole('button', { name: 'Save provider profile for review' })).toBeNull();
+    await selectApplication();
+    expect(screen.getByRole('checkbox', { name: /confirm Cleaning Company/ })).toBeTruthy();
+    confirmIdentity();
+    expect((screen.getByRole('checkbox', { name: /I submitted this application/ }) as HTMLInputElement).checked).toBe(true);
+    await selectApplication(other.id);
+    expect((screen.getByRole('checkbox', { name: /confirm Other Company/ }) as HTMLInputElement).checked).toBe(false);
+    expect(fetchMock.mock.calls.some(([, options]) => options?.method === 'POST')).toBe(false);
+  });
+
+  it('requires identity confirmation for an existing owner-imported pending provider', async () => {
+    fetchMock.mockResolvedValue(success({ provider: { ...pendingProvider, opted_in: false }, applications: [], jobs: [], jobOffersEnabled: false }));
+    render(<TenantCleaningProvider />);
+    const save = await screen.findByRole('button', { name: 'Save provider profile for review' });
+    expect((save as HTMLButtonElement).disabled).toBe(true);
+    fireEvent.submit(save.closest('form')!);
+    await screen.findByText('Select your own application and confirm the displayed business name before saving.');
+    expect(fetchMock.mock.calls.some(([, options]) => options?.method === 'POST')).toBe(false);
+    confirmIdentity();
+    expect((save as HTMLButtonElement).disabled).toBe(false);
+  });
+
+  it('lets a reviewed provider withdraw email consent explicitly without altering coverage or eligibility', async () => {
+    fetchMock.mockResolvedValueOnce(success({ provider: { ...pendingProvider, eligibility: 'eligible' }, jobs: [], jobOffersEnabled: true }))
+      .mockResolvedValueOnce(success({ provider: { ...pendingProvider, eligibility: 'eligible', opted_in: false }, saved: true }));
+    render(<TenantCleaningProvider />);
+    const save = await screen.findByRole('button', { name: 'Save email preference' });
+    fireEvent.click(screen.getByRole('checkbox', { name: /I want job-opportunity emails/ }));
+    confirmIdentity();
+    fireEvent.submit(save.closest('form')!);
+    await screen.findByText(/Job-opportunity emails are turned off/);
+    expect(JSON.parse(fetchMock.mock.calls[1][1].body)).toEqual({ action: 'consent', ...identityBody, optedIn: false });
+    expect(screen.getByText('Review status: Approved.')).toBeTruthy();
+    expect(screen.queryByRole('textbox', { name: /ZIP codes/ })).toBeNull();
+  });
+
+  it('reports a review race honestly and refreshes to the reviewed profile without claiming withdrawal', async () => {
+    fetchMock.mockResolvedValueOnce(success({ provider: pendingProvider, jobs: [], jobOffersEnabled: false }))
+      .mockResolvedValueOnce({ ok: false, json: async () => ({ error: 'Your review status changed. Refresh before editing your profile.' }) })
+      .mockResolvedValueOnce(success({ provider: { ...pendingProvider, eligibility: 'eligible' }, jobs: [], jobOffersEnabled: false }));
+    render(<TenantCleaningProvider />);
+    const save = await screen.findByRole('button', { name: 'Save provider profile for review' });
+    confirmIdentity();
+    fireEvent.click(screen.getByRole('checkbox', { name: /I want job-opportunity emails/ }));
+    fireEvent.submit(save.closest('form')!);
+    await screen.findByText('Your review status changed. Refresh before editing your profile.');
+    expect(screen.queryByText(/Provider profile saved|emails are turned off/)).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: 'Refresh profile' }));
+    await screen.findByRole('button', { name: 'Save email preference' });
+    expect(screen.getByText('Review status: Approved.')).toBeTruthy();
+    expect((screen.getByRole('checkbox', { name: /I want job-opportunity emails/ }) as HTMLInputElement).checked).toBe(true);
   });
 });

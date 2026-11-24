@@ -58,19 +58,30 @@ export function TenantCleaningBooking(){
  </section>;
 }
 type CleaningProvider = {
+  lead_id: string;
   name: string;
+  identityRevision: string;
   hourly_cents: number;
   zips: string[];
   services: string[];
   opted_in: boolean;
   eligibility: 'pending' | 'eligible' | 'suspended';
 };
+type CleaningApplication = {
+  id: string;
+  name: string;
+  contactName: string;
+  createdAt: string | null;
+  identityRevision: string;
+};
 
 export function TenantCleaningProvider() {
   const api = useCleaningApi();
   const readOnly = useReadOnlyTenantPreview();
   const [provider, setProvider] = useState<CleaningProvider | null>(null);
-  const [applicantName, setApplicantName] = useState<string | null>(null);
+  const [applications, setApplications] = useState<CleaningApplication[]>([]);
+  const [applicationId, setApplicationId] = useState('');
+  const [identityConfirmed, setIdentityConfirmed] = useState(false);
   const [assigned, setAssigned] = useState<any[]>([]);
   const [rate, setRate] = useState('');
   const [zips, setZips] = useState('');
@@ -82,9 +93,14 @@ export function TenantCleaningProvider() {
   const [busy, setBusy] = useState(false);
   const [needsEmailVerification, setNeedsEmailVerification] = useState(false);
   const pending = !provider || provider.eligibility === 'pending';
+  const selectedApplication = applications.find(application => application.id === applicationId);
+  const identity = provider
+    ? { id: provider.lead_id, name: provider.name, identityRevision: provider.identityRevision }
+    : selectedApplication;
 
   function showProvider(value: CleaningProvider | null) {
     setProvider(value);
+    setIdentityConfirmed(false);
     if (!value) return;
     setRate((value.hourly_cents / 100).toFixed(2));
     setZips(value.zips.join(', '));
@@ -96,22 +112,32 @@ export function TenantCleaningProvider() {
     if (error instanceof CleaningApiError && error.code === 'provider_email_verification_required') {
       setNeedsEmailVerification(true);
       setProvider(null);
-      setApplicantName(null);
+      setApplications([]);
+      setApplicationId('');
+      setIdentityConfirmed(false);
       setAssigned([]);
       setLoaded(false);
     }
     setNotice(error instanceof Error ? error.message : fallback);
   }
 
-  useEffect(() => {
-    void api('provider').then(result => {
+  async function loadProfile() {
+    try {
+      const result = await api('provider');
       showProvider(result.provider);
-      setApplicantName(result.application?.name || null);
+      setApplications(result.applications || []);
+      setApplicationId('');
       setAssigned(result.jobs || []);
       setJobOffersEnabled(result.jobOffersEnabled === true);
       setLoaded(true);
       setNeedsEmailVerification(false);
-    }).catch(error => showError(error, 'Unable to load your profile.'));
+    } catch (error) {
+      showError(error, 'Unable to load your profile.');
+    }
+  }
+
+  useEffect(() => {
+    void loadProfile();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   async function sendEmailLink() {
@@ -142,6 +168,10 @@ export function TenantCleaningProvider() {
     event.preventDefault();
     const cents = parseHourlyRate(rate);
     if (cents === null || busy) return;
+    if (pending && (!identity || !identityConfirmed)) {
+      setNotice('Select your own application and confirm the displayed business name before saving.');
+      return;
+    }
     const submittedZips = [...new Set(zips.split(/[\s,]+/).filter(Boolean))];
     if (pending && (!submittedZips.length || submittedZips.some(zip => !/^\d{5}$/.test(zip)) || !selectedServices.length)) {
       setNotice('Enter five-digit ZIP codes and select at least one cleaning service.');
@@ -151,7 +181,7 @@ export function TenantCleaningProvider() {
     setNotice('');
     try {
       const result = await api('provider', pending
-        ? { action: 'onboard', hourlyCents: cents, zips: submittedZips, services: selectedServices, optedIn }
+        ? { action: 'onboard', applicationId: identity!.id, confirmedBusinessName: identity!.name, identityRevision: identity!.identityRevision, identityConfirmed: true, hourlyCents: cents, zips: submittedZips, services: selectedServices, optedIn }
         : { hourlyCents: cents });
       if (result.provider) showProvider(result.provider);
       setNotice(result.alreadySubmitted
@@ -166,12 +196,35 @@ export function TenantCleaningProvider() {
     }
   }
 
+  async function saveConsent(event: FormEvent) {
+    event.preventDefault();
+    if (busy) return;
+    if (!identity || !identityConfirmed) {
+      setNotice('Confirm the displayed application and business name before changing email permission.');
+      return;
+    }
+    setBusy(true);
+    setNotice('');
+    try {
+      const result = await api('provider', { action: 'consent', applicationId: identity.id, confirmedBusinessName: identity.name, identityRevision: identity.identityRevision, identityConfirmed: true, optedIn });
+      showProvider(result.provider);
+      setNotice(result.provider.opted_in
+        ? 'Your email preference is saved. Job emails still require approval, an open network, and a matching opportunity.'
+        : 'Job-opportunity emails are turned off. Existing accepted assignments remain unchanged.');
+    } catch (error) {
+      showError(error, 'Unable to save your email preference.');
+    } finally {
+      setBusy(false);
+    }
+  }
+
   return <section className="mx-auto max-w-4xl px-5 py-14">
     <h2 className="text-3xl font-black">Your cleaning business</h2>
     <SignIn path="/provider" />
     <div className="mt-5 flex flex-wrap gap-5 leading-7">
       <a href={`${cleaningSiteUrl}/join-network`} className="font-bold underline">Cleaning network application</a>
       <a href={`${siteUrls.lms}/community`} className="font-bold underline">Open the community</a>
+      <button type="button" disabled={busy} onClick={() => void loadProfile()} className="font-bold underline">Refresh profile</button>
     </div>
     {needsEmailVerification ? <div className="mt-6 rounded-2xl border bg-white p-6">
       <h3 className="text-xl font-bold">Verify access to your email</h3>
@@ -180,9 +233,20 @@ export function TenantCleaningProvider() {
         {busy ? 'Requesting link…' : 'Email me a secure sign-in link'}
       </button>
     </div> : null}
-    {loaded && !provider && !applicantName ? <p className="mt-5 leading-7">Submit the cleaning network application with your verified account email, then return here to finish your provider profile.</p> : null}
-    {provider || applicantName ? <>
-      <p className="mt-6 font-bold">{provider?.name || applicantName}</p>
+    {loaded && !provider && !applications.length ? <p className="mt-5 leading-7">Submit the cleaning network application with your verified account email, then return here to finish your provider profile.</p> : null}
+    {!provider && applications.length ? <div className="mt-6 rounded-2xl border bg-white p-6">
+      <label className="block font-bold">Choose the network application you submitted
+        <select value={applicationId} onChange={event => { setApplicationId(event.target.value); setIdentityConfirmed(false); }} className={input}>
+          <option value="">Select your application</option>
+          {applications.map(application => <option key={application.id} value={application.id}>
+            {application.name} · {application.contactName}{application.createdAt ? ' · ' + new Date(application.createdAt).toLocaleString() : ''}
+          </option>)}
+        </select>
+      </label>
+      <p className="mt-3 leading-7">Application forms are public. Choose only an application you submitted and confirm its business name below. If none belongs to you, submit your own network application.</p>
+    </div> : null}
+    {identity ? <>
+      <p className="mt-6 font-bold">{identity.name}</p>
       <p className="mt-2 leading-7">Review status: {provider?.eligibility === 'eligible' ? 'Approved' : provider?.eligibility === 'suspended' ? 'Paused' : 'Pending review'}.</p>
       {pending ? <p className="mt-3 leading-7">Tell us your requested rate, service area, and services. The network team reviews your qualifications before approving job offers.</p>
         : provider?.eligibility === 'eligible' ? <p className="mt-3 leading-7">When the network is open, opted-in providers receive matching opportunities by email. Review the scope, payment, and stated time before choosing to accept a job.</p>
@@ -191,6 +255,10 @@ export function TenantCleaningProvider() {
       <form onSubmit={save} className="mt-6 space-y-6">
         <TenantProviderRate value={rate} onChange={setRate} required />
         {pending ? <>
+          <label className="flex gap-3 rounded-xl border p-4 leading-7">
+            <input type="checkbox" checked={identityConfirmed} onChange={event => setIdentityConfirmed(event.target.checked)} required className="mt-2" />
+            <span>I submitted this application and confirm <strong>{identity.name}</strong> as my provider business name.</span>
+          </label>
           <label className="block font-bold">ZIP codes you can serve
             <input value={zips} onChange={event => setZips(event.target.value)} required maxLength={600} placeholder="46204, 46201" className={input} />
             <span className="mt-2 block text-sm font-normal">Separate five-digit ZIP codes with commas or spaces.</span>
@@ -208,8 +276,20 @@ export function TenantCleaningProvider() {
           </label>
           <p className="text-sm leading-7">You may save a profile without email opt-in. Job emails require your permission, approval, and a matching opportunity. Work is not guaranteed.</p>
         </> : null}
-        <button disabled={busy || parseHourlyRate(rate) === null} className={button}>{busy ? 'Saving…' : pending ? 'Save provider profile for review' : 'Save hourly rate'}</button>
+        <button disabled={busy || parseHourlyRate(rate) === null || (pending && !identityConfirmed)} className={button}>{busy ? 'Saving…' : pending ? 'Save provider profile for review' : 'Save hourly rate'}</button>
       </form>
+      {!pending ? <form onSubmit={saveConsent} className="mt-6 space-y-4 rounded-xl border p-5">
+        <label className="flex gap-3 leading-7">
+          <input type="checkbox" checked={identityConfirmed} onChange={event => setIdentityConfirmed(event.target.checked)} required className="mt-2" />
+          <span>I submitted this application and confirm <strong>{identity.name}</strong> as my provider business name.</span>
+        </label>
+        <label className="flex gap-3 leading-7">
+          <input type="checkbox" checked={optedIn} onChange={event => setOptedIn(event.target.checked)} className="mt-2" />
+          <span>I want job-opportunity emails when my provider profile is approved and the network is open.</span>
+        </label>
+        <p className="text-sm leading-7">You control this permission. Turning it off stops new job emails and does not cancel work you already accepted.</p>
+        <button disabled={busy || !identityConfirmed} className={button}>Save email preference</button>
+      </form> : null}
       {provider?.eligibility === 'eligible' ? <>
         <h3 className="mt-8 text-2xl font-bold">Your assignments</h3>
         {!assigned.length ? <p className="mt-3 leading-7">No accepted assignments are listed.</p> : null}

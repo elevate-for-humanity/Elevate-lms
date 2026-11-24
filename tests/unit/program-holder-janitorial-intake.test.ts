@@ -66,7 +66,7 @@ describe('janitorial program-holder scope review', () => {
     for (const slugs of [undefined, [], [''], [null], [123]]) {
       expect(unresolvedProgramHolderInterest({ requested_program_interest: 'janitorial', requested_program_slugs: slugs })).toBe(true);
     }
-    expect(unresolvedProgramHolderInterest({ requested_program_interest: 'janitorial', requested_program_slugs: ['verified-program'] })).toBe(false);
+    expect(unresolvedProgramHolderInterest({ requested_program_interest: 'janitorial', requested_program_slugs: ['hvac-technician'] })).toBe(true);
     expect(unresolvedProgramHolderInterest({ requested_program_slugs: ['hvac-technician'] })).toBe(false);
   });
 });

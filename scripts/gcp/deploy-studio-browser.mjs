@@ -1,3 +1,4 @@
+// Branch refreshed to pick up main (71e31a22): /apply/student E2E fix + Dockerfile.google-lms.
 import { spawnSync } from 'node:child_process';
 
 const PROJECT='elegant-racer-299721';

@@ -431,21 +431,16 @@ export const FORKLIFT_DATA: TradesProgramData = {
   secondaryImage: '/images/pages/training-classroom.webp',
   careerImage: '/images/refresh-20261014/forklift.webp',
   duration: forkliftPlan.duration,
-  totalHours: '48 planned online hours; employer practice recorded separately',
+  totalHours: '48 planned online hours; actual supervised practical hours recorded separately',
   rtiHours: '48 hours (8 forklift + 16 assembly + 24 quality inspection)',
-  ojtHours: 'Employer-set; estimated 2–4 weeks, with competency-based completion',
-  modality: 'Hybrid: online lessons, interactive scenarios and workbooks, followed by employer-led practical training',
-  credentials: [
-    {
-      name: 'Online learning completion record; employer practical evaluation is separate',
-      issuingBody: 'Elevate for Humanity (online record); participating employer (practical record)',
-    },
-  ],
+  ojtHours: 'Planning estimate: 2–4 weeks; qualified partner, actual hours and schedule pending',
+  modality: 'Hybrid: online lessons, simulations and workbooks; a qualified practical partner is being arranged',
+  credentials: [],
   curriculum: forkliftPlan.blocks.map(block => ({ week: `${block.hours} online hours`, title: block.title, topics: [...block.topics], project: 'Complete the matching workbook assignments and scenario practice.' })),
   admissionsRequirements: [
     '18 years or older',
     'Valid photo ID',
-    'Employer practical placement and applicable job requirements confirmed before equipment training',
+    'Practical partner or employer, site, equipment, instructor, hours and total costs confirmed before enrollment',
     'Access to an internet-connected computer or tablet',
   ],
   materialsIncluded: [
@@ -453,7 +448,7 @@ export const FORKLIFT_DATA: TradesProgramData = {
     'Student workbook',
     'Employer practical guide and evaluation forms',
   ],
-  workBasedLearning: forkliftPlan.practicalDisclosure,
+  workBasedLearning: `${forkliftPlan.partnerReadiness} ${forkliftPlan.practicalDisclosure} ${forkliftPlan.credentialDisclosure}`,
   careers: [
     { title: 'Industrial Truck and Tractor Operator', salaryRange: 'Employer-set' },
     { title: 'Team Assembler', salaryRange: 'Employer-set' },
@@ -463,6 +458,6 @@ export const FORKLIFT_DATA: TradesProgramData = {
   examFeesIncluded: false,
   nextLevelJobsEligible: false,
   schedule: forkliftPlan.schedule,
-  attendanceTracking: 'Record actual online participation and employer practice separately; planned hours do not automatically award attendance credit.',
-  paymentTerms: 'Confirm tuition and any employer sponsorship in writing before enrollment.',
+  attendanceTracking: 'Record actual online participation and supervised practical hours separately; planned hours do not automatically award attendance credit.',
+  paymentTerms: 'Confirm tuition, practical training costs and any employer sponsorship in writing before enrollment.',
 };

@@ -1,6 +1,6 @@
 import 'server-only';
 import type { SupabaseClient } from '@/lib/supabase';
-export { loadManufacturingSimulationSpec, assertManufacturingLessonSpecs } from './manufacturing-simulation-reference.ts';
+export { loadManufacturingSimulationSpec, assertManufacturingLessonSpecs } from './manufacturing-simulation-reference.mjs';
 
 /** This service-only table is never reconstructed from learner-editable progress. */
 export async function loadManufacturingSimulationProgress(

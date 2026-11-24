@@ -185,10 +185,20 @@ export async function POST(req: NextRequest) {
       { status: 202 },
     );
   } catch (error) {
-    if (error instanceof Error &&
-        ['COURSE_BUILDER_GENERATION_PAUSED', 'COURSE_GENERATION_PAUSED'].includes(error.message))
+    if (error instanceof Error && error.message === 'COURSE_BUILDER_GENERATION_PAUSED')
       return NextResponse.json(
-        { error: 'Generation controls currently block this course. No worker was queued.', code: error.message },
+        {
+          error: 'Generation controls currently block this course. No worker was queued.',
+          code: 'COURSE_BUILDER_GENERATION_PAUSED',
+        },
+        { status: 409 },
+      );
+    if (error instanceof Error && error.message === 'COURSE_GENERATION_PAUSED')
+      return NextResponse.json(
+        {
+          error: 'Generation controls currently block this course. No worker was queued.',
+          code: 'COURSE_GENERATION_PAUSED',
+        },
         { status: 409 },
       );
     if (error instanceof Error && error.message === 'COURSE_START_STATE_CHANGED')

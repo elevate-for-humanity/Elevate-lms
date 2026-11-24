@@ -6,6 +6,8 @@ import {
   ULTIMATE_LESSON_CONTRACT_VERSION,
 } from '../../lib/ultimate-course-builder/core/lesson-contract';
 import { LEARNER_RUNTHROUGH_CHECKS } from '../../lib/ultimate-course-builder/quality/learner-runthrough';
+import { publicManufacturingSimulation } from '@/lib/lms/manufacturing-simulation';
+import { simulationFixture } from '../fixtures/manufacturing-simulation';
 const artifacts = { finished_media_qa: { mediaQA: { inspection: { mediaSha256: 'media' } } } };
 let currentArtifacts: unknown = artifacts;
 const query: any = {
@@ -24,11 +26,11 @@ function configured() {
   vi.stubEnv('ULTIMATE_LEARNER_RUNTHROUGH_URL', 'https://browser.example.org/run');
   vi.stubEnv('ULTIMATE_LEARNER_RUNTHROUGH_SECRET', 'test-secret');
 }
-function report() {
+function report(inputArtifacts: unknown = artifacts) {
   return {
     contractVersion: ULTIMATE_LESSON_CONTRACT_VERSION,
     mediaSha256: 'media',
-    artifactHash: contractHash(artifacts),
+    artifactHash: contractHash(inputArtifacts),
     lessonBuildId: 'lesson-build',
     testRunId: 'test-run',
     checkedAt: new Date().toISOString(),
@@ -47,6 +49,37 @@ function response(evidence: any) {
   return { ok: true, json: async () => ({ evidence, signature }) };
 }
 describe('authentic learner evidence', () => {
+  const simulation = publicManufacturingSimulation({ ...simulationFixture, gradingKeyId: '30000000-0000-4000-8000-000000000001' });
+  const manufacturingReport = () => ({
+    ...report(currentArtifacts),
+    manufacturingWorkflow: {
+      version: 'staged-manufacturing-qa-v1', simulationId: simulation.id, gradingKeyId: simulation.gradingKeyId,
+      specHash: contractHash(simulation), taskCount: simulation.tasks.length, deniedBefore: true,
+      deniedCritical: true, submittedThroughUI: true, score: 100, criticalMisses: 0, persisted: true, completionObserved: true,
+    },
+  });
+  function manufacturingArtifacts() {
+    currentArtifacts = { ...artifacts, assessment_alignment: { authoredPreservation: { experience: { manufacturingSimulation: simulation } } } };
+  }
+
+  it('accepts exact signed simulation workflow evidence bound to the current public problem', async () => {
+    configured();
+    manufacturingArtifacts();
+    vi.stubGlobal('fetch', vi.fn(async () => response(manufacturingReport())));
+    expect((await new UltimatePlatformLearnerRuntime(db).verify(input)).completion).toBe(true);
+  });
+
+  it.each(['missing', 'version', 'simulationId', 'gradingKeyId', 'specHash', 'taskCount', 'deniedBefore', 'deniedCritical',
+    'submittedThroughUI', 'score', 'criticalMisses', 'persisted', 'completionObserved'])('rejects signed generic or incomplete simulation evidence: %s', async field => {
+    configured();
+    manufacturingArtifacts();
+    const evidence: any = manufacturingReport();
+    if (field === 'missing') delete evidence.manufacturingWorkflow;
+    else evidence.manufacturingWorkflow[field] = field === 'score' ? 80 : field === 'criticalMisses' ? 1 : false;
+    vi.stubGlobal('fetch', vi.fn(async () => response(evidence)));
+    await expect(new UltimatePlatformLearnerRuntime(db).verify(input)).rejects.toThrow('ULTIMATE_MANUFACTURING_BROWSER_EVIDENCE_REQUIRED');
+  });
+
   it('pins the exact current lesson build instead of selecting the latest course attempt', async () => {
     configured();
     vi.stubGlobal('fetch', vi.fn(async () => response(report())));

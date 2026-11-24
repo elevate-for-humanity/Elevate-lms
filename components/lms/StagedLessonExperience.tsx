@@ -1,6 +1,7 @@
 'use client';
 import { useRef, useState } from 'react';
 import InteractiveVideoPlayer from './InteractiveVideoPlayer';
+import ManufacturingSimulation from './ManufacturingSimulation';
 export default function StagedLessonExperience({
   runId,
   snapshot,
@@ -21,11 +22,12 @@ export default function StagedLessonExperience({
     lastSave = useRef(0),
     root = useRef<HTMLDivElement>(null);
   const b = snapshot.blueprint;
-  async function act(body: any) {
+  async function act(body: any, signal?: AbortSignal) {
     const res = await fetch(`/api/learner-testing/runs/${runId}`, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify(body),
+      signal,
     });
     const data = await res.json();
     if (!res.ok) {
@@ -163,6 +165,21 @@ export default function StagedLessonExperience({
             </p>
           ) : null}
         </section>
+      ) : null}
+      {b.manufacturingSimulation ? (
+        <div data-testid="manufacturing-simulation">
+          <ManufacturingSimulation
+            simulation={b.manufacturingSimulation}
+            courseId={snapshot.courseId}
+            lessonId={snapshot.lessonId}
+            interactionId={`qa-${runId}-${b.manufacturingSimulation.id}`}
+            initialAttempt={progress.manufacturingSimulation}
+            submitAttempt={async (responses, signal) => {
+              const data = await act({ action: 'manufacturing_simulation', responses }, signal);
+              return data.attempt;
+            }}
+          />
+        </div>
       ) : null}
       <section data-testid={retake ? 'reassessment' : 'lesson_assessment'}>
         <h2 className="text-lg font-bold">{retake ? 'Reassessment' : 'Lesson assessment'}</h2>

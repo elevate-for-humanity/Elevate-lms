@@ -1,5 +1,6 @@
 import { createHmac, timingSafeEqual } from 'node:crypto';
 import { contractHash } from '../core/lesson-contract';
+import { parsePublicManufacturingSimulation, publicManufacturingSimulation } from '@/lib/lms/manufacturing-simulation';
 
 export function validTestCredential(actual: string, expected: string | undefined) {
   if (!expected || !actual) return false;
@@ -19,7 +20,12 @@ export function scoreLessonQuestions(questions: any[], responses: number[], thre
 }
 export function publicBlueprint(blueprint: any) {
   const redact = (q: any) => ({ id: q.id, prompt: q.prompt, choices: q.choices });
-  return { ...blueprint, assessment: { ...blueprint.assessment,
+  const simulation = blueprint.manufacturingSimulation === undefined ? undefined
+    : parsePublicManufacturingSimulation(blueprint.manufacturingSimulation);
+  if (simulation === null) throw new Error('STAGED_MANUFACTURING_PUBLIC_PROJECTION_INVALID');
+  return { ...blueprint,
+    ...(simulation ? { manufacturingSimulation: publicManufacturingSimulation(simulation) } : {}),
+    assessment: { ...blueprint.assessment,
     questions: blueprint.assessment.questions.map(redact),
     reassessment: blueprint.assessment.reassessment.map(redact) } };
 }

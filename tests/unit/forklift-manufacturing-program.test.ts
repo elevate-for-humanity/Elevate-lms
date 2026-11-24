@@ -40,6 +40,8 @@ describe('combined forklift and manufacturing public program contract', () => {
       expect(publicProgram.funding?.wrg_eligible).toBe(false);
       expect(publicProgram.fundingOptions).not.toContain('wioa');
       expect(publicProgram.fundingOptions).not.toContain('wrg');
+      expect(publicProgram.credentials).toEqual([]);
+      expect(publicProgram.employerPartners).toEqual([]);
       expect(
         publicProgram.credentials.every((credential) => !/OSHA/i.test(credential.issuer)),
       ).toBe(true);
@@ -47,6 +49,8 @@ describe('combined forklift and manufacturing public program contract', () => {
     expect(PROGRAMS.find((entry) => entry.slug === plan.slug)?.etplApproved).toBe(false);
     expect(FORKLIFT_DATA.nextLevelJobsEligible).toBe(false);
     expect(LOC_PROGRAM_SPECS.forklift.nextLevelJobsEligible).toBe(false);
+    expect(FORKLIFT_DATA.credentials).toEqual([]);
+    expect(LOC_PROGRAM_SPECS.forklift.credentials).toEqual([]);
     expect(program.selfPayCost).toMatch(/confirm/i);
     expect(plan.practicalDisclosure).toContain('do not replace');
     expect(plan.credentialDisclosure).toContain('no external credential is awarded');

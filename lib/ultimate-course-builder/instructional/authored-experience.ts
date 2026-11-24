@@ -1,7 +1,7 @@
 import { createHash } from 'node:crypto';
 import { contractHash } from '../core/lesson-contract';
 import type { UltimateCredentialProfile } from '../core/types';
-import { parsePublicManufacturingSimulation } from '@/lib/lms/manufacturing-simulation';
+import { parsePublicManufacturingSimulation, publicManufacturingSimulation } from '@/lib/lms/manufacturing-simulation';
 
 export const AUTHORED_EXPERIENCE_VERSION = 'authored-experience-v1';
 type JsonObject = Record<string, any>;
@@ -229,6 +229,9 @@ export function createAuthoredPreservation(profile: UltimateCredentialProfile, c
   });
   const learnerBlueprint = {
     ...providerProjection,
+    ...(experience.manufacturingSimulation === undefined ? {} : {
+      manufacturingSimulation: publicManufacturingSimulation(experience.manufacturingSimulation),
+    }),
     projection: { producer: AUTHORED_EXPERIENCE_VERSION, providerBlueprintHash: contractHash(blueprint), snapshotHash: record.snapshotHash },
     stages: [...(blueprint.stages ?? []), ...(readingText ? [{ stage: 'authored_reading', instruction: readingText, objectiveIds: [] }] : [])],
     activities: [...(blueprint.activities ?? []).filter((activity: JsonObject) => !authoredActivities.some((authored: JsonObject) => authored.id === activity.id)), ...authoredActivities],

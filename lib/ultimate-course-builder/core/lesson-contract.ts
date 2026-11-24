@@ -5,6 +5,7 @@ import { ULTIMATE_BUILD_STEPS, type UltimateBuildStep } from './types';
 import { renderMediaUrl, renderPlaybackUrl } from '../media/playback-source.mjs';
 import { isExternalCourseVideoReference } from '../../storage/course-video-policy.mjs';
 import { assertAuthoredExperienceArtifacts } from '../instructional/authored-experience';
+import { assertManufacturingRunthroughEvidence, authoredManufacturingSimulation } from '../quality/manufacturing-runthrough';
 
 /** Changing this version invalidates every checkpoint and release certificate. */
 export const ULTIMATE_LESSON_CONTRACT_VERSION = 'ultimate-lesson-2026-10-29.1';
@@ -310,6 +311,8 @@ export function assertCompleteLesson(
   const competency = competencies.find((c: any) => c.id === competencyId) ?? (competencies.length === 1 ? competencies[0] : undefined);
   if (profile && competency)
     assertAuthoredExperienceArtifacts(artifacts, profile as any, competency.id);
+  if (artifacts.learner_runthrough)
+    assertManufacturingRunthroughEvidence(authoredManufacturingSimulation(artifacts), artifacts.learner_runthrough.learnerRuntimeEvidence?.evidence);
   if (practicalVisualFailures(artifacts, competency).length)
     throw new Error('ULTIMATE_PRACTICAL_DEMONSTRATION_VIDEO_REQUIRED');
   for (const step of ULTIMATE_BUILD_STEPS) {

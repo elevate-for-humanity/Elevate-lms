@@ -15,6 +15,12 @@ import {
   reviewStagedPractical,
 } from '@/lib/ultimate-course-builder/testing/staged-practical';
 import { logger } from '@/lib/logger';
+import {
+  publicStagedProgress,
+  stagedManufacturingComplete,
+  submitStagedManufacturingSimulation,
+} from '@/lib/ultimate-course-builder/testing/staged-manufacturing-simulation';
+import { assertManufacturingRunthroughEvidence } from '@/lib/ultimate-course-builder/quality/manufacturing-runthrough';
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 type Params = { params: Promise<{ runId: string }> };
@@ -23,10 +29,15 @@ const response = (body: unknown, status = 200) =>
 export async function GET(_req: NextRequest, { params }: Params) {
   const access = await loadOwnedLearnerTest((await params).runId);
   if (!access) return response({ error: 'Unauthorized' }, 401);
-  return response({
-    progress: access.run.progress,
-    snapshot: { ...access.run.snapshot, blueprint: publicBlueprint(access.run.snapshot.blueprint) },
-  });
+  try {
+    return response({
+      progress: publicStagedProgress(access.run.progress),
+      snapshot: { ...access.run.snapshot, blueprint: publicBlueprint(access.run.snapshot.blueprint) },
+    });
+  } catch (error) {
+    logger.error('Staged learner read failed', error);
+    return response({ error: 'Learner test could not be read' }, 500);
+  }
 }
 export async function POST(req: NextRequest, { params }: Params) {
   const access = await loadOwnedLearnerTest((await params).runId);
@@ -82,10 +93,20 @@ export async function POST(req: NextRequest, { params }: Params) {
     const input = await req.json();
     const p = { ...run.progress },
       b = run.snapshot.blueprint;
-    if (input.action === 'practical_submit') {
+    if (input.action === 'manufacturing_simulation') {
+      if (run.snapshot.qaOnly !== true) return response({ error: 'Marked QA run required' }, 403);
+      const attempt = await submitStagedManufacturingSimulation(db, run, input.responses);
+      if (!attempt) return response({ error: 'Answer every required virtual practice task using the displayed choices and units.' }, 400);
+      if (p.manufacturingSimulation)
+        p.manufacturingSimulationHistory = [...(p.manufacturingSimulationHistory ?? []), p.manufacturingSimulation].slice(-20);
+      p.manufacturingSimulation = attempt;
+      p.completed = false;
+      await saveStagedProgress(db, run, p);
+      return response({ progress: publicStagedProgress(p), attempt });
+    } else if (input.action === 'practical_submit') {
       const progress = submitStagedPractical(run, input);
       await saveStagedProgress(db, run, progress);
-      return response({ progress });
+      return response({ progress: publicStagedProgress(progress) });
     } else if (input.action === 'progress') {
       const position = Number(input.position),
         duration = Number(input.duration);
@@ -159,10 +180,15 @@ export async function POST(req: NextRequest, { params }: Params) {
         required.some((a: any) => !p.activities?.[a.id])
       )
         return response({ error: 'Finish video, practice, and assessment before completion' }, 409);
+      if (!(await stagedManufacturingComplete(db, run)))
+        return response({
+          error: 'Pass the required virtual workplace practice before completion.',
+          code: 'MANUFACTURING_SIMULATION_REQUIRED',
+        }, 409);
       p.completed = true;
     } else return response({ error: 'Unknown learner action' }, 400);
     await saveStagedProgress(db, run, p);
-    return response({ progress: p });
+    return response({ progress: publicStagedProgress(p) });
   } catch (error) {
     if (error instanceof Error && error.message.startsWith('PRACTICAL_'))
       return response({ error: error.message }, 409);
@@ -178,7 +204,7 @@ export async function PUT(req: NextRequest, { params }: Params) {
   const db = await requireAdminClient();
   const { data: run } = await db
     .from('ultimate_learner_test_runs')
-    .select('lesson_build_id,artifact_hash,media_sha256')
+    .select('id,learner_id,lesson_build_id,artifact_hash,media_sha256,snapshot,progress')
     .eq('id', (await params).runId)
     .maybeSingle();
   if (!run) return response({ error: 'Test run not found' }, 404);
@@ -191,6 +217,18 @@ export async function PUT(req: NextRequest, { params }: Params) {
     !validTestCredential(signature, signLearnerEvidence(evidence, secret!))
   )
     return response({ error: 'Evidence mismatch' }, 409);
+  if (run.snapshot?.blueprint?.manufacturingSimulation !== undefined) {
+    try {
+      assertManufacturingRunthroughEvidence(run.snapshot.blueprint.manufacturingSimulation, evidence);
+      if (run.progress?.completed !== true || !(await stagedManufacturingComplete(db, run)))
+        return response({ error: 'Completed virtual workplace practice evidence required' }, 409);
+    } catch (error) {
+      if (error instanceof Error && error.message === 'ULTIMATE_MANUFACTURING_BROWSER_EVIDENCE_REQUIRED')
+        return response({ error: 'Observed virtual workplace practice workflow required' }, 409);
+      logger.error('Staged virtual practice evidence could not be verified', error);
+      return response({ error: 'Virtual workplace practice evidence could not be verified' }, 500);
+    }
+  }
   const { error } = await db
     .from('ultimate_learner_test_evidence')
     .insert({
@@ -257,7 +295,7 @@ export async function PATCH(req: NextRequest, { params }: Params) {
   try {
     const progress = reviewStagedPractical(run, await req.json(), `qa-service:${run.id}`);
     await saveStagedProgress(db, run, progress);
-    return response({ progress, syntheticQA: true, realCompetencyAwarded: false });
+    return response({ progress: publicStagedProgress(progress), syntheticQA: true, realCompetencyAwarded: false });
   } catch (error) {
     if (error instanceof Error && error.message.startsWith('PRACTICAL_'))
       return response({ error: error.message }, 409);

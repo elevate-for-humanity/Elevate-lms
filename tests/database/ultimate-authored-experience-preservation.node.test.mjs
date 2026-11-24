@@ -7,6 +7,7 @@ import { PGlite } from '@electric-sql/pglite';
 // All accepted artifacts below are synthetic SQL fixtures, never production QA
 // evidence. Exercise the actual installed function bodies in isolated Postgres.
 const migrationUrl = new URL('../../supabase/migrations/20261124174506_preserve_authored_ultimate_experience.sql', import.meta.url);
+const rollbackMigrationUrl = new URL('../../supabase/migrations/20261124183158_restore_authored_ultimate_release_history.sql', import.meta.url);
 const hash = value => createHash('sha256').update(typeof value === 'string' ? value : JSON.stringify(value)).digest('hex');
 const contractVersion = 'ultimate-lesson-2026-10-29.1';
 
@@ -16,6 +17,7 @@ test('authored Ultimate attachment and publication against isolated PostgreSQL',
     await db.exec(`
       create role anon; create role authenticated; create role service_role;
       create schema auth; create schema rpc_private;
+      create table auth.users(id uuid primary key);
       grant usage on schema rpc_private to authenticated, service_role;
       create function rpc_private.existing_authenticated_access() returns boolean language sql as 'select true';
       revoke all on function rpc_private.existing_authenticated_access() from public;
@@ -48,21 +50,35 @@ test('authored Ultimate attachment and publication against isolated PostgreSQL',
       create table public.ultimate_release_versions(id uuid primary key default gen_random_uuid(),build_id uuid,
         course_id uuid,version integer,package jsonb,status text,released_by uuid,rolled_back_from uuid,
         released_at timestamptz default now());
+      create table public.course_versions(id uuid primary key,course_id uuid,snapshot jsonb);
       set request.jwt.claim.role='service_role';
     `);
     const prior = await readFile(new URL('../../supabase/migrations/20261027031413_atomic_ultimate_publication.sql', import.meta.url), 'utf8');
     await db.exec(prior.slice(0, prior.indexOf('CREATE OR REPLACE FUNCTION public.commit_ultimate_release')));
     const migration = await readFile(migrationUrl, 'utf8');
+    await db.exec(await readFile(new URL('../../supabase/migrations/20261124165505_protect_manufacturing_simulation_keys.sql', import.meta.url), 'utf8'));
+    await db.exec(await readFile(new URL('../../supabase/migrations/20261124171036_version_manufacturing_simulation_progress.sql', import.meta.url), 'utf8'));
     await db.exec(migration);
+    const rollbackMigration = await readFile(rollbackMigrationUrl, 'utf8');
+    await db.exec(rollbackMigration);
 
     async function seed({ authored = true } = {}) {
       const course = randomUUID(), build = randomUUID(), canonical = randomUUID(), lesson = randomUUID(), actor = randomUUID();
+      const gradingKey = randomUUID();
+      const privateSpec = { version: 1, id: 'scenario', title: 'Synthetic inspection', kind: 'inspection',
+        brief: 'Use only the synthetic exhibit.', masteryThreshold: 80,
+        exhibits: [{ title: 'Synthetic equipment', columns: [{ key: 'status', label: 'Status' }], rows: [{ status: 'Brake defect reported' }] }],
+        tasks: [{ id: 'hold', type: 'choice', prompt: 'Which decision follows the exhibit?',
+          options: [{ value: 'hold', label: 'Hold' }, { value: 'operate', label: 'Operate' }],
+          critical: true, expected: 'hold', rationale: 'Hold until the defect is resolved.' }] };
+      const publicSpec = { ...privateSpec, gradingKeyId: gradingKey,
+        tasks: privateSpec.tasks.map(({ expected: _expected, rationale: _rationale, ...task }) => task) };
       const experience = {
         version: 1, plannedMinutes: 120, actualHoursAwardedByContent: 0,
         knowledgeChecks: [{ id: 'authored-one', question: 'What must be held?', options: ['Unresolved load', 'Nothing'], correct: 0 }, { id: 'authored-two', question: 'Who evaluates operation?', options: ['Employer', 'This simulation'], correct: 0 }],
         exercises: [{ id: 'original-exercise', title: 'Document the hold' }],
         readingGuide: { summary: 'Original reviewed reading' }, remediation: ['Review the employer/site boundary'],
-        manufacturingSimulation: { id: 'scenario', gradingKeyId: randomUUID(), tasks: [{ id: 'hold', kind: 'choice', options: ['Hold', 'Operate'] }] },
+        manufacturingSimulation: publicSpec,
       };
       const workbook = { brief: 'Original workbook', questions: ['Evidence?', 'Decision?', 'Next step?'] };
       const activityPlan = [{ title: 'Scenario and reflection', minutes: 120 }];
@@ -94,6 +110,7 @@ test('authored Ultimate attachment and publication against isolated PostgreSQL',
           authoredLessonPreservation: { competency: record } } : {}) };
       const contentJson = { ...(authored ? { authoredLessonId: 'authored-01' } : {}), experience, workbook, activityPlan, unrelated: 'retain' };
       await db.query('insert into courses(id) values($1)', [course]);
+      await db.query('insert into manufacturing_simulation_specs(id,lesson_id,course_id,spec) values($1,$2,$3,$4)', [gradingKey, canonical, course, privateSpec]);
       await db.query('insert into ultimate_course_builds(id,course_id,profile) values($1,$2,$3)', [build, course, profile]);
       await db.query("insert into ultimate_lesson_builds values($1,$2,'competency','built',$3)", [lesson, build, artifacts]);
       await db.query(`insert into course_lessons(id,course_id,slug,title,order_index,lesson_type,is_required,status,is_published,approved,
@@ -110,7 +127,7 @@ test('authored Ultimate attachment and publication against isolated PostgreSQL',
         media: { lesson_title: 'Synthetic media', provider: 'synthetic-test-only', video_url: source.videoUrl,
           script: 'Synthetic accepted narration fixture', duration_seconds: 373, scene_count: 1, review_notes: 'Isolated SQL fixture only', quality_evidence: { syntheticFixture: true } } };
       const pkg = { courseId: course, buildId: build, contractVersion, title: 'Synthetic course', profile, lessons: [source] };
-      return { course, build, canonical, lesson, actor, profile, artifacts, record, snapshot, certifiedExperience, pkg, prepared,
+      return { course, build, canonical, lesson, actor, gradingKey, privateSpec, profile, artifacts, record, snapshot, certifiedExperience, pkg, prepared,
         row: async () => (await db.query('select * from course_lessons where id=$1', [canonical])).rows[0],
         attach: (accepted = artifacts, fence = [null, null, null]) => db.query('select public.ultimate_attach_lesson_media($1,$2,$3,$4,$5) result', [lesson, accepted, ...fence]),
         publish: (rows = [prepared], packageValue = pkg) => db.query('select public.commit_ultimate_publication_core($1,$2,$3) result', [packageValue, JSON.stringify(rows), actor]),
@@ -120,7 +137,7 @@ test('authored Ultimate attachment and publication against isolated PostgreSQL',
       assert.deepEqual(row.content_json.experience, f.certifiedExperience);
       assert.deepEqual(row.quiz_questions, f.snapshot.quizQuestions);
       assert.deepEqual(row.learning_objectives, f.snapshot.learningObjectives);
-      assert.equal(row.duration_minutes, 120); assert.equal(row.passing_score, 85);
+      assert.equal(row.duration_minutes, f.snapshot.durationMinutes); assert.equal(row.passing_score, f.snapshot.passingScore);
       assert.equal(row.content, f.snapshot.content); assert.equal(row.rendered_html, f.snapshot.renderedHtml);
       assert.deepEqual(row.content_json.workbook, f.snapshot.workbook);
       assert.deepEqual(row.content_json.activityPlan, f.snapshot.activityPlan);
@@ -131,6 +148,47 @@ test('authored Ultimate attachment and publication against isolated PostgreSQL',
         (select count(*)::int from course_modules where course_id=$1) modules,
         (select count(*)::int from ultimate_release_versions where course_id=$1) releases`, [f.course])).rows[0];
     }
+    async function publishRevision(f) {
+      const b = structuredClone(Object.fromEntries(Object.entries(f).filter(([, value]) => typeof value !== 'function')));
+      b.build = randomUUID(); b.lesson = randomUUID(); b.gradingKey = randomUUID();
+      b.privateSpec.tasks[0].prompt = 'Revision B: decide from the changed inspection evidence.';
+      b.snapshot.experience.manufacturingSimulation = { ...b.privateSpec, gradingKeyId: b.gradingKey,
+        tasks: b.privateSpec.tasks.map(({ expected: _expected, rationale: _rationale, ...task }) => task) };
+      b.snapshot.experience.knowledgeChecks[0].question = 'Revision B reviewed question';
+      b.snapshot.quizQuestions[0].question = 'Revision B vetted assessment question';
+      b.snapshot.workbook.brief = 'Revision B workbook';
+      b.snapshot.activityPlan = [{ title: 'Revision B activities', minutes: 130 }];
+      b.snapshot.content = '<p>Revision B source</p>'; b.snapshot.renderedHtml = '<article>Revision B</article>';
+      b.snapshot.learningObjectives = ['Revision B objective']; b.snapshot.durationMinutes = 130; b.snapshot.passingScore = 90;
+      b.certifiedExperience = { ...b.snapshot.experience, learningActivities: [{ id: 'revision-b-added' }], reassessment: [{ id: 'b-retry' }] };
+      const sourceText = 'Explicit synthetic revision B source; no production approval.\n' + b.canonical;
+      b.record = { ...b.record, sourceHash: hash(sourceText), snapshotHash: hash(b.snapshot), snapshot: b.snapshot };
+      b.profile = { ...b.profile, instructionalSources: [{ id: 'attached-source', text: sourceText }],
+        authoredLessonPreservation: { competency: b.record } };
+      const learnerBlueprint = { title: 'Revision B learner projection', knowledgeChecks: b.snapshot.experience.knowledgeChecks };
+      b.artifacts.assessment_alignment.authoredPreservation = { ...b.record, experience: b.certifiedExperience,
+        experienceHash: hash(b.certifiedExperience), learnerBlueprint, learnerBlueprintHash: hash(learnerBlueprint) };
+      b.artifacts.lesson_film_render.render.videoUrl = 'https://media.example/revision-b.mp4';
+      b.prepared = { ...b.prepared, sourceLessonBuildId: b.lesson,
+        row: { ...b.prepared.row, video_url: b.artifacts.lesson_film_render.render.videoUrl,
+          content_json: { ...b.prepared.row.content_json, experience: b.certifiedExperience } },
+        media: { ...b.prepared.media, video_url: b.artifacts.lesson_film_render.render.videoUrl } };
+      b.pkg = { ...b.pkg, buildId: b.build, profile: b.profile, lessons: [{ ...b.pkg.lessons[0],
+        sourceLessonBuildId: b.lesson, videoUrl: b.artifacts.lesson_film_render.render.videoUrl, contractArtifacts: b.artifacts }] };
+      await db.query('insert into manufacturing_simulation_specs(id,lesson_id,course_id,spec) values($1,$2,$3,$4)', [b.gradingKey, b.canonical, b.course, b.privateSpec]);
+      await db.query(`update course_lessons set status='draft',is_published=false,approved=false,content_json=$1,
+        quiz_questions=$2,passing_score=$3,duration_minutes=$4,content=$5,rendered_html=$6,learning_objectives=$7 where id=$8`,
+      [{ authoredLessonId: 'authored-01', experience: b.snapshot.experience, workbook: b.snapshot.workbook, activityPlan: b.snapshot.activityPlan },
+        JSON.stringify(b.snapshot.quizQuestions), b.snapshot.passingScore, b.snapshot.durationMinutes, JSON.stringify(b.snapshot.content), b.snapshot.renderedHtml,
+        JSON.stringify(b.snapshot.learningObjectives), b.canonical]);
+      await db.query('insert into ultimate_course_builds(id,course_id,profile) values($1,$2,$3)', [b.build, b.course, b.profile]);
+      await db.query("insert into ultimate_lesson_builds values($1,$2,'competency','built',$3)", [b.lesson, b.build, b.artifacts]);
+      b.release = (await f.publish([b.prepared], b.pkg)).rows[0].result;
+      assertAuthored(await f.row(), b);
+      return b;
+    }
+    const rollback = (f, release, pkg = f.pkg, rows = [f.prepared]) => db.query(
+      'select public.commit_ultimate_publication_core($1,$2,$3,$4) result', [pkg, JSON.stringify(rows), f.actor, release.id]);
 
     await t.test('attachment retains authored questions, workbooks, source content, duration and objectives on retry', async () => {
       const f = await seed(); await f.attach(); await f.attach(); const row = await f.row();
@@ -250,9 +308,72 @@ test('authored Ultimate attachment and publication against isolated PostgreSQL',
         [f.pkg, JSON.stringify([f.prepared]), f.actor, { jobId: job, workerId: 'other', generation: 3 }]), /ULTIMATE_JOB_LEASE_LOST/);
       assert.deepEqual(await counts(f), { media: 0, modules: 0, releases: 0 });
     });
+    await t.test('historical rollback restores authored revision A after B and retains both immutable keys and accepted progress versions', async () => {
+      const f = await seed(); const releaseA = (await f.publish()).rows[0].result;
+      const b = await publishRevision(f), learner = randomUUID();
+      await db.query('insert into auth.users values($1)', [learner]);
+      for (const [spec, passed, attempts] of [[f.gradingKey, true, 2], [b.gradingKey, false, 3]]) {
+        await db.query(`insert into manufacturing_simulation_progress
+          (learner_id,course_id,lesson_id,spec_id,lesson_slug,interaction_id,answers,score,completed,attempts,feedback)
+          values($1,$2,$3,$4,'authored-01','scenario','{}',$5,$6,$7,'[]')`,
+        [learner, f.course, f.canonical, spec, passed ? 100 : 0, passed, attempts]);
+      }
+      const beforeProgress = (await db.query('select * from manufacturing_simulation_progress where learner_id=$1 order by spec_id', [learner])).rows;
+      const result = (await rollback(f, releaseA)).rows[0].result;
+      assert.equal(result.rolled_back_from, releaseA.id); assert.equal(result.version, 3);
+      assertAuthored(await f.row(), f);
+      assert.equal((await f.row()).video_url, f.prepared.row.video_url);
+      assert.equal((await f.row()).content_json.experience.manufacturingSimulation.gradingKeyId, f.gradingKey);
+      assert.deepEqual((await db.query('select * from manufacturing_simulation_progress where learner_id=$1 order by spec_id', [learner])).rows, beforeProgress);
+      assert.equal((await db.query('select count(*)::int n from manufacturing_simulation_specs where course_id=$1', [f.course])).rows[0].n, 2);
+      assert.equal((await rollback(f, releaseA)).rows[0].result.id, result.id);
+      assert.deepEqual(await counts(f), { media: 1, modules: 1, releases: 3 });
+    });
+    await t.test('rollback rejects a request differing from the exact historical release before writes', async () => {
+      const f = await seed(); const releaseA = (await f.publish()).rows[0].result; await publishRevision(f);
+      const before = await f.row(); const altered = structuredClone(f.pkg); altered.title = 'Not the stored historical release';
+      await assert.rejects(rollback(f, releaseA, altered), /ULTIMATE_RELEASE_NOT_FOUND/);
+      assert.deepEqual(await f.row(), before); assert.deepEqual(await counts(f), { media: 1, modules: 1, releases: 2 });
+    });
+    await t.test('missing, foreign and mismatched historical grading references reject rollback atomically', async () => {
+      for (const problem of ['missing', 'foreign', 'mismatch']) {
+        const f = await seed(); const releaseA = (await f.publish()).rows[0].result; await publishRevision(f);
+        const before = await f.row();
+        if (problem === 'missing') await db.query('delete from manufacturing_simulation_specs where id=$1', [f.gradingKey]);
+        if (problem === 'foreign') await db.query('update manufacturing_simulation_specs set lesson_id=$1 where id=$2', [randomUUID(), f.gradingKey]);
+        if (problem === 'mismatch') await db.query("update manufacturing_simulation_specs set spec=jsonb_set(spec,'{tasks,0,prompt}','\"Changed private problem\"') where id=$1", [f.gradingKey]);
+        await assert.rejects(rollback(f, releaseA), /ULTIMATE_AUTHORED_HISTORICAL_GRADING_REQUIRED/);
+        assert.deepEqual(await f.row(), before); assert.deepEqual(await counts(f), { media: 1, modules: 1, releases: 2 });
+      }
+    });
+    await t.test('historical rollback still rejects altered accepted projections and source evidence', async () => {
+      for (const problem of ['projection', 'source']) {
+        const f = await seed(); const releaseA = (await f.publish()).rows[0].result; await publishRevision(f);
+        const before = await f.row(), pkg = structuredClone(f.pkg), rows = structuredClone([f.prepared]);
+        if (problem === 'projection') rows[0].row.content_json.experience.knowledgeChecks = [];
+        else {
+          pkg.profile.instructionalSources[0].text += ' Corrupted historical source';
+          await db.query('update ultimate_release_versions set package=$1 where id=$2', [pkg, releaseA.id]);
+        }
+        await assert.rejects(rollback(f, releaseA, pkg, rows), /ULTIMATE_AUTHORED_(PUBLICATION|SOURCE)_CHANGED/);
+        assert.deepEqual(await f.row(), before); assert.deepEqual(await counts(f), { media: 1, modules: 1, releases: 2 });
+      }
+    });
+    await t.test('rollback readback interference rolls source, media and release history back to revision B', async () => {
+      const f = await seed(); const releaseA = (await f.publish()).rows[0].result; await publishRevision(f);
+      const before = await f.row();
+      await db.exec(`create function break_historical_restore() returns trigger language plpgsql as $$ begin
+        if new.duration_minutes=120 and new.status='published' then new.rendered_html='interference'; end if; return new; end $$;
+        create trigger break_historical_restore before update on course_lessons for each row execute function break_historical_restore();`);
+      try {
+        await assert.rejects(rollback(f, releaseA), /ULTIMATE_AUTHORED_SNAPSHOT_CHANGED/);
+        assert.deepEqual(await f.row(), before); assert.deepEqual(await counts(f), { media: 1, modules: 1, releases: 2 });
+      } finally { await db.exec('drop trigger break_historical_restore on course_lessons; drop function break_historical_restore()'); }
+    });
     await t.test('new helper and release RPC deny public roles without breaking unrelated authenticated schema access', async () => {
       for (const role of ['anon', 'authenticated']) for (const fn of [
         'rpc_private.ultimate_authored_preservation(jsonb,jsonb,text,jsonb,jsonb)',
+        'rpc_private.ultimate_authored_rollback_payload(jsonb,jsonb,text,jsonb,jsonb)',
         'public.ultimate_attach_lesson_media(uuid,jsonb,uuid,text,bigint)',
         'public.commit_ultimate_publication_core(jsonb,jsonb,uuid,uuid,jsonb)',
       ]) assert.equal((await db.query("select has_function_privilege($1,$2,'execute') allowed", [role, fn])).rows[0].allowed, false);
@@ -263,7 +384,7 @@ test('authored Ultimate attachment and publication against isolated PostgreSQL',
       } finally { await db.exec('reset role'); }
     });
     await t.test('forward migration replay retains data, schema ACL and exact installed release contract', async () => {
-      const f = await seed(); await f.attach(); const before = await f.row(); await db.exec(migration);
+      const f = await seed(); await f.attach(); const before = await f.row(); await db.exec(rollbackMigration);
       assert.deepEqual(await f.row(), before);
       assert.equal((await db.query("select has_schema_privilege('authenticated','rpc_private','usage') allowed")).rows[0].allowed, true);
       const definition = (await db.query("select pg_get_functiondef('public.commit_ultimate_publication_core(jsonb,jsonb,uuid,uuid,jsonb)'::regprocedure) source")).rows[0].source;

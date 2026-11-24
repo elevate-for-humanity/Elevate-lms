@@ -1,0 +1,2195 @@
+[
+  {
+    "id": "forklift-hazard-route-v1",
+    "kind": "sequence",
+    "brief": "This lesson-1 orientation exercise applies the information-handoff process: identify unresolved site conditions, hold the movement request, and seek qualified review. All route data are fictional. It is an administrative decision exercise, not a driving game. No answer releases a route or establishes operating competence. Reassess updated information while preserving restrictions until the employer resolves the hazards.",
+    "tasks": [
+      {
+        "id": "route-first",
+        "type": "choice",
+        "prompt": "At the initial review, which route may the learner release?",
+        "options": [
+          {
+            "label": "Route A",
+            "value": "A"
+          },
+          {
+            "label": "Route B",
+            "value": "B"
+          },
+          {
+            "label": "None: every route has an unresolved condition",
+            "value": "none"
+          }
+        ],
+        "critical": true
+      },
+      {
+        "id": "route-pedestrian",
+        "type": "choice",
+        "prompt": "A coworker offers to wave the learner across Route A. What changes?",
+        "options": [
+          {
+            "label": "Route A is automatically clear",
+            "value": "clear"
+          },
+          {
+            "label": "The workplace traffic controls still need verification",
+            "value": "hold"
+          },
+          {
+            "label": "A horn makes controls unnecessary",
+            "value": "horn"
+          }
+        ],
+        "critical": true
+      },
+      {
+        "id": "route-update",
+        "type": "choice",
+        "prompt": "What does the later Route B update support?",
+        "options": [
+          {
+            "label": "Independent operation immediately",
+            "value": "operate"
+          },
+          {
+            "label": "Reassessment with the trainer; the listed pending checks remain",
+            "value": "review"
+          },
+          {
+            "label": "Use of any truck and load",
+            "value": "any"
+          }
+        ],
+        "critical": true
+      },
+      {
+        "id": "route-record-sequence",
+        "type": "sequence",
+        "prompt": "Order the administrative review steps. This sequence assumes no active emergency; emergency alerts take priority.",
+        "options": [
+          {
+            "label": "Record route hazards and unresolved evidence",
+            "value": "record"
+          },
+          {
+            "label": "Keep the movement request on hold",
+            "value": "hold"
+          },
+          {
+            "label": "Request the assigned supervisor's assessed plan",
+            "value": "request"
+          },
+          {
+            "label": "Review the authorized update and remaining conditions before any release",
+            "value": "reassess"
+          }
+        ],
+        "critical": false
+      }
+    ],
+    "title": "Route evidence: decide when every option needs a hold",
+    "version": 1,
+    "exhibits": [
+      {
+        "rows": [
+          {
+            "route": "A",
+            "missing": "Confirmed traffic separation/control plan",
+            "condition": "Active packing-line pedestrian crossing"
+          },
+          {
+            "route": "B",
+            "missing": "Approved surface condition and support assessment",
+            "condition": "Floor opening under temporary cover"
+          },
+          {
+            "route": "C",
+            "missing": "Confirmed trailer/dock status and authorized access",
+            "condition": "Dock approach to trailer"
+          }
+        ],
+        "title": "Initial route review",
+        "columns": [
+          {
+            "key": "route",
+            "label": "Route"
+          },
+          {
+            "key": "condition",
+            "label": "Condition"
+          },
+          {
+            "key": "missing",
+            "label": "Missing evidence"
+          }
+        ]
+      },
+      {
+        "rows": [
+          {
+            "field": "Surface",
+            "value": "Authorized repair and support assessment documented in the fictional case."
+          },
+          {
+            "field": "Traffic",
+            "value": "Revised pedestrian separation plan provided."
+          },
+          {
+            "field": "Pending",
+            "value": "Assigned trainer must review actual task, truck/load fit, clearances, and current conditions."
+          }
+        ],
+        "title": "Later supervisor update for Route B",
+        "columns": [
+          {
+            "key": "field",
+            "label": "Field"
+          },
+          {
+            "key": "value",
+            "label": "Update"
+          }
+        ]
+      }
+    ],
+    "sourceUrls": [
+      "https://www.osha.gov/laws-regs/regulations/standardnumber/1910/1910.178",
+      "https://www.osha.gov/etools/powered-industrial-trucks/workplace/pedestrian-traffic",
+      "https://www.osha.gov/etools/powered-industrial-trucks/workplace/physical-conditions",
+      "https://www.osha.gov/etools/powered-industrial-trucks/workplace/loading-docks",
+      "https://www.osha.gov/etools/powered-industrial-trucks/workplace/ramps-grades",
+      "https://www.osha.gov/etools/powered-industrial-trucks/workplace/enclosed-hazardous-areas",
+      "https://www.osha.gov/etools/powered-industrial-trucks/workplace/narrow-aisles"
+    ],
+    "gradingKeyId": "ffdd66f5-aadb-4e76-8446-dc188094a6fc",
+    "masteryThreshold": 80
+  },
+  {
+    "id": "forklift-load-plate-match-v1",
+    "kind": "load-plate",
+    "brief": "All values are invented for classroom decisions. Match only explicit supplied conditions; do not interpolate or apply any value to equipment. A matching record permits further review only. The exercise does not authorize lifting, operation, or a modification.",
+    "tasks": [
+      {
+        "id": "plate-entry",
+        "type": "choice",
+        "prompt": "Which entry exactly matches P-101's supplied attachment, center, and height?",
+        "options": [
+          {
+            "label": "Entry A",
+            "value": "A"
+          },
+          {
+            "label": "Entry B",
+            "value": "B"
+          },
+          {
+            "label": "Entry C",
+            "value": "C"
+          }
+        ],
+        "critical": false
+      },
+      {
+        "id": "plate-match-limit",
+        "type": "choice",
+        "prompt": "How should P-101 be recorded?",
+        "options": [
+          {
+            "label": "Safe to lift now",
+            "value": "operate"
+          },
+          {
+            "label": "Data match for further supervised review",
+            "value": "review"
+          },
+          {
+            "label": "Authorized for all sites",
+            "value": "all-sites"
+          }
+        ],
+        "critical": true
+      },
+      {
+        "id": "plate-excess",
+        "type": "choice",
+        "prompt": "What is the decision for P-102?",
+        "options": [
+          {
+            "label": "Hold: 2,600 lb exceeds Entry B's 2,400 lb",
+            "value": "hold"
+          },
+          {
+            "label": "Proceed slowly",
+            "value": "slow"
+          },
+          {
+            "label": "Use Entry A because it has a larger number",
+            "value": "use-a"
+          }
+        ],
+        "critical": true
+      },
+      {
+        "id": "plate-center",
+        "type": "choice",
+        "prompt": "How should P-103's 30-inch load center be handled?",
+        "options": [
+          {
+            "label": "Interpolate an estimated capacity",
+            "value": "interpolate"
+          },
+          {
+            "label": "Use the nearest center",
+            "value": "nearest"
+          },
+          {
+            "label": "Hold: no explicit entry matches",
+            "value": "hold"
+          }
+        ],
+        "critical": true
+      },
+      {
+        "id": "plate-attachment",
+        "type": "choice",
+        "prompt": "What is the decision for P-104?",
+        "options": [
+          {
+            "label": "Use the standard-fork number",
+            "value": "base"
+          },
+          {
+            "label": "Hold: the matching clamp entry is 2,000 lb",
+            "value": "hold"
+          },
+          {
+            "label": "Approve because the attachment looks small",
+            "value": "approve"
+          }
+        ],
+        "critical": true
+      }
+    ],
+    "title": "Fictional capacity-card evidence review",
+    "version": 1,
+    "exhibits": [
+      {
+        "rows": [
+          {
+            "row": "A",
+            "center": 24,
+            "height": 120,
+            "capacity": 3000,
+            "attachment": "Standard forks"
+          },
+          {
+            "row": "B",
+            "center": 24,
+            "height": 180,
+            "capacity": 2400,
+            "attachment": "Standard forks"
+          },
+          {
+            "row": "C",
+            "center": 24,
+            "height": 120,
+            "capacity": 2000,
+            "attachment": "Clamp C-12"
+          }
+        ],
+        "title": "Fictional truck F-17 capacity card — training data only",
+        "columns": [
+          {
+            "key": "row",
+            "label": "Entry"
+          },
+          {
+            "key": "attachment",
+            "label": "Attachment"
+          },
+          {
+            "key": "center",
+            "label": "Load center (in)"
+          },
+          {
+            "key": "height",
+            "label": "Lift height (in)"
+          },
+          {
+            "key": "capacity",
+            "label": "Stated capacity (lb)"
+          }
+        ]
+      },
+      {
+        "rows": [
+          {
+            "order": "P-101",
+            "center": 24,
+            "height": 120,
+            "weight": 2600,
+            "attachment": "Standard forks"
+          },
+          {
+            "order": "P-102",
+            "center": 24,
+            "height": 180,
+            "weight": 2600,
+            "attachment": "Standard forks"
+          },
+          {
+            "order": "P-103",
+            "center": 30,
+            "height": 120,
+            "weight": 2300,
+            "attachment": "Standard forks"
+          },
+          {
+            "order": "P-104",
+            "center": 24,
+            "height": 120,
+            "weight": 2100,
+            "attachment": "Clamp C-12"
+          }
+        ],
+        "title": "Orders for paperwork review",
+        "columns": [
+          {
+            "key": "order",
+            "label": "Order"
+          },
+          {
+            "key": "attachment",
+            "label": "Attachment"
+          },
+          {
+            "key": "center",
+            "label": "Load center (in)"
+          },
+          {
+            "key": "height",
+            "label": "Lift height (in)"
+          },
+          {
+            "key": "weight",
+            "label": "Gross load (lb)"
+          }
+        ]
+      }
+    ],
+    "sourceUrls": [
+      "https://www.osha.gov/laws-regs/regulations/standardnumber/1910/1910.178",
+      "https://www.osha.gov/etools/powered-industrial-trucks/operating-forklift/load-handling"
+    ],
+    "gradingKeyId": "a6f29195-e6ef-4ab0-8fa7-a628f49dfcb9",
+    "masteryThreshold": 80
+  },
+  {
+    "id": "forklift-preuse-escalation-v1",
+    "kind": "inspection",
+    "brief": "Review supplied fictional observations from truck E-22. Do not approach or test equipment. Your job is to record facts, recognize a hold, and route unresolved conditions to the authorized process. Passing does not qualify you to inspect or operate a real truck.",
+    "tasks": [
+      {
+        "id": "inspection-fact",
+        "type": "choice",
+        "prompt": "Which wording belongs in the observation report?",
+        "options": [
+          {
+            "label": "Wet patch below the hydraulic area; cause unknown",
+            "value": "fact"
+          },
+          {
+            "label": "The pump has failed",
+            "value": "diagnosis"
+          },
+          {
+            "label": "Normal condensation; no review required",
+            "value": "dismiss"
+          }
+        ],
+        "critical": false
+      },
+      {
+        "id": "inspection-hold",
+        "type": "choice",
+        "prompt": "What is the overall equipment decision?",
+        "options": [
+          {
+            "label": "Use only for light loads",
+            "value": "light"
+          },
+          {
+            "label": "Do not use; follow the site out-of-service and reporting process",
+            "value": "hold"
+          },
+          {
+            "label": "Use because yesterday's log was clear",
+            "value": "yesterday"
+          }
+        ],
+        "critical": true
+      },
+      {
+        "id": "inspection-contact",
+        "type": "choice",
+        "prompt": "How should the wet patch be investigated by the learner?",
+        "options": [
+          {
+            "label": "Feel for a pressurized leak",
+            "value": "touch"
+          },
+          {
+            "label": "Tighten fittings",
+            "value": "repair"
+          },
+          {
+            "label": "Record the supplied observation and refer it to authorized personnel",
+            "value": "report"
+          }
+        ],
+        "critical": true
+      },
+      {
+        "id": "inspection-record",
+        "type": "choice",
+        "prompt": "Which record is most useful?",
+        "options": [
+          {
+            "label": "Truck bad",
+            "value": "short"
+          },
+          {
+            "label": "Truck E-22; location/time; separate observations; recipient and pending status",
+            "value": "complete"
+          },
+          {
+            "label": "Truck E-22; guessed cause and invented repair date",
+            "value": "invent"
+          }
+        ],
+        "critical": false
+      },
+      {
+        "id": "inspection-release",
+        "type": "choice",
+        "prompt": "Who resolves return to service?",
+        "options": [
+          {
+            "label": "The learner after passing this simulation",
+            "value": "learner"
+          },
+          {
+            "label": "The designated authority through the site's authorized correction and release process",
+            "value": "process"
+          },
+          {
+            "label": "Any coworker who needs the truck",
+            "value": "peer"
+          }
+        ],
+        "critical": true
+      }
+    ],
+    "title": "Inspection observations and safe escalation",
+    "version": 1,
+    "exhibits": [
+      {
+        "rows": [
+          {
+            "item": "Fork",
+            "status": "Instructor-provided image",
+            "observation": "Visible crack in supplied image"
+          },
+          {
+            "item": "Capacity plate",
+            "status": "Current attachment not verified",
+            "observation": "Text cannot be read"
+          },
+          {
+            "item": "Hydraulic area",
+            "status": "Cause unknown",
+            "observation": "Wet patch below area"
+          },
+          {
+            "item": "Yesterday's log",
+            "status": "Previous record only",
+            "observation": "No defects reported yesterday"
+          }
+        ],
+        "title": "Supplied observation log",
+        "columns": [
+          {
+            "key": "item",
+            "label": "Item"
+          },
+          {
+            "key": "observation",
+            "label": "Observed information"
+          },
+          {
+            "key": "status",
+            "label": "Verification"
+          }
+        ]
+      },
+      {
+        "rows": [
+          {
+            "role": "Learner",
+            "instruction": "Do not operate; give observation report to assigned trainer."
+          },
+          {
+            "role": "Shift lead",
+            "instruction": "Apply site controls preventing use and arrange authorized review."
+          },
+          {
+            "role": "Authorized maintenance / designated release authority",
+            "instruction": "Assess, correct, document, and release through site procedure."
+          }
+        ],
+        "title": "Fictional site procedure excerpt",
+        "columns": [
+          {
+            "key": "role",
+            "label": "Role"
+          },
+          {
+            "key": "instruction",
+            "label": "Relevant responsibility"
+          }
+        ]
+      }
+    ],
+    "sourceUrls": [
+      "https://www.osha.gov/laws-regs/regulations/standardnumber/1910/1910.178",
+      "https://www.osha.gov/etools/powered-industrial-trucks/operating-forklift/pre-operation"
+    ],
+    "gradingKeyId": "5ab7375c-f809-4ae4-bd2f-639969a1ac79",
+    "masteryThreshold": 80
+  },
+  {
+    "id": "forklift-incident-response-v1",
+    "kind": "sequence",
+    "brief": "Analyze an invented near miss. Follow the supplied site roles; do not stage an incident, attempt a rescue, move equipment, or practice emergency maneuvers. In a real emergency, immediate protective action and the site emergency plan take priority over this exercise's documentation workflow.",
+    "tasks": [
+      {
+        "id": "incident-response",
+        "type": "choice",
+        "prompt": "What is the supported immediate response if the hazard is still active?",
+        "options": [
+          {
+            "label": "Enter the area for photographs before alerting anyone",
+            "value": "photo"
+          },
+          {
+            "label": "Stay or move clear when safe, alert designated responders, and follow the site emergency arrangements",
+            "value": "protect"
+          },
+          {
+            "label": "Move the pallet personally to reopen the path",
+            "value": "restart"
+          }
+        ],
+        "critical": true
+      },
+      {
+        "id": "incident-fact",
+        "type": "choice",
+        "prompt": "Which incident note is supported?",
+        "options": [
+          {
+            "label": "The operator was reckless",
+            "value": "blame"
+          },
+          {
+            "label": "Pallet shifted at 10:12; lead notified at 10:13; cause unknown",
+            "value": "fact"
+          },
+          {
+            "label": "A brake defect caused the event",
+            "value": "mechanical"
+          }
+        ],
+        "critical": false
+      },
+      {
+        "id": "incident-nearmiss",
+        "type": "choice",
+        "prompt": "Does the absence of a reported injury settle the training question?",
+        "options": [
+          {
+            "label": "Yes: no review is needed",
+            "value": "none"
+          },
+          {
+            "label": "No: a near miss triggers relevant refresher training and evaluation",
+            "value": "review"
+          },
+          {
+            "label": "Yes, if the online score is high",
+            "value": "quiz"
+          }
+        ],
+        "critical": true
+      },
+      {
+        "id": "incident-tipover",
+        "type": "choice",
+        "prompt": "Which tip-over instruction may this generic online block issue?",
+        "options": [
+          {
+            "label": "One universal maneuver for every truck type",
+            "value": "one"
+          },
+          {
+            "label": "None: actual truck-specific emergency instruction must come from the applicable manual and qualified trainer",
+            "value": "manual"
+          },
+          {
+            "label": "Stage a controlled tip-over for practice",
+            "value": "practice"
+          }
+        ],
+        "critical": true
+      },
+      {
+        "id": "incident-admin",
+        "type": "sequence",
+        "prompt": "After immediate protection and response are established, order this documentation-and-return workflow.",
+        "options": [
+          {
+            "label": "Record observed facts and unresolved questions",
+            "value": "facts"
+          },
+          {
+            "label": "Employer reviews conditions, causes, and applicable refresher needs",
+            "value": "review"
+          },
+          {
+            "label": "Complete required corrections, instruction, and evaluation",
+            "value": "training"
+          },
+          {
+            "label": "Employer records the competence and return-to-assignment decision",
+            "value": "decision"
+          }
+        ],
+        "critical": false
+      }
+    ],
+    "title": "Near-miss reporting and a restricted return to work",
+    "version": 1,
+    "exhibits": [
+      {
+        "rows": [
+          {
+            "fact": "Pallet shifted near a pedestrian crossing; path obstructed.",
+            "time": "10:12"
+          },
+          {
+            "fact": "Shift lead notified under the site procedure.",
+            "time": "10:13"
+          },
+          {
+            "fact": "No injury reported in the case; cause, truck condition, and restart status unknown.",
+            "time": "Current"
+          }
+        ],
+        "title": "Fictional case record",
+        "columns": [
+          {
+            "key": "time",
+            "label": "Time"
+          },
+          {
+            "key": "fact",
+            "label": "Available information"
+          }
+        ]
+      },
+      {
+        "rows": [
+          {
+            "role": "Learner",
+            "responsibility": "Remain clear, alert assigned personnel, report observations, and preserve operating restrictions."
+          },
+          {
+            "role": "Shift lead / emergency response",
+            "responsibility": "Manage the area and response under the site plan; determine further assistance needed."
+          },
+          {
+            "role": "Employer and qualified trainer",
+            "responsibility": "Review causes and controls, arrange relevant refresher training/evaluation, and decide authorized return."
+          }
+        ],
+        "title": "Fictional site roles",
+        "columns": [
+          {
+            "key": "role",
+            "label": "Role"
+          },
+          {
+            "key": "responsibility",
+            "label": "Responsibility"
+          }
+        ]
+      }
+    ],
+    "sourceUrls": [
+      "https://www.osha.gov/laws-regs/regulations/standardnumber/1910/1910.178",
+      "https://www.osha.gov/etools/powered-industrial-trucks/training",
+      "https://www.osha.gov/etools/powered-industrial-trucks/operating-forklift/pre-operation",
+      "https://www.osha.gov/etools/powered-industrial-trucks/operating-forklift/traveling-maneuvering"
+    ],
+    "gradingKeyId": "0eadf472-ca57-482e-ba10-79dbde22db9c",
+    "masteryThreshold": 80
+  },
+  {
+    "id": "SIM-MFG-02",
+    "kind": "sequence",
+    "brief": "SYNTHETIC TRAINING CASE. All products, documents, numbers, and acceptance rules below are fictional. Arrange virtual document and component actions. No real tools, fasteners, chemicals, or equipment are used. Five tasks each carry 20 points; critical sequence and exception decisions must be correct.",
+    "tasks": [
+      {
+        "id": "approved_sequence",
+        "type": "sequence",
+        "prompt": "Place all seven digital actions in the required order.",
+        "options": [
+          {
+            "label": "Associate cap card",
+            "value": "cap"
+          },
+          {
+            "label": "Associate base card",
+            "value": "base"
+          },
+          {
+            "label": "Review completed record",
+            "value": "review"
+          },
+          {
+            "label": "Associate two pin cards",
+            "value": "pins"
+          },
+          {
+            "label": "Verify order and revision",
+            "value": "order"
+          },
+          {
+            "label": "Verify kit identities and quantities",
+            "value": "kit"
+          },
+          {
+            "label": "Verify and record pin count",
+            "value": "verify_pins"
+          }
+        ],
+        "critical": true
+      },
+      {
+        "id": "skipped_check",
+        "type": "choice",
+        "prompt": "For E1, what is the appropriate digital response?",
+        "options": [
+          {
+            "label": "Continue and sign the check later.",
+            "value": "continue"
+          },
+          {
+            "label": "Mark the run incomplete and resolve or reset the skipped check in the simulation.",
+            "value": "hold"
+          },
+          {
+            "label": "Delete the check requirement.",
+            "value": "delete"
+          }
+        ],
+        "critical": true
+      },
+      {
+        "id": "wrong_revision",
+        "type": "choice",
+        "prompt": "For E2, what should happen?",
+        "options": [
+          {
+            "label": "Use the old revision because it fits the screen.",
+            "value": "substitute"
+          },
+          {
+            "label": "Reject the substitution and request the required revision or an authorized resolution.",
+            "value": "resolve"
+          },
+          {
+            "label": "Rename the cap card as revision B.",
+            "value": "rename"
+          }
+        ],
+        "critical": true
+      },
+      {
+        "id": "pin_quantity",
+        "type": "number",
+        "unit": "pins",
+        "prompt": "How many pins are required for the 12-unit practice order?",
+        "critical": false,
+        "tolerance": 0
+      },
+      {
+        "id": "fixture_change",
+        "type": "choice",
+        "prompt": "For E3, what is the appropriate next step?",
+        "options": [
+          {
+            "label": "Modify the physical fixture immediately.",
+            "value": "modify"
+          },
+          {
+            "label": "Submit the proposal for the employer’s technical approval.",
+            "value": "submit"
+          },
+          {
+            "label": "Bypass the fixture during the trial.",
+            "value": "bypass"
+          }
+        ],
+        "critical": true
+      }
+    ],
+    "title": "Sequence a digital assembly with visible hold points",
+    "version": 1,
+    "exhibits": [
+      {
+        "rows": [
+          {
+            "step": 1,
+            "requirement": "Verify order and revision."
+          },
+          {
+            "step": 2,
+            "requirement": "Verify all kit identities and quantities."
+          },
+          {
+            "step": 3,
+            "requirement": "Associate base card."
+          },
+          {
+            "step": 4,
+            "requirement": "Associate two pin cards."
+          },
+          {
+            "step": 5,
+            "requirement": "Verify and record pin count."
+          },
+          {
+            "step": 6,
+            "requirement": "Associate cap card."
+          },
+          {
+            "step": 7,
+            "requirement": "Review the completed identity and check record."
+          }
+        ],
+        "title": "Approved digital instruction",
+        "columns": [
+          {
+            "key": "step",
+            "label": "Step"
+          },
+          {
+            "key": "requirement",
+            "label": "Requirement"
+          }
+        ]
+      },
+      {
+        "rows": [
+          {
+            "id": "E1",
+            "condition": "Cap action attempted before pin-count verification."
+          },
+          {
+            "id": "E2",
+            "condition": "Revision-A cap offered for a revision-B order."
+          },
+          {
+            "id": "E3",
+            "condition": "A proposed physical fixture change has not been technically approved."
+          },
+          {
+            "id": "Q1",
+            "condition": "Practice order contains 12 units; each requires 2 pins."
+          }
+        ],
+        "title": "Exception cards",
+        "columns": [
+          {
+            "key": "id",
+            "label": "Card"
+          },
+          {
+            "key": "condition",
+            "label": "Condition"
+          }
+        ]
+      }
+    ],
+    "sourceUrls": [
+      "https://www.nist.gov/blogs/manufacturing-innovation-blog/lean-management-road-map-build-more-proactive-game-plan",
+      "https://www.osha.gov/laws-regs/regulations/standardnumber/1910/1910.212"
+    ],
+    "gradingKeyId": "34a399c9-e617-40cb-b1f9-2e49bfe2781a",
+    "masteryThreshold": 80
+  },
+  {
+    "id": "SIM-MFG-01",
+    "kind": "inspection",
+    "brief": "SYNTHETIC TRAINING CASE. All products, documents, numbers, and acceptance rules below are fictional. Review the initial packet and the later authorized updates separately. Calculate complete kits, identify initial blocks, and reconcile the final handoff. Ten equally weighted tasks; at least 80% and every critical task correct are required. The simulation does not authorize a real build or release.",
+    "tasks": [
+      {
+        "id": "initial_revision",
+        "type": "choice",
+        "prompt": "At initial review, what should happen because the work instruction is revision A?",
+        "options": [
+          {
+            "label": "Use revision A because the product name matches.",
+            "value": "proceed"
+          },
+          {
+            "label": "Hold the start and obtain the approved revision-B instruction.",
+            "value": "resolve"
+          },
+          {
+            "label": "Change the order to revision A.",
+            "value": "rewrite"
+          }
+        ],
+        "critical": true
+      },
+      {
+        "id": "kit_limit",
+        "type": "number",
+        "unit": "kits",
+        "prompt": "How many complete kits do the initial usable quantities support?",
+        "critical": false,
+        "tolerance": 0
+      },
+      {
+        "id": "limiting_component",
+        "type": "choice",
+        "prompt": "Which component limits the complete-kit count?",
+        "options": [
+          {
+            "label": "Base",
+            "value": "base"
+          },
+          {
+            "label": "Cap",
+            "value": "cap"
+          },
+          {
+            "label": "Pin",
+            "value": "pin"
+          },
+          {
+            "label": "Label",
+            "value": "label"
+          }
+        ],
+        "critical": false
+      },
+      {
+        "id": "cap_shortage",
+        "type": "number",
+        "unit": "caps",
+        "prompt": "How many additional usable caps are needed for the original 24-unit quantity?",
+        "critical": false,
+        "tolerance": 0
+      },
+      {
+        "id": "partial_authority",
+        "type": "choice",
+        "prompt": "Does the initial kit calculation by itself authorize a 23-unit partial run?",
+        "options": [
+          {
+            "label": "Yes; arithmetic changes the order.",
+            "value": "yes"
+          },
+          {
+            "label": "No; the designated lead must authorize the partial quantity.",
+            "value": "no"
+          }
+        ],
+        "critical": true
+      },
+      {
+        "id": "pin_use",
+        "type": "number",
+        "unit": "pins",
+        "prompt": "After the authorized 23-unit virtual run, how many pins were consumed?",
+        "critical": false,
+        "tolerance": 0
+      },
+      {
+        "id": "pin_remaining",
+        "type": "number",
+        "unit": "pins",
+        "prompt": "How many of the 49 issued pins remain after that run?",
+        "critical": false,
+        "tolerance": 0
+      },
+      {
+        "id": "review_ready",
+        "type": "number",
+        "unit": "units",
+        "prompt": "How many produced units have complete check records and are eligible for the designated release review?",
+        "critical": false,
+        "tolerance": 0
+      },
+      {
+        "id": "unproduced_balance",
+        "type": "number",
+        "unit": "units",
+        "prompt": "How many units remain unproduced against the original order?",
+        "critical": false,
+        "tolerance": 0
+      },
+      {
+        "id": "release",
+        "type": "choice",
+        "prompt": "Who must make the unresolved release decision under this case?",
+        "options": [
+          {
+            "label": "Any learner who finishes the calculation",
+            "value": "learner"
+          },
+          {
+            "label": "The designated quality lead after reviewing required evidence",
+            "value": "quality_lead"
+          },
+          {
+            "label": "Release is automatic when assembly ends",
+            "value": "automatic"
+          }
+        ],
+        "critical": true
+      }
+    ],
+    "title": "Review the order, kit, and partial-run handoff",
+    "version": 1,
+    "exhibits": [
+      {
+        "rows": [
+          {
+            "value": "24 DSK-100 units; revision B",
+            "document": "Work order WO-CAP-01"
+          },
+          {
+            "value": "Revision B; one base, one cap, two pins, one label per unit",
+            "document": "BOM"
+          },
+          {
+            "value": "Revision A",
+            "document": "Work instruction"
+          },
+          {
+            "value": "Not issued at initial review",
+            "document": "Partial-run authorization"
+          }
+        ],
+        "title": "Initial document packet",
+        "columns": [
+          {
+            "key": "document",
+            "label": "Document"
+          },
+          {
+            "key": "value",
+            "label": "Supplied value"
+          }
+        ]
+      },
+      {
+        "rows": [
+          {
+            "usable": 24,
+            "perUnit": 1,
+            "component": "Base B-100"
+          },
+          {
+            "usable": 23,
+            "perUnit": 1,
+            "component": "Cap C-100 rev B"
+          },
+          {
+            "usable": 49,
+            "perUnit": 2,
+            "component": "Pin P-10"
+          },
+          {
+            "usable": 24,
+            "perUnit": 1,
+            "component": "Label L-100"
+          }
+        ],
+        "title": "Released usable stock at initial review",
+        "columns": [
+          {
+            "key": "component",
+            "label": "Component"
+          },
+          {
+            "key": "perUnit",
+            "label": "Per unit"
+          },
+          {
+            "key": "usable",
+            "label": "Usable quantity"
+          }
+        ]
+      },
+      {
+        "rows": [
+          {
+            "event": "Document resolution",
+            "record": "Document owner supplies approved revision-B instruction."
+          },
+          {
+            "event": "Quantity decision",
+            "record": "Lead authorizes a 23-unit partial run; original order remains 24."
+          },
+          {
+            "event": "Final production",
+            "record": "23 virtual units produced;22 have complete check records;1 is held for a missing label check."
+          },
+          {
+            "event": "Material rule",
+            "record": "Each produced unit consumes 2 pins; unused pins retain their controlled identity."
+          },
+          {
+            "event": "Release rule",
+            "record": "Quality lead reviews evidence and records release; no release is yet supplied."
+          }
+        ],
+        "title": "Later supplied events",
+        "columns": [
+          {
+            "key": "event",
+            "label": "Event"
+          },
+          {
+            "key": "record",
+            "label": "Record"
+          }
+        ]
+      }
+    ],
+    "sourceUrls": [
+      "https://www.nist.gov/mep/value-stream-mapping",
+      "https://www.nist.gov/blogs/manufacturing-innovation-blog/lean-management-road-map-build-more-proactive-game-plan"
+    ],
+    "gradingKeyId": "ab04e84d-7403-4a90-87ce-93706a7f1204",
+    "masteryThreshold": 80
+  },
+  {
+    "id": "SIM-MFG-03",
+    "kind": "measurement",
+    "brief": "SYNTHETIC TRAINING CASE. All products, documents, numbers, and acceptance rules below are fictional. Use only the fictional Rule B below. Do not round readings before applying it. Ten tasks each carry 10 points; instrument-status and record-integrity tasks are critical.",
+    "tasks": [
+      {
+        "id": "classify_m1",
+        "type": "choice",
+        "prompt": "Classify M1 under Rule B.",
+        "options": [
+          {
+            "label": "Conforming under Rule B",
+            "value": "conforming"
+          },
+          {
+            "label": "Hold for review under Rule B",
+            "value": "hold"
+          },
+          {
+            "label": "Nonconforming under Rule B",
+            "value": "nonconforming"
+          }
+        ],
+        "critical": false
+      },
+      {
+        "id": "classify_m2",
+        "type": "choice",
+        "prompt": "Classify M2 under Rule B.",
+        "options": [
+          {
+            "label": "Conforming under Rule B",
+            "value": "conforming"
+          },
+          {
+            "label": "Hold for review under Rule B",
+            "value": "hold"
+          },
+          {
+            "label": "Nonconforming under Rule B",
+            "value": "nonconforming"
+          }
+        ],
+        "critical": false
+      },
+      {
+        "id": "classify_m3",
+        "type": "choice",
+        "prompt": "Classify M3 under Rule B.",
+        "options": [
+          {
+            "label": "Conforming under Rule B",
+            "value": "conforming"
+          },
+          {
+            "label": "Hold for review under Rule B",
+            "value": "hold"
+          },
+          {
+            "label": "Nonconforming under Rule B",
+            "value": "nonconforming"
+          }
+        ],
+        "critical": false
+      },
+      {
+        "id": "classify_m4",
+        "type": "choice",
+        "prompt": "Classify M4 under Rule B.",
+        "options": [
+          {
+            "label": "Conforming under Rule B",
+            "value": "conforming"
+          },
+          {
+            "label": "Hold for review under Rule B",
+            "value": "hold"
+          },
+          {
+            "label": "Nonconforming under Rule B",
+            "value": "nonconforming"
+          }
+        ],
+        "critical": false
+      },
+      {
+        "id": "classify_m5",
+        "type": "choice",
+        "prompt": "Classify M5 under Rule B.",
+        "options": [
+          {
+            "label": "Conforming under Rule B",
+            "value": "conforming"
+          },
+          {
+            "label": "Hold for review under Rule B",
+            "value": "hold"
+          },
+          {
+            "label": "Nonconforming under Rule B",
+            "value": "nonconforming"
+          }
+        ],
+        "critical": false
+      },
+      {
+        "id": "classify_m6",
+        "type": "choice",
+        "prompt": "Classify M6 under Rule B.",
+        "options": [
+          {
+            "label": "Conforming under Rule B",
+            "value": "conforming"
+          },
+          {
+            "label": "Hold for review under Rule B",
+            "value": "hold"
+          },
+          {
+            "label": "Nonconforming under Rule B",
+            "value": "nonconforming"
+          }
+        ],
+        "critical": false
+      },
+      {
+        "id": "classify_m7",
+        "type": "choice",
+        "prompt": "Classify M7 under Rule B.",
+        "options": [
+          {
+            "label": "Conforming under Rule B",
+            "value": "conforming"
+          },
+          {
+            "label": "Hold for review under Rule B",
+            "value": "hold"
+          },
+          {
+            "label": "Nonconforming under Rule B",
+            "value": "nonconforming"
+          }
+        ],
+        "critical": false
+      },
+      {
+        "id": "classify_m8",
+        "type": "choice",
+        "prompt": "Classify M8 under Rule B.",
+        "options": [
+          {
+            "label": "Conforming under Rule B",
+            "value": "conforming"
+          },
+          {
+            "label": "Hold for review under Rule B",
+            "value": "hold"
+          },
+          {
+            "label": "Nonconforming under Rule B",
+            "value": "nonconforming"
+          }
+        ],
+        "critical": false
+      },
+      {
+        "id": "overdue_tool",
+        "type": "choice",
+        "prompt": "May card X1’s overdue instrument be treated as approved merely because its reading looks plausible?",
+        "options": [
+          {
+            "label": "Yes; a plausible number is enough.",
+            "value": "use"
+          },
+          {
+            "label": "No; preserve the evidence and request the required instrument/result review.",
+            "value": "review"
+          }
+        ],
+        "critical": true
+      },
+      {
+        "id": "rounding",
+        "type": "choice",
+        "prompt": "May a learner change 100.21 mm to 100.20 mm before applying the rule to obtain a preferred outcome?",
+        "options": [
+          {
+            "label": "Yes; the difference is small.",
+            "value": "change"
+          },
+          {
+            "label": "No; preserve the supplied observation and apply the stated rule.",
+            "value": "preserve"
+          }
+        ],
+        "critical": true
+      }
+    ],
+    "title": "Evaluate measurement intervals and instrument evidence",
+    "version": 1,
+    "exhibits": [
+      {
+        "rows": [
+          {
+            "field": "Specification",
+            "value": "99.80–100.20 mm, inclusive."
+          },
+          {
+            "field": "Measurement interval",
+            "value": "Each supplied reading plus or minus 0.03 mm."
+          },
+          {
+            "field": "Conforming",
+            "value": "Entire measurement interval lies within the specification, including boundaries."
+          },
+          {
+            "field": "Nonconforming",
+            "value": "Entire interval is strictly outside the specification on one side."
+          },
+          {
+            "field": "Hold",
+            "value": "Interval overlaps either specification boundary."
+          },
+          {
+            "field": "Instrument condition",
+            "value": "A separate card X1 is overdue; results from X1 require review before use."
+          }
+        ],
+        "title": "Supplied decision rule",
+        "columns": [
+          {
+            "key": "field",
+            "label": "Field"
+          },
+          {
+            "key": "value",
+            "label": "Value"
+          }
+        ]
+      },
+      {
+        "rows": [
+          {
+            "id": "M1",
+            "readingMm": 99.75
+          },
+          {
+            "id": "M2",
+            "readingMm": 99.8
+          },
+          {
+            "id": "M3",
+            "readingMm": 99.83
+          },
+          {
+            "id": "M4",
+            "readingMm": 100
+          },
+          {
+            "id": "M5",
+            "readingMm": 100.17
+          },
+          {
+            "id": "M6",
+            "readingMm": 100.18
+          },
+          {
+            "id": "M7",
+            "readingMm": 100.21
+          },
+          {
+            "id": "M8",
+            "readingMm": 100.25
+          }
+        ],
+        "title": "Synthetic readings from the approved exercise instrument",
+        "columns": [
+          {
+            "key": "id",
+            "label": "Unit"
+          },
+          {
+            "key": "readingMm",
+            "label": "Reading(mm)"
+          }
+        ]
+      }
+    ],
+    "sourceUrls": [
+      "https://www.nist.gov/metrology/metrological-traceability",
+      "https://www.nist.gov/publications/uncertainty-due-finite-resolution-measurements-0"
+    ],
+    "gradingKeyId": "24cb0be0-178a-49c4-a10c-6557e6710e27",
+    "masteryThreshold": 80
+  },
+  {
+    "id": "SIM-MFG-04",
+    "kind": "defect-sort",
+    "brief": "SYNTHETIC TRAINING CASE. All products, documents, numbers, and acceptance rules below are fictional. These written evidence cards simulate inspection decisions; they do not test physical visual-inspection ability. Apply only the supplied fictional standard. Ten equally weighted tasks, with critical hold and insufficient-evidence decisions required.",
+    "tasks": [
+      {
+        "id": "classify_v1",
+        "type": "choice",
+        "prompt": "Choose the status for V1.",
+        "options": [
+          {
+            "label": "Conforming to the supplied card criteria",
+            "value": "conforming"
+          },
+          {
+            "label": "Hold for observed condition",
+            "value": "hold"
+          },
+          {
+            "label": "Review for insufficient evidence",
+            "value": "review"
+          }
+        ],
+        "critical": false
+      },
+      {
+        "id": "classify_v2",
+        "type": "choice",
+        "prompt": "Choose the status for V2.",
+        "options": [
+          {
+            "label": "Conforming to the supplied card criteria",
+            "value": "conforming"
+          },
+          {
+            "label": "Hold for observed condition",
+            "value": "hold"
+          },
+          {
+            "label": "Review for insufficient evidence",
+            "value": "review"
+          }
+        ],
+        "critical": false
+      },
+      {
+        "id": "classify_v3",
+        "type": "choice",
+        "prompt": "Choose the status for V3.",
+        "options": [
+          {
+            "label": "Conforming to the supplied card criteria",
+            "value": "conforming"
+          },
+          {
+            "label": "Hold for observed condition",
+            "value": "hold"
+          },
+          {
+            "label": "Review for insufficient evidence",
+            "value": "review"
+          }
+        ],
+        "critical": false
+      },
+      {
+        "id": "classify_v4",
+        "type": "choice",
+        "prompt": "Choose the status for V4.",
+        "options": [
+          {
+            "label": "Conforming to the supplied card criteria",
+            "value": "conforming"
+          },
+          {
+            "label": "Hold for observed condition",
+            "value": "hold"
+          },
+          {
+            "label": "Review for insufficient evidence",
+            "value": "review"
+          }
+        ],
+        "critical": false
+      },
+      {
+        "id": "classify_v5",
+        "type": "choice",
+        "prompt": "Choose the status for V5.",
+        "options": [
+          {
+            "label": "Conforming to the supplied card criteria",
+            "value": "conforming"
+          },
+          {
+            "label": "Hold for observed condition",
+            "value": "hold"
+          },
+          {
+            "label": "Review for insufficient evidence",
+            "value": "review"
+          }
+        ],
+        "critical": true
+      },
+      {
+        "id": "classify_v6",
+        "type": "choice",
+        "prompt": "Choose the status for V6.",
+        "options": [
+          {
+            "label": "Conforming to the supplied card criteria",
+            "value": "conforming"
+          },
+          {
+            "label": "Hold for observed condition",
+            "value": "hold"
+          },
+          {
+            "label": "Review for insufficient evidence",
+            "value": "review"
+          }
+        ],
+        "critical": true
+      },
+      {
+        "id": "classify_v7",
+        "type": "choice",
+        "prompt": "Choose the status for V7.",
+        "options": [
+          {
+            "label": "Conforming to the supplied card criteria",
+            "value": "conforming"
+          },
+          {
+            "label": "Hold for observed condition",
+            "value": "hold"
+          },
+          {
+            "label": "Review for insufficient evidence",
+            "value": "review"
+          }
+        ],
+        "critical": true
+      },
+      {
+        "id": "classify_v8",
+        "type": "choice",
+        "prompt": "Choose the status for V8.",
+        "options": [
+          {
+            "label": "Conforming to the supplied card criteria",
+            "value": "conforming"
+          },
+          {
+            "label": "Hold for observed condition",
+            "value": "hold"
+          },
+          {
+            "label": "Review for insufficient evidence",
+            "value": "review"
+          }
+        ],
+        "critical": false
+      },
+      {
+        "id": "nonconforming_units",
+        "type": "number",
+        "unit": "units",
+        "prompt": "How many distinct units have observed nonconforming conditions, excluding the unresolved V7?",
+        "critical": false,
+        "tolerance": 0
+      },
+      {
+        "id": "defect_occurrences",
+        "type": "number",
+        "unit": "occurrences",
+        "prompt": "How many nonconforming-condition occurrences are recorded on those units?",
+        "critical": false,
+        "tolerance": 0
+      }
+    ],
+    "title": "Sort defect evidence and preserve uncertain cases",
+    "version": 1,
+    "exhibits": [
+      {
+        "rows": [
+          {
+            "rule": "At most 3.0 mm, inclusive.",
+            "criterion": "Zone A superficial marks"
+          },
+          {
+            "rule": "At most 10.0 mm, inclusive.",
+            "criterion": "Zone B superficial marks"
+          },
+          {
+            "rule": "Any reported crack requires hold.",
+            "criterion": "Cracks"
+          },
+          {
+            "rule": "Missing required component or unreadable/wrong identity code requires hold.",
+            "criterion": "Components and codes"
+          },
+          {
+            "rule": "Review for insufficient evidence; do not invent zone or length.",
+            "criterion": "Missing view information"
+          }
+        ],
+        "title": "Fictional appearance and completeness standard",
+        "columns": [
+          {
+            "key": "criterion",
+            "label": "Criterion"
+          },
+          {
+            "key": "rule",
+            "label": "Rule"
+          }
+        ]
+      },
+      {
+        "rows": [
+          {
+            "id": "V1",
+            "evidence": "All required evidence complete; Zone-A superficial mark 2.0 mm; no other condition."
+          },
+          {
+            "id": "V2",
+            "evidence": "All required evidence complete; Zone-A superficial mark 3.0 mm; no other condition."
+          },
+          {
+            "id": "V3",
+            "evidence": "All required evidence complete; Zone-A superficial mark 3.1 mm; no other condition."
+          },
+          {
+            "id": "V4",
+            "evidence": "All required evidence complete; Zone-B superficial mark 8.0 mm; no other condition."
+          },
+          {
+            "id": "V5",
+            "evidence": "Crack reported; other required evidence complete."
+          },
+          {
+            "id": "V6",
+            "evidence": "One required pin missing and lot code unreadable."
+          },
+          {
+            "id": "V7",
+            "evidence": "Mark reported; zone and length not supplied."
+          },
+          {
+            "id": "V8",
+            "evidence": "All required evidence complete; Zone-B superficial mark 11.0 mm; no other condition."
+          }
+        ],
+        "title": "Synthetic evidence cards",
+        "columns": [
+          {
+            "key": "id",
+            "label": "Unit"
+          },
+          {
+            "key": "evidence",
+            "label": "Evidence"
+          }
+        ]
+      }
+    ],
+    "sourceUrls": [
+      "https://www.nist.gov/blogs/manufacturing-innovation-blog/lean-management-road-map-build-more-proactive-game-plan",
+      "https://www.nist.gov/mep/lean-and-process-improvement"
+    ],
+    "gradingKeyId": "49b54c45-b5d6-4b24-9ee5-877ac7903ae0",
+    "masteryThreshold": 80
+  },
+  {
+    "id": "SIM-MFG-05",
+    "kind": "inspection",
+    "brief": "SYNTHETIC TRAINING CASE. All products, documents, numbers, and acceptance rules below are fictional. The sample plan is invented for this exercise and must not be used to design a real acceptance program. Five tasks each carry 20 points. Apply the ordinary-unit count, the critical gate, and the documentation condition separately.",
+    "tasks": [
+      {
+        "id": "lot_a_count",
+        "type": "number",
+        "unit": "units",
+        "prompt": "How many ordinary nonconforming sampled units are counted for S-A?",
+        "critical": false,
+        "tolerance": 0
+      },
+      {
+        "id": "lot_a_status",
+        "type": "choice",
+        "prompt": "What is S-A’s status under the supplied criteria?",
+        "options": [
+          {
+            "label": "Meets supplied sample/document criteria; eligible for designated release review.",
+            "value": "eligible"
+          },
+          {
+            "label": "Every one of the 200 units is proven defect-free.",
+            "value": "all_good"
+          },
+          {
+            "label": "Automatically scrap the whole lot.",
+            "value": "scrap"
+          }
+        ],
+        "critical": false
+      },
+      {
+        "id": "lot_b_status",
+        "type": "choice",
+        "prompt": "What should happen to S-B?",
+        "options": [
+          {
+            "label": "Hold: two nonconforming sampled units exceed acceptance number one.",
+            "value": "hold"
+          },
+          {
+            "label": "Replace one failed sample unit and pass.",
+            "value": "replace"
+          },
+          {
+            "label": "Pass because most sampled units conform.",
+            "value": "pass"
+          }
+        ],
+        "critical": true
+      },
+      {
+        "id": "lot_c_status",
+        "type": "choice",
+        "prompt": "What should happen to S-C?",
+        "options": [
+          {
+            "label": "Pass because ordinary defects are zero.",
+            "value": "pass"
+          },
+          {
+            "label": "Hold because the critical-condition gate fails.",
+            "value": "hold"
+          },
+          {
+            "label": "Remove unit 68 from the record.",
+            "value": "ignore"
+          }
+        ],
+        "critical": true
+      },
+      {
+        "id": "sample_integrity",
+        "type": "choice",
+        "prompt": "May a failed selected unit be replaced with a better-looking unit?",
+        "options": [
+          {
+            "label": "Yes, to keep the sample representative.",
+            "value": "yes"
+          },
+          {
+            "label": "No; retain the selected ID and observation and follow the plan.",
+            "value": "no"
+          }
+        ],
+        "critical": true
+      }
+    ],
+    "title": "Decide lot status using a supplied sampling plan",
+    "version": 1,
+    "exhibits": [
+      {
+        "rows": [
+          {
+            "rule": "200 units per lot.",
+            "field": "Lot size"
+          },
+          {
+            "rule": "8 stated IDs per lot, without replacement.",
+            "field": "Sample size"
+          },
+          {
+            "rule": "7, 23, 49, 68, 91, 123, 158, 184.",
+            "field": "Selected IDs"
+          },
+          {
+            "rule": "At most 1 nonconforming sampled unit.",
+            "field": "Ordinary criterion"
+          },
+          {
+            "rule": "Zero listed critical conditions accepted.",
+            "field": "Critical criterion"
+          },
+          {
+            "rule": "Complete required documents before eligibility for release review.",
+            "field": "Documents"
+          },
+          {
+            "rule": "Hold lot for designated review; do not substitute samples or improvise extra sampling.",
+            "field": "Failure response"
+          }
+        ],
+        "title": "Plan SP-TRAIN-B",
+        "columns": [
+          {
+            "key": "field",
+            "label": "Field"
+          },
+          {
+            "key": "rule",
+            "label": "Rule"
+          }
+        ]
+      },
+      {
+        "rows": [
+          {
+            "lot": "S-A",
+            "critical": "None",
+            "ordinary": "Unit 23 has two ordinary defects; all other sampled units meet ordinary criteria.",
+            "documents": "Complete"
+          },
+          {
+            "lot": "S-B",
+            "critical": "None",
+            "ordinary": "Units 23 and 158 each have one ordinary defect.",
+            "documents": "Complete"
+          },
+          {
+            "lot": "S-C",
+            "critical": "Unit 68 has one listed critical condition.",
+            "ordinary": "No ordinary nonconforming units.",
+            "documents": "Complete"
+          }
+        ],
+        "title": "Lot observations",
+        "columns": [
+          {
+            "key": "lot",
+            "label": "Lot"
+          },
+          {
+            "key": "ordinary",
+            "label": "Ordinary observations"
+          },
+          {
+            "key": "critical",
+            "label": "Critical observations"
+          },
+          {
+            "key": "documents",
+            "label": "Documents"
+          }
+        ]
+      }
+    ],
+    "sourceUrls": [
+      "https://www.itl.nist.gov/div898/handbook/pmc/section2/pmc21.htm",
+      "https://www.itl.nist.gov/div898/handbook/pmc/section2/pmc22.htm"
+    ],
+    "gradingKeyId": "38747f95-f0d8-4712-9c21-67e75483f6f9",
+    "masteryThreshold": 80
+  },
+  {
+    "id": "SIM-MFG-06",
+    "kind": "traceability",
+    "brief": "SYNTHETIC TRAINING CASE. All products, documents, numbers, and acceptance rules below are fictional. Combine lot tracing, instrument evidence, status, and quantity reconciliation. Ten tasks each carry 10 points. This is a review packet; no release has yet been authorized. All critical authority and evidence tasks must pass.",
+    "tasks": [
+      {
+        "id": "associated_count",
+        "type": "number",
+        "unit": "units",
+        "prompt": "How many units are explicitly recorded to C-102?",
+        "critical": false,
+        "tolerance": 0
+      },
+      {
+        "id": "uncertain_count",
+        "type": "number",
+        "unit": "units",
+        "prompt": "How many additional units have unresolved cap identities?",
+        "critical": false,
+        "tolerance": 0
+      },
+      {
+        "id": "initial_review_count",
+        "type": "number",
+        "unit": "units",
+        "prompt": "What is the total initial review quantity under the supplied scope rule?",
+        "critical": false,
+        "tolerance": 0
+      },
+      {
+        "id": "scope_status",
+        "type": "choice",
+        "prompt": "How should the six-unit group be described?",
+        "options": [
+          {
+            "label": "All six are proven defective.",
+            "value": "all_defective"
+          },
+          {
+            "label": "Held for review: four associated and two potentially associated; individual conformity is not established by this scope alone.",
+            "value": "held_review"
+          },
+          {
+            "label": "Released because they have been produced.",
+            "value": "released"
+          }
+        ],
+        "critical": true
+      },
+      {
+        "id": "eligible_review",
+        "type": "number",
+        "unit": "units",
+        "prompt": "How many units are eligible for normal release review outside this specific concern, given the complete evidence stated?",
+        "critical": false,
+        "tolerance": 0
+      },
+      {
+        "id": "already_released",
+        "type": "number",
+        "unit": "units",
+        "prompt": "How many units have actually been released according to the supplied packet?",
+        "critical": true,
+        "tolerance": 0
+      },
+      {
+        "id": "correction",
+        "type": "choice",
+        "prompt": "What is the correct treatment of U-03’s transcription error?",
+        "options": [
+          {
+            "label": "Overwrite 100.80 with 100.08 and remove the history.",
+            "value": "overwrite"
+          },
+          {
+            "label": "Retain the original and record 100.08 mm with source, reason, author, and correction time.",
+            "value": "audit"
+          },
+          {
+            "label": "Keep 100.80 because corrections are never allowed.",
+            "value": "keep_wrong"
+          }
+        ],
+        "critical": true
+      },
+      {
+        "id": "packing",
+        "type": "choice",
+        "prompt": "What does the packing queue need through the fictional internal process?",
+        "options": [
+          {
+            "label": "An instruction to ship before the concern grows.",
+            "value": "ship"
+          },
+          {
+            "label": "The affected IDs, hold status, reason, and designated review owner.",
+            "value": "hold_notice"
+          },
+          {
+            "label": "No information because packing did not cause the issue.",
+            "value": "no_information"
+          }
+        ],
+        "critical": true
+      },
+      {
+        "id": "reconciliation",
+        "type": "number",
+        "unit": "units",
+        "prompt": "Add the 4 eligible-for-review units and 6 held units. What is the total produced quantity?",
+        "critical": false,
+        "tolerance": 0
+      },
+      {
+        "id": "disposition",
+        "type": "choice",
+        "prompt": "Who decides the unresolved disposition and any release after required verification?",
+        "options": [
+          {
+            "label": "The designated quality lead under the case procedure.",
+            "value": "quality_lead"
+          },
+          {
+            "label": "Any learner who scores 80%.",
+            "value": "learner"
+          },
+          {
+            "label": "The software automatically releases product after a quiz.",
+            "value": "automatic"
+          }
+        ],
+        "critical": true
+      }
+    ],
+    "title": "Prepare the quality review and containment handoff",
+    "version": 1,
+    "exhibits": [
+      {
+        "rows": [
+          {
+            "field": "Order",
+            "value": "WO-QCAP-01:10 DSK-100 revision-B units; all 10 have been produced."
+          },
+          {
+            "field": "Concern",
+            "value": "A confirmed cap-revision mismatch is linked to cap lot C-102. Quality lead has not yet set final scope or disposition."
+          },
+          {
+            "field": "Initial-scope rule",
+            "value": "Include units recorded to C-102 and units with unknown cap identity that could be affected."
+          },
+          {
+            "field": "Other evidence",
+            "value": "U-01–U-04 have complete required inspection records and no other open concerns in this case."
+          },
+          {
+            "field": "Release",
+            "value": "Only the quality lead can record release. No release has yet been recorded."
+          }
+        ],
+        "title": "Order and concern",
+        "columns": [
+          {
+            "key": "field",
+            "label": "Field"
+          },
+          {
+            "key": "value",
+            "label": "Value"
+          }
+        ]
+      },
+      {
+        "rows": [
+          {
+            "units": "U-01–U-04",
+            "capLot": "C-101",
+            "location": "Inspection"
+          },
+          {
+            "units": "U-05–U-08",
+            "capLot": "C-102",
+            "location": "Packing"
+          },
+          {
+            "units": "U-09–U-10",
+            "capLot": "Unknown",
+            "location": "Assembly"
+          }
+        ],
+        "title": "Traceability and location",
+        "columns": [
+          {
+            "key": "units",
+            "label": "Units"
+          },
+          {
+            "key": "capLot",
+            "label": "Cap lot"
+          },
+          {
+            "key": "location",
+            "label": "Current queue"
+          }
+        ]
+      },
+      {
+        "rows": [
+          {
+            "record": "Instrument C-21",
+            "evidence": "Approved range/method; current status; required reference check passed."
+          },
+          {
+            "record": "Source observation for U-03",
+            "evidence": "100.08 mm; source unit card U-03."
+          },
+          {
+            "record": "Entered record for U-03",
+            "evidence": "100.80 mm; transcription error confirmed against the supplied source."
+          },
+          {
+            "record": "Correction rule",
+            "evidence": "Retain original entry; record corrected value, source basis, reason, author, and correction time."
+          }
+        ],
+        "title": "Measurement record review",
+        "columns": [
+          {
+            "key": "record",
+            "label": "Record"
+          },
+          {
+            "key": "evidence",
+            "label": "Evidence"
+          }
+        ]
+      }
+    ],
+    "sourceUrls": [
+      "https://www.nist.gov/metrology/metrological-traceability",
+      "https://www.nist.gov/blogs/manufacturing-innovation-blog/lean-management-road-map-build-more-proactive-game-plan",
+      "https://www.nist.gov/mep/value-stream-mapping"
+    ],
+    "gradingKeyId": "5f140797-c9d0-4ff3-973d-5ae3337896c3",
+    "masteryThreshold": 80
+  }
+]

@@ -87,7 +87,7 @@ describe('forklift marketing route', () => {
     expect(container.querySelector('a[href*="Employer_Practical_Guide.pdf"]')).toBeNull();
     expect(container.querySelector('a[href*="Workbook.pdf"]')).toBeNull();
     expect(screen.getByRole('link', { name: 'Request enrollment information' })).toHaveAttribute('href', '/apply?program=forklift');
-    expect(screen.getByRole('link', { name: 'Discuss an employer partnership' })).toHaveAttribute('href', '/contact?program=forklift&interest=employer-training');
+    expect(screen.getByRole('link', { name: 'Discuss a hands-on partnership' })).toHaveAttribute('href', '/contact?program=forklift&interest=employer-training');
   });
 
   it('uses the not-found boundary when the published-program loader returns no record', async () => {

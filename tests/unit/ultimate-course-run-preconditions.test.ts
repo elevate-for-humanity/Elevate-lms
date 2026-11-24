@@ -8,6 +8,7 @@ const mocks = vi.hoisted(() => ({
   enqueue: vi.fn(),
   dispatch: vi.fn(),
   dispatchEvidence: vi.fn(),
+  logError: vi.fn(),
 }));
 
 vi.mock('@/lib/admin/guards', () => ({ apiRequireAdmin: mocks.authorize }));
@@ -20,7 +21,7 @@ vi.mock('@/lib/gcp/course-worker-launch', () => ({ requestCourseWorker: mocks.di
 vi.mock('@/lib/ultimate-course-builder/worker/dispatch-evidence', () => ({
   recordCourseDispatch: mocks.dispatchEvidence,
 }));
-vi.mock('@/lib/logger', () => ({ logger: { error: vi.fn(), warn: vi.fn(), info: vi.fn() } }));
+vi.mock('@/lib/logger', () => ({ logger: { error: mocks.logError, warn: vi.fn(), info: vi.fn() } }));
 
 // Keep generation-control and the shared course reactivation helper real. These
 // tests must exercise the policy reads rather than stub a successful assertion.
@@ -33,6 +34,7 @@ const LESSON_ID = 'efff8a53-06ea-5235-a015-5d68fe39952e';
 const ACTOR_ID = 'authenticated-course-owner';
 const REVISION = '2026-11-24T00:00:00.000Z';
 const PAUSE_KEY = 'course_builder_generation_paused';
+const PUBLIC_FAILURE_MESSAGE = 'The worker launch failed. Your saved build is preserved. Check deployment access and retry Resume.';
 type Row = Record<string, any>;
 type QueryRecord = { table: string; operation: 'select' | 'update'; columns: string; values?: Row };
 type Failure = { table: string; operation: 'select' | 'update'; columns?: string };
@@ -172,7 +174,13 @@ describe('Ultimate run policy before reactivation and worker dispatch', () => {
     db.tables.courses[0].status = 'archived';
     db.tables.ultimate_course_builds[0].profile.ownerPaused = ownerPaused;
     const before = clone(db.tables);
-    expect((await run()).status).toBe(409);
+    const response = await run();
+    expect(response.status).toBe(409);
+    expect(await response.json()).toEqual({
+      error: 'Generation controls currently block this course. No worker was queued.',
+      code: 'COURSE_BUILDER_GENERATION_PAUSED',
+    });
+    expect(mocks.logError).not.toHaveBeenCalled();
     expectUntouched(before);
   });
 
@@ -219,7 +227,13 @@ describe('Ultimate run policy before reactivation and worker dispatch', () => {
     db.tables.courses[0].status = 'archived';
     db.tables.ultimate_course_builds[0].profile.ownerPaused = ownerPaused;
     const before = clone(db.tables);
-    expect((await run()).status).toBe(409);
+    const response = await run();
+    expect(response.status).toBe(409);
+    expect(await response.json()).toEqual({
+      error: 'Generation controls currently block this course. No worker was queued.',
+      code: 'COURSE_GENERATION_PAUSED',
+    });
+    expect(mocks.logError).not.toHaveBeenCalled();
     expectUntouched(before);
   });
 
@@ -233,8 +247,40 @@ describe('Ultimate run policy before reactivation and worker dispatch', () => {
     const before = clone(db.tables);
     const response = await run();
     expect(response.status).toBe(500);
-    expect(await response.text()).not.toContain('private-database-failure');
+    expect(await response.json()).toEqual({ error: PUBLIC_FAILURE_MESSAGE });
+    expect(mocks.logError).toHaveBeenCalledExactlyOnceWith(
+      'Course Builder worker dispatch failed', { error: expect.any(String) },
+    );
     expectUntouched(before);
+  });
+
+  it.each([
+    new Error('COURSE_GENERATION_PAUSED: private connection credentials'),
+    { code: 'XX000', message: 'private connection credentials', details: 'internal database table' },
+  ])('logs unexpected failures internally and returns no private message or unrecognized code', async failure => {
+    const before = clone(db.tables);
+    mocks.adminClient.mockRejectedValue(failure);
+    const response = await run();
+    expect(response.status).toBe(500);
+    expect(await response.json()).toEqual({ error: PUBLIC_FAILURE_MESSAGE });
+    expect(mocks.logError).toHaveBeenCalledExactlyOnceWith(
+      'Course Builder worker dispatch failed',
+      { error: failure instanceof Error ? failure.message : String(failure) },
+    );
+    expect(db.from).not.toHaveBeenCalled();
+    expectUntouched(before);
+  });
+
+  it('retains a retryable 503 when an allowed build is queued but worker dispatch is unavailable', async () => {
+    mocks.dispatch.mockResolvedValue({ dispatched: false, dispatchError: 'COURSE_WORKER_LAUNCH_UNAVAILABLE' });
+    const response = await run();
+    expect(response.status).toBe(503);
+    expect(await response.json()).toMatchObject({
+      ok: false, queued: true, dispatched: false, buildId: BUILD_ID, jobId: 'saved-job',
+      dispatchError: 'COURSE_WORKER_LAUNCH_UNAVAILABLE',
+    });
+    expect(mocks.enqueue).toHaveBeenCalledExactlyOnceWith(BUILD_ID, { requestedBy: ACTOR_ID });
+    expect(mocks.dispatch).toHaveBeenCalledTimes(1);
   });
 
   it('does not unpause a build whose mapped course is missing', async () => {

@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation';
 import { loadOwnedLearnerTest } from '@/lib/ultimate-course-builder/testing/test-run-access';
 import { publicBlueprint } from '@/lib/ultimate-course-builder/testing/learner-test-policy';
 import StagedLessonExperience from '@/components/lms/StagedLessonExperience';
+import { publicStagedProgress } from '@/lib/ultimate-course-builder/testing/staged-manufacturing-simulation';
 export const dynamic = 'force-dynamic';
 export const metadata = { title: 'Private lesson acceptance', robots: { index: false, follow: false } };
 export default async function StagedLesson({ params }: { params: Promise<{ runId: string }> }) {
@@ -13,6 +14,6 @@ export default async function StagedLesson({ params }: { params: Promise<{ runId
     <h1 className="my-4 text-2xl font-bold">{access.run.snapshot.title}</h1>
     <StagedLessonExperience runId={runId} snapshot={{ ...access.run.snapshot,
       render: { playbackUrl: `${media}?asset=video`, captionsUrl: `${media}?asset=captions` },
-      blueprint: publicBlueprint(access.run.snapshot.blueprint) }} initialProgress={access.run.progress} />
+      blueprint: publicBlueprint(access.run.snapshot.blueprint) }} initialProgress={publicStagedProgress(access.run.progress)} />
   </main>;
 }

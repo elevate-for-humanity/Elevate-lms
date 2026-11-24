@@ -9,6 +9,7 @@ import type {
   SimulationAnswer,
   SimulationResponses,
   SimulationResult,
+  SimulationFeedback,
 } from '@/lib/lms/manufacturing-simulation';
 import { evaluateManufacturingSimulation } from '@/lib/lms/manufacturing-simulation';
 
@@ -17,7 +18,10 @@ export interface ManufacturingPracticeAttempt {
   completed: boolean;
   attempts: number;
   answers?: SimulationResponses;
-  feedback: SimulationResult['feedback'];
+  feedback: Omit<SimulationResult['feedback'], 'tasks'> & {
+    tasks: Array<Pick<SimulationFeedback, 'taskId' | 'correct' | 'critical'> &
+      Partial<Pick<SimulationFeedback, 'expected' | 'rationale'>>>;
+  };
 }
 interface Props {
   simulation: PublicManufacturingSimulation;
@@ -26,6 +30,8 @@ interface Props {
   interactionId: string;
   initialAttempt?: ManufacturingPracticeAttempt | null;
   readOnlyPreviewSpec?: ManufacturingSimulationSpec;
+  /** Staged QA uses its isolated run endpoint; normal learners retain the LMS transport. */
+  submitAttempt?: (responses: SimulationResponses, signal: AbortSignal) => Promise<ManufacturingPracticeAttempt>;
 }
 
 const roomNames = {
@@ -45,6 +51,7 @@ export default function ManufacturingSimulation({
   interactionId,
   initialAttempt,
   readOnlyPreviewSpec,
+  submitAttempt,
 }: Props) {
   const [responses, setResponses] = useState<SimulationResponses>(initialAttempt?.answers ?? {});
   const [result, setResult] = useState<ManufacturingPracticeAttempt | null>(initialAttempt ?? null);
@@ -84,27 +91,24 @@ export default function ManufacturingSimulation({
     setSaving(true);
     setError('');
     try {
-      const response = await fetch('/api/learner/interactions', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        signal: controller.signal,
-        body: JSON.stringify({
-          courseId,
-          lessonId,
-          interactionId,
-          interactionType: 'manufacturing-simulation',
-          responses,
-        }),
-      });
-      const body = await response.json().catch(() => ({}));
-      if (!response.ok)
-        throw new Error(
-          body.error ?? 'Practice could not be saved. Your entries remain on this page.',
-        );
-      if (!body.attempt || typeof body.attempt.score !== 'number' || !body.attempt.feedback?.tasks)
+      let attempt: ManufacturingPracticeAttempt;
+      if (submitAttempt) attempt = await submitAttempt(responses, controller.signal);
+      else {
+        const response = await fetch('/api/learner/interactions', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          signal: controller.signal,
+          body: JSON.stringify({ courseId, lessonId, interactionId, interactionType: 'manufacturing-simulation', responses }),
+        });
+        const body = await response.json().catch(() => ({}));
+        if (!response.ok)
+          throw new Error(body.error ?? 'Practice could not be saved. Your entries remain on this page.');
+        attempt = body.attempt;
+      }
+      if (!attempt || typeof attempt.score !== 'number' || !attempt.feedback?.tasks)
         throw new Error('Practice response was incomplete. Please try saving again.');
       if (!controller.signal.aborted) {
-        setResult(body.attempt);
+        setResult(attempt);
         window.requestAnimationFrame(() => feedbackRef.current?.focus());
       }
     } catch (caught) {
@@ -206,6 +210,7 @@ export default function ManufacturingSimulation({
           {simulation.tasks.map((task, index) => (
             <fieldset
               key={task.id}
+              data-simulation-task={task.id}
               disabled={saving}
               className="rounded-xl border border-slate-300 p-4 sm:p-5"
             >
@@ -247,6 +252,7 @@ export default function ManufacturingSimulation({
                   </label>
                   <input
                     id={`${interactionId}-${task.id}`}
+                    aria-label={task.prompt}
                     type="number"
                     step="any"
                     inputMode="decimal"
@@ -354,8 +360,8 @@ export default function ManufacturingSimulation({
                     <h4 className="font-bold">
                       {feedback.correct ? 'Correct' : 'Needs correction'}: {task.prompt}
                     </h4>
-                    <p className="mt-2 leading-7 text-slate-800">{feedback.rationale}</p>
-                    {!feedback.correct ? (
+                    {feedback.rationale ? <p className="mt-2 leading-7 text-slate-800">{feedback.rationale}</p> : null}
+                    {!feedback.correct && feedback.expected !== undefined ? (
                       <p className="mt-2 text-sm font-semibold text-slate-700">
                         Expected response: {answerLabel(task, feedback.expected)}
                       </p>

@@ -131,6 +131,19 @@ async function runContract(profile: any, competencyId: string, complete = true) 
   const handlers = Object.fromEntries(ULTIMATE_BUILD_STEPS.map(step => [step, async () => ({ artifacts: fixtureArtifact(step) })]));
   handlers.learning_objectives = production.learning_objectives;
   handlers.assessment_alignment = production.assessment_alignment;
+  // Synthetic contract fixture only: the actual browser workflow is covered
+  // separately by the staged endpoint/UI and browser-runner tests.
+  handlers.learner_runthrough = async (context: any) => {
+    const artifact = fixtureArtifact('learner_runthrough');
+    const simulation = context.artifacts.assessment_alignment?.authoredPreservation?.experience?.manufacturingSimulation;
+    if (simulation) artifact.learnerRuntimeEvidence.evidence.manufacturingWorkflow = {
+      version: 'staged-manufacturing-qa-v1', simulationId: simulation.id, gradingKeyId: simulation.gradingKeyId,
+      specHash: contractHash(publicManufacturingSimulation(simulation)), taskCount: simulation.tasks.length,
+      deniedBefore: true, deniedCritical: true, submittedThroughUI: true, score: 100, criticalMisses: 0,
+      persisted: true, completionObserved: true,
+    };
+    return { artifacts: artifact };
+  };
   const context: any = { buildId: `fixture:${competencyId}`, courseId: COURSE_ID, profile, artifacts: {}, findings: [], passedSteps: new Set(),
     ...(!complete ? { stopAfterStep: 'assessment_alignment' } : {}) };
   await new UltimateBuildRunner(handlers).run(context);
@@ -228,6 +241,7 @@ describe('source-bound authored Ultimate experience', () => {
     expect(preserved.learnerBlueprint).not.toHaveProperty('authoringEvidence');
     expect(preserved.learnerBlueprint).not.toHaveProperty('authoredExperience');
     expect(preserved.learnerBlueprint.projection.providerBlueprintHash).toBe(contractHash(provider.blueprint));
+    expect(preserved.learnerBlueprint.manufacturingSimulation).toEqual(lessons[0].content_json.experience.manufacturingSimulation);
     expect(preserved.learnerBlueprint.stages.at(-1).instruction).toContain(lessons[0].content_json.experience.readingGuide.body);
     expect(preserved.learnerBlueprint.activities.at(-1).prompt).toContain(lessons[0].content_json.workbook.prompts[0]);
     expect(preserved.learnerBlueprint.assessment.questions[0].answerIndex).toBe(0);
@@ -257,6 +271,17 @@ describe('source-bound authored Ultimate experience', () => {
     expect(prepared[0].row.content_json.experience.plannedMinutes).toBe(120);
     expect(prepared[0].row).not.toHaveProperty('duration_minutes');
     expect(prepared[0].row.published_by).toBe('real-actor');
+  });
+
+  it('does not accept a generic browser scenario as the authored simulation release evidence', async () => {
+    const { profile, lessons } = authoredFixture();
+    const bound = bindAuthoredLessonPreservation(profile, lessons);
+    const id = lessons[0].id;
+    const { context } = await runContract(bound, id);
+    assertCompleteLesson(context.artifacts, bound, id);
+    delete context.artifacts.learner_runthrough.learnerRuntimeEvidence.evidence.manufacturingWorkflow;
+    expect(() => assertCompleteLesson(context.artifacts, bound, id)).toThrow('ULTIMATE_MANUFACTURING_BROWSER_EVIDENCE_REQUIRED');
+    expect(() => prepareUltimatePublication(publication(bound, id, context.artifacts), 'actor')).toThrow('ULTIMATE_MANUFACTURING_BROWSER_EVIDENCE_REQUIRED');
   });
 
   it.each(['snapshot', 'source', 'profile-record', 'projection', 'provider-blueprint'])('rejects %s changes instead of recertifying a changed source after QA', async variant => {

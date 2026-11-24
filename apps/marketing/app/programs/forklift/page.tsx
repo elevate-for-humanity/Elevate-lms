@@ -8,7 +8,7 @@ import { FORKLIFT_MANUFACTURING as plan } from '@/lib/programs/forklift-manufact
 export const revalidate = 300;
 export const metadata: Metadata = {
   title: 'Forklift and Manufacturing Operations | Elevate for Humanity',
-  description: '48 online hours of forklift foundations, assembly and quality-inspection learning, including simulations and workbooks, followed by employer-led practical training.',
+  description: '48 planned online hours of forklift foundations, assembly and quality inspection, including simulations and workbooks. Hands-on partner arrangements are being confirmed.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/programs/forklift' },
 };
 
@@ -35,8 +35,8 @@ export default async function ForkliftProgramPage() {
       <section aria-label="Program schedule" className="border-b border-slate-200 bg-slate-50 px-5 py-10 sm:px-8">
         <div className="mx-auto grid max-w-6xl gap-6 md:grid-cols-3">
           <div><p className="text-sm font-bold uppercase tracking-wide text-slate-600">Online learning</p><p className="mt-2 text-4xl font-black">48 hours</p><p className="mt-2 leading-7 text-slate-700">Lessons, simulations, workbook tasks and assessments are included in the planned hours.</p></div>
-          <div><p className="text-sm font-bold uppercase tracking-wide text-slate-600">Employer practice</p><p className="mt-2 text-4xl font-black">2–4 weeks</p><p className="mt-2 leading-7 text-slate-700">An estimated practical phase. Training continues until job-specific competence is demonstrated.</p></div>
-          <div><p className="text-sm font-bold uppercase tracking-wide text-slate-600">Suggested pace</p><p className="mt-2 text-4xl font-black">4–6 weeks</p><p className="mt-2 leading-7 text-slate-700">Two online weeks at 24 hours per week, then employer practice. Scheduling and learner needs may extend this.</p></div>
+          <div><p className="text-sm font-bold uppercase tracking-wide text-slate-600">Practical planning estimate</p><p className="mt-2 text-4xl font-black">2–4 weeks</p><p className="mt-2 leading-7 text-slate-700">Partner, actual clock hours and schedule are being confirmed. Training continues until job-specific competence is demonstrated.</p></div>
+          <div><p className="text-sm font-bold uppercase tracking-wide text-slate-600">Example timeline</p><p className="mt-2 text-4xl font-black">4–6 weeks</p><p className="mt-2 leading-7 text-slate-700">Two online weeks at 24 hours per week, then supervised practical training. This example is not a confirmed cohort schedule.</p></div>
         </div>
       </section>
 
@@ -62,8 +62,8 @@ export default async function ForkliftProgramPage() {
       </section>
 
       <section className="mx-auto grid max-w-6xl gap-12 px-5 py-16 sm:px-8 lg:grid-cols-2">
-        <div><h2 className="text-3xl font-black">What happens at the employer site?</h2><p className="mt-5 text-base leading-8 text-slate-700">A qualified trainer demonstrates the equipment and job procedures, supervises practice, and evaluates performance at the workplace. Assembly and inspection tasks can be coordinated within the same practical phase. We do not add separate blocks of calendar weeks unless the employer’s training plan needs them.</p><p className="mt-4 text-base leading-8 text-slate-700">The training record identifies the learner, trainer, equipment, dates, observed skills and any further practice needed. Only the employer can authorize independent operation after the required training and evaluation.</p></div>
-        <div><h2 className="text-3xl font-black">Completion and credentials</h2><p className="mt-5 text-base leading-8 text-slate-700">{plan.credentialDisclosure}</p><p className="mt-4 text-base leading-8 text-slate-700">The employer reviews the technical material and adapts training to its truck types, site hazards and job requirements before using it for operator training.</p><h3 className="mt-6 text-xl font-bold">Tuition and funding</h3><p className="mt-3 text-base leading-8 text-slate-700">{plan.fundingDisclosure}</p></div>
+        <div><h2 className="text-3xl font-black">Where will hands-on training take place?</h2><p className="mt-5 text-base leading-8 text-slate-700">{plan.partnerReadiness}</p><p className="mt-4 text-base leading-8 text-slate-700">The practical plan must provide equipment demonstrations, supervised practice and evaluation by a qualified trainer. Assembly and inspection tasks may be coordinated within that phase where the partner can provide them.</p><p className="mt-4 text-base leading-8 text-slate-700">The training record identifies the learner, trainer, equipment, dates, observed skills and any further practice needed. Only the employer can authorize independent operation after the required training and workplace evaluation.</p></div>
+        <div><h2 className="text-3xl font-black">Completion and credentials</h2><p className="mt-5 text-base leading-8 text-slate-700">{plan.credentialDisclosure}</p><p className="mt-4 text-base leading-8 text-slate-700">The qualified trainer and employer must review the technical material and adapt instruction to the actual truck types, site hazards and job requirements.</p><h3 className="mt-6 text-xl font-bold">Tuition and funding</h3><p className="mt-3 text-base leading-8 text-slate-700">{plan.fundingDisclosure}</p></div>
       </section>
 
       <section className="border-y border-slate-200 bg-slate-50 px-5 py-12 sm:px-8">
@@ -73,7 +73,7 @@ export default async function ForkliftProgramPage() {
         </div></div>
       </section>
 
-      <section className="mx-auto max-w-6xl px-5 py-16 sm:px-8"><h2 className="text-3xl font-black">Plan your training</h2><p className="mt-5 max-w-3xl text-lg leading-8 text-slate-700">Admissions will confirm tuition, access to the online course, and the employer practical arrangement before you begin. Employers can discuss a group built around their entry-level production or material-handling roles.</p><div className="mt-7 flex flex-wrap gap-3"><Link href="/contact?program=forklift" className="inline-flex min-h-12 items-center rounded-xl bg-brand-blue-800 px-6 py-3 font-bold text-white">Talk with admissions</Link><Link href="/contact?program=forklift&interest=employer-training" className="inline-flex min-h-12 items-center rounded-xl border border-slate-300 px-6 py-3 font-bold">Discuss an employer partnership</Link></div><p className="mt-10 text-sm leading-7 text-slate-600">Training references: {plan.sources.map((source,index) => <span key={source.url}>{index > 0 ? ' · ' : ''}<a className="underline" href={source.url} target="_blank" rel="noopener noreferrer">{source.title}</a></span>)}</p></section>
+      <section className="mx-auto max-w-6xl px-5 py-16 sm:px-8"><h2 className="text-3xl font-black">Plan your training</h2><p className="mt-5 max-w-3xl text-lg leading-8 text-slate-700">Before enrollment, admissions must confirm tuition and all student costs, online access, the qualified practical partner, location, equipment and schedule. Employers and training providers can discuss a paid hands-on partnership for our students.</p><div className="mt-7 flex flex-wrap gap-3"><Link href="/contact?program=forklift" className="inline-flex min-h-12 items-center rounded-xl bg-brand-blue-800 px-6 py-3 font-bold text-white">Talk with admissions</Link><Link href="/contact?program=forklift&interest=employer-training" className="inline-flex min-h-12 items-center rounded-xl border border-slate-300 px-6 py-3 font-bold">Discuss a hands-on partnership</Link></div><p className="mt-10 text-sm leading-7 text-slate-600">Training references: {plan.sources.map((source,index) => <span key={source.url}>{index > 0 ? ' · ' : ''}<a className="underline" href={source.url} target="_blank" rel="noopener noreferrer">{source.title}</a></span>)}</p></section>
     </main>
   );
 }

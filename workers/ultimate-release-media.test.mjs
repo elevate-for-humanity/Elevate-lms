@@ -4,6 +4,7 @@ import { readFileSync } from 'node:fs';
 import { stripTypeScriptTypes } from 'node:module';
 import { renderMediaUrl, renderPlaybackUrl } from '../lib/ultimate-course-builder/media/playback-source.mjs';
 import { recoveredSourcePublicationAllowed } from '../lib/ultimate-course-builder/release/recovered-source-policy.mjs';
+import { assertManufacturingLessonSpecs } from '../lib/lms/manufacturing-simulation-reference.mjs';
 
 const prepareSource = stripTypeScriptTypes(readFileSync(new URL('../lib/ultimate-course-builder/release/prepare-publication.ts', import.meta.url), 'utf8'), { mode: 'transform' })
   .replace(/^import .*;\n/gm, '').replace('export function ', 'function ');
@@ -11,8 +12,8 @@ const prepare = new Function('assertCompleteLesson', 'ULTIMATE_LESSON_CONTRACT_V
   a => { if (!a.verified) throw new Error('QA_FAILED'); }, 'current', renderMediaUrl, renderPlaybackUrl, recoveredSourcePublicationAllowed);
 const serviceSource = stripTypeScriptTypes(readFileSync(new URL('../lib/ultimate-course-builder/release/release-service.ts', import.meta.url), 'utf8'), { mode: 'transform' })
   .replace(/^import .*;\n/gm, '').replace('export class ', 'class ');
-const Service = new Function('prepareUltimatePublication','assertCompleteLesson','ULTIMATE_LESSON_CONTRACT_VERSION','renderMediaUrl','renderPlaybackUrl','recoveredSourcePublicationAllowed', serviceSource + '\nreturn UltimateReleaseService;')(
-  prepare,a=>{if(!a.verified)throw new Error('QA_FAILED');},'current',renderMediaUrl,renderPlaybackUrl,recoveredSourcePublicationAllowed);
+const Service = new Function('prepareUltimatePublication','assertCompleteLesson','ULTIMATE_LESSON_CONTRACT_VERSION','renderMediaUrl','renderPlaybackUrl','recoveredSourcePublicationAllowed','assertManufacturingLessonSpecs', serviceSource + '\nreturn UltimateReleaseService;')(
+  prepare,a=>{if(!a.verified)throw new Error('QA_FAILED');},'current',renderMediaUrl,renderPlaybackUrl,recoveredSourcePublicationAllowed,assertManufacturingLessonSpecs);
 const lesson = () => ({
   title: 'Lesson', videoUrl: 'https://media.example/film.mp4', script: 'Verified narration',
   canonicalLessonId: 'lesson', slug: 'lesson', orderIndex: 1, competencyId: 'competency',

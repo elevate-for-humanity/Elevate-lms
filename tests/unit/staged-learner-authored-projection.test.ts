@@ -34,6 +34,8 @@ import {
   contractHash,
   ULTIMATE_LESSON_CONTRACT_VERSION,
 } from '@/lib/ultimate-course-builder/core/lesson-contract';
+import { publicManufacturingSimulation } from '@/lib/lms/manufacturing-simulation';
+import { simulationFixture } from '../fixtures/manufacturing-simulation';
 
 const COURSE_ID = '832cf9d8-e676-4bfb-a623-ab13a7ddf847';
 const LESSON_ID = 'efff8a53-06ea-5235-a015-5d68fe39952e';
@@ -41,10 +43,12 @@ const LESSON_BUILD_ID = '00000000-0000-4000-8000-000000000123';
 const SECRET = 'unit-only-learner-projection-credential';
 const VIDEO_URL = `/api/courses/${COURSE_ID}/lessons/${LESSON_ID}/playback`;
 const MEDIA_HASH = 'a'.repeat(64);
+const GRADING_KEY_ID = '30000000-0000-4000-8000-000000000001';
+const publicSimulation = publicManufacturingSimulation({ ...simulationFixture, gradingKeyId: GRADING_KEY_ID });
 const clone = <T,>(value: T): T => JSON.parse(JSON.stringify(value));
 
 /** Real source matching and projection certification, not a mocked accessor. */
-function lessonFixture(authored = true) {
+function lessonFixture(authored = true, withSimulation = false) {
   const originalQuestion = {
     id: 'authored-question', question: 'Which record supports the authored decision?',
     options: ['An assumption', 'A blank form', 'The supplied inspection record'],
@@ -66,7 +70,7 @@ function lessonFixture(authored = true) {
     }],
   };
   const canonical = {
-    id: LESSON_ID, learning_objectives: source.objectives, duration_minutes: 120, passing_score: 80,
+    id: LESSON_ID, course_id: COURSE_ID, learning_objectives: source.objectives, duration_minutes: 120, passing_score: 80,
     quiz_questions: [originalQuestion], content: { html: '<p>Complete authored inspection lesson.</p>' },
     rendered_html: '<p>Complete authored inspection lesson.</p>',
     content_json: {
@@ -77,6 +81,7 @@ function lessonFixture(authored = true) {
       },
       activityPlan: [{ task: 'Read and complete the workbook', minutes: 120 }],
       experience: {
+        ...(withSimulation ? { manufacturingSimulation: clone(publicSimulation) } : {}),
         plannedMinutes: 120,
         narrationScript: `${source.bodyMarkdown}\n\n${source.workedExample}`,
         readingGuide: { body: source.bodyMarkdown },
@@ -142,6 +147,7 @@ function lessonFixture(authored = true) {
     createAuthoredPreservation(profile, LESSON_ID, artifacts, generatedAssessment);
   return {
     id: LESSON_BUILD_ID, competency_id: LESSON_ID, artifacts,
+    canonicalLesson: canonical,
     ultimate_course_builds: { course_id: COURSE_ID, profile },
   };
 }
@@ -165,6 +171,16 @@ beforeEach(() => {
     storage: { from: () => ({ createSignedUploadUrl: mocks.signedUpload }) },
     from: (table: string) => {
       if (table === 'ultimate_learner_test_runs') return { insert: mocks.saveRun };
+      if (table === 'course_lessons' || table === 'manufacturing_simulation_specs') {
+        const row = table === 'course_lessons' ? mocks.lesson.canonicalLesson
+          : { id: GRADING_KEY_ID, course_id: COURSE_ID, lesson_id: LESSON_ID, spec: simulationFixture };
+        const filters: Array<[string, unknown]> = [];
+        const query = {
+          select: () => query, eq: (key: string, value: unknown) => { filters.push([key, value]); return query; },
+          maybeSingle: async () => ({ data: row && filters.every(([key, value]) => (row as any)[key] === value) ? row : null, error: null }),
+        };
+        return query;
+      }
       if (table !== 'ultimate_lesson_builds') throw new Error(`Unexpected table: ${table}`);
       const query = { select: () => query, eq: () => query, single: async () => ({ data: mocks.lesson, error: null }) };
       return query;
@@ -192,6 +208,35 @@ function expectNoIdentityOrRun() {
 }
 
 describe('staged learner QA consumes the certified authored projection', () => {
+  it('carries the exact public simulation into the staged snapshot without changing provider evidence', async () => {
+    mocks.lesson = lessonFixture(true, true);
+    const before = clone(mocks.lesson);
+    const response = await createRun(request());
+    expect(response.status).toBe(200);
+    const snapshot = (await response.json()).snapshot;
+    expect(snapshot).toMatchObject({ courseId: COURSE_ID, lessonId: LESSON_ID, qaOnly: true });
+    expect(snapshot.blueprint.manufacturingSimulation).toEqual(publicSimulation);
+    expect(JSON.stringify(snapshot.blueprint.manufacturingSimulation)).not.toMatch(/"(?:expected|rationale)":/);
+    expect(mocks.lesson).toEqual(before);
+    const read = await readRun(new NextRequest('https://app.elevateforhumanity.org/api/learner-testing/runs/unit'), { params: Promise.resolve({ runId: mocks.run.id }) });
+    expect(read.status).toBe(200);
+    expect((await read.json()).snapshot.blueprint.manufacturingSimulation).toEqual(publicSimulation);
+  });
+
+  it('rejects a changed canonical simulation before creating a QA identity or run', async () => {
+    mocks.lesson = lessonFixture(true, true);
+    mocks.lesson.canonicalLesson.content_json.experience.manufacturingSimulation.tasks[0].critical = false;
+    expect((await createRun(request())).status).toBe(500);
+    expectNoIdentityOrRun();
+  });
+
+  it('rejects a grading reference bound to another canonical lesson before creating a QA identity', async () => {
+    mocks.lesson = lessonFixture(true, true);
+    mocks.lesson.ultimate_course_builds.profile.canonicalLessonIds[LESSON_ID] = '00000000-0000-4000-8000-000000000999';
+    expect((await createRun(request())).status).toBe(500);
+    expectNoIdentityOrRun();
+  });
+
   it('saves authored reading, workbook, and questions while leaving provider artifacts and evidence unchanged', async () => {
     const before = clone(mocks.lesson);
     const response = await createRun(request());

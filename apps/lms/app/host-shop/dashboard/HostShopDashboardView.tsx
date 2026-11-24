@@ -266,9 +266,11 @@ export default async function HostShopDashboardView() {
             },
             {
               title: 'Documents to resolve',
-              value: board.missingDocuments.length + board.pendingDocuments.length,
+              value: board.unavailableData.includes('uploaded documents') ? 'Unavailable' : board.missingDocuments.length,
               href: '/host-shop/dashboard/documents',
-              detail: 'Review missing or pending items.',
+              detail: board.pendingDocuments.length > 0
+                ? `${board.pendingDocuments.length} uploaded and awaiting review.`
+                : 'Check for missing or replacement documents.',
             },
           ].map((item) => (
             <Link

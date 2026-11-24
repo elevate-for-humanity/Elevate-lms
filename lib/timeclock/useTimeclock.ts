@@ -254,8 +254,9 @@ export function useTimeclock(options: UseTimeclockOptions) {
 
       const data: ActionResponse = await response.json();
 
-      if (!response.ok) {
-        throw new Error(data.error || 'Clock in failed');
+      if (!response.ok || data.success !== true || data.action !== 'clock_in' ||
+          !data.progress_entry_id || !data.clock_in_at || !Number.isFinite(Date.parse(data.clock_in_at))) {
+        throw new Error(data.error || 'The server could not confirm the clock-in');
       }
 
       setState((prev) => ({

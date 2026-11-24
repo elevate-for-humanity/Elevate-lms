@@ -19,6 +19,8 @@ export function isSharedPostLoginDestination(destination: string): boolean {
     const url = new URL(destination);
     return (
       (url.origin === new URL(siteUrls.app).origin && url.pathname === '/portal-guide') ||
+      (url.origin === new URL(siteUrls.lms).origin &&
+        url.pathname === '/programs/hvac-technician/course') ||
       (url.origin === STORE_ORIGIN &&
         (url.pathname === '/store' || url.pathname.startsWith('/store/'))) ||
       (url.origin === new URL(siteUrls.site).origin &&

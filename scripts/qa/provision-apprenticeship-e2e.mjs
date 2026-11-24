@@ -289,41 +289,123 @@ async function provision() {
 }
 
 async function cleanup() {
+  // A missing state file is not proof that a cancelled run left no fixtures.
+  // Cleanup must not print success or suppress errors in that case.
   let state;
   try {
     state = JSON.parse(await readFile(statePath, 'utf8'));
   } catch {
-    console.log('No QA E2E state file found; nothing to clean up.');
-    return;
+    throw new Error('QA cleanup state missing: reconcile run-scoped fixtures before certifying teardown');
   }
 
-  const enrollmentId = state.enrollmentId;
-  const placementId = state.placementId;
-  const shopId = state.shopId;
-  const hostShopId = state.hostShopId;
-  const partnerId = state.partnerId;
+  if (!state.runId || state.marker !== `qa-e2e-${state.runId}`) {
+    throw new Error('QA cleanup state does not contain a valid exact-run marker');
+  }
+
+  const expectedEmail = (kind) => `${state.marker}-${kind}@qa.invalid`;
+  for (const kind of ['host', 'apprentice']) {
+    if (state[kind] && (!state[kind].id || state[kind].email !== expectedEmail(kind))) {
+      throw new Error(`QA cleanup rejected unexpected ${kind} identity`);
+    }
+  }
+
+  const checked = async (promise, label) => {
+    const { data, error } = await promise;
+    if (error) throw new Error(`QA cleanup ${label}: ${error.message}`);
+    return data;
+  };
+  const { enrollmentId, placementId, shopId, hostShopId, partnerId } = state;
   const hostId = state.host?.id;
   const apprenticeId = state.apprentice?.id;
-
-  if (enrollmentId) {
-    await db.from('apprentice_competency_records').delete().eq('enrollment_id', enrollmentId);
+  // Fail BEFORE any destructive action if this fixture gained regulated records.
+  if (placementId) {
+    const placement = await checked(db.from('apprentice_placements')
+      .select('id,shop_id,student_id').eq('id', placementId).maybeSingle(), 'load placement');
+    if (placement && (placement.shop_id !== shopId || placement.student_id !== apprenticeId)) {
+      throw new Error('QA cleanup placement ownership mismatch');
+    }
+    for (const [table, column] of [
+      ['host_shop_attendance_records', 'placement_id'],
+      ['apprenticeship_wage_obligations', 'placement_id'],
+    ]) {
+      const records = await checked(db.from(table).select('id').eq(column, placementId).limit(1),
+        `check ${table} retention dependencies`);
+      if (records.length) throw new Error(`QA cleanup retention review required: ${table}`);
+    }
   }
-  if (placementId) await db.from('apprentice_placements').delete().eq('id', placementId);
-  if (enrollmentId) await db.from('program_enrollments').delete().eq('id', enrollmentId);
-  if (shopId) await db.from('shop_staff').delete().eq('shop_id', shopId);
-  if (hostId && partnerId) await db.from('partner_users').delete().eq('user_id', hostId).eq('partner_id', partnerId);
-  if (shopId) await db.from('shops').delete().eq('id', shopId);
-  if (hostShopId) await db.from('host_shops').delete().eq('id', hostShopId);
-  if (partnerId) await db.from('partners').delete().eq('id', partnerId);
+  if (shopId) {
+    const shop = await checked(db.from('shops').select('id,name').eq('id', shopId).maybeSingle(), 'load shop');
+    if (shop && shop.name !== `[QA E2E] Host Shop ${state.runId}`) {
+      throw new Error('QA cleanup rejected non-fixture shop');
+    }
+  }
+  // Host shop has the exact same ID as shops. The insert may have committed
+  // before the second checkpoint was saved during a cancelled runner.
+  const recoveredHostShopId = hostShopId || shopId;
+  if (hostShopId && shopId && hostShopId !== shopId) {
+    throw new Error('QA cleanup host shop checkpoint disagrees with canonical shop ID');
+  }
+  if (recoveredHostShopId) {
+    const hostShop = await checked(db.from('host_shops')
+      .select('id,name,owner_id').eq('id', recoveredHostShopId).maybeSingle(), 'load host shop');
+    if (hostShop && (hostShop.name !== `[QA E2E] Host Shop ${state.runId}`
+      || hostShop.owner_id !== hostId)) {
+      throw new Error('QA cleanup rejected non-fixture host shop');
+    }
+  }
+  if (partnerId) {
+    const partner = await checked(db.from('partners').select('id,name').eq('id', partnerId).maybeSingle(), 'load partner');
+    if (partner && partner.name !== `[QA E2E] Host Shop ${state.runId}`) {
+      throw new Error('QA cleanup rejected non-fixture partner');
+    }
+  }
+  for (const [userId, kind] of [[hostId, 'host'], [apprenticeId, 'apprentice']]) {
+    if (!userId) continue;
+    const profile = await checked(db.from('profiles').select('id,email').eq('id', userId).maybeSingle(),
+      `load ${kind} profile`);
+    if (profile && profile.email !== expectedEmail(kind)) throw new Error('QA cleanup rejected non-fixture profile');
+  }
 
-  for (const userId of [apprenticeId, hostId].filter(Boolean)) {
-    await db.from('profiles').delete().eq('id', userId);
-    // Preserve immutable audit-log foreign keys while disabling the disposable QA identity.
-    // Supabase soft delete prevents future sign-in without erasing compliance history.
+  if (enrollmentId) await checked(db.from('apprentice_competency_records')
+    .delete().eq('enrollment_id', enrollmentId), 'delete competency records');
+  if (placementId) await checked(db.from('apprentice_placements').delete().eq('id', placementId), 'delete placement');
+  if (enrollmentId) await checked(db.from('program_enrollments').delete().eq('id', enrollmentId), 'delete enrollment');
+  if (shopId) await checked(db.from('shop_staff').delete().eq('shop_id', shopId), 'delete shop staff');
+  if (hostId && partnerId) await checked(db.from('partner_users').delete()
+    .eq('user_id', hostId).eq('partner_id', partnerId), 'delete partner membership');
+  if (shopId) await checked(db.from('shops').delete().eq('id', shopId), 'delete shop');
+  if (recoveredHostShopId) await checked(db.from('host_shops').delete().eq('id', recoveredHostShopId), 'delete host shop');
+  if (partnerId) await checked(db.from('partners').delete().eq('id', partnerId), 'delete partner');
+
+  for (const [userId, kind] of [[apprenticeId, 'apprentice'], [hostId, 'host']]) {
+    if (!userId) continue;
+    await checked(db.from('profiles').delete().eq('id', userId), `delete ${kind} profile`);
     const { error } = await db.auth.admin.deleteUser(userId, true);
-    if (error && !/not found/i.test(error.message)) console.error(`soft-delete auth user ${userId}: ${error.message}`);
+    if (error && !/not found/i.test(error.message)) {
+      throw new Error(`QA cleanup soft-delete auth ${kind}: ${error.message}`);
+    }
   }
 
+  for (const [table, id] of [
+    ['apprentice_placements', placementId],
+    ['program_enrollments', enrollmentId],
+    ['shops', shopId],
+    ['host_shops', recoveredHostShopId],
+    ['partners', partnerId],
+  ]) {
+    if (!id) continue;
+    const remaining = await checked(db.from(table).select('id').eq('id', id).limit(1),
+      `verify ${table} teardown`);
+    if (remaining.length) throw new Error(`QA cleanup incomplete: ${table}`);
+  }
+  for (const userId of [apprenticeId, hostId].filter(Boolean)) {
+    const remaining = await checked(db.from('profiles').select('id').eq('id', userId).limit(1),
+      'verify profile teardown');
+    if (remaining.length) throw new Error('QA cleanup incomplete: profile');
+    const { data, error } = await db.auth.admin.getUserById(userId);
+    if (error && !/not found/i.test(error.message)) throw new Error(`QA Auth readback: ${error.message}`);
+    if (data?.user && !data.user.deleted_at) throw new Error('QA Auth identity remains active');
+  }
   console.log(JSON.stringify({ ok: true, cleanedRunId: state.runId }));
 }
 

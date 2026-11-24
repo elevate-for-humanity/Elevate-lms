@@ -43,6 +43,15 @@ test('missing MP4 still blocks acceptance as a missing public asset', () => {
   assert.match(result.stdout, /linked public asset missing/);
 });
 
+test('checks public Markdown syllabi as downloadable assets', () => {
+  const href = '/docs/syllabi/hvac-technician.md';
+  const present = runAudit(href, 'public' + href);
+  assert.equal(present.status, 0, present.stdout + present.stderr);
+  const missing = runAudit(href);
+  assert.equal(missing.status, 1);
+  assert.match(missing.stdout, /linked public asset missing/);
+});
+
 test('missing page routes still block acceptance', () => {
   const result = runAudit('/programs/missing');
   assert.equal(result.status, 1);

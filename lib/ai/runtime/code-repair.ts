@@ -1,13 +1,13 @@
 import {ensureRepairMainCI,hasDurableMainCIObservation,isVerifiedMainCIReceipt} from './exact-main-ci-request.mjs';
 import {loadCourseRepairEvidence} from '@/lib/devstudio/paris-course-repair-evidence.mjs';
 import {parisRepairEngine} from '@/lib/devstudio/paris-openhands-repair.mjs';
-import {nextAcceptedOpenHandsObservation,superviseAcceptedOpenHandsRepair} from '@/lib/devstudio/paris-openhands-supervision.mjs';
+import {nextAcceptedOpenHandsObservation,superviseAcceptedOpenHandsRepair,shouldReconcileTerminalRepair} from '@/lib/devstudio/paris-openhands-supervision.mjs';
 import {applyOwnedParisRepairTransition} from './paris-owned-transition.mjs';
 import {REPAIR_MODEL_PROBE_TIMEOUT_MS,repairRetryGoal} from '@/lib/devstudio/repair-inference-budget.mjs';
 import {untouchedPlannerNeedsFreshGeneration} from '@/lib/devstudio/repair-checkpoint-recovery.mjs';
 import {verifyParisRuntimeOrigins} from './paris-runtime-evidence.mjs';
 import {failedCurrentReleases,queuedWorkflowRepairTarget,queuedWorkflowRepairDisposition} from './deployment-repair-events.mjs';
-import {recordFailedRepairWorkflow,repairDispatchValues} from './repair-workflow-reconciliation.mjs';
+import {recordFailedRepairWorkflow,repairDispatchValues,expireUnclaimedRepairDispatch} from './repair-workflow-reconciliation.mjs';
 import 'server-only';
 import {resolveOwnedModelConnection} from '@/lib/ai/providers/owned-model-config.mjs';
 import {reconcileRecoveredRepairs} from './repair-reconciliation';
@@ -305,9 +305,12 @@ export async function reportParisDispatchFailure(id:string) {
 }
 
 export async function reportParisRepairFailure(id:string,runId:number){
- const db=await requireAdminClient();const {data}=await db.from('paris_code_repairs').select('status,workflow_run_id').eq('id',id).maybeSingle();
- if(data?.workflow_run_id!==runId)return;
- if(['patching','validating'].includes(data.status))await updateOwnedRepair(id,runId,data.status,{status:'blocked',error_code:'PATCH_OR_VALIDATION_FAILED_SEE_WORKFLOW'},true);
+ const db=await requireAdminClient();const {data,error}=await db.from('paris_code_repairs').select('status,workflow_run_id').eq('id',id).maybeSingle();
+ if(error)throw error;
+ if(data?.workflow_run_id!==runId)return {recorded:false,reason:'RUN_NOT_ASSOCIATED'};
+ if(!['patching','validating'].includes(data.status))return {recorded:false,reason:'STATE_ALREADY_SETTLED'};
+ const recorded=await updateOwnedRepair(id,runId,data.status,{status:'blocked',error_code:'PATCH_OR_VALIDATION_FAILED_SEE_WORKFLOW'},true);
+ return {recorded,reason:recorded?'FAILURE_RECORDED':'STATE_CHANGED'};
 }
 export async function tickParisCodeRepairs(options:{workflowOwnedDispatch?:boolean}={}){
  const result=await runParisCodeRepairTick(options);
@@ -412,6 +415,7 @@ async function runParisCodeRepairTick({workflowOwnedDispatch=false}:{workflowOwn
  // A timed-out prepare is not a provider-terminal result. Observe only one
  // accepted task, under the same owner policy, without spending an attempt.
  const accepted=nextAcceptedOpenHandsObservation(blocked.data??[],policy.actor_id);
+ let observedOpenHandsRepairId: string | undefined;
  if(accepted){
   const busy=await db.from('paris_code_repairs').select('id').in('status',['dispatched','patching','validating','deploying','verifying']).limit(1);
   if(busy.error)throw busy.error;
@@ -454,8 +458,11 @@ async function runParisCodeRepairTick({workflowOwnedDispatch=false}:{workflowOwn
     },
    });
    if(result.dispatchRequired)return {enabled:true,dispatched:0,dispatchRequired:true,repairId:result.repairId};
-   if(result.awaitingProvider)return {enabled:true,dispatched:0,awaitingProvider:true,reason:'ACCEPTED_OPENHANDS_EXECUTION_PENDING'};
-   if(result.handled)return {enabled:true,dispatched:0,reason:'ACCEPTED_OPENHANDS_OBSERVATION_RECORDED'};
+   if(result.handled){
+    observedOpenHandsRepairId=accepted.id;
+    console.info('[PARIS] OpenHands observation did not claim a repair; continuing queue scan.',
+      {repairId:accepted.id,awaitingProvider:result.awaitingProvider===true});
+   }
   }
  }
  let recoveredProviderThisTick=false;
@@ -465,6 +472,8 @@ async function runParisCodeRepairTick({workflowOwnedDispatch=false}:{workflowOwn
  let githubAppRecoveryHealth: boolean | undefined;
  const ownedTier=resolveOwnedModelConnection().tier;
  for(const repair of blocked.data??[]){
+  // The observation may have updated this row since the blocked snapshot.
+  if(repair.id===observedOpenHandsRepairId)continue;
   // One post-fix replay for a source-free planner with an immutable zero-write
   // checkpoint. Do not reset attempts or override an existing source approval.
   if(!recoveredProviderThisTick && parisRepairEngine(repair.candidate)==='internal' && canResumeZeroWritePlannerRepair(repair)){
@@ -630,10 +639,13 @@ async function runParisCodeRepairTick({workflowOwnedDispatch=false}:{workflowOwn
   const retry=await db.from('paris_code_repairs').update({status:'queued',candidate:null,workflow_run_id:null,error_code:null,goal:repairRetryGoal(repair.goal,evidence),attempt_history:[...(repair.attempt_history??[]),{runId:repair.workflow_run_id,sha:repair.candidate.branch.sha,error:repair.error_code}],updated_at:new Date().toISOString()}).eq('id',repair.id).eq('status','blocked').eq('attempt_count',repair.attempt_count);
   if(retry.error)throw retry.error;
  }
- const terminal=await db.from('paris_code_repairs').select('id,status,release_sha,error_code').in('status',['verified','blocked']).order('updated_at',{ascending:false}).limit(2000);
+ const terminal=await db.from('paris_code_repairs').select('id,actor_id,status,release_sha,error_code,candidate,verification').in('status',['verified','blocked']).order('updated_at',{ascending:false}).limit(2000);
  if(terminal.error)throw terminal.error;
  if(terminal.data?.length===2000)throw Error('PARIS_TERMINAL_REPAIR_SCAN_LIMIT');
  for(const repair of terminal.data??[]){
+  // Observe only one receipt per tick, but protect ALL accepted provider
+  // checkpoints from terminal reconciliation, including other approval waits.
+  if(!shouldReconcileTerminalRepair(repair,policy.actor_id))continue;
   const tasks=await db.from('ai_tasks').select('id,status,studio_run_id,studio_run_step_id,tool_name,result_json,tool_output,error_message').eq('status','running').eq('tool_output->>repairId',repair.id);
   if(tasks.error)throw tasks.error;
   for(const task of tasks.data??[]){
@@ -692,7 +704,10 @@ async function runParisCodeRepairTick({workflowOwnedDispatch=false}:{workflowOwn
    }catch(error){await update(repair.id,{status:'blocked',error_code:String(error instanceof Error?error.message:error).slice(0,500)});}
    continue;
   }
-  if(repair.status==='dispatched'&&!repair.workflow_run_id&&Date.now()-Date.parse(repair.updated_at)>15*60000){await update(repair.id,{status:'blocked',error_code:'REPAIR_DISPATCH_NOT_CLAIMED'});continue;}
+  if(repair.status==='dispatched'&&!repair.workflow_run_id){
+   if(await expireUnclaimedRepairDispatch(db,repair))repair.status='blocked';
+   continue;
+  }
   if(['dispatched','patching','validating'].includes(repair.status)&&repair.workflow_run_id){
    const run=await gh(`/actions/runs/${repair.workflow_run_id}`);
    await recordFailedRepairWorkflow(db,repair,run);
@@ -878,9 +893,11 @@ async function runParisCodeRepairTick({workflowOwnedDispatch=false}:{workflowOwn
  if(queued.data?.length===1000)throw Error('PARIS_QUEUED_REPAIR_SCAN_LIMIT');
  if(queued.error)throw queued.error;
  let pending: {id:string;attempt_count:number;source_job_id:string|null;attempt_history:unknown;workflow_run_id:number|null;candidate:unknown}|null=null;
+ const queueScan={scanned:0,attemptBudgetExhausted:0,workflowEvidenceRejected:0,courseEvidenceRejected:0};
  let awaitingCurrentWorkflowEvidence=0;
  const sourceRunCache=new Map<number,any>();
  for(const candidate of queued.data??[]){
+  queueScan.scanned++;
   // The production CHECK constraint was reconciled by the reviewed
   // paris_bounded_context_retry_contract migration. The policy below is the
   // sole application preflight; Postgres enforces the identical bound.
@@ -895,6 +912,7 @@ async function runParisCodeRepairTick({workflowOwnedDispatch=false}:{workflowOwn
    }).eq('id',candidate.id).eq('status','queued').eq('attempt_count',candidate.attempt_count).select('id').maybeSingle();
    if(limited.error)throw limited.error;
    if(!limited.data?.id)throw Error('PARIS_REPAIR_DISPOSITION_LOST_CAS');
+   queueScan.attemptBudgetExhausted++;
    continue;
   }
   if(!candidate.source_job_id){
@@ -915,6 +933,7 @@ async function runParisCodeRepairTick({workflowOwnedDispatch=false}:{workflowOwn
       .eq('id',candidate.id).eq('status','queued').eq('attempt_count',candidate.attempt_count).select('id').maybeSingle();
      if(retained.error)throw retained.error;
      if(!retained.data?.id)throw Error('PARIS_REPAIR_DISPOSITION_LOST_CAS');
+     queueScan.workflowEvidenceRejected++;
      continue;
     }
    }
@@ -937,8 +956,9 @@ async function runParisCodeRepairTick({workflowOwnedDispatch=false}:{workflowOwn
   }).eq('id',candidate.id).eq('status','queued').eq('attempt_count',candidate.attempt_count).select('id').maybeSingle();
   if(blocked.error)throw blocked.error;
   if(!blocked.data?.id)throw Error('PARIS_REPAIR_DISPOSITION_LOST_CAS');
+  queueScan.courseEvidenceRejected++;
  }
- if(!pending)return {enabled:true,dispatched:0,reason:awaitingCurrentWorkflowEvidence?'CURRENT_WORKFLOW_EVIDENCE_PENDING':'NO_ELIGIBLE_REPAIR_IN_SCANNED_QUEUE',awaitingCurrentWorkflowEvidence};
+ if(!pending)return {enabled:true,dispatched:0,reason:awaitingCurrentWorkflowEvidence?'CURRENT_WORKFLOW_EVIDENCE_PENDING':'NO_ELIGIBLE_REPAIR_IN_SCANNED_QUEUE',awaitingCurrentWorkflowEvidence,queueScan};
  // New repairs use the owned internal engine by default. Explicit OpenHands
  // opt-in still requires read-only provider authorization before admission;
  // readiness alone never proves successful execution or a completed repair.

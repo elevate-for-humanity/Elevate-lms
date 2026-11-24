@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   inboundAttachmentEntries,
+  inboundDeliveryRecipients,
   parseEnvelopeAddresses,
   parseInboundEmail,
   safeAttachmentName,
@@ -47,4 +48,15 @@ it('separates split-envelope claims while retaining stable mailbox message ident
   expect(bcc.eventId).toBe(visible.eventId);
   expect(bcc.deliveryId).not.toBe(visible.deliveryId);
   expect(both.deliveryId).toBe(retry.deliveryId);
+});
+
+it('uses routing review for an empty or invalid signed envelope and preserves Reply-To', async () => {
+  const form = new FormData();
+  form.set('from', 'Sender <sender@example.org>');
+  form.set('to', 'admissions@elevateforhumanity.org');
+  form.set('envelope', '{"from":"unrelated@example.org","to":[]}');
+  form.set('headers', 'Reply-To: replies@example.org\r\nMessage-ID: <example@example.org>');
+  const parsed = await parseInboundEmail(new Request('https://test.invalid', { method: 'POST', body: form }));
+  expect(parsed).toMatchObject({ replyTo: 'replies@example.org', providerMessageId: '<example@example.org>' });
+  expect(inboundDeliveryRecipients(parsed!)).toEqual([]);
 });

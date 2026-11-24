@@ -48,6 +48,7 @@ if (registeredTables.size === 0) {
 }
 
 const AUTH_PATTERNS = [
+  /await\s+requireCleaningOwner\s*\(/,
   /\.getUser\s*\(/,
   /\.getSession\s*\(/,
   /getCurrentUser\s*\(/,

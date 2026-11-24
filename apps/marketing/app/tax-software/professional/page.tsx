@@ -14,6 +14,7 @@ export default function ProfessionalPage() {
     <TaxSiteShell>
       <main>
         <TaxHero
+          layout="editorial"
           eyebrow="Learn the profession · Build your business"
           title={
             <>

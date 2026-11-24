@@ -100,6 +100,10 @@ export function WellnessStorefront({ site, pathname, basePath, children }: { sit
   const products = (site.config.products || []).map(p => p.image?.includes('image_aaab83e1-7a70-4bf5-b28a-ec718af12b9f') ? { ...p, image: `${ROOT}/hair-scalp-oil-catalog.webp` } : p);
   const design = site.config.meta?.designPreferences ? readWebsiteDesign(site.config.meta.designPreferences) : null;
   const heroOverride = typeof site.config.meta?.heroImageOverride === 'string' ? site.config.meta.heroImageOverride : '';
+  const pageHero = site.config.pages?.find(page => page.slug === pathname)?.sections.find(section => section.type === 'hero' && section.visible !== false);
+  const heroContent = pageHero?.content;
+  const heroText = (key: string, fallback: string) => typeof heroContent?.[key] === 'string' ? heroContent[key] as string : fallback;
+  const heroLayout = pageHero?.settings?.layout || design?.layout;
 
   const bag = useTenantShoppingBag({ ...site, config: { ...site.config, products } }, basePath);
   const {totalCount, add, openBag, notice, dialog, href} = bag;
@@ -122,7 +126,7 @@ export function WellnessStorefront({ site, pathname, basePath, children }: { sit
       <div className={styles.productCopy}><p className={styles.kicker}>MERI-GOLD-ROUND</p><h3><a href={href(product.href || '/shop')}>{product.name}</a></h3><p>{product.description}</p><strong>{money(price(product))}</strong><button type="button" onClick={() => add(product)} disabled={!product.href || !Number.isFinite(price(product)) || price(product) <= 0}>Add to bag <span aria-hidden="true">+</span></button></div>
     </article>;
   }
-  return <div className={styles.store} data-template={design?.template} data-layout={design?.layout} data-density={design?.density} style={design ? { '--ink': site.config.branding?.primaryColor, backgroundColor: site.config.branding?.backgroundColor } as CSSProperties : undefined}>
+  return <div className={styles.store} data-page={pathname} data-template={design?.template} data-layout={heroLayout} data-density={design?.density} style={design ? { '--ink': site.config.branding?.primaryColor, backgroundColor: site.config.branding?.backgroundColor } as CSSProperties : undefined}>
     <div className={styles.announcement}>CURVATURE BODY SCULPTING · THE MERI-GOLD-ROUND COLLECTION</div>
     <header className={styles.header}>
       <a className={styles.brand} href={href('/')} aria-label="MERI-GOLD-ROUND home">{site.config.branding?.logoImage ? <img src={site.config.branding?.logoImage} alt="MERI-GOLD-ROUND" style={{ width: 144, height: 76, maxWidth: '32vw', objectFit: 'contain' }} /> : <><span>MERI-GOLD-ROUND</span><small>BOTANICAL BODY, SKIN & HAIR CARE</small></>}</a>
@@ -132,8 +136,8 @@ export function WellnessStorefront({ site, pathname, basePath, children }: { sit
     <main id="main-content">
       {isHome ? <>
         <section className={styles.hero}>
-          <img src={heroOverride || `${ROOT}/spa-stones-hero.webp`} alt="Warm spa setting with stacked massage stones, botanical greenery, oil and mineral bath salts" fetchPriority="high" />
-          <div className={styles.heroCopy}><p className={styles.kicker}>A LITTLE CARE. A FULLER RITUAL.</p><h1>Come back<br />to yourself.</h1><p>Botanical oils, nourishing body care, and everyday rituals for skin and hair. Discover your own round of self-care.</p><a className={styles.primary} href={href('/shop')}>Find your ritual <ArrowRight size={18} /></a><a className={styles.textLink} href="#brand-film">Meet Meri-Gold-Round ↓</a></div>
+          <img src={heroText('image', heroOverride || `${ROOT}/spa-stones-hero.webp`)} alt={heroText('imageAlt', 'Warm spa setting with stacked massage stones, botanical greenery, oil and mineral bath salts')} fetchPriority="high" />
+          <div className={styles.heroCopy}><p className={styles.kicker}>{heroText('eyebrow', 'A LITTLE CARE. A FULLER RITUAL.')}</p><h1>{heroText('title', 'Come back to yourself.')}</h1><p>{heroText('text', 'Botanical oils, nourishing body care, and everyday rituals for skin and hair. Discover your own round of self-care.')}</p><a className={styles.primary} href={href(heroText('buttonHref', '/shop'))}>{heroText('buttonText', 'Find your ritual')} <ArrowRight size={18} /></a><a className={styles.textLink} href="#brand-film">Meet Meri-Gold-Round ↓</a></div>
         </section>
         <div className={styles.promise}><span>Body & massage</span><span>Hair & scalp</span><span>Bath & foot care</span><span>Skin & daily cleansing</span></div>
         <div className={styles.purchaseInfo}><div><strong>Shop your ritual</strong><span>Body, skin, hair and bath essentials in one collection.</span></div><div><strong>Your bag stays with you</strong><span>Review quantities and a clear merchandise subtotal.</span></div><div><strong>Personal order support</strong><span>Request an invoice to confirm availability, shipping and tax.</span></div></div>

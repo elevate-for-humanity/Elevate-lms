@@ -34,7 +34,11 @@ export function repairDashboardReceipt(row: any, task: any, actorId: string) {
   return {
     repairId: row.id, sourceJobId: scalar(row.source_job_id, uuid), status: row.status,
     area: row.source_job_id ? 'Course Builder' : 'Engineering', repository, operation: 'Source repair',
-    engine: !candidate || candidate.provider === 'openhands' || candidate.kind === 'openhands-checkpoint' ? 'openhands' : 'internal',
+    // The engine label must reflect evidence: 'openhands' only when the
+    // repair actually ran on OpenHands (provider or checkpoint kind). A
+    // repair with no candidate yet runs on the owned internal engine by
+    // default — it must never be labelled OpenHands.
+    engine: candidate?.provider === 'openhands' || candidate?.kind === 'openhands-checkpoint' ? 'openhands' : 'internal',
     taskId, conversationId: owned ? scalar(task.tool_output?.conversation_id, identifier) : null,
     providerConfirmationRequired: Boolean(owned && task.status === 'awaiting_approval' &&
       task.requires_approval === true && isProviderConfirmationSnapshot(task)),

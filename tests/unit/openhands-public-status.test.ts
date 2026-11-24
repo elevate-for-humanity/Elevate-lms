@@ -26,6 +26,8 @@ import { GET as taskGet } from '../../apps/admin/app/api/admin/dev-studio/tasks/
 
 beforeEach(() => {
   vi.resetAllMocks();
+  // These tests exercise the opted-in OpenHands path.
+  vi.stubEnv('PARIS_REPAIR_ENGINE', 'openhands');
   mocks.limit.mockResolvedValue(null);
   mocks.auth.mockResolvedValue({ userId: 'owner', effectiveRoles: ['admin'] });
   mocks.permission.mockReturnValue(true);
@@ -84,6 +86,17 @@ for (const [name, post, field] of [['agent', agentPost, 'task'], ['chat', chatPo
     }));
     expect(response.status).toBe(502);
     expect(await response.text()).not.toContain('DO_NOT_PUBLISH');
+  });
+
+  it(`${name} start fails closed without the OpenHands opt-in`, async () => {
+    vi.stubEnv('PARIS_REPAIR_ENGINE', '');
+    const response = await post(new NextRequest('https://admin.example.test/agent', {
+      method: 'POST', headers: { 'content-type': 'application/json', 'idempotency-key': 'isolated-test' },
+      body: JSON.stringify({ [field]: 'Isolated test' }),
+    }));
+    expect(response.status).toBe(503);
+    expect(await response.text()).toContain('opt-in only');
+    expect(mocks.dispatch).not.toHaveBeenCalled();
   });
 }
 

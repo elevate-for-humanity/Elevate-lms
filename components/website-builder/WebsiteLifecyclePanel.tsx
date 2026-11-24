@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { ArchiveRestore, BarChart3, EyeOff, MonitorSmartphone, Trash2, Users } from 'lucide-react';
+import { useWebsitePublication } from './WebsiteConfigProvider';
 
 type Revision = {
   id: string;
@@ -20,7 +21,7 @@ export function WebsiteLifecyclePanel({
   websiteId: string;
   isPublished: boolean;
 }) {
-  const [published, setPublished] = useState(isPublished);
+  const [published, setPublished] = useWebsitePublication(isPublished);
   const [revisions, setRevisions] = useState<Revision[]>([]);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
@@ -50,7 +51,8 @@ export function WebsiteLifecyclePanel({
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || 'Could not unpublish website');
-      setPublished(false);
+      if (data.website?.is_published !== false) throw new Error('Could not verify that the website is offline. Refresh to check its status.');
+      setPublished(data.website.is_published);
       setInfo('Website is now offline. Your draft and domain settings were preserved.');
       await loadRevisions();
     } catch (err) {

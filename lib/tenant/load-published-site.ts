@@ -47,11 +47,14 @@ export async function loadPublishedSiteBySubdomain(
     .from('user_websites')
     .select('id, user_id, subdomain, site_name, organization_id, site_config, is_published')
     .eq('subdomain', slug)
-    .eq('is_published', true)
     .maybeSingle();
 
-  if (!error && site) {
+  if (error) return null;
+  if (site) {
     const row = site as WebsiteRow;
+    // An explicit unpublished site must never fall through to an organization
+    // alias or a generated default website on the same public address.
+    if (row.is_published !== true) return null;
     if (!(await userOwnedSiteCanServe(db, row.user_id))) return null;
     return {
       id: row.id,
@@ -71,7 +74,7 @@ export async function loadPublishedSiteBySubdomain(
 
   if (!org || org.status === 'trial_expired' || org.status === 'archived') return null;
 
-  const { data: orgSite } = await db
+  const { data: orgSite, error: orgSiteError } = await db
     .from('user_websites')
     .select('id, user_id, subdomain, site_name, organization_id, site_config, is_published')
     .eq('organization_id', org.id)
@@ -79,6 +82,7 @@ export async function loadPublishedSiteBySubdomain(
     .limit(1)
     .maybeSingle();
 
+  if (orgSiteError) return null;
   if (orgSite) {
     const row = orgSite as WebsiteRow;
     if (row.is_published) {
@@ -94,11 +98,5 @@ export async function loadPublishedSiteBySubdomain(
     }
   }
 
-  return {
-    id: `org-${org.id}`,
-    subdomain: slug,
-    siteName: org.name,
-    organizationId: org.id,
-    config: ensureComposableSiteConfig(buildDefaultSiteConfig({ organizationName: org.name })),
-  };
+  return null;
 }

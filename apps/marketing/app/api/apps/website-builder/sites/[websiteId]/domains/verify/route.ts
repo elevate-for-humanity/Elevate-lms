@@ -43,7 +43,7 @@ export async function POST(
       updated_at: new Date().toISOString(),
     }).eq('id', domainId);
     return NextResponse.json({
-      domain: { ...row, ...domain },
+      domain: { ...row, ...domain, id: row.id },
       message:
         domain.status === 'verified' || domain.status === 'active'
           ? 'Domain verified and SSL active.'

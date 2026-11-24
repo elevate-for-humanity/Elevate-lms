@@ -34,7 +34,7 @@ export interface VoucherData {
   voucher_issued_date: string | null;
   voucher_paid_date: string | null;
   payout_due_date: string | null;
-  payout_status: 'not_triggered' | 'pending' | 'due' | 'overdue' | 'paid';
+  payout_status: 'not_triggered' | 'pending' | 'due' | 'overdue' | 'paid' | 'voided';
   payout_paid_date: string | null;
   payout_paid_by_name: string | null;
   payout_notes: string | null;
@@ -57,6 +57,7 @@ const PAYOUT_STATUS_STYLES: Record<string, string> = {
   due: 'bg-orange-100 text-orange-800',
   overdue: 'bg-red-100 text-red-800',
   paid: 'bg-emerald-100 text-emerald-800',
+  voided: 'bg-slate-100 text-slate-600',
 };
 
 const PAYOUT_STATUS_LABELS: Record<string, string> = {
@@ -65,6 +66,7 @@ const PAYOUT_STATUS_LABELS: Record<string, string> = {
   due: 'Due Now',
   overdue: 'Overdue',
   paid: 'Paid',
+  voided: 'Voided',
 };
 
 function fmtDate(iso: string | null) {
@@ -104,6 +106,7 @@ export default function EnrollmentVoucherPanel({ data }: { data: VoucherData }) 
   const isOverdue =
     localData.payout_due_date &&
     localData.payout_status !== 'paid' &&
+    localData.payout_status !== 'voided' &&
     new Date(localData.payout_due_date) < new Date();
 
   async function handleSave() {
@@ -184,7 +187,7 @@ export default function EnrollmentVoucherPanel({ data }: { data: VoucherData }) 
 
       <div className="p-6 space-y-6">
         {/* Payout due date callout */}
-        {localData.payout_due_date && localData.payout_status !== 'paid' && (
+        {localData.payout_due_date && localData.payout_status !== 'paid' && localData.payout_status !== 'voided' && (
           <div
             className={`rounded-lg p-4 flex items-start gap-3 ${isOverdue ? 'bg-red-50 border border-red-200' : 'bg-amber-50 border border-amber-200'}`}
           >

@@ -44,9 +44,14 @@ does not alias them, create an active learner program, assert funding eligibilit
 or replace the signed apprenticeship standards. Scope review must reconcile the
 canonical program record, approved delivery and applicable agreement first.
 
-The standard MOU describes per-student net-revenue sharing, subject to the
-applicable written agreement and verified milestones. A request does not establish
-a fixed janitorial dollar award. Subcontractor job payments are separate.
+The executed individual agreement and addenda govern compensation. The current
+signing flow presents participation tiers with cohort-based hosting terms or a
+student referral fee; a separate legacy admin download still describes a
+per-student midpoint/completion model. These are not interchangeable offers.
+This repair does not select a participation tier or set a janitorial rate.
+The janitorial agreement must specify the per-student amount or calculation,
+qualifying milestones, funding conditions and payment timing before training
+begins. Subcontractor job payments are separate.
 
 ## Production checks before an invitation claims complete readiness
 

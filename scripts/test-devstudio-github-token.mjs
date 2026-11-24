@@ -11,6 +11,11 @@ async function resolver({deployed, canonical, statuses = [], storeError, workflo
     .replace("import { getDecryptedPlatformSecret } from '@/lib/secrets';", '')
     .replace("import { currentWorkflowGitHubToken } from './workflow-github-context';", '')
     .replace("import { getGitHubAppToken } from './github-app-token';", '')
+    // PR1 (#2070) added a multi-line import for the branch-authority probe.
+    // The evaluated source cannot keep any import statement (new Function),
+    // and the tested entry points never call the probe, so strip it like the
+    // other credential imports above.
+    .replace("import {\n  GITHUB_APP_403_BRANCH,\n  GITHUB_BRANCH_AUTHORITY_UNKNOWN,\n  classifyRepoBranchPermission,\n  githubBranchAuthorityError,\n} from './github-branch-authority';", '')
     .replaceAll('process.env.GITHUB_TOKEN', 'environment.GITHUB_TOKEN')
     .replaceAll('process.env.PARIS_GITHUB_AUTH_MODE', 'environment.PARIS_GITHUB_AUTH_MODE');
   const factory = new Function('getDecryptedPlatformSecret', 'fetch', 'environment', 'currentWorkflowGitHubToken', 'getGitHubAppToken',

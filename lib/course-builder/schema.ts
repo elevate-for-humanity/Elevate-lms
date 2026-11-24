@@ -278,6 +278,88 @@ export interface ProgramBuilderTemplate {
   modules: BuilderModule[];
   status?: 'draft' | 'published';
   regulatory: RegulatoryMetadata;
+  /**
+   * O*NET-SOC code for the occupation this course trains for (e.g. '39-5011.00'
+   * for barbers). Resolved from lib/onet/soc-map.ts when not set explicitly.
+   * The government job feed is keyed off this code.
+   */
+  socCode?: string | null;
+  /** Funding / program types this course is eligible for. */
+  funding?: CourseFunding;
+  /**
+   * Government job-feed evidence (O*NET, CareerOneStop, USAJobs, BLS),
+   * fetched at build time and stored on the course — not prompt-only.
+   * Null until the feed has been attached by attachJobFeedEvidence().
+   */
+  workforceEvidence?: JobFeedEvidence | null;
+}
+
+/**
+ * Funding / program types a course is eligible for. These mirror the
+ * funding flags on ProgramSchema (lib/programs/program-schema.ts).
+ *
+ * JAG is Jobs for America's Graduates, listed as a funding source in
+ * public/docs/PROGRAM_HOLDER_ONBOARDING_PACKET.md alongside WIOA, WRG,
+ * Apprenticeship, Employer-Sponsored and Private Pay. It is a funding /
+ * program type only — there is no JAG API or feed in the repo, so nothing
+ * here fetches JAG data.
+ */
+export interface CourseFunding {
+  wioaEligible?: boolean;
+  wrgEligible?: boolean;
+  wexEligible?: boolean;
+  etplApproved?: boolean;
+  /** Jobs for America's Graduates. Funding/program type only, not a feed. */
+  jagEligible?: boolean;
+  fundingNotes?: string;
+}
+
+/**
+ * Government JOB FEED evidence stored on a course. This is the job feed:
+ * O*NET occupations, CareerOneStop job postings (/v1/jobsearch), USAJobs
+ * federal listings, and BLS wages/projections — all keyed by SOC code.
+ * Built by lib/course-builder/workforce-evidence.ts from the live feeds
+ * (via loadIndustryStandards + fetchUsaJobs + buildCourseEvidenceContext)
+ * and persisted on the course; it is never prompt-only text.
+ */
+export interface JobFeedEvidence {
+  socCode: string;
+  occupationTitle: string;
+  onet: {
+    description: string;
+    tasks: string[];
+    skills: string[];
+    knowledge: string[];
+    technologySkills: string[];
+  } | null;
+  careerOneStop: {
+    jobPostingsCount: number | null;
+    location: string | null;
+    certifications: Array<{ name: string; organization: string }>;
+  } | null;
+  usaJobs: {
+    count: number;
+    listings: Array<{
+      title: string;
+      organization: string | null;
+      location: string | null;
+      salaryRange: string | null;
+      applicationUrl: string | null;
+    }>;
+  };
+  bls: {
+    medianAnnualWage: number | null;
+    entryWage: number | null;
+    experiencedWage: number | null;
+    projectedGrowthPct: number | null;
+    projectedGrowthCat: string | null;
+    projectedOpenings: number | null;
+    typicalEducation: string | null;
+  } | null;
+  /** Feed sources that actually returned data, e.g. 'US-DOL-O*NET'. */
+  sources: string[];
+  fetchedAt: string;
+  warnings: string[];
 }
 
 // Legacy aliases — pipeline.ts / compiler.ts / validate.ts import these names.

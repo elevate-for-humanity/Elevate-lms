@@ -51,3 +51,30 @@ and attempts `roles/run.invoker` on the private model. It runs best-effort per
 consumer: a grant that requires a project owner is reported in the activation
 output rather than aborting the already-verified Admin cutover. The chat surface
 stays portal-specific; only the model connection is shared.
+
+## Status addendum — 2026-11-23 (provider re-check, no live inference run)
+
+- **2026-10-21:** Model deployed (revision `elevate-owned-cpu-llm-00001-m5n`, image
+  `sha256:267e2ec2347c128ca950493bad8e0ba712a809ebbe566267054d2bc1cc1ad2b2`) and
+  deployment-identity acceptance passed. The Admin-identity probe returned HTTP 403
+  (missing `roles/run.invoker` for `elevate-admin-runtime@`).
+- **2026-11-13:** Workflow run `43341661249` (`verify-owned-cpu-access.yml`,
+  `workflow_dispatch`) completed with **verify: success** and **connect: success**.
+  The verify job includes the Admin-identity model-discovery probe, so the Admin
+  identity could discover `elevate-local` on that date, and the connect job ran
+  `activate-owned-cpu-model.mjs`, staging an Admin revision carrying
+  `ELEVATE_LLM_URL` / `ELEVATE_LLM_CPU_URL` + `ELEVATE_LLM_GOOGLE_IAM=true` and
+  routing traffic to it. That is the last successful live proof on record.
+- **2026-11-23:** Unauthenticated probe of the private URL returns HTTP 403 from
+  Google Frontend — the service exists and is still IAM-gated (alive, private).
+  That alone does **not** prove the model answers; only a Google identity + the
+  application token can prove inference. Admin deploys since Nov 13
+  (`deploy-admin.yml`) use `--update-env-vars` for a small named set and state
+  "keep the existing runtime identity, secrets, memory and scaling", so the
+  Nov 13 endpoint configuration is not removed by a deploy. No evidence on
+  record since Nov 13 of a live PARIS chat or code-repair turn through the owned
+  model (release step 7) — that proof is still open.
+- **Re-proof without changing anything:** dispatch `verify-owned-cpu-access.yml`
+  with `connect: false` (see `docs/provider-live-proof.md`). It runs the same
+  deployment-identity acceptance and Admin-identity probe as Nov 13 and skips
+  the connect/activate job.

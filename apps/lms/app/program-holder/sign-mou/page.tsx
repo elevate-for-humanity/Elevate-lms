@@ -1,3 +1,4 @@
+import { ACHIEVE_HOLDER_ID, achieveCnaAgreements, achieveDocumentVersion, hasCurrentAchieveSignature } from '@/lib/program-holder/achieve-cna-agreements';
 import { PrintDocumentControl } from '@/components/program-holder/PrintDocumentControl';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
@@ -19,10 +20,9 @@ export default async function SignMouPage() {
     .select('id,organization_name,status,approved_at,mou_signed,mou_final_pdf_url,features')
     .eq('id', context.holderId).maybeSingle();
   if (error || !holder) throw new Error('Program Holder agreement could not load.');
-  // Do not sign the summary while this holder's full contract details await review.
-  if (holder.id === 'acc9f5ab-8804-432e-9b12-aac1a6c86426' && holder.features?.full_forms_status === 'review_pending') {
-    redirect('/program-holder/agreements');
-  }
+  const isAchieve = holder.id === ACHIEVE_HOLDER_ID;
+  const packet = isAchieve ? achieveCnaAgreements(holder.features) : null;
+  const signed = holder.mou_signed && (!isAchieve || hasCurrentAchieveSignature(holder.features, 'mou', packet?.digest));
   const executedUrl = typeof holder.mou_final_pdf_url === 'string' && /^https:\/\//i.test(holder.mou_final_pdf_url) ? holder.mou_final_pdf_url : null;
   const approvalReady = ['approved', 'active', 'approved_pending_mou'].includes(holder.status) && Boolean(holder.approved_at);
   const requirements: string[] = Array.isArray(holder.features?.custom_mou?.requirements) ? holder.features.custom_mou.requirements.filter((value: unknown): value is string => typeof value === 'string') : [];
@@ -78,7 +78,16 @@ export default async function SignMouPage() {
           W-9, required business documents, program-specific credentials, and training plan have all been approved.
         </section>
 
-        {holder.mou_signed ? (
+        {packet && <section className="mt-6 space-y-3 rounded-xl border p-5">
+          <h2 className="text-lg font-bold">Final CNA MOU and Schedule A</h2>
+          <p className="whitespace-pre-wrap">{packet.mou}</p>
+          <dl>{packet.scheduleTerms.map(({ label, value }) => (
+            <div key={label} className="mt-2">
+              <dt className="font-bold">{label}</dt><dd className="whitespace-pre-wrap">{value}</dd>
+            </div>
+          ))}</dl>
+        </section>}
+        {signed ? (
           <div className="mt-6 rounded-xl border border-emerald-200 bg-emerald-50 p-5 text-sm font-semibold text-emerald-950">
             Your Program Holder MOU is recorded as signed. {executedUrl ? "Open the recorded document above to review your agreement." : "The executed document has not been attached to this record. Ask Elevate through Office Mail to attach the original; the general terms above are not a copy of your executed agreement."}
             <Link href="/program-holder/documents" className="mt-3 block font-bold underline">
@@ -87,12 +96,14 @@ export default async function SignMouPage() {
           </div>
         ) : context.mode === 'preview' ? (
           <p className="mt-6 rounded-xl bg-blue-50 p-5">Administrator preview is read only. The Program Holder must sign from their own account.</p>
+        ) : isAchieve && !packet ? (
+          <p className="mt-6 rounded-xl bg-amber-50 p-5">Signing opens when Elevate publishes the finalized CNA MOU and Schedule A.</p>
         ) : !approvalReady ? (
           <p className="mt-6 rounded-xl bg-amber-50 p-5">Review these documents while Elevate completes your application approval. Your signature is not recorded by viewing this page.</p>
         ) : (
           <DocumentSignatureBlock
             agreementType="program_holder_mou"
-            agreementVersion={`3.0-${holder.id}`}
+            agreementVersion={packet ? achieveDocumentVersion('mou', packet.digest) : `3.0-${holder.id}`}
             buttonLabel="Sign Program Holder MOU & Continue"
             nextUrl="/program-holder/dashboard"
           />

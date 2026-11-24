@@ -41,10 +41,13 @@ export async function GET() {
       { status: 503, headers },
     );
   const holder = holderRes.data;
+  // Invoice readiness depends on the MOU actually being signed (plus the payment
+  // addendum below, when one exists). Program holders do not pay, so the
+  // payment-schedule review flag (features.full_forms_status) must not keep
+  // blocking invoices once the MOU is signed.
   let signed =
     holder.mou_signed === true &&
-    ['signed', 'fully_executed'].includes(holder.mou_status || 'signed') &&
-    holder.features?.full_forms_status !== 'review_pending';
+    ['signed', 'fully_executed'].includes(holder.mou_status || 'signed');
   const addendum = paymentAddendum(holder.features, ctx.holderId);
   if (addendum) {
     const acceptance = await ctx.db

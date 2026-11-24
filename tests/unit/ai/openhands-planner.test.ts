@@ -1,5 +1,9 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { planAIToolFromCommand } from '../../../lib/ai/tools/planner';
+
+afterEach(() => {
+  vi.unstubAllEnvs();
+});
 
 describe('engineering delegation', () => {
   it('routes repository engineering work to internal Studio', () => {
@@ -28,11 +32,21 @@ describe('engineering delegation', () => {
     expect(planned?.input.task).toContain('Store demo');
   });
 
-  it('does not confuse Store engineering evidence with an OpenHands status query', () => {
+  it('routes named OpenHands engineering work to OpenHands only with the explicit opt-in', () => {
     const command =
       'Audit the live Elevate Store page end to end on desktop and mobile using the existing repository and production deployment. Check responsive layout, accessibility, navigation, Store-owned links, guided setup, marketplace filters, ROI labels, console errors, failed API requests, and checkout entry points without making a purchase. Fix only independently repairable defects through the governed OpenHands engineering workflow, preserve unrelated changes, add regression tests, and return commit, test, deployment, and live verification evidence.';
+    vi.stubEnv('PARIS_REPAIR_ENGINE', 'openhands');
     const planned = planAIToolFromCommand(command);
     expect(planned?.name).toBe('openhands.execute');
+    expect(planned?.input.task).toBe(command);
+  });
+
+  it('routes the same named OpenHands work to the owned engine without the opt-in', () => {
+    const command =
+      'Audit the live Elevate Store page end to end on desktop and mobile using the existing repository and production deployment. Check responsive layout, accessibility, navigation, Store-owned links, guided setup, marketplace filters, ROI labels, console errors, failed API requests, and checkout entry points without making a purchase. Fix only independently repairable defects through the governed OpenHands engineering workflow, preserve unrelated changes, add regression tests, and return commit, test, deployment, and live verification evidence.';
+    vi.stubEnv('PARIS_REPAIR_ENGINE', '');
+    const planned = planAIToolFromCommand(command);
+    expect(planned?.name).toBe('studio.engineering.execute');
     expect(planned?.input.task).toBe(command);
   });
 
@@ -136,10 +150,19 @@ describe('engineering delegation', () => {
     expect(planned?.input.task).toBe(command);
   });
 
-  it('keeps OpenHands available only when explicitly requested', () => {
+  it('keeps OpenHands available only when explicitly requested (opted in)', () => {
     const command = 'Use OpenHands to fix the repository regression test';
+    vi.stubEnv('PARIS_REPAIR_ENGINE', 'openhands');
     const planned = planAIToolFromCommand(command);
     expect(planned?.name).toBe('openhands.execute');
+    expect(planned?.input.task).toBe(command);
+  });
+
+  it('routes explicitly requested OpenHands work to the owned engine without the opt-in', () => {
+    const command = 'Use OpenHands to fix the repository regression test';
+    vi.stubEnv('PARIS_REPAIR_ENGINE', '');
+    const planned = planAIToolFromCommand(command);
+    expect(planned?.name).toBe('studio.engineering.execute');
     expect(planned?.input.task).toBe(command);
   });
 

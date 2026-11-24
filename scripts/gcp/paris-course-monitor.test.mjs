@@ -468,3 +468,41 @@ test('publication approval stays blocked despite retry capacity and historical r
  assert.equal(codeRepair.state,'recovering');
  assert.equal(codeRepair.action,'requeue');
 });
+
+
+test('failed autopilot stage waits for canonical predecessor without consuming retry budget',async()=>{
+ const row=job({status:'failed',last_error:'ULTIMATE_AUTOPILOT_STAGE_NOT_COMPLETE:synchronization',
+  payload:{autopilot:{role:'quality'}},monitor:{enabled:true,recoveries:0}});
+ let readyCalls=0;const changes=[];
+ const result=await monitorCourseQueue({env:monitorEnv,now,request:async(url,options)=>{
+  if(String(url).includes('/rpc/ultimate_autopilot_ready_jobs')){
+   readyCalls++;assert.deepEqual(JSON.parse(options.body),{p_jobs:['job']});
+   return {ok:true,json:async()=>[]};
+  }
+  if(options.method==='PATCH'){changes.push(JSON.parse(options.body));return {ok:true,json:async()=>[{id:'job'}]};}
+  return {ok:true,json:async()=>[row]};
+ }});
+ assert.equal(readyCalls,1);
+ assert.equal(changes.length,1);
+ assert.equal(changes[0].status,undefined,'never requeue a missing prerequisite');
+ assert.equal(changes[0].attempts,undefined);
+ assert.equal(changes[0].execution_generation,undefined);
+ assert.equal(changes[0].monitor.state,'prerequisite_wait');
+ assert.equal(changes[0].monitor.action,'observe');
+ assert.equal(result[0].saved,true);
+});
+test('failed autopilot stage requeues once canonical readiness is positively verified',async()=>{
+ const row=job({status:'failed',last_error:'ULTIMATE_AUTOPILOT_STAGE_NOT_COMPLETE:synchronization',
+  payload:{autopilot:{role:'quality'}},monitor:{enabled:true,recoveries:0}});
+ let changes;
+ const result=await monitorCourseQueue({env:monitorEnv,now,request:async(url,options)=>{
+  if(String(url).includes('/rpc/ultimate_autopilot_ready_jobs'))
+   return {ok:true,json:async()=>['job']};
+  if(options.method==='PATCH'){changes=JSON.parse(options.body);return {ok:true,json:async()=>[{id:'job'}]};}
+  return {ok:true,json:async()=>[row]};
+ }});
+ assert.equal(changes.status,'queued');
+ assert.equal(changes.attempts,undefined,'preserve attempt history');
+ assert.equal(changes.execution_generation,3);
+ assert.equal(result[0].action,'requeue');
+});

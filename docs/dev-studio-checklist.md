@@ -1,5 +1,14 @@
 # Dev Studio Checklist - Implementation Status
 
+> Correction 2026-11-23: several lines below were wrong and are corrected
+> in place. `lib/dev-studio/skills-loader.ts` and `lib/dev-studio/agent.ts`
+> do not exist at HEAD. O*NET / CareerOneStop / BLS ARE connected — in the
+> Ultimate Course Builder (lib/ultimate-course-builder/, feed clients in
+> lib/industry/ and lib/onet/; single-builder PR #2823). Snapshot/rollback
+> routes exist (`snapshots/[id]/rollback`). `/api/devstudio/*` routes do
+> not exist at HEAD. Unverified lines are marked as such; do not treat
+> this checklist as a status source without re-checking the code.
+
 ## ✅ EXISTING (Already Implemented)
 
 ### 1. Repository Scan
@@ -13,7 +22,7 @@
 - ✅ Logs panel - apps/admin/app/admin/dev-studio/logs/
 - ✅ Deployment controls - DeployPanel.tsx + GitPanel.tsx
 - ✅ Northflank deployment status - NorthflankStatusPanel.tsx
-- ❌ Rollback controls - NOT IMPLEMENTED
+- ⚠️ Rollback controls - routes exist (`snapshots/[id]/rollback`, tasks rollback) but live UI wiring is UNVERIFIED — corrected 2026-11-23; was wrongly listed as NOT IMPLEMENTED
 - ❌ Cloudflare cache controls - NOT IMPLEMENTED
 - ❌ Supabase status - NOT IMPLEMENTED (partial in health panel)
 - ❌ Stripe status - NOT IMPLEMENTED
@@ -21,8 +30,8 @@
 
 ### 3. AI Assistants
 - ✅ AI Chat - AIChat.tsx, UnifiedEllieChat.tsx
-- ✅ Skills loader - lib/dev-studio/skills-loader.ts
-- ✅ Agent system - lib/dev-studio/agent.ts
+- ❌ Skills loader - lib/dev-studio/skills-loader.ts — FILE DOES NOT EXIST at HEAD (stale line, corrected 2026-11-23)
+- ❌ Agent system - lib/dev-studio/agent.ts — FILE DOES NOT EXIST at HEAD; agent code lives in lib/devstudio/openhands/ (stale line, corrected 2026-11-23)
 - ❌ Named assistants with avatars - NOT IMPLEMENTED
 - ❌ Assistant permissions - PARTIAL
 - ❌ Assistant audit logs - PARTIAL
@@ -42,9 +51,9 @@
 ### 6. Course Generator
 - ✅ AI Course Builder Chat - AICourseBuilderChat.tsx
 - ✅ Supabase Edge Function - supabase/functions/ai-course-create
-- ❌ O*NET connection - NOT IMPLEMENTED
-- ❌ CareerOneStop connection - NOT IMPLEMENTED
-- ❌ BLS connection - NOT IMPLEMENTED
+- ✅ O*NET connection - IMPLEMENTED in the Ultimate Course Builder (lib/onet/, lib/industry/standards-loader.ts) — corrected 2026-11-23; was wrongly listed as NOT IMPLEMENTED
+- ✅ CareerOneStop connection - IMPLEMENTED in the Ultimate Course Builder (lib/industry/careeronestop.ts) — corrected 2026-11-23
+- ✅ BLS connection - IMPLEMENTED in the Ultimate Course Builder (lib/industry/bls.ts) — corrected 2026-11-23
 - ❌ Media to Cloudflare R2 - NOT IMPLEMENTED
 
 ### 7. Course Gap Detection
@@ -104,7 +113,7 @@
 
 ### 18. Deployment Safety
 - ✅ Lint/typecheck/build in CI
-- ❌ /api/devstudio/control-plane build issue - NOT FIXED
+- ❌ /api/devstudio/control-plane build issue - STALE: no /api/devstudio/* route exists at HEAD; the issue as written cannot be checked — corrected 2026-11-23
 
 ### 19. Backup/Recovery
 - ✅ GitHub backup

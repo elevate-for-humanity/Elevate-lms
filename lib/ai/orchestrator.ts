@@ -30,6 +30,10 @@ import { withLaminarSpan } from '@/lib/observability/laminar';
  */
 
 import { aiChat, aiReason, isReasoningAvailable } from '@/lib/ai/ai-service';
+import {
+  COURSE_GENERATION_AUTHORITY_NOTE,
+  isCourseGenerationTask,
+} from '@/lib/ai/course-generation-authority';
 import { logger } from '@/lib/logger';
 import type { ChatMessage } from '@/lib/ai/types';
 import { getRAGContext } from '@/lib/platform/rag';
@@ -64,6 +68,7 @@ export type AITask =
   | 'recap_generation'           // Generate lesson recap
   | 'rag_query'                  // RAG-augmented Q&A over platform knowledge chunks
   | 'knowledge_graph_query'      // Structured lookup against the platform knowledge graph
+  | 'code_repair'                // Owned-engine code fix (Dev Studio own engine)
   | 'plan_decompose';            // Decompose a goal into an ordered plan (planner)
 
 // ─── Context shapes ───────────────────────────────────────────────────────────
@@ -119,6 +124,12 @@ export type AITaskResult = {
   tokensUsed?: number;
   blocked?: boolean;
   blockReason?: string;
+  /**
+   * Set for course/lesson/quiz generation tasks. Generated output is a
+   * draft: it must cross Course Factory before it becomes a course.
+   * See lib/ai/course-generation-authority.ts.
+   */
+  authorityNote?: string;
 };
 
 // ─── System prompt templates ──────────────────────────────────────────────────
@@ -179,6 +190,17 @@ Be specific and cite the source when relevant. If the retrieved context does not
   knowledge_graph_query: () => `You are a platform architecture assistant for ${PLATFORM_DEFAULTS.orgName}.
 You have access to the full platform knowledge graph: systems, routes, DB tables, canonical decisions, and known debt.
 Answer questions about platform structure, ownership, and architecture precisely.`,
+
+  // Owned-engine code fix. The caller is lib/devstudio/own-engine/agent-loop.ts
+  // and parses the reply as JSON, so the contract below is load-bearing: reply
+  // with ONLY valid JSON, no prose. You are a small 7B model: keep changes
+  // narrow, prefer the smallest fix, and never invent APIs, keys, or URLs.
+  code_repair: () => `You are the owned code-repair model for ${PLATFORM_DEFAULTS.orgName}.
+Return only valid JSON matching this shape, with no prose before or after it:
+{"summary": "one sentence describing the fix", "files": [{"path": "lib/example.ts", "content": "full new file contents"}]}
+Change at most 6 files. Write complete file contents, not diffs. Never write
+secrets, credentials, keys, or .env files. If the goal cannot be fixed from
+the context given, return {"summary": "cannot fix: <reason>", "files": []}.`,
 
   plan_decompose: () => `You are a platform operations planner for ${PLATFORM_DEFAULTS.orgName}.
 Given a high-level goal, you decompose it into ordered, executable steps.
@@ -358,6 +380,8 @@ async function runAITaskInternal(input: AITaskInput): Promise<AITaskResult> {
     recap_generation:           { maxTokens: 400,  temperature: 0.4 },
     rag_query:                  { maxTokens: 800,  temperature: 0.3 },
     knowledge_graph_query:      { maxTokens: 1000, temperature: 0.2 },
+    // Owned-engine code fix: small model, low temperature, JSON-only output.
+    code_repair:                 { maxTokens: 4000, temperature: 0.2 },
     plan_decompose:             { maxTokens: 2000, temperature: 0.3 },
   };
 
@@ -390,11 +414,22 @@ async function runAITaskInternal(input: AITaskInput): Promise<AITaskResult> {
         maxTokens: maxTokens ?? params.maxTokens,
       });
     } else {
+      // code_repair runs on the owned engine only: providerPolicy 'owned-only'
+      // forces ElevateProvider and fails closed when the owned model is not
+      // configured, so a repair can never silently fall through to a
+      // commercial provider. jsonMode requests provider-native JSON output;
+      // the agent loop still validates the reply structurally. The `model`
+      // name below is ignored by ElevateProvider (it always serves
+      // `elevate-local`); it only matters for non-owned providers, which
+      // code_repair never reaches.
       result = await aiChat({
         model: FULL_MODEL_TASKS.includes(task) ? 'gpt-4.1' : 'gpt-4.1-mini',
         messages,
         temperature: temperature ?? params.temperature,
         maxTokens: maxTokens ?? params.maxTokens,
+        ...(task === 'code_repair'
+          ? { providerPolicy: 'owned-only' as const, jsonMode: true }
+          : {}),
       });
     }
 
@@ -409,6 +444,9 @@ async function runAITaskInternal(input: AITaskInput): Promise<AITaskResult> {
       provider: result.provider ?? 'unknown',
       task,
       tokensUsed: result.usage?.totalTokens,
+      ...(isCourseGenerationTask(task)
+        ? { authorityNote: COURSE_GENERATION_AUTHORITY_NOTE }
+        : {}),
     };
 
     // Persist results for operational tasks (fire-and-forget, non-blocking)

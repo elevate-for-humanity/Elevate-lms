@@ -196,6 +196,8 @@ export interface ProgramSchema {
   };
 
   credentials: ProgramCredential[];
+  /** Plain completion disclosure when no external credential is listed. */
+  completionDisclosure?: string;
   outcomes: ProgramOutcome[];
   careerPathway: CareerPathwayStep[];
   weeklySchedule: WeeklyScheduleEntry[];

@@ -25,6 +25,7 @@ export const FORKLIFT_MANUFACTURING_PROGRAM: ProgramSchema = {
   // Completion records and practice portfolios are described below. They must
   // not be counted as promised industry credentials while testing is unconfirmed.
   credentials: [],
+  completionDisclosure: plan.completionDisclosure,
   outcomes: [
     { statement: 'Identify the formal, practical and workplace-evaluation requirements for forklift operators.' },
     { statement: 'Use fictional capacity-plate information to identify a documented match or escalate an unsupported load.' },

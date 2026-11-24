@@ -25,6 +25,7 @@ export const FORKLIFT_MANUFACTURING = {
     'Complete a production and quality handoff with traceable records.',
   ],
   practicalDisclosure: 'Online simulations are knowledge and decision-making practice. They do not replace equipment demonstrations, supervised operation, workplace evaluation, or employer authorization. A qualified training partner or employer must document actual practical instruction and demonstrated skills. The employer remains responsible for workplace evaluation and authorization to operate its equipment.',
+  completionDisclosure: 'Elevate online completion record only; external credential/testing unconfirmed; practical training and workplace evaluation separate.',
   credentialDisclosure: 'Elevate records completion of its online learning, workbook and assessments. These internal records are not external industry credentials. Practical training and workplace evaluation must be documented separately under 29 CFR 1910.178(l). An external credential and testing arrangement have not yet been confirmed; no external credential is awarded by finishing these online exercises.',
   fundingDisclosure: 'This combined program is not currently listed as an approved Elevate ETPL/WIOA program. Tuition, employer sponsorship, and any future agency funding must be confirmed for this exact program before enrollment.',
   sources: [

@@ -122,7 +122,7 @@ function fromProgramSchema(program: ProgramSchema, fallbackTuition: number | nul
         ? `${normalized.durationWeeks} ${normalized.durationWeeks === 1 ? 'week' : 'weeks'}`
         : (normalized.schedule ?? null)),
     credential:
-      verified?.credential ?? normalized.credentials?.[0]?.name ?? normalized.badge ?? null,
+      verified?.credential ?? normalized.credentials?.[0]?.name ?? (normalized.completionDisclosure?.trim() || null),
     ...fundingFields(verified?.slug ?? normalized.slug),
     tuition,
     price_label: getPriceLabel(tuition),

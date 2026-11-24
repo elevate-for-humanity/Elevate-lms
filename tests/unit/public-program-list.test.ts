@@ -1,5 +1,7 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import * as programRegistry from '@/data/programs/index';
 import { STATIC_PROGRAM_MAP } from '@/data/programs/index';
+import { FORKLIFT_MANUFACTURING_PROGRAM } from '@/data/programs/forklift';
 import { FORKLIFT_MANUFACTURING } from '@/lib/programs/forklift-manufacturing';
 import { loadApplyProgramOptions, loadPublicProgramList } from '@/lib/programs/public-program-list';
 
@@ -22,7 +24,7 @@ const expectedForklift = {
   slug: 'forklift',
   title: FORKLIFT_MANUFACTURING.title,
   duration: FORKLIFT_MANUFACTURING.duration,
-  credential: 'Elevate Online Learning Completion Record',
+  credential: 'Elevate online completion record only; external credential/testing unconfirmed; practical training and workplace evaluation separate.',
   funding_eligible: false,
   funding_tier: 'self-pay',
   funding_labels: ['Self-Pay'],
@@ -32,6 +34,10 @@ const expectedForklift = {
 
 beforeEach(() => {
   createPublicClient.mockReset();
+});
+
+afterEach(() => {
+  vi.restoreAllMocks();
 });
 
 describe('public program catalog contract', () => {
@@ -93,6 +99,27 @@ describe('public program catalog contract', () => {
 
     expect(result.source).toBe('database');
     expect(result.programs.some((program) => program.slug === 'forklift')).toBe(false);
+  });
+
+  it.each([
+    { name: 'listed external credential', external: true, disclosure: 'Internal completion record only', expected: 'Documented external credential' },
+    { name: 'explicit completion disclosure', external: false, disclosure: 'Internal completion record only', expected: 'Internal completion record only' },
+    { name: 'no credential or disclosure', external: false, disclosure: undefined, expected: null },
+    { name: 'blank disclosure', external: false, disclosure: '   ', expected: null },
+  ])('uses $name without interpreting a funding badge as a credential', async ({ external, disclosure, expected }) => {
+    const slug = 'catalog-credential-fixture';
+    mockPrograms([{ slug, title: 'Catalog fixture' }]);
+    vi.spyOn(programRegistry, 'getStaticProgram').mockReturnValue({
+      ...FORKLIFT_MANUFACTURING_PROGRAM,
+      slug,
+      credentials: external ? [{ name: 'Documented external credential', issuer: 'Fixture issuer', description: 'Fixture credential' }] : [],
+      completionDisclosure: disclosure,
+      badge: 'Self-Pay Program',
+    });
+
+    const result = await loadPublicProgramList();
+
+    expect(result.programs.find((program) => program.slug === slug)?.credential).toBe(expected);
   });
 
   it.each(['database', 'static-catalog'])('offers forklift for inquiries without workforce funding in the %s path', async (source) => {

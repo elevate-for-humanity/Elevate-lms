@@ -1,4 +1,4 @@
-// pre-auth-registry: exempt - A signature-verified email magic-link session owns provider access, never eligibility.
+// pre-auth-registry: exempt - Current signed Auth claims and a server-owned same-browser mailbox proof own provider access, never eligibility.
 import { NextRequest } from 'next/server';
 import { z } from 'zod';
 import {
@@ -66,7 +66,7 @@ const consentSchema = z.object({ action: z.literal('consent'), ...identityFields
 export async function GET(request: NextRequest) {
   return cleaningHandler(async () => {
     const { db, user, site, session } = await cleaningContext(request, false, 'provider-onboarding');
-    const actor = await verifiedProviderEmail(user, session);
+    const actor = await verifiedProviderEmail(user, session, db);
     const provider = await readProvider(db, actor.email);
     let applications: any[] = [];
     if (!provider) {
@@ -106,7 +106,7 @@ export async function POST(request: NextRequest) {
   return cleaningHandler(async () => {
     sameOrigin(request);
     const { db, user, session } = await cleaningContext(request, false, 'provider-onboarding');
-    const actor = await verifiedProviderEmail(user, session);
+    const actor = await verifiedProviderEmail(user, session, db);
     const raw = z.record(z.string(), z.unknown()).parse(await request.json());
 
     if (raw.action === 'consent') {

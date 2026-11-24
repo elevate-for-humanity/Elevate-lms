@@ -1,8 +1,9 @@
 // @vitest-environment node
 import { generateKeyPairSync, sign } from 'node:crypto';
 import { createClient, type SupabaseClient, type User } from '@supabase/supabase-js';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { verifiedProviderEmail } from '@/lib/cleaning/provider-email-proof';
+import { CLEANING_SITE } from '@/lib/cleaning/server';
 
 const { publicKey, privateKey } = generateKeyPairSync('rsa', { modulusLength: 2048 });
 const jwk = {
@@ -67,10 +68,16 @@ function session(token: string) {
 }
 
 describe('provider email proof with cryptographically verified Supabase claims', () => {
-  it('accepts a signed email magic-link session for the matching Auth user', async () => {
-    await expect(verifiedProviderEmail(user, session(signedToken(claims())))).resolves.toEqual({
+  const proof = (data: unknown = true, error: unknown = null) => ({ rpc: vi.fn(async (_name: string, _args: Record<string, unknown>) => ({ data, error })) });
+
+  it('accepts a signed email magic-link session only with its exact server-recorded mailbox proof', async () => {
+    const db = proof();
+    await expect(verifiedProviderEmail(user, session(signedToken(claims())), db)).resolves.toEqual({
       id: user.id,
       email: user.email,
+    });
+    expect(db.rpc).toHaveBeenCalledExactlyOnceWith('cleaning_provider_proof_valid', {
+      p_website_id: CLEANING_SITE, p_user_id: user.id, p_session_id: 'provider-session', p_email: user.email,
     });
   });
 
@@ -78,17 +85,40 @@ describe('provider email proof with cryptographically verified Supabase claims',
     const token = signedToken(claims('password'));
     const [header, , signature] = token.split('.');
     const forged = `${header}.${encode(claims('magiclink'))}.${signature}`;
-    await expect(verifiedProviderEmail(user, session(forged))).rejects.toMatchObject({
+    const db = proof();
+    await expect(verifiedProviderEmail(user, session(forged), db)).rejects.toMatchObject({
+      status: 403,
+      code: 'provider_email_verification_required',
+    });
+    expect(db.rpc).not.toHaveBeenCalled();
+  });
+
+  it('rejects an expired signed magic-link token', async () => {
+    const payload = { ...claims(), exp: 1 };
+    await expect(verifiedProviderEmail(user, session(signedToken(payload)), proof())).rejects.toMatchObject({
       status: 403,
       code: 'provider_email_verification_required',
     });
   });
 
-  it('rejects an expired signed magic-link token', async () => {
-    const payload = { ...claims(), exp: 1 };
-    await expect(verifiedProviderEmail(user, session(signedToken(payload)))).rejects.toMatchObject({
-      status: 403,
-      code: 'provider_email_verification_required',
-    });
+  it.each([false, null, {}, 'true'])('rejects a direct magic-link login without a boolean server proof (%j)', async data => {
+    await expect(verifiedProviderEmail(user, session(signedToken(claims())), proof(data))).rejects.toMatchObject({ status: 403 });
+  });
+
+  it('rejects an old magic-link session refreshed with a changed email', async () => {
+    const changed = { ...user, email: 'changed@example.invalid' };
+    const db = proof(false);
+    await expect(verifiedProviderEmail(changed, session(signedToken({ ...claims(), email: changed.email })), db)).rejects.toMatchObject({ status: 403 });
+    expect(db.rpc.mock.calls[0][1]).toMatchObject({ p_email: changed.email, p_session_id: 'provider-session' });
+  });
+
+  it('fails closed when proof storage is unavailable', async () => {
+    await expect(verifiedProviderEmail(user, session(signedToken(claims())), proof(null, { message: 'database unavailable' }))).rejects.toMatchObject({ status: 403 });
+  });
+
+  it('still rejects an unconfirmed current Auth user even with a stored proof', async () => {
+    const db = proof();
+    await expect(verifiedProviderEmail({ ...user, email_confirmed_at: undefined }, session(signedToken(claims())), db)).rejects.toMatchObject({ status: 401 });
+    expect(db.rpc).not.toHaveBeenCalled();
   });
 });

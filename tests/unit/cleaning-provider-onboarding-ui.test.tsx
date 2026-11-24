@@ -1,13 +1,17 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { TenantCleaningProvider } from '@/components/tenant/TenantCleaningNetwork';
 
-const auth = vi.hoisted(() => ({ createClient: vi.fn(), getUser: vi.fn(), signInWithOtp: vi.fn(), readOnly: false }));
+const auth = vi.hoisted(() => ({ createClient: vi.fn(), readOnly: false }));
 vi.mock('@/lib/supabase/client', () => ({ createClient: auth.createClient }));
 vi.mock('@/components/tenant/TenantPreviewContext', () => ({ useTenantRequestHeaders: () => ({}), useReadOnlyTenantPreview: () => auth.readOnly }));
 const fetchMock = vi.fn();
-const success = (body: unknown) => ({ ok: true, json: async () => body });
-const verificationRequired = () => ({ ok: false, json: async () => ({ error: 'Open a secure email sign-in link to access your cleaning provider profile.', code: 'provider_email_verification_required' }) });
+const success = (body: unknown) => ({ ok: true, status: 200, json: async () => body });
+const failure = (error: string, status = 403, code?: string) => ({ ok: false, status, json: async () => ({ error, code }) });
+const verificationRequired = () => failure('Open a secure email verification link to access your cleaning provider profile.', 403, 'provider_email_verification_required');
+const providerPath = '/sites/2exclusive-platinum-cleaning/provider';
+const verificationPath = '/api/tenant-sites/cleaning/provider/verification';
+const verificationButton = 'Email me a secure verification link';
 const application = { id: '00000000-0000-4000-8000-000000000001', name: 'Cleaning Company', contactName: 'Applicant', createdAt: null, identityRevision: 'a'.repeat(64) };
 const pendingProvider = { id: 'provider', lead_id: application.id, name: application.name, identityRevision: application.identityRevision, eligibility: 'pending', hourly_cents: 3500, zips: ['46204'], services: ['commercial'], opted_in: true };
 const identityBody = { applicationId: application.id, confirmedBusinessName: application.name, identityRevision: application.identityRevision, identityConfirmed: true };
@@ -18,74 +22,178 @@ function confirmIdentity() { fireEvent.click(screen.getByRole('checkbox', { name
 
 beforeEach(() => {
   vi.clearAllMocks();
+  fetchMock.mockReset();
   vi.stubGlobal('fetch', fetchMock);
+  window.history.replaceState({}, '', providerPath);
   auth.readOnly = false;
-  auth.getUser.mockResolvedValue({ data: { user: { id: 'current-user', email: 'account@example.invalid', user_metadata: { email: 'spoofed@example.invalid' } } }, error: null });
-  auth.signInWithOtp.mockResolvedValue({ error: null });
-  auth.createClient.mockReturnValue({ auth: { getUser: auth.getUser, signInWithOtp: auth.signInWithOtp } });
+  auth.createClient.mockImplementation(() => { throw new Error('Provider verification must use the server endpoint.'); });
   fetchMock.mockResolvedValue(success({ provider: null, applications: [application], jobs: [], jobOffersEnabled: false }));
 });
-afterEach(() => { cleanup(); vi.unstubAllGlobals(); });
+afterEach(() => { cleanup(); window.history.replaceState({}, '', providerPath); vi.unstubAllGlobals(); });
 
 describe('cleaning provider profile workflow', () => {
-  it('requests an email-specific sign-in link only on explicit action, using the current account and fixed provider return', async () => {
-    fetchMock.mockResolvedValue(verificationRequired());
+  it('requests verification only on explicit action through the server without client-owned email or flow inputs', async () => {
+    fetchMock.mockResolvedValueOnce(verificationRequired()).mockResolvedValueOnce(success({ sent: true }));
     render(<TenantCleaningProvider />);
-    const send = await screen.findByRole('button', { name: 'Email me a secure sign-in link' });
+    const send = await screen.findByRole('button', { name: verificationButton });
     expect(screen.queryByRole('button', { name: /Save/ })).toBeNull();
-    expect(auth.getUser).not.toHaveBeenCalled();
-    expect(auth.signInWithOtp).not.toHaveBeenCalled();
+    expect(fetchMock).toHaveBeenCalledTimes(1);
     fireEvent.click(send);
-    await screen.findByText(/Check your account email for the secure sign-in link/);
-    expect(auth.signInWithOtp).toHaveBeenCalledTimes(1);
-    const sent = auth.signInWithOtp.mock.calls[0][0];
-    expect(sent.email).toBe('account@example.invalid');
-    expect(sent.options.shouldCreateUser).toBe(false);
-    const callback = new URL(sent.options.emailRedirectTo);
-    expect(callback.origin).toBe('https://lms.elevateforhumanity.org');
-    expect(callback.pathname).toBe('/auth/callback');
-    expect(callback.searchParams.get('redirect')).toBe('https://www.elevateforhumanity.org/sites/2exclusive-platinum-cleaning/provider');
+    await screen.findByText(/Check your account email for the secure verification link/);
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(fetchMock.mock.calls[1]).toEqual([verificationPath, expect.objectContaining({
+      method: 'POST', credentials: 'same-origin', body: '{}', cache: 'no-store',
+      headers: { 'Content-Type': 'application/json' },
+    })]);
+    expect(auth.createClient).not.toHaveBeenCalled();
     expect(screen.queryByRole('textbox')).toBeNull();
-    expect(fetchMock.mock.calls.some(([, options]) => options?.method === 'POST')).toBe(false);
+    expect(screen.queryByRole('combobox')).toBeNull();
+    expect(screen.queryByText(/Your email is verified/)).toBeNull();
   });
 
   it('reports an actual email service error without claiming a link was sent', async () => {
-    fetchMock.mockResolvedValue(verificationRequired());
-    auth.signInWithOtp.mockResolvedValue({ error: new Error('Email rate limit exceeded. Please try again later.') });
+    fetchMock.mockResolvedValueOnce(verificationRequired())
+      .mockResolvedValueOnce(failure('Email rate limit exceeded. Please try again later.', 429));
     render(<TenantCleaningProvider />);
-    fireEvent.click(await screen.findByRole('button', { name: 'Email me a secure sign-in link' }));
+    fireEvent.click(await screen.findByRole('button', { name: verificationButton }));
     await screen.findByText('Email rate limit exceeded. Please try again later.');
     expect(screen.queryByText(/Check your account email/)).toBeNull();
     expect(screen.queryByRole('button', { name: /Save/ })).toBeNull();
   });
 
-  it('does not send to an unverified client identity when the account lookup fails', async () => {
-    fetchMock.mockResolvedValue(verificationRequired());
-    auth.getUser.mockResolvedValue({ data: { user: null }, error: new Error('Session expired') });
+  it('requires the server to identify the session before reporting delivery', async () => {
+    fetchMock.mockResolvedValueOnce(verificationRequired())
+      .mockResolvedValueOnce(failure('Sign in with your account email before requesting a secure link.', 401));
     render(<TenantCleaningProvider />);
-    fireEvent.click(await screen.findByRole('button', { name: 'Email me a secure sign-in link' }));
+    fireEvent.click(await screen.findByRole('button', { name: verificationButton }));
     await screen.findByText('Sign in with your account email before requesting a secure link.');
-    expect(auth.signInWithOtp).not.toHaveBeenCalled();
+    expect(screen.queryByText(/Check your account email/)).toBeNull();
+    expect(screen.queryByRole('button', { name: verificationButton })).toBeNull();
+    expect(screen.getByRole('link', { name: 'Sign in' })).toBeTruthy();
+    expect(auth.createClient).not.toHaveBeenCalled();
   });
 
   it('never sends email from the read-only site preview', async () => {
     fetchMock.mockResolvedValue(verificationRequired());
     auth.readOnly = true;
     render(<TenantCleaningProvider />);
-    const send = await screen.findByRole('button', { name: 'Email me a secure sign-in link' });
+    const send = await screen.findByRole('button', { name: verificationButton });
     expect((send as HTMLButtonElement).disabled).toBe(true);
     fireEvent.click(send);
-    expect(auth.signInWithOtp).not.toHaveBeenCalled();
+    expect(fetchMock.mock.calls.some(([, options]) => options?.method === 'POST')).toBe(false);
+    expect(auth.createClient).not.toHaveBeenCalled();
   });
 
-  it('hides previously loaded provider and assignment data if mailbox proof is lost during a save', async () => {
+  it('does not claim delivery without the server sent receipt', async () => {
+    fetchMock.mockResolvedValueOnce(verificationRequired()).mockResolvedValueOnce(success({ sent: false }));
+    render(<TenantCleaningProvider />);
+    fireEvent.click(await screen.findByRole('button', { name: verificationButton }));
+    await screen.findByText('The verification link could not be requested. Please try again.');
+    expect(screen.queryByText(/Check your account email/)).toBeNull();
+    expect(screen.queryByRole('button', { name: /Save/ })).toBeNull();
+  });
+
+  it('disables repeat delivery requests while the server request is pending', async () => {
+    let complete!: (value: ReturnType<typeof success>) => void;
+    const request = new Promise(resolve => { complete = resolve; });
+    fetchMock.mockResolvedValueOnce(verificationRequired()).mockReturnValueOnce(request);
+    render(<TenantCleaningProvider />);
+    fireEvent.click(await screen.findByRole('button', { name: verificationButton }));
+    const busy = await screen.findByRole('button', { name: 'Requesting link…' });
+    expect((busy as HTMLButtonElement).disabled).toBe(true);
+    fireEvent.click(busy);
+    expect(fetchMock.mock.calls.filter(([, options]) => options?.method === 'POST')).toHaveLength(1);
+    await act(async () => complete(success({ sent: true })));
+    await screen.findByText(/Check your account email/);
+  });
+
+  it.each([
+    ['expired', 'This verification link has expired or was already used. Request a new link and open it in this browser.'],
+    ['wrong_browser', 'Open the verification link in the same browser where you requested it. To continue in this browser, request a new link here.'],
+    ['failed', 'We could not verify your email with that link. Request a new link and try again.'],
+  ])('shows fixed %s callback feedback without hiding it behind the profile authorization response', async (status, message) => {
+    window.history.replaceState({}, '', `${providerPath}?provider_email_verification=${status}`);
+    fetchMock.mockResolvedValue(verificationRequired());
+    render(<TenantCleaningProvider />);
+    await screen.findByRole('button', { name: verificationButton });
+    expect(screen.getByRole('alert').textContent).toBe(message);
+    expect(screen.queryByRole('button', { name: /Save/ })).toBeNull();
+    expect(window.location.search).toBe('');
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(auth.createClient).not.toHaveBeenCalled();
+  });
+
+  it('accepts a success callback only after the profile API proves access and reloads the saved profile', async () => {
+    window.history.replaceState({}, '', `${providerPath}?provider_email_verification=success&view=profile#details`);
+    let complete!: (value: ReturnType<typeof success>) => void;
+    fetchMock.mockReturnValueOnce(new Promise(resolve => { complete = resolve; }));
+    render(<TenantCleaningProvider />);
+    expect(screen.queryByRole('button', { name: /Save/ })).toBeNull();
+    expect(screen.queryByText(/Your email is verified/)).toBeNull();
+    await act(async () => complete(success({ provider: pendingProvider, jobs: [], jobOffersEnabled: false })));
+    await screen.findByRole('button', { name: 'Save provider profile for review' });
+    expect(screen.getByText('Your email is verified. Continue with your provider profile below.')).toBeTruthy();
+    expect((screen.getByRole('spinbutton') as HTMLInputElement).value).toBe('35.00');
+    expect(window.location.search).toBe('?view=profile');
+    expect(window.location.hash).toBe('#details');
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not let a forged success callback bypass server proof', async () => {
+    window.history.replaceState({}, '', `${providerPath}?provider_email_verification=success`);
+    fetchMock.mockResolvedValue(verificationRequired());
+    render(<TenantCleaningProvider />);
+    await screen.findByRole('button', { name: verificationButton });
+    expect(screen.queryByText(/Your email is verified/)).toBeNull();
+    expect(screen.queryByRole('combobox')).toBeNull();
+    expect(screen.queryByRole('button', { name: /Save/ })).toBeNull();
+  });
+
+  it('ignores unknown callback values without rendering them or treating them as authority', async () => {
+    const untrusted = 'untrusted-email@example.invalid';
+    window.history.replaceState({}, '', `${providerPath}?provider_email_verification=${encodeURIComponent(untrusted)}`);
+    fetchMock.mockResolvedValue(verificationRequired());
+    render(<TenantCleaningProvider />);
+    await screen.findByRole('button', { name: verificationButton });
+    expect(screen.queryByText(untrusted)).toBeNull();
+    expect(screen.queryByRole('alert')).toBeNull();
+    expect(screen.queryByRole('button', { name: /Save/ })).toBeNull();
+    expect(window.location.search).toBe('');
+  });
+
+  it('refreshes after delivery and exposes the form only when the server accepts the completed proof', async () => {
+    fetchMock.mockResolvedValueOnce(verificationRequired())
+      .mockResolvedValueOnce(success({ sent: true }))
+      .mockResolvedValueOnce(success({ provider: pendingProvider, jobs: [], jobOffersEnabled: false }));
+    render(<TenantCleaningProvider />);
+    fireEvent.click(await screen.findByRole('button', { name: verificationButton }));
+    await screen.findByText(/Check your account email/);
+    expect(screen.queryByRole('button', { name: /Save/ })).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: 'Refresh profile' }));
+    await screen.findByRole('button', { name: 'Save provider profile for review' });
+    expect(screen.getByText('Your email is verified. Continue with your provider profile below.')).toBeTruthy();
+    expect(screen.queryByText(/Check your account email/)).toBeNull();
+    expect(screen.queryByRole('button', { name: verificationButton })).toBeNull();
+    expect(fetchMock.mock.calls[2][1].method).toBe('GET');
+    expect(auth.createClient).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ['mailbox proof', verificationRequired, true],
+    ['the authenticated session', () => failure('Sign in again to continue.', 401), false],
+  ])('hides previously loaded provider and assignment data if %s is lost during a save', async (_reason, denied, canVerify) => {
     fetchMock.mockResolvedValueOnce(success({ provider: { ...pendingProvider, eligibility: 'eligible' }, jobs: [{ id: 'job', service: 'commercial', starts_at: '2026-11-25T12:00:00Z', status: 'assigned', customer_name: 'Private Customer', customer_email: 'private@example.invalid', provider_pay_cents: 3500, private_details: 'Private address' }], jobOffersEnabled: true }))
-      .mockResolvedValueOnce(verificationRequired());
+      .mockResolvedValueOnce(denied());
     render(<TenantCleaningProvider />);
     const save = await screen.findByRole('button', { name: 'Save hourly rate' });
     expect(screen.getByText('Private address')).toBeTruthy();
     fireEvent.submit(save.closest('form')!);
-    await screen.findByRole('button', { name: 'Email me a secure sign-in link' });
+    if (canVerify) await screen.findByRole('button', { name: verificationButton });
+    else {
+      await screen.findByText('Sign in again to continue.');
+      expect(screen.queryByRole('button', { name: verificationButton })).toBeNull();
+      expect(screen.getByRole('link', { name: 'Sign in' })).toBeTruthy();
+    }
     expect(screen.queryByText('Private address')).toBeNull();
     expect(screen.queryByText('Cleaning Company')).toBeNull();
     expect(screen.queryByRole('button', { name: 'Save hourly rate' })).toBeNull();

@@ -17,6 +17,7 @@ const fixture = {
   security_captcha_enabled: false,
   security_captcha_secret: 'private-captcha-secret',
   mailer_autoconfirm: true,
+  mailer_secure_email_change_enabled: true,
   external_google_enabled: true,
   external_google_client_id: 'private-google-id',
   external_google_secret: 'private-google-secret',
@@ -41,6 +42,7 @@ test('reports only selected configuration and removes credentials, queries and f
   assert.equal(report.signupEnabled, true);
   assert.equal(report.emailEnabled, true);
   assert.equal(report.mailerAutoconfirm, true);
+  assert.equal(report.secureEmailChangeEnabled, true);
   assert.equal(report.captchaEnabled, false);
   assert.equal(report.magicLink.enabled, true);
   assert.equal(report.sendEmailHookEnabled, false);
@@ -99,6 +101,7 @@ test('does not present missing template/configuration values as successful verif
   assert.equal(unknown.signupEnabled, null);
   assert.equal(unknown.emailEnabled, null);
   assert.equal(unknown.mailerAutoconfirm, null);
+  assert.equal(unknown.secureEmailChangeEnabled, null);
   assert.equal(unknown.captchaEnabled, null);
   assert.equal(unknown.magicLink.enabled, null);
   assert.equal(
@@ -130,6 +133,21 @@ test('does not present missing template/configuration values as successful verif
     true,
   );
   assert.equal(summarizeAuthConfig({ smtp_pass: '******' }).smtp.passwordMasked, true);
+});
+
+test('reports secure email change as an observed boolean without assuming a default', () => {
+  for (const value of [true, false]) {
+    assert.equal(
+      summarizeAuthConfig({ mailer_secure_email_change_enabled: value }).secureEmailChangeEnabled,
+      value,
+    );
+  }
+  for (const value of [undefined, null, 'true', 'false', 1, {}]) {
+    assert.equal(
+      summarizeAuthConfig({ mailer_secure_email_change_enabled: value }).secureEmailChangeEnabled,
+      null,
+    );
+  }
 });
 
 test('uses a read-only GET for the fixed project and reports no management credential', async () => {

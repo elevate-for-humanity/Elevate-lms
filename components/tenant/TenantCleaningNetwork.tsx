@@ -2,7 +2,6 @@
 import { useEffect,useState,useRef,type FormEvent } from 'react';
 import { money,parseHourlyRate } from '@/lib/cleaning/pricing';
 import { siteUrls } from '@/lib/utils/site-urls';
-import { createClient } from '@/lib/supabase/client';
 import { TenantProviderRate } from './TenantProviderRate';
 import { useTenantRequestHeaders,useReadOnlyTenantPreview } from './TenantPreviewContext';
 const services=['standard','deep','moveout','commercial','event','carpet','valet-trash'];
@@ -11,14 +10,14 @@ const serviceLabels:Record<string,string>={standard:'Standard cleaning',deep:'De
 const input='mt-2 w-full rounded-xl border border-slate-400 bg-white p-3 text-slate-950';
 const button='rounded-full bg-slate-900 px-6 py-3 font-bold text-white disabled:opacity-50';
 class CleaningApiError extends Error {
-  constructor(message: string, readonly code?: string) { super(message); }
+  constructor(message: string, readonly code?: string, readonly status?: number) { super(message); }
 }
 function useCleaningApi(){
  const headers=useTenantRequestHeaders();const readOnly=useReadOnlyTenantPreview();
  return async(path:string,body?:unknown,token?:string)=>{
   if(body&&readOnly)throw new Error('This preview cannot submit changes.');
-  const response=await fetch(`/api/tenant-sites/cleaning/${path}`,{method:body?'POST':'GET',headers:{...headers,...(body?{'Content-Type':'application/json'}:{}),...(token?{Authorization:`Bearer ${token}`}:{})},...(body?{body:JSON.stringify(body)}:{}),cache:'no-store'});
-  const result=await response.json();if(!response.ok)throw new CleaningApiError(result.error||'Unable to complete this request.',result.code);return result;
+  const response=await fetch(`/api/tenant-sites/cleaning/${path}`,{method:body?'POST':'GET',credentials:'same-origin',headers:{...headers,...(body?{'Content-Type':'application/json'}:{}),...(token?{Authorization:`Bearer ${token}`}:{})},...(body?{body:JSON.stringify(body)}:{}),cache:'no-store'});
+  const result=await response.json();if(!response.ok)throw new CleaningApiError(result.error||'Unable to complete this request.',result.code,response.status);return result;
  };
 }
 const cleaningSiteUrl = `${siteUrls.site}/sites/2exclusive-platinum-cleaning`;
@@ -90,6 +89,7 @@ export function TenantCleaningProvider() {
   const [jobOffersEnabled, setJobOffersEnabled] = useState(false);
   const [loaded, setLoaded] = useState(false);
   const [notice, setNotice] = useState('');
+  const [verificationNotice, setVerificationNotice] = useState('');
   const [busy, setBusy] = useState(false);
   const [needsEmailVerification, setNeedsEmailVerification] = useState(false);
   const pending = !provider || provider.eligibility === 'pending';
@@ -109,19 +109,25 @@ export function TenantCleaningProvider() {
   }
 
   function showError(error: unknown, fallback: string) {
-    if (error instanceof CleaningApiError && error.code === 'provider_email_verification_required') {
-      setNeedsEmailVerification(true);
+    if (error instanceof CleaningApiError &&
+        (error.code === 'provider_email_verification_required' || error.status === 401)) {
+      setNeedsEmailVerification(error.status !== 401);
       setProvider(null);
       setApplications([]);
       setApplicationId('');
       setIdentityConfirmed(false);
       setAssigned([]);
+      setRate('');
+      setZips('');
+      setSelectedServices([]);
+      setOptedIn(false);
+      setJobOffersEnabled(false);
       setLoaded(false);
     }
     setNotice(error instanceof Error ? error.message : fallback);
   }
 
-  async function loadProfile() {
+  async function loadProfile(afterVerification = false) {
     try {
       const result = await api('provider');
       showProvider(result.provider);
@@ -131,34 +137,48 @@ export function TenantCleaningProvider() {
       setJobOffersEnabled(result.jobOffersEnabled === true);
       setLoaded(true);
       setNeedsEmailVerification(false);
+      if (afterVerification || needsEmailVerification) {
+        setVerificationNotice('');
+        setNotice('Your email is verified. Continue with your provider profile below.');
+      }
     } catch (error) {
       showError(error, 'Unable to load your profile.');
     }
   }
 
   useEffect(() => {
-    void loadProfile();
+    const url = new URL(window.location.href);
+    const verification = url.searchParams.get('provider_email_verification');
+    // The callback marker is feedback only. The provider API must accept the
+    // server-held proof before private data or a success message is displayed.
+    if (verification !== null) {
+      url.searchParams.delete('provider_email_verification');
+      window.history.replaceState(window.history.state, '', `${url.pathname}${url.search}${url.hash}`);
+    }
+    const failures: Record<string, string> = {
+      expired: 'This verification link has expired or was already used. Request a new link and open it in this browser.',
+      wrong_browser: 'Open the verification link in the same browser where you requested it. To continue in this browser, request a new link here.',
+      failed: 'We could not verify your email with that link. Request a new link and try again.',
+    };
+    if (verification && Object.hasOwn(failures, verification)) {
+      setVerificationNotice(failures[verification]);
+      setNeedsEmailVerification(true);
+    }
+    void loadProfile(verification === 'success');
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   async function sendEmailLink() {
     if (busy) return;
     setBusy(true);
     setNotice('');
+    setVerificationNotice('');
     try {
-      if (readOnly) throw new Error('This preview cannot send sign-in links.');
-      const supabase = createClient();
-      const { data: { user }, error: identityError } = await supabase.auth.getUser();
-      if (identityError || !user?.email) throw new Error('Sign in with your account email before requesting a secure link.');
-      const callback = new URL('/auth/callback', siteUrls.lms);
-      callback.searchParams.set('redirect', `${cleaningSiteUrl}/provider`);
-      const { error } = await supabase.auth.signInWithOtp({
-        email: user.email,
-        options: { shouldCreateUser: false, emailRedirectTo: callback.toString() },
-      });
-      if (error) throw error;
-      setNotice('Check your account email for the secure sign-in link. Open it in this browser to return to your provider profile.');
+      if (readOnly) throw new Error('This preview cannot send verification links.');
+      const result = await api('provider/verification', {});
+      if (result.sent !== true) throw new Error('The verification link could not be requested. Please try again.');
+      setNotice('Check your account email for the secure verification link. Open it in this browser to return to your provider profile.');
     } catch (error) {
-      setNotice(error instanceof Error ? error.message : 'Unable to request your secure email sign-in link.');
+      showError(error, 'Unable to request your secure email verification link.');
     } finally {
       setBusy(false);
     }
@@ -228,11 +248,12 @@ export function TenantCleaningProvider() {
     </div>
     {needsEmailVerification ? <div className="mt-6 rounded-2xl border bg-white p-6">
       <h3 className="text-xl font-bold">Verify access to your email</h3>
-      <p className="mt-3 leading-7">Open a secure sign-in link sent to your account email before viewing your application, provider profile, or assignments. Use the same browser to open the link.</p>
+      <p className="mt-3 leading-7">Open a secure verification link sent to your account email before viewing your application, provider profile, or assignments. Use the same browser to open the link.</p>
       <button type="button" onClick={() => void sendEmailLink()} disabled={busy || readOnly} className={`${button} mt-5`}>
-        {busy ? 'Requesting link…' : 'Email me a secure sign-in link'}
+        {busy ? 'Requesting link…' : 'Email me a secure verification link'}
       </button>
     </div> : null}
+    {verificationNotice ? <p role="alert" className="mt-5 rounded-xl border p-4 leading-7">{verificationNotice}</p> : null}
     {loaded && !provider && !applications.length ? <p className="mt-5 leading-7">Submit the cleaning network application with your verified account email, then return here to finish your provider profile.</p> : null}
     {!provider && applications.length ? <div className="mt-6 rounded-2xl border bg-white p-6">
       <label className="block font-bold">Choose the network application you submitted

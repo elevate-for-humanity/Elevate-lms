@@ -15,13 +15,15 @@ This repair:
   from their existing application, with their own rate, ZIP coverage, services and
   explicit email choice. It does not grant eligibility or import other people's
   applications. Existing reviewed providers retain the narrow rate-update path.
-- Requires a signature-verified PKCE email magic-link session before every
+- Requires a signature-verified PKCE email magic-link session and a server-held
+  receipt binding the exact website, user, session and email before every
   provider read or write. Production currently automatically confirms ordinary
   signup emails, so `email_confirmed_at` alone cannot prove mailbox ownership.
-  The signed subject and email must match the current Auth user; password,
-  signup, generic OTP/SMS, anonymous and forged sessions cannot claim a lead or
-  read an existing provider's assignments. The person explicitly requests the
-  email link and opens it in the same browser.
+  The server sends the requested link for the current account email and retains
+  its exact PKCE verifier in protected storage. The callback must match that
+  request, its browser nonce and its identity before recording proof. Password,
+  signup, generic OTP/SMS, anonymous, forged and unrelated magic-link sessions
+  cannot claim a lead or read assignments.
 - Separates `cleaningProviderOnboardingEnabled` from `cleaningNetworkEnabled`.
   Booking, payment, offers and email dispatch retain the full commerce gate.
 - Adds `prepareCleaningProviderOnboardingConfig(current, true)` for publishing
@@ -47,6 +49,44 @@ This repair:
   used only for an explicitly assigned Gary site coordinator; its compensation is
   never applied to an ordinary Program Holder.
 
+## Provider mailbox verification
+
+An AMR method names how a session authenticated; it does not permanently bind
+that event to the current account email. Review of Supabase Auth commit
+`83865c14a595aa616af30549ddf4477de0a0d732` identified a conditional email-change
+path under automatic confirmation and secure email change where an old-address
+confirmation can finish the change. Existing sessions retain their AMR, and a
+previously verified PKCE code can be exchanged after the address changes. See
+the upstream [email-change verification](https://github.com/supabase/auth/blob/83865c14a595aa616af30549ddf4477de0a0d732/internal/api/verify.go)
+and [PKCE exchange](https://github.com/supabase/auth/blob/83865c14a595aa616af30549ddf4477de0a0d732/internal/api/token.go)
+implementations. This is a source finding, not a live exploit test or a claim
+about the exact managed Auth build. The repair does not change global Auth
+settings or rely on that configuration combination remaining disabled.
+
+Provider verification now follows this sequence:
+
+1. A same-origin authenticated request sends an empty body to
+   `/api/tenant-sites/cleaning/provider/verification`. The server obtains the
+   account email and a new PKCE verifier; the browser cannot choose either.
+2. Protected database state binds the fixed website, user, original session,
+   exact email, state hash and separate browser-nonce hash for ten minutes.
+   Only the HttpOnly browser nonce is stored in a cookie. The verifier is never
+   sent to the browser.
+3. The fixed callback atomically claims that state once and removes its stored
+   verifier. It exchanges the received code using the claimed verifier, checks
+   the resulting identity, and records proof for the new session and exact email.
+4. A protected RPC verifies that proof before any application, provider or
+   assignment lookup. It checks the current Auth identity and live session.
+   Ordinary token refresh preserves the same binding; changing the email or
+   session cannot transfer it. Proof expires after thirty days.
+
+The tables have RLS enabled and no direct client or service-role table grants.
+Only narrowly scoped service-role RPCs can begin, claim, complete, validate or
+cancel a challenge. Expired, replayed, wrong-browser and mismatched identities
+fail closed. Callback status parameters provide feedback only; they cannot
+unlock private data. No new signing secret or alternative email transport is
+introduced.
+
 ## Program and payment boundary
 
 The commercial-cleaning course, building-maintenance classroom program and
@@ -69,8 +109,9 @@ begins. Subcontractor job payments are separate.
 1. Pass required exact-commit CI, protected merge and affected Google releases.
    Verify the marketing, LMS and Admin runtime SHA/revision against the release.
 2. After the migration commit is contained in `main`, apply only the reviewed
-   auth-profile migration through the supervised production migration process.
-   Verify the recorded migration and hardened function definition. Do not run
+   auth-profile and provider-proof migrations through the supervised production
+   migration process. Verify both recorded migrations, the hardened profile
+   function, proof functions, table RLS and restricted grants. Do not run
    unrelated pending migrations as a side effect of this repair.
    The official apply-migration API may assign a different history timestamp:
    record the source commit, source SQL SHA-256, actual remote version/name,
@@ -86,11 +127,15 @@ begins. Subcontractor job payments are separate.
    Use authorized test identities; do not create a real applicant's account or
    agree to their terms on their behalf.
    The existing main-only OAuth audit now reads the managed Auth settings with
-   sanitized callback patterns, mail configuration presence and magic-link
+   sanitized callback patterns, mail configuration presence, secure-email-change
+   state and magic-link
    template checks. Its read-only report does not prove actual mail receipt or
-   successful login; verify those through the real PKCE flow. Administrative
+   successful login; verify those through the server-owned PKCE flow and its
+   actual Marketing callback at
+   `/api/tenant-sites/cleaning/provider/verification/callback`. Administrative
    `generateLink` plus `verifyOtp` produces a generic OTP session and must not be
-   substituted for the required email-specific PKCE proof.
+   substituted for the required server-bound mailbox receipt. A direct generic
+   browser magic-link login is also insufficient without that receipt.
 5. Complete the paid-marketplace gates in `marketplace-release.md` before enabling
    job offers: actual provider review, payment/invoice/webhook/worker evidence and
    approved end-to-end transaction, email receipt, acceptance and ledger checks.

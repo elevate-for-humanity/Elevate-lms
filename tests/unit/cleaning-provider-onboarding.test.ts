@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { NextRequest } from 'next/server';
 
 const mocks = vi.hoisted(() => ({
-  admin: vi.fn(), session: vi.fn(), claims: vi.fn(), tenant: vi.fn(), owner: vi.fn(), rateLimit: vi.fn(), invoice: vi.fn(),
+  admin: vi.fn(), session: vi.fn(), claims: vi.fn(), proofRpc: vi.fn(), tenant: vi.fn(), owner: vi.fn(), rateLimit: vi.fn(), invoice: vi.fn(),
 }));
 vi.mock('@/lib/supabase/admin', () => ({ requireAdminClient: mocks.admin }));
 vi.mock('@/lib/supabase/server', () => ({ createClient: mocks.session }));
@@ -24,6 +24,8 @@ const origin = 'https://www.elevateforhumanity.org';
 const email = 'provider@example.invalid';
 const leadId = '00000000-0000-4000-8000-000000000001';
 const providerId = '00000000-0000-4000-8000-000000000002';
+const userId = '00000000-0000-4000-8000-000000000003';
+const sessionId = '00000000-0000-4000-8000-000000000004';
 const pending = () => ({
   id: providerId, website_id: CLEANING_SITE, lead_id: leadId, email,
   name: 'Verified Cleaning Company', hourly_cents: 3000, zips: ['46204'],
@@ -37,9 +39,17 @@ let raceInsert: Row | null;
 let beforeUpdate: (() => void) | null;
 let user: Row | null;
 let claims: Row | null;
+let mailboxProof: Row | null;
 
 function database() {
   return {
+    async rpc(name: string, args: Row) {
+      mocks.proofRpc(name, args);
+      if (name !== 'cleaning_provider_proof_valid') throw new Error(`Unexpected proof RPC: ${name}`);
+      const failure = failures[`${name}:rpc`];
+      if (failure) return { data: null, error: failure };
+      return { data: mailboxProof !== null && Object.entries(mailboxProof).every(([key, value]) => args[key] === value), error: null };
+    },
     from(table: string) {
       const call = { table, operation: 'select', values: undefined as Row | undefined, filters: [] as Array<[string, unknown]> };
       calls.push(call);
@@ -98,9 +108,10 @@ const writes = () => calls.filter(call => call.operation !== 'select');
 
 beforeEach(() => {
   vi.clearAllMocks(); calls = []; failures = {}; raceInsert = null; beforeUpdate = null;
-  user = { id: 'verified-user', email, email_confirmed_at: '2026-11-24T12:00:00Z' };
+  user = { id: userId, email, email_confirmed_at: '2026-11-24T12:00:00Z' };
   const now = Math.floor(Date.now() / 1000);
-  claims = { sub: user.id, email, role: 'authenticated', session_id: 'verified-session', iat: now, exp: now + 3600, amr: [{ method: 'magiclink', timestamp: now }] };
+  claims = { sub: user.id, email, role: 'authenticated', session_id: sessionId, iat: now, exp: now + 3600, amr: [{ method: 'magiclink', timestamp: now }] };
+  mailboxProof = { p_website_id: CLEANING_SITE, p_user_id: userId, p_session_id: sessionId, p_email: email };
   tables = {
     user_websites: [{ id: CLEANING_SITE, is_published: true, site_config: { meta: { cleaningProviderOnboardingEnabled: true, cleaningNetworkEnabled: false } } }],
     tenant_site_leads: [{ id: leadId, website_id: CLEANING_SITE, email, name: 'Verified Contact', source_path: '/sites/2exclusive-platinum-cleaning/join-network', message: 'Company name, if applicable: Verified Cleaning Company\nServices: commercial' }],
@@ -200,6 +211,67 @@ describe('pending cleaning provider onboarding', () => {
     expect((await POST(request(body()))).status).toBe(201);
     expect(mocks.claims).toHaveBeenCalledTimes(2);
     expect(tables.cleaning_providers[0].eligibility).toBe('pending');
+    expect(mocks.proofRpc).toHaveBeenCalledWith('cleaning_provider_proof_valid', mailboxProof);
+  });
+
+  it('rejects a signed magic-link session without server-owned mailbox proof before any private lookup', async () => {
+    mailboxProof = null;
+    tables.cleaning_providers.push({ ...pending(), eligibility: 'eligible' });
+    for (const payload of [undefined, body(), { hourlyCents: 4000 }]) {
+      const response = payload === undefined ? await GET(request()) : await POST(request(payload));
+      expect(response.status).toBe(403);
+      expect((await response.json()).code).toBe('provider_email_verification_required');
+    }
+    expect(mocks.proofRpc).toHaveBeenCalledTimes(3);
+    expect(calls.every(call => call.table === 'user_websites')).toBe(true);
+    expect(writes()).toHaveLength(0);
+    expect(tables.cleaning_providers[0].hourly_cents).toBe(3000);
+  });
+
+  it.each([
+    { p_website_id: '00000000-0000-4000-8000-000000000005' },
+    { p_user_id: '00000000-0000-4000-8000-000000000006' },
+    { p_session_id: '00000000-0000-4000-8000-000000000007' },
+    { p_email: 'another-mailbox@example.invalid' },
+  ])('rejects a server proof belonging to another binding %j', async changes => {
+    mailboxProof = { ...mailboxProof, ...changes };
+    expect((await GET(request())).status).toBe(403);
+    expect((await POST(request(body()))).status).toBe(403);
+    expect(calls.every(call => call.table === 'user_websites')).toBe(true);
+    expect(writes()).toHaveLength(0);
+  });
+
+  it('does not transfer old mailbox proof when refresh claims and the current Auth email change together', async () => {
+    const changedEmail = 'changed-mailbox@example.invalid';
+    user!.email = changedEmail;
+    claims!.email = changedEmail;
+    // The upstream refresh can retain the old magiclink AMR while exposing the
+    // new current email. Only the server-owned exact email binding prevents it.
+    tables.tenant_site_leads.push({ ...tables.tenant_site_leads[0], id: '00000000-0000-4000-8000-000000000008', email: changedEmail });
+    expect((await GET(request())).status).toBe(403);
+    expect((await POST(request(body()))).status).toBe(403);
+    expect(mocks.proofRpc).toHaveBeenCalledWith('cleaning_provider_proof_valid', { ...mailboxProof, p_email: changedEmail });
+    expect(calls.every(call => call.table === 'user_websites')).toBe(true);
+    expect(writes()).toHaveLength(0);
+  });
+
+  it('retains the exact session/email proof across ordinary signed-token refresh', async () => {
+    const now = Math.floor(Date.now() / 1000);
+    claims!.amr = [{ method: 'magiclink', timestamp: now - 3600 }];
+    claims!.iat = now;
+    claims!.exp = now + 3600;
+    expect((await GET(request())).status).toBe(200);
+    expect((await POST(request(body()))).status).toBe(201);
+    expect(mocks.proofRpc).toHaveBeenCalledTimes(2);
+    expect(tables.cleaning_providers[0].eligibility).toBe('pending');
+  });
+
+  it('fails closed when the protected mailbox-proof lookup fails', async () => {
+    failures['cleaning_provider_proof_valid:rpc'] = { message: 'Proof store unavailable' };
+    expect((await GET(request())).status).toBe(403);
+    expect((await POST(request(body()))).status).toBe(403);
+    expect(calls.every(call => call.table === 'user_websites')).toBe(true);
+    expect(writes()).toHaveLength(0);
   });
 
   it('requires same-origin submission before any database work', async () => {

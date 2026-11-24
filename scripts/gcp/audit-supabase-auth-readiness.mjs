@@ -48,6 +48,7 @@ export function summarizeAuthConfig(body) {
     signupEnabled: typeof body.disable_signup === 'boolean' ? !body.disable_signup : null,
     emailEnabled: booleanOrUnknown(body.external_email_enabled),
     mailerAutoconfirm: booleanOrUnknown(body.mailer_autoconfirm),
+    secureEmailChangeEnabled: booleanOrUnknown(body.mailer_secure_email_change_enabled),
     captchaEnabled: booleanOrUnknown(body.security_captcha_enabled),
     sendEmailHookEnabled: booleanOrUnknown(body.hook_send_email_enabled),
     siteUrl: sanitizeAuthUrl(body.site_url),

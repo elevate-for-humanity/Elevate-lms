@@ -15,6 +15,13 @@ This repair:
   from their existing application, with their own rate, ZIP coverage, services and
   explicit email choice. It does not grant eligibility or import other people's
   applications. Existing reviewed providers retain the narrow rate-update path.
+- Requires a signature-verified PKCE email magic-link session before every
+  provider read or write. Production currently automatically confirms ordinary
+  signup emails, so `email_confirmed_at` alone cannot prove mailbox ownership.
+  The signed subject and email must match the current Auth user; password,
+  signup, generic OTP/SMS, anonymous and forged sessions cannot claim a lead or
+  read an existing provider's assignments. The person explicitly requests the
+  email link and opens it in the same browser.
 - Separates `cleaningProviderOnboardingEnabled` from `cleaningNetworkEnabled`.
   Booking, payment, offers and email dispatch retain the full commerce gate.
 - Adds `prepareCleaningProviderOnboardingConfig(current, true)` for publishing
@@ -25,6 +32,10 @@ This repair:
   still requires the existing admission checks.
 - Preserves safe return destinations across signup, verification, resend, OAuth
   and login. Public role selections record interest, not authority.
+- Lets the Auth SDK finish its URL initialization before completing the callback,
+  so a PKCE code consumed by automatic initialization is not redeemed twice.
+- Keeps the employer application confirmation's resources link on the public
+  employer information page, which is available before partnership approval.
 - Restores the previously authored trusted-metadata profile trigger in a focused
   versioned migration. Public signup can supply a display name and requested role;
   only server-managed metadata grants a role or tenant. The migration refuses an
@@ -61,6 +72,11 @@ begins. Subcontractor job payments are separate.
    auth-profile migration through the supervised production migration process.
    Verify the recorded migration and hardened function definition. Do not run
    unrelated pending migrations as a side effect of this repair.
+   The official apply-migration API may assign a different history timestamp:
+   record the source commit, source SQL SHA-256, actual remote version/name,
+   stored-statement fingerprint, resulting function definition and privileges.
+   Do not rewrite migration history or replay old migrations to force timestamps
+   to match.
 3. Preserve the current tenant configuration/revision. Apply only the provider
    onboarding helper after its source is live; do not turn on paid commerce as an
    incidental consequence of enabling applications.
@@ -69,6 +85,12 @@ begins. Subcontractor job payments are separate.
    provider profile, consent, and community access in the authenticated browser.
    Use authorized test identities; do not create a real applicant's account or
    agree to their terms on their behalf.
+   The existing main-only OAuth audit now reads the managed Auth settings with
+   sanitized callback patterns, mail configuration presence and magic-link
+   template checks. Its read-only report does not prove actual mail receipt or
+   successful login; verify those through the real PKCE flow. Administrative
+   `generateLink` plus `verifyOtp` produces a generic OTP session and must not be
+   substituted for the required email-specific PKCE proof.
 5. Complete the paid-marketplace gates in `marketplace-release.md` before enabling
    job offers: actual provider review, payment/invoice/webhook/worker evidence and
    approved end-to-end transaction, email receipt, acceptance and ledger checks.

@@ -1,10 +1,11 @@
-// pre-auth-registry: exempt - Verified email owns a pending applicant profile and hourly rate, never eligibility.
+// pre-auth-registry: exempt - A signature-verified email magic-link session owns provider access, never eligibility.
 import { NextRequest } from 'next/server';
 import { z } from 'zod';
 import {
-  cleaningContext, cleaningHandler, verifiedCustomer, sameOrigin, reply,
+  cleaningContext, cleaningHandler, sameOrigin, reply,
   CLEANING_SITE, CleaningError, serviceSchema,
 } from '@/lib/cleaning/server';
+import { verifiedProviderEmail } from '@/lib/cleaning/provider-email-proof';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -41,8 +42,8 @@ async function readApplication(db: any, email: string) {
 
 export async function GET(request: NextRequest) {
   return cleaningHandler(async () => {
-    const { db, user, site } = await cleaningContext(request, false, 'provider-onboarding');
-    const actor = verifiedCustomer(user);
+    const { db, user, site, session } = await cleaningContext(request, false, 'provider-onboarding');
+    const actor = await verifiedProviderEmail(user, session);
     const provider = await readProvider(db, actor.email);
     const application = provider ? null : await readApplication(db, actor.email);
     let jobs: any[] = [];
@@ -66,8 +67,8 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   return cleaningHandler(async () => {
     sameOrigin(request);
-    const { db, user } = await cleaningContext(request, false, 'provider-onboarding');
-    const actor = verifiedCustomer(user);
+    const { db, user, session } = await cleaningContext(request, false, 'provider-onboarding');
+    const actor = await verifiedProviderEmail(user, session);
     const raw = z.record(z.string(), z.unknown()).parse(await request.json());
 
     // Preserve the existing, narrow rate-update contract for reviewed providers.

@@ -3,16 +3,18 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const state = vi.hoisted(() => ({
   assign: vi.fn(), replace: vi.fn(), fetch: vi.fn(), from: vi.fn(),
-  exchange: vi.fn(), setSession: vi.fn(), getSession: vi.fn(), studentHome: vi.fn(),
+  initialize: vi.fn(), exchange: vi.fn(), setSession: vi.fn(), getSession: vi.fn(), getUser: vi.fn(), studentHome: vi.fn(),
   role: 'student', secondaryRoles: [] as string[], onboardingCompleted: false,
 }));
 vi.mock('@/lib/supabase/client', () => ({
   createClient: () => ({
     from: state.from,
     auth: {
+      initialize: state.initialize,
       exchangeCodeForSession: state.exchange,
       setSession: state.setSession,
       getSession: state.getSession,
+      getUser: state.getUser,
       signOut: vi.fn(),
     },
   }),
@@ -62,9 +64,11 @@ beforeEach(() => {
     }),
   }));
   state.studentHome.mockResolvedValue(getRoleDestinationUrl('student'));
+  state.initialize.mockResolvedValue({ error: null });
   state.exchange.mockResolvedValue({ error: null });
   state.setSession.mockResolvedValue({ error: null });
   state.getSession.mockResolvedValue({ data: { session: { user: { id: 'network-member', role: 'student' } } }, error: null });
+  state.getUser.mockResolvedValue({ data: { user: { id: 'network-member' } }, error: null });
 });
 afterEach(() => { cleanup(); vi.unstubAllGlobals(); });
 

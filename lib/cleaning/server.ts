@@ -10,7 +10,7 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 export const CLEANING_SITE = 'e0fcb1f1-33f8-4b2c-abeb-ec8e0a819231';
 export const CLEANING_URL = 'https://www.elevateforhumanity.org/sites/2exclusive-platinum-cleaning';
 export const serviceSchema = z.enum(['standard','deep','moveout','commercial','event','carpet','valet-trash']);
-export class CleaningError extends Error { constructor(message: string, readonly status = 400) { super(message); } }
+export class CleaningError extends Error { constructor(message: string, readonly status = 400, readonly code?: string) { super(message); } }
 export const hashCapability = (token: string) => createHash('sha256').update(token).digest('hex');
 export const newCapability = () => randomBytes(32).toString('hex');
 export const reply = (body: unknown, status = 200) => NextResponse.json(body, { status, headers: { 'Cache-Control': 'no-store' } });
@@ -43,7 +43,7 @@ export async function cleaningContext(
   if (owner) {
     if (!user || !(await canManageHostedWebsite(db,CLEANING_SITE,user.id))) throw new CleaningError('Sign in as this website’s administrator.',403);
   }
-  return { db, user, site };
+  return { db, user, site, session };
 }
 export async function requireCleaningOwner(request:NextRequest){return cleaningContext(request,true);}
 export function verifiedCustomer(user: any) {
@@ -58,7 +58,7 @@ export async function rpc(db: any, name: string, args: Record<string,unknown>) {
 export async function cleaningHandler(work: () => Promise<NextResponse>) {
   try { return await work(); }
   catch(error) {
-    if (error instanceof CleaningError) return reply({ error:error.message },error.status);
+    if (error instanceof CleaningError) return reply({ error:error.message, ...(error.code ? { code: error.code } : {}) },error.status);
     if (error instanceof z.ZodError) return reply({ error:error.issues[0]?.message || 'Check the form.' },400);
     return reply({ error:'Cleaning service is temporarily unavailable. Your payment or assignment has not been confirmed here.' },503);
   }

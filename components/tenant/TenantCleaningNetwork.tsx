@@ -2,6 +2,7 @@
 import { useEffect,useState,useRef,type FormEvent } from 'react';
 import { money,parseHourlyRate } from '@/lib/cleaning/pricing';
 import { siteUrls } from '@/lib/utils/site-urls';
+import { createClient } from '@/lib/supabase/client';
 import { TenantProviderRate } from './TenantProviderRate';
 import { useTenantRequestHeaders,useReadOnlyTenantPreview } from './TenantPreviewContext';
 const services=['standard','deep','moveout','commercial','event','carpet','valet-trash'];
@@ -9,12 +10,15 @@ const statusLabels:Record<string,string>={requested:'Request received',quoted:'Q
 const serviceLabels:Record<string,string>={standard:'Standard cleaning',deep:'Deep cleaning',moveout:'Move-in / move-out',commercial:'Commercial janitorial',event:'Event cleanup',carpet:'Carpet / upholstery','valet-trash':'Valet trash'};
 const input='mt-2 w-full rounded-xl border border-slate-400 bg-white p-3 text-slate-950';
 const button='rounded-full bg-slate-900 px-6 py-3 font-bold text-white disabled:opacity-50';
+class CleaningApiError extends Error {
+  constructor(message: string, readonly code?: string) { super(message); }
+}
 function useCleaningApi(){
  const headers=useTenantRequestHeaders();const readOnly=useReadOnlyTenantPreview();
  return async(path:string,body?:unknown,token?:string)=>{
   if(body&&readOnly)throw new Error('This preview cannot submit changes.');
   const response=await fetch(`/api/tenant-sites/cleaning/${path}`,{method:body?'POST':'GET',headers:{...headers,...(body?{'Content-Type':'application/json'}:{}),...(token?{Authorization:`Bearer ${token}`}:{})},...(body?{body:JSON.stringify(body)}:{}),cache:'no-store'});
-  const result=await response.json();if(!response.ok)throw new Error(result.error||'Unable to complete this request.');return result;
+  const result=await response.json();if(!response.ok)throw new CleaningApiError(result.error||'Unable to complete this request.',result.code);return result;
  };
 }
 const cleaningSiteUrl = `${siteUrls.site}/sites/2exclusive-platinum-cleaning`;
@@ -64,6 +68,7 @@ type CleaningProvider = {
 
 export function TenantCleaningProvider() {
   const api = useCleaningApi();
+  const readOnly = useReadOnlyTenantPreview();
   const [provider, setProvider] = useState<CleaningProvider | null>(null);
   const [applicantName, setApplicantName] = useState<string | null>(null);
   const [assigned, setAssigned] = useState<any[]>([]);
@@ -75,6 +80,7 @@ export function TenantCleaningProvider() {
   const [loaded, setLoaded] = useState(false);
   const [notice, setNotice] = useState('');
   const [busy, setBusy] = useState(false);
+  const [needsEmailVerification, setNeedsEmailVerification] = useState(false);
   const pending = !provider || provider.eligibility === 'pending';
 
   function showProvider(value: CleaningProvider | null) {
@@ -86,6 +92,17 @@ export function TenantCleaningProvider() {
     setOptedIn(value.opted_in);
   }
 
+  function showError(error: unknown, fallback: string) {
+    if (error instanceof CleaningApiError && error.code === 'provider_email_verification_required') {
+      setNeedsEmailVerification(true);
+      setProvider(null);
+      setApplicantName(null);
+      setAssigned([]);
+      setLoaded(false);
+    }
+    setNotice(error instanceof Error ? error.message : fallback);
+  }
+
   useEffect(() => {
     void api('provider').then(result => {
       showProvider(result.provider);
@@ -93,8 +110,33 @@ export function TenantCleaningProvider() {
       setAssigned(result.jobs || []);
       setJobOffersEnabled(result.jobOffersEnabled === true);
       setLoaded(true);
-    }).catch(error => setNotice(error instanceof Error ? error.message : 'Unable to load your profile.'));
+      setNeedsEmailVerification(false);
+    }).catch(error => showError(error, 'Unable to load your profile.'));
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  async function sendEmailLink() {
+    if (busy) return;
+    setBusy(true);
+    setNotice('');
+    try {
+      if (readOnly) throw new Error('This preview cannot send sign-in links.');
+      const supabase = createClient();
+      const { data: { user }, error: identityError } = await supabase.auth.getUser();
+      if (identityError || !user?.email) throw new Error('Sign in with your account email before requesting a secure link.');
+      const callback = new URL('/auth/callback', siteUrls.lms);
+      callback.searchParams.set('redirect', `${cleaningSiteUrl}/provider`);
+      const { error } = await supabase.auth.signInWithOtp({
+        email: user.email,
+        options: { shouldCreateUser: false, emailRedirectTo: callback.toString() },
+      });
+      if (error) throw error;
+      setNotice('Check your account email for the secure sign-in link. Open it in this browser to return to your provider profile.');
+    } catch (error) {
+      setNotice(error instanceof Error ? error.message : 'Unable to request your secure email sign-in link.');
+    } finally {
+      setBusy(false);
+    }
+  }
 
   async function save(event: FormEvent) {
     event.preventDefault();
@@ -118,7 +160,7 @@ export function TenantCleaningProvider() {
           ? 'Provider profile saved for review. Job offers require eligibility approval and an open network.'
           : 'Rate saved for future opportunities. Payments on accepted jobs stay unchanged.');
     } catch (error) {
-      setNotice(error instanceof Error ? error.message : 'Unable to save your provider profile.');
+      showError(error, 'Unable to save your provider profile.');
     } finally {
       setBusy(false);
     }
@@ -131,6 +173,13 @@ export function TenantCleaningProvider() {
       <a href={`${cleaningSiteUrl}/join-network`} className="font-bold underline">Cleaning network application</a>
       <a href={`${siteUrls.lms}/community`} className="font-bold underline">Open the community</a>
     </div>
+    {needsEmailVerification ? <div className="mt-6 rounded-2xl border bg-white p-6">
+      <h3 className="text-xl font-bold">Verify access to your email</h3>
+      <p className="mt-3 leading-7">Open a secure sign-in link sent to your account email before viewing your application, provider profile, or assignments. Use the same browser to open the link.</p>
+      <button type="button" onClick={() => void sendEmailLink()} disabled={busy || readOnly} className={`${button} mt-5`}>
+        {busy ? 'Requesting link…' : 'Email me a secure sign-in link'}
+      </button>
+    </div> : null}
     {loaded && !provider && !applicantName ? <p className="mt-5 leading-7">Submit the cleaning network application with your verified account email, then return here to finish your provider profile.</p> : null}
     {provider || applicantName ? <>
       <p className="mt-6 font-bold">{provider?.name || applicantName}</p>

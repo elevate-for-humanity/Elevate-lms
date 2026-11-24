@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { NextRequest } from 'next/server';
 
 const mocks = vi.hoisted(() => ({
-  admin: vi.fn(), session: vi.fn(), tenant: vi.fn(), owner: vi.fn(), rateLimit: vi.fn(), invoice: vi.fn(),
+  admin: vi.fn(), session: vi.fn(), claims: vi.fn(), tenant: vi.fn(), owner: vi.fn(), rateLimit: vi.fn(), invoice: vi.fn(),
 }));
 vi.mock('@/lib/supabase/admin', () => ({ requireAdminClient: mocks.admin }));
 vi.mock('@/lib/supabase/server', () => ({ createClient: mocks.session }));
@@ -31,6 +31,7 @@ let failures: Record<string, { code?: string; message: string }>;
 let raceInsert: Row | null;
 let beforeUpdate: (() => void) | null;
 let user: Row | null;
+let claims: Row | null;
 
 function database() {
   return {
@@ -89,13 +90,16 @@ const writes = () => calls.filter(call => call.operation !== 'select');
 beforeEach(() => {
   vi.clearAllMocks(); calls = []; failures = {}; raceInsert = null; beforeUpdate = null;
   user = { id: 'verified-user', email, email_confirmed_at: '2026-11-24T12:00:00Z' };
+  const now = Math.floor(Date.now() / 1000);
+  claims = { sub: user.id, email, role: 'authenticated', session_id: 'verified-session', iat: now, exp: now + 3600, amr: [{ method: 'magiclink', timestamp: now }] };
   tables = {
     user_websites: [{ id: CLEANING_SITE, is_published: true, site_config: { meta: { cleaningProviderOnboardingEnabled: true, cleaningNetworkEnabled: false } } }],
     tenant_site_leads: [{ id: leadId, website_id: CLEANING_SITE, email, name: 'Verified Contact', source_path: '/sites/2exclusive-platinum-cleaning/join-network', message: 'Company name, if applicable: Verified Cleaning Company\nServices: commercial' }],
     cleaning_providers: [], cleaning_jobs: [],
   };
   mocks.admin.mockResolvedValue(database());
-  mocks.session.mockImplementation(async () => ({ auth: { getUser: async () => ({ data: { user } }) } }));
+  mocks.claims.mockImplementation(async () => ({ data: claims ? { claims } : null, error: null }));
+  mocks.session.mockImplementation(async () => ({ auth: { getUser: async () => ({ data: { user } }), getClaims: mocks.claims } }));
   mocks.tenant.mockResolvedValue({ websiteId: CLEANING_SITE });
   mocks.owner.mockResolvedValue(false);
   mocks.rateLimit.mockResolvedValue(null);
@@ -117,12 +121,76 @@ describe('pending cleaning provider onboarding', () => {
     expect(mocks.invoice).not.toHaveBeenCalled();
   });
 
-  it.each([null, { id: 'unverified', email }])('rejects a missing or unverified email session before applicant reads (%j)', async identity => {
+  it.each([null, { id: 'email-missing' }])('rejects a missing account or email before applicant reads (%j)', async identity => {
     user = identity;
     expect((await GET(request())).status).toBe(401);
     expect((await POST(request(body()))).status).toBe(401);
     expect(calls.every(call => call.table === 'user_websites')).toBe(true);
     expect(writes()).toHaveLength(0);
+  });
+
+  it('denies an unconfirmed current Auth user even when an older signed magic-link session exists', async () => {
+    user!.email_confirmed_at = null;
+    tables.cleaning_providers.push({ ...pending(), eligibility: 'eligible' });
+    for (const payload of [undefined, body(), { hourlyCents: 4000 }]) {
+      const response = payload === undefined ? await GET(request()) : await POST(request(payload));
+      expect(response.status).toBe(401);
+      expect(await response.json()).toEqual({ error: 'Sign in with a verified account email to continue.' });
+    }
+    expect(calls.every(call => call.table === 'user_websites')).toBe(true);
+    expect(writes()).toHaveLength(0);
+    expect(tables.cleaning_providers[0].hourly_cents).toBe(3000);
+  });
+
+  it.each([
+    ['automatically confirmed password session', { amr: [{ method: 'password', timestamp: 1 }] }],
+    ['generic OTP, including SMS', { amr: [{ method: 'otp', timestamp: 1 }] }],
+    ['automatic email signup', { amr: [{ method: 'email/signup', timestamp: 1 }] }],
+    ['editable metadata claiming email verification', { amr: [], user_metadata: { email_verified: true, amr: [{ method: 'magiclink', timestamp: 1 }] } }],
+    ['missing methods', { amr: undefined }],
+    ['method without authenticated timestamp', { amr: ['magiclink'] }],
+    ['another subject', { sub: 'another-user' }],
+    ['another email', { email: 'other@example.invalid' }],
+    ['missing email', { email: undefined }],
+    ['missing session', { session_id: '' }],
+    ['anonymous session', { is_anonymous: true }],
+    ['service token', { role: 'service_role' }],
+    ['expired proof', { exp: 1 }],
+    ['future magic link', { amr: [{ method: 'magiclink', timestamp: Number.MAX_SAFE_INTEGER }] }],
+  ])('denies %s before reading any application, provider or assignment', async (_reason, changes) => {
+    claims = { ...claims, ...changes };
+    tables.cleaning_providers.push({ ...pending(), eligibility: 'eligible' });
+    for (const payload of [undefined, body(), { hourlyCents: 4000 }]) {
+      const response = payload === undefined ? await GET(request()) : await POST(request(payload));
+      expect(response.status).toBe(403);
+      expect(await response.json()).toEqual({
+        error: 'Open a secure email sign-in link to access your cleaning provider profile.',
+        code: 'provider_email_verification_required',
+      });
+    }
+    expect(calls.every(call => call.table === 'user_websites')).toBe(true);
+    expect(writes()).toHaveLength(0);
+    expect(tables.cleaning_providers[0].hourly_cents).toBe(3000);
+  });
+
+  it.each(['missing', 'error', 'throws'])('fails closed when signature-verified claims are %s', async failure => {
+    if (failure === 'missing') claims = null;
+    if (failure === 'error') mocks.claims.mockResolvedValue({ data: { claims }, error: new Error('Invalid JWT signature') });
+    if (failure === 'throws') mocks.claims.mockRejectedValue(new Error('Auth unavailable'));
+    expect((await GET(request())).status).toBe(403);
+    expect((await POST(request(body()))).status).toBe(403);
+    expect(calls.every(call => call.table === 'user_websites')).toBe(true);
+    expect(writes()).toHaveLength(0);
+  });
+
+  it('uses a verified email magic-link session even for an historically auto-confirmed account', async () => {
+    user!.email_confirmed_at = '2020-01-01T00:00:00Z';
+    user!.user_metadata = { role: 'admin', email_verified: false };
+    claims!.email = email.toUpperCase();
+    expect((await GET(request())).status).toBe(200);
+    expect((await POST(request(body()))).status).toBe(201);
+    expect(mocks.claims).toHaveBeenCalledTimes(2);
+    expect(tables.cleaning_providers[0].eligibility).toBe('pending');
   });
 
   it('requires same-origin submission before any database work', async () => {

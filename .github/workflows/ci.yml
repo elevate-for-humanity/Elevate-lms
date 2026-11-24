@@ -57,7 +57,7 @@ jobs:
         run: node --test tests/worker/openhands-protected-acceptance.test.mjs tests/worker/openhands-paris-protected-merge.test.mjs tests/worker/openhands-policy-readback.test.mjs tests/worker/paris-protected-merge-decision.test.mjs tests/worker/paris-merge-authorization.test.mjs tests/worker/paris-protected-merge-driver.test.mjs tests/worker/paris-exact-main-ci-request.test.mjs
       - name: PARIS OpenHands handoff and supervision regressions
         if: ${{ !cancelled() && steps.dependencies.outcome == 'success' }}
-        run: node --test tests/worker/paris-openhands-handoff.test.mjs tests/worker/paris-openhands-supervision.test.mjs
+        run: node --test tests/worker/paris-openhands-handoff.test.mjs tests/worker/paris-openhands-supervision.test.mjs tests/worker/paris-openhands-prompt-policy-version.test.mjs
       - name: Dev Studio container configuration regressions
         if: ${{ !cancelled() && steps.dependencies.outcome == 'success' }}
         run: node --test tests/devstudio-jsonc.test.mjs tests/studio-model-health-budget.test.mjs scripts/gcp/verify-runtime-readiness.test.mjs scripts/gcp/verify-admin-revision.test.mjs

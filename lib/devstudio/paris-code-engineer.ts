@@ -15,7 +15,8 @@ import { aiChat } from '@/lib/ai/ai-service';
 import {requireAdminClient} from '@/lib/supabase/admin';
 import {executePaidInference,reservePaidInference,paidArtifactFingerprint} from '@/lib/ai/paid-inference-gateway';
 import { hydrateProcessEnv } from '@/lib/secrets';
-import { getGitHubHeaders, githubApiErrorMessage } from '@/lib/devstudio/github-token';
+import { getGitHubHeaders, getGitHubToken, githubApiErrorMessage, verifyGitHubBranchAuthority } from '@/lib/devstudio/github-token';
+import { classifySearchFailure, type SearchFallback } from './github-search-fallback';
 import { getGitHubAppToken } from '@/lib/devstudio/github-app-token';
 import { logger } from '@/lib/logger';
 import { PARIS_SYSTEM_IDENTITY } from '@/lib/ai/paris-identity';
@@ -72,14 +73,48 @@ function normalizePath(value: unknown): string {
 
 /** Broad application repairs remain allowed. Authorization, validation and
  * release controls require a separately reviewed change, never self-approval. */
-export function blockedPath(path: string): boolean {
-  return /^(?:apps\/admin\/app\/api\/(?:cron\/paris-code-repair|dev-studio|internal)(?:\/|$)|lib\/ai\/paid-inference[^/]*|\.github(?:\/|$)|scripts(?:\/|$)|lib\/(?:devstudio|ai\/runtime|auth|rbac|supabase|secrets)(?:\/|\.|$)|lib\/paris-workflow-identity\.ts$|AGENTS\.md$|Dockerfile(?:\.|$)|(?:package(?:-lock)?\.json|pnpm-lock\.yaml|pnpm-workspace\.yaml)$)/.test(path) ||
+/**
+ * Typed blocked-path reasons (PR1, #2070). Previously blockedPath() returned
+ * a bare boolean, so a denied secret, a protected control path and a
+ * malformed traversal all collapsed into one receipt. The block is unchanged.
+ * NOTE: this definition is intentionally self-contained in this file —
+ * tests/worker/paris-openhands-handoff.test.mjs evaluates this file with
+ * import lines stripped, so it cannot import the pure copy. Keep in sync
+ * with ./paris-blocked-path.ts (unit-tested there; equivalence is verified
+ * by the validation harness in the PR notes).
+ */
+export type BlockedPathReason =
+  | 'ALLOWED'
+  | 'DENIED_INVALID'
+  | 'DENIED_SECRET'
+  | 'DENIED_PROTECTED';
+
+export function blockedPathReason(path: string): BlockedPathReason {
+  if (
+    !path ||
+    path.includes('..') ||
+    path.startsWith('/') ||
+    path === '.git' ||
+    path.startsWith('.git/') ||
+    /(?:^|\/)(?:node_modules|\.next)(?:\/|$)/.test(path)
+  ) {
+    return 'DENIED_INVALID';
+  }
+  if (/(?:^|\/)(?:\.env(?:\.[^/]*)?|[^/]*\.(?:pem|key|p12|pfx)|id_(?:rsa|ed25519)[^/]*)$/i.test(path)) return 'DENIED_SECRET';
+  if (
+    /^(?:apps\/admin\/app\/api\/(?:cron\/paris-code-repair|dev-studio|internal)(?:\/|$)|lib\/ai\/paid-inference[^/]*|\.github(?:\/|$)|scripts(?:\/|$)|lib\/(?:devstudio|ai\/runtime|auth|rbac|supabase|secrets)(?:\/|\.|$)|lib\/paris-workflow-identity\.ts$|AGENTS\.md$|Dockerfile(?:\.|$)|(?:package(?:-lock)?\.json|pnpm-lock\.yaml|pnpm-workspace\.yaml)$)/.test(path) ||
     /(?:^|\/)(?:tsconfig[^/]*\.json|vitest\.config\.[^/]+|eslint\.config\.[^/]+|\.npmrc|AGENTS\.md)$/.test(path) ||
-    /^(?:tests\/unit\/(?:course-builder-live-preview|course-builder-assessment-preview|paris-course-integration)\.test\.tsx?|tests\/worker\/approved-picture-timeline\.test\.mjs)$/.test(path) ||
-    !path || path.includes('..') || path.startsWith('/') ||
-    path === '.git' || path.startsWith('.git/') ||
-    /(?:^|\/)(?:node_modules|\.next)(?:\/|$)/.test(path) ||
-    /(?:^|\/)(?:\.env(?:\.[^/]*)?|[^/]*\.(?:pem|key|p12|pfx)|id_(?:rsa|ed25519)[^/]*)$/i.test(path);
+    /^(?:tests\/unit\/(?:course-builder-live-preview|course-builder-assessment-preview|paris-course-integration)\.test\.tsx?|tests\/worker\/approved-picture-timeline\.test\.mjs)$/.test(path)
+  ) {
+    return 'DENIED_PROTECTED';
+  }
+  return 'ALLOWED';
+}
+
+/** Broad application repairs remain allowed. Authorization, validation and
+ * release controls require a separately reviewed change, never self-approval. */
+export function blockedPath(path: string): boolean {
+  return blockedPathReason(path) !== 'ALLOWED';
 }
 
 async function githubHeaders(): Promise<HeadersInit> {
@@ -101,14 +136,25 @@ async function githubJson(path: string, init: RequestInit = {}) {
   const text = await response.text();
   const payload = text ? JSON.parse(text) : {};
   if (!response.ok) {
+    // A 403 on branch creation is a distinct receipt, not a generic failure.
+    if (response.status === 403 && path.startsWith('/git/refs') && init.method === 'POST') {
+      throw new Error(
+        `${githubApiErrorMessage(response.status, path)}; provider message: ${String(payload?.message ?? '').slice(0, 140)}`,
+      );
+    }
     throw new Error(
-      `GitHub API ${response.status} for ${path}: ${githubApiErrorMessage(response.status)}; provider message: ${String(payload?.message ?? '').slice(0, 140)}`,
+      `GitHub API ${response.status} for ${path}: ${githubApiErrorMessage(response.status, path)}; provider message: ${String(payload?.message ?? '').slice(0, 140)}`,
     );
   }
   return payload;
 }
 
 async function createTaskBranch(taskId: string) {
+  // Pre-flight branch authority (PR1, #2070): fail with GITHUB_APP_403_BRANCH
+  // before attempting POST /git/refs, instead of after a failed create.
+  const branchToken = await getGitHubToken();
+  if (!branchToken) throw new Error('GitHub authentication is not configured. Bind GitHub App credentials in the server runtime or add GITHUB_TOKEN in Dev Studio > Secrets.');
+  await verifyGitHubBranchAuthority(branchToken);
   const base = await githubJson(`/git/ref/heads/${encodeURIComponent(BASE_BRANCH)}`);
   const baseSha = String(base?.object?.sha ?? '');
   if (!baseSha) throw new Error('Could not resolve the canonical main branch SHA.');
@@ -122,7 +168,7 @@ async function createTaskBranch(taskId: string) {
 
 async function readFile(path: string, branch: string, task = '') {
   const normalized = normalizePath(path);
-  if (blockedPath(normalized)) throw new Error('Repository path is not allowed.');
+  if (blockedPath(normalized)) throw new Error(`Repository path is not allowed. [${blockedPathReason(normalized)}]`);
   const data = await githubJson(
     `/contents/${normalized.split('/').map(encodeURIComponent).join('/')}?ref=${encodeURIComponent(branch)}`,
   );
@@ -138,7 +184,7 @@ async function readFile(path: string, branch: string, task = '') {
 
 async function listDirectory(path: string, branch: string) {
   const normalized = normalizePath(path);
-  if (normalized && blockedPath(`${normalized}/`)) throw new Error('Repository path is not allowed.');
+  if (normalized && blockedPath(`${normalized}/`)) throw new Error(`Repository path is not allowed. [${blockedPathReason(`${normalized}/`)}]`);
   const data = await githubJson(
     `/contents${normalized ? '/' + normalized.split('/').map(encodeURIComponent).join('/') : ''}?ref=${encodeURIComponent(branch)}`,
   );
@@ -151,13 +197,13 @@ async function listDirectory(path: string, branch: string) {
 
 function rejectedSourceRead(error: unknown): boolean {
   const message = error instanceof Error ? error.message : '';
-  return message === 'Repository path is not allowed.' ||
+  return /^Repository path is not allowed\./.test(message) ||
     /^GitHub API 404 for \/contents/.test(message) ||
     / is not a (?:file|directory)\.$/.test(message);
 }
 
 async function rejectedReadFeedback(path: string, branch: string): Promise<string> {
-  const message = `READ_REJECTED ${path}: use list to discover an allowed application path. No source was read or changed.`;
+  const message = `READ_REJECTED ${path} [${blockedPathReason(normalizePath(path))}]: use list to discover an allowed application path. No source was read or changed.`;
   // Protected paths remain opaque. Only discover ancestors of allowed paths.
   if (blockedPath(path)) return message;
   const parts = path.replace(/\/+$/, '').split('/').filter(Boolean);
@@ -187,7 +233,7 @@ async function writeFile(input: {
   message: string;
 }) {
   const normalized = normalizePath(input.path);
-  if (blockedPath(normalized)) throw new Error('Repository path is not allowed.');
+  if (blockedPath(normalized)) throw new Error(`Repository path is not allowed. [${blockedPathReason(normalized)}]`);
   // Workflow file updates require the configured App's workflow permission.
   // Use that explicit identity for this operation, before sending any write.
   let workflowHeaders: HeadersInit | undefined;
@@ -228,9 +274,15 @@ async function writeFile(input: {
   return {path:normalized,contentSha,commitSha};
 }
 
-async function searchCode(query: string) {
+export type SearchCodeResult = {
+  matches: Array<{ path: string; name: string; matches: string[] }>;
+  /** Distinguishes "no matches" from "search unavailable, tree fallback used". */
+  searchFallback: SearchFallback;
+};
+
+export async function searchCode(query: string): Promise<SearchCodeResult> {
   const q = query.trim().slice(0, 500);
-  if (!q) return [];
+  if (!q) return { matches: [], searchFallback: 'none' };
   const response = await fetch(
     `https://api.github.com/search/code?q=${encodeURIComponent(`${q} repo:${REPOSITORY}`)}&per_page=10`,
     {
@@ -257,15 +309,17 @@ async function searchCode(query: string) {
         headers: await githubHeaders(), redirect: 'error', cache: 'no-store',
         signal: AbortSignal.timeout(8000),
       });
-      if (repository.ok) return [];
+      if (repository.ok) return { matches: [], searchFallback: classifySearchFailure(401, true) };
       throw new Error(`GitHub repository authorization failed: ${repository.status}`);
     }
     if (response.status === 403 || response.status === 429) {
-      return [];
+      // Record the fallback instead of silently returning no matches (#2070):
+      // the repair receipt can now tell search-unavailable from no-results.
+      return { matches: [], searchFallback: classifySearchFailure(response.status) };
     }
     throw new Error(`GitHub code search failed: ${response.status}`);
   }
-  return (Array.isArray(payload.items) ? payload.items : [])
+  const matches = (Array.isArray(payload.items) ? payload.items : [])
     .filter((item: any) => typeof item.path === 'string' && !blockedPath(normalizePath(item.path)))
     .map((item: any) => ({
     path: item.path,
@@ -274,6 +328,7 @@ async function searchCode(query: string) {
       ? item.text_matches.slice(0, 3).map((match: any) => match.fragment)
       : [],
   }));
+  return { matches, searchFallback: 'none' };
 }
 
 function suggestedSourcePaths(query: string, tree: Array<{ type: string; path: string }> = [], task = '') {
@@ -620,7 +675,10 @@ export async function stageParisCodeRepair(task: string, repairId?: string, acto
         continue;
       }
       if (action.type === 'search') {
-        const matches = await searchCode(action.query);
+        const { matches, searchFallback } = await searchCode(action.query);
+        if (searchFallback !== 'none') {
+          observations.push(`${searchFallback}: GitHub code search was unavailable for this repair; using authenticated tree/contents reads instead. Do not retry code search.`);
+        }
         if (!matches.length) {
           const tree = await githubJson(`/git/trees/${headSha}?recursive=1`);
           const paths = suggestedSourcePaths(action.query, tree.tree, task + JSON.stringify(sourceEvidence ?? {}));

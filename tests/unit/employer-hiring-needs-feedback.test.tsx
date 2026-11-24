@@ -1,3 +1,4 @@
+import { renderToString } from 'react-dom/server';
 import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 
@@ -54,4 +55,25 @@ it('does not infer save success for an ordinary initial visit', () => {
   render(<HiringNeedsForm initial={initial} />);
   expect(screen.queryByText(confirmation)).not.toBeInTheDocument();
   expect(screen.getByRole('button')).toHaveAttribute('type', 'submit');
+});
+
+it('does not expose editable controls until controlled input handlers are hydrated', () => {
+  const html = renderToString(<HiringNeedsForm initial={initial} />);
+  const shell = document.createElement('div');
+  shell.innerHTML = html;
+  for (const control of shell.querySelectorAll('textarea,button')) {
+    expect(control).toBeDisabled();
+  }
+  render(<HiringNeedsForm initial={initial} />);
+  expect(screen.getByLabelText('Positions or staff training needed')).toBeEnabled();
+  expect(screen.getByRole('button')).toBeEnabled();
+});
+
+it('replaces persisted values repeatedly without appending previous state', () => {
+  render(<HiringNeedsForm initial={initial} />);
+  const field = screen.getByLabelText('Positions or staff training needed');
+  for (const value of ['QA staff training only','QA updated staff training','']) {
+    fireEvent.change(field,{target:{value}});
+    expect(field).toHaveValue(value);
+  }
 });

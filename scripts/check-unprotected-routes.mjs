@@ -5,6 +5,7 @@ import path from 'node:path';
 
 const root = process.cwd();
 const GUARDS = ['requireRole', 'apiRequireAdmin', 'apiRequireDevStudio', 'getCurrentUser',
+  'verifiedCustomer', 'requireCleaningOwner', 'requireCleaningOffer',
   'requireAdminClient', 'withAuth', 'capabilityHealthResponse', 'requireUser'];
 const MUTATING = /export\s+(?:async\s+)?(?:function\s+|const\s+|let\s+)(POST|PUT|PATCH|DELETE)\b|export\s*\{[^}]*\b(POST|PUT|PATCH|DELETE)\b[^}]*\}/;
 const REEXPORT = /export\s*\{[^}]*\}\s*from\s*['"](\.[^'"]+)['"]/g;

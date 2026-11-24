@@ -14,3 +14,9 @@ export const LMS_ROLE_MANIFESTS = [
   '/manifest-program-holder.json',
   '/manifest-shop-owner.json',
 ] as const;
+
+export const ADMIN_WORKSPACE_PWAS = {
+  'dev-studio': { name: 'Dev Studio', openPath: '/studio', installPath: '/install/dev-studio.html' },
+  'course-builder': { name: 'Course Builder', openPath: '/studio/courses', installPath: '/install/course-builder.html' },
+  email: { name: 'Email', openPath: '/phone/email', installPath: '/install/email.html' },
+} as const;

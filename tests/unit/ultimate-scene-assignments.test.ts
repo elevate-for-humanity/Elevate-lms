@@ -57,9 +57,49 @@ describe('automatic licensed scene assignment', () => {
       { ...asset, content_sha256: 'original' },
       { ...asset, id: 'derived', content_sha256: 'converted' },
     ];
-    expect(
-      buildSceneAssignments([...scenes, { ...scenes[0], id: 'second' }], copies).gaps,
-    ).toHaveLength(1);
+    const gaps = buildSceneAssignments([...scenes, { ...scenes[0], id: 'second' }], copies).gaps;
+    expect(gaps).toHaveLength(1);
+    expect(gaps[0]).toMatchObject({
+      licensedAssetCount: 1,
+      licensedAssetRecordCount: 2,
+    });
+  });
+  it('accepts distinct inspected non-overlapping excerpts from one licensed Envato item', () => {
+    const parentHash = 'f'.repeat(64);
+    const inspectedExcerpt = (id: string, hash: string, start: number, end: number) => ({
+      ...asset,
+      id,
+      provider: 'envato',
+      storage_path: `licensed-library/envato/item/${id}.mp4`,
+      public_url: `https://media.example/${id}.mp4`,
+      content_sha256: hash,
+      visual_observation: {
+        method: 'sampled-frame-inspection',
+        contentSha256: hash,
+        sourceContentSha256: parentHash,
+        excerptStartSeconds: start,
+        excerptEndSeconds: end,
+        reviewedAt: '2026-11-23T00:00:00Z',
+        sampleFractions: [0.2, 0.8],
+      },
+    });
+    const distinct = [
+      inspectedExcerpt('excerpt-one', 'a'.repeat(64), 0, 8),
+      inspectedExcerpt('excerpt-two', 'b'.repeat(64), 8, 16),
+    ];
+    const twoScenes = [...scenes, { ...scenes[0], id: 'second' }];
+    expect(buildSceneAssignments(twoScenes, distinct).gaps).toHaveLength(0);
+    // Overlapping windows, identical bytes or missing independent inspection
+    // must never manufacture two physical source clips.
+    expect(buildSceneAssignments(twoScenes, [
+      distinct[0], inspectedExcerpt('overlap', 'b'.repeat(64), 6, 16),
+    ]).gaps).toHaveLength(1);
+    expect(buildSceneAssignments(twoScenes, [
+      distinct[0], inspectedExcerpt('same-bytes', 'a'.repeat(64), 8, 16),
+    ]).gaps).toHaveLength(1);
+    expect(buildSceneAssignments(twoScenes, [
+      distinct[0], { ...distinct[1], visual_observation: undefined },
+    ]).gaps).toHaveLength(1);
   });
   it("finds complete coverage when first-fit would consume another scene's only clip", () => {
     const boards = [

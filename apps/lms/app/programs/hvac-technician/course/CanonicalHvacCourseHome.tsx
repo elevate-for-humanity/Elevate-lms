@@ -1,5 +1,6 @@
 'use client';
 
+import { siteUrls } from '@/lib/utils/site-urls';
 import { useMemo, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -126,6 +127,18 @@ export default function CanonicalHvacCourseHome({
               <ClipboardCheck className="h-4 w-4" aria-hidden="true" />
               EPA 608 practice tests
             </Link>
+            <Link
+              href="/workbooks/hvac-epa608-guided-practice"
+              className="inline-flex min-h-11 items-center rounded-lg border border-white/40 px-5 py-3 font-bold text-white"
+            >
+              Workbook and simulator
+            </Link>
+            <a
+              href={`${siteUrls.site}/docs/syllabi/hvac-technician.md`}
+              className="inline-flex min-h-11 items-center rounded-lg border border-white/40 px-5 py-3 font-bold text-white"
+            >
+              View syllabus
+            </a>
           </div>
         </div>
       </section>

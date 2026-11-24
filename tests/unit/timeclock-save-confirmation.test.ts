@@ -49,7 +49,7 @@ beforeEach(() => {
               : table === 'program_enrollments'
                 ? { program_id: 'program' }
                 : table === 'progress_entries' && inserting
-                  ? { id: 'saved-shift' }
+                  ? { id: 'saved-shift', clock_in_at: inserting.clock_in_at }
                   : table === 'documents'
                     ? []
                     : null;
@@ -124,8 +124,10 @@ describe('saved clock punch and confirmation', () => {
     expect(await response.json()).toMatchObject({
       success: true,
       progress_entry_id: 'saved-shift',
+      clock_in_at: mocks.persisted[0]?.clock_in_at,
     });
     expect(mocks.persisted).toHaveLength(1);
+    expect(mocks.persisted[0].clock_in_at).toEqual(expect.any(String));
     expect(mocks.notified.map((row) => row.user_id)).toEqual(['learner', 'admin-one', 'admin-two']);
     expect(new Set(mocks.notified.map((row) => row.idempotency_key)).size).toBe(3);
   });

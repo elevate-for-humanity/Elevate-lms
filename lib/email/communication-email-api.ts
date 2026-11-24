@@ -324,9 +324,15 @@ export async function handleCommunicationEmailGet(
           .concat(await assignedInstructorDirectory(context.db, context.user.id))
           .concat([
             {
+              id: 'support',
+              address: 'support@elevateforhumanity.org',
+              display_name: 'Elevate Support',
+              mailbox_kind: 'department',
+            },
+            {
               id: 'admin',
               address: 'admissions@elevateforhumanity.org',
-              display_name: 'Elevate Admin',
+              display_name: 'Elevate Admissions',
               mailbox_kind: 'department',
             },
           ]),
@@ -632,7 +638,7 @@ export async function handleCommunicationEmailPost(
     for (const file of files) {
       const content = Buffer.from(await file.arrayBuffer());
       const fileName = safeAttachmentName(file.name);
-      const storagePath = `${mailbox.id}/${messageId}/${randomUUID()}-${fileName}`;
+      const storagePath = `${mailbox.id}/${messageId}/${randomUUID()}`;
       const { error: uploadError } = await context.db.storage
         .from(ATTACHMENT_BUCKET)
         .upload(storagePath, content, { contentType: file.type, upsert: false });

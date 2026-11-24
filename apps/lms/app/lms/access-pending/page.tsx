@@ -15,12 +15,10 @@ export default async function LearnerAccessPendingPage() {
       <h1 className="text-3xl font-bold text-slate-950">Enrollment review pending</h1>
       <p className="mt-4 text-base leading-7 text-slate-700">
         Your account is available, but training materials and the learner dashboard
-        remain locked until Elevate for Humanity approves your enrollment and
-        confirms payment. Applying or creating an account does not grant course access.
+        remain locked until your enrollment is active. For state-funded enrollment, an administrator must approve your funding and enrollment.
       </p>
       <p className="mt-3 text-sm text-slate-600">
-        If you have already paid, the admissions team must verify and approve your
-        enrollment. Please do not submit a second payment just to unlock the portal.
+        If you paid directly, submit the full enrollment application with your verified payment to activate access. Please do not pay again to unlock the portal.
       </p>
       <Link href="/enrollment" className="mt-7 rounded-xl bg-slate-950 px-5 py-3 font-semibold text-white">
         View enrollment steps

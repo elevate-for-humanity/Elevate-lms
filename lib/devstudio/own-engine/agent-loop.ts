@@ -342,7 +342,7 @@ export async function runOwnEngineLoop(
         continue;
       }
       if (isRetryableModelError(error)) {
-        throw new Error(`OWN_ENGINE_ATTEMPTS_EXHAUSTED:${message.slice(0, 300)}`);
+        throw new Error(`OWN_ENGINE_ATTEMPTS_EXHAUSTED:${message.slice(0, 300)}`, { cause: error });
       }
       throw error instanceof Error ? error : new Error(message);
     }

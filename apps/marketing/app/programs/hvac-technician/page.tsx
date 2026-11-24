@@ -23,6 +23,20 @@ export default async function HvacTechnicianPage() {
         heroOverride={<HvacLabHero />}
         visualContent={<HvacTrainingShowcase />}
       />
+      <section aria-labelledby="hvac-syllabus" className="border-t border-slate-200 bg-white px-4 py-10">
+        <div className="mx-auto max-w-6xl">
+          <h2 id="hvac-syllabus" className="text-2xl font-black text-slate-950">HVAC curriculum and syllabus</h2>
+          <p className="mt-2 text-slate-700">See what you’ll cover during the six-week training program.</p>
+          <div className="mt-4 flex flex-wrap gap-x-6">
+            <Link href="/programs/hvac-technician/curriculum" className="inline-flex min-h-11 items-center font-bold text-brand-blue-800 underline">
+              Preview the curriculum
+            </Link>
+            <Link href="/docs/syllabi/hvac-technician.md" className="inline-flex min-h-11 items-center font-bold text-brand-blue-800 underline">
+              Open the six-week syllabus
+            </Link>
+          </div>
+        </div>
+      </section>
       <section className="border-t border-slate-200 bg-slate-950 px-4 py-12 text-white">
         <div className="mx-auto flex max-w-6xl flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
           <div>

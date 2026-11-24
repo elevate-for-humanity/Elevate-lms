@@ -286,7 +286,7 @@ export function AdminDashboardContent({
   return (
     <div className="w-full max-w-none min-w-0 px-3 pb-16 pt-4 sm:px-5 lg:px-6">
       <section
-        className={`mb-5 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm ${heroAssets.length ? 'grid lg:grid-cols-[1.1fr_1fr]' : ''}`}
+        className="mb-5 grid overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm lg:grid-cols-[1.1fr_1fr]"
       >
         <div className="p-4 sm:p-5">
           <LogoImage
@@ -312,7 +312,7 @@ export function AdminDashboardContent({
             payment, compliance, and system-health data.
           </p>
         </div>
-        {heroAssets.length > 0 && (
+        {heroAssets.length > 0 ? (
           <div className="grid min-h-64 grid-cols-2 gap-1 bg-slate-950 lg:min-h-80">
             {heroAssets.slice(0, 1).map((asset, index) => (
               <div key={asset.id} className={`relative min-h-64 col-span-2`}>
@@ -328,8 +328,21 @@ export function AdminDashboardContent({
               </div>
             ))}
           </div>
+        ) : (
+          <div className="relative min-h-48 bg-slate-950 lg:min-h-64">
+            <Image src="/images/hero/admin-hero.webp" alt="" fill sizes="(min-width: 1024px) 50vw, 100vw" className="object-cover" />
+          </div>
         )}
       </section>
+      <details className="mb-5 rounded-xl border border-slate-200 bg-white px-4 py-3">
+        <summary className="cursor-pointer font-bold text-slate-950">Dashboard orientation</summary>
+        <ol className="mt-3 list-decimal space-y-2 pl-5 text-sm leading-6 text-slate-700">
+          <li><Link href={APPLICATION_REVIEW_URL} className="font-semibold underline">Review applications</Link> and resolve missing documents or funding before advancing enrollment.</li>
+          <li><Link href="/students" className="font-semibold underline">Open learner records</Link> for training access, or <Link href="/apprenticeships" className="font-semibold underline">manage apprenticeships</Link> for work-based training and hours.</li>
+          <li><Link href="/hr/payroll" className="font-semibold underline">Open Payroll</Link> to review pay runs and export records. Use its QuickBooks link for payroll processing.</li>
+          <li><Link href="/phone/email" className="font-semibold underline">Open Email</Link> to review messages and alerts, or <Link href="/ai-team" className="font-semibold underline">open Paris</Link> for help with platform operations.</li>
+        </ol>
+      </details>
       <DegradedBanner data={data} />
       {canAccessDevStudio && (
         <section
@@ -485,7 +498,7 @@ export function AdminDashboardContent({
             shell on this device.
           </p>
         </div>
-        <PwaInstallCenter />
+        <PwaInstallCenter showWorkspaceApps={canAccessDevStudio} />
         <HostShopPortalLauncher />
       </section>
     </div>

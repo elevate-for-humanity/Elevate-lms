@@ -46,6 +46,16 @@ describe('separate staff and learner workspaces', () => {
       getRoleDestinationUrl('staff'),
     );
   });
+  it('preserves the exact enrolled HVAC workspace without rerouting Admin program pages', () => {
+    const lms = new URL(getRoleDestinationUrl('student'));
+    const path = '/programs/hvac-technician/course';
+    expect(resolveRoleCompatiblePostLoginUrl(path, 'student')).toBe(
+      new URL(path, lms).toString(),
+    );
+    expect(resolveRoleCompatiblePostLoginUrl('/programs/hvac-technician', 'student')).toBe(
+      getRoleDestinationUrl('student'),
+    );
+  });
   it('does not let a student return into the staff workspace', () => {
     expect(
       resolveRoleCompatiblePostLoginUrl('/staff-portal/dashboard', 'student', ['student']),

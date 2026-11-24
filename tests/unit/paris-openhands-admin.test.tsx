@@ -70,3 +70,17 @@ it('Admin panel queues a repair and displays pending validation without claiming
  const request=calls.find(init=>init?.method==='POST');expect(request.headers['Idempotency-Key']).toMatch(/^[a-f0-9-]{36}$/);
  expect(JSON.parse(request.body)).toEqual({task:h.goal});expect(screen.queryByText(/production verified$/)).toBeNull();
 });
+
+it.each([true,false])('panel offers confirmation only when the receipt verifies a provider wait: %s',async(providerWait)=>{
+ const row=repairRow();
+ const task={id:taskId,user_id:'owner',tenant_id:null,tool_name:'openhands.execute',status:'awaiting_approval',
+  requires_approval:true,approval_status:'pending',correlation_id:'paris-repair:11111111-1111-4111-8111-111111111111:attempt:1',
+  approval_reason:providerWait?'OpenHands is waiting for confirmation. Elevate retains approval authority.':'Missing verifiable GitHub output',
+  tool_output:{conversation_id:'original-conversation',start_task_id:'original-start'}};
+ vi.stubGlobal('fetch',vi.fn(async()=>Response.json({repairs:[repairDashboardReceipt(row,task,'owner')]})));
+ render(<OpenHandsRepairPanel/>);
+ await screen.findByText('Existing conversation: original-conversation');
+ const link=screen.queryByRole('link',{name:'Review pending action in original OpenHands conversation'});
+ if(providerWait)expect(link).toHaveAttribute('href','https://app.all-hands.dev/conversations/original-conversation');
+ else expect(link).toBeNull();
+});

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { isApprovedPaidEnrollment, hasApprovedPaidLearnerEnrollment } from '../../lib/learner/approved-paid-admission.mjs';
+import { isApprovedPaidEnrollment, hasApprovedPaidLearnerEnrollment, hasAdmissionPaymentOrFunding } from '../../lib/learner/approved-paid-admission.mjs';
 
 const valid = {
   user_id:'student-1', student_id:null, status:'active', payment_status:'paid',
@@ -9,7 +9,7 @@ const valid = {
   revoked_at:null, cancelled_at:null, suspended_at:null, refunded_at:null
 };
 
-test('only active paid explicitly admin-approved enrollment unlocks the learner',()=>{
+test('legacy paid enrollment requires approval and active access',()=>{
   assert.equal(isApprovedPaidEnrollment(valid),true);
   for (const field of ['approved_at','approved_by','access_granted_at']) {
     assert.equal(isApprovedPaidEnrollment({...valid,[field]:null}),false,field);
@@ -37,4 +37,27 @@ test('fails closed on read errors and does not mutate enrollment records',async(
   const db={from:()=>({select:()=>({or:()=>({limit:async()=>({data:null,error:{message:'offline'}})})}),update:()=>{writes++;throw Error('must not write');}})};
   await assert.rejects(hasApprovedPaidLearnerEnrollment(db,'student-1'),/LEARNER_ENROLLMENT_ACCESS_CHECK_UNAVAILABLE/);
   assert.equal(writes,0);
+});
+
+
+test('verified self-pay and manually approved state funding grant access independently', () => {
+  const selfPay = {
+    ...valid, funding_source: 'self_pay', approved_at: null, approved_by: null,
+    payment_reference: 'invoice', self_pay_application_verified_at: '2026-11-18T01:00:00Z',
+  };
+  assert.equal(isApprovedPaidEnrollment(selfPay), true);
+  assert.equal(isApprovedPaidEnrollment({ ...selfPay, self_pay_application_verified_at: null }), false);
+  assert.equal(isApprovedPaidEnrollment({ ...selfPay, payment_reference: null }), false);
+  assert.equal(isApprovedPaidEnrollment({ ...selfPay, funding_source: 'wioa' }), false);
+  assert.equal(isApprovedPaidEnrollment({ ...selfPay, refunded_at: valid.access_granted_at }), false);
+  const stateFunded = { ...valid, funding_source: 'wioa', funding_verified: true, eligibility_status: 'eligible', payment_status: 'pending' };
+  assert.equal(isApprovedPaidEnrollment(stateFunded), true);
+  assert.equal(isApprovedPaidEnrollment({ ...stateFunded, approved_by: null }), false);
+  for (const funding_source of ['wioa', 'wrg', 'workone', 'jri']) {
+    const paidFunded = { ...stateFunded, funding_source, payment_status: 'paid' };
+    assert.equal(hasAdmissionPaymentOrFunding(paidFunded), true);
+    assert.equal(hasAdmissionPaymentOrFunding({ ...paidFunded, funding_verified: false }), false);
+    assert.equal(hasAdmissionPaymentOrFunding({ ...paidFunded, eligibility_status: null }), false);
+  }
+  assert.equal(isApprovedPaidEnrollment({ ...stateFunded, funding_verified: false, payment_status: 'paid' }), false);
 });

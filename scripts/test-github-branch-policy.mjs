@@ -32,3 +32,17 @@ test('permission denial returns a safe failure without reading the upstream body
   assert.equal(result.ok, false);
   assert.equal(result.reason, 'github_app_administration_read_required');
 });
+
+test('zero-review policy is read literally, while absent or malformed policy is unknown', async () => {
+  for (const [raw, expected] of [
+    [{ required_pull_request_reviews: { required_approving_review_count: 0 } }, 0],
+    [{}, null],
+    [{ required_pull_request_reviews: {} }, null],
+    [{ required_pull_request_reviews: { required_approving_review_count: -1 } }, null],
+  ]) {
+    const result = await readGitHubBranchPolicy('synthetic-only', async () => ({
+      ok: true, status: 200, json: async () => raw,
+    }));
+    assert.equal(result.policy.requiredApprovals, expected);
+  }
+});

@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { headers } from 'next/headers';
 import type { ReactNode } from 'react';
 
 const tools = [
@@ -10,7 +11,8 @@ const tools = [
   { label: 'Dashboard', href: '/dashboard' },
 ];
 
-export default function PhoneLayout({ children }: { children: ReactNode }) {
+export default async function PhoneLayout({ children }: { children: ReactNode }) {
+  if ((await headers()).get('x-elevate-staff-inbox') === '1') return children;
   return (
     <>
       <nav aria-label="Phone app navigation" className="flex flex-wrap gap-2 border-b border-slate-200 bg-white p-4">

@@ -21,7 +21,17 @@ const db = createClient(supabaseUrl, serviceRoleKey, {
   auth: { autoRefreshToken: false, persistSession: false },
 });
 
+const qaHostname = new URL(supabaseUrl).hostname;
+if (qaHostname !== 'isdgjcdabhxxozarmxta.supabase.co') {
+  throw new Error('This fixture may run only against the isolated QA project');
+}
+
 const tenantId = '6ba71334-58f4-4104-9b2a-5114f2a7614c';
+// The desktop-chrome workflow runs shards in parallel against the same QA
+// project: QA_PORTAL_E2E_RUN_ID is per-shard (run-attempt-shard), while
+// GITHUB_RUN_ID is shared, so a shared marker would collide on the
+// disposable apprentice/host emails. The registered-apprenticeship workflow
+// does not set QA_PORTAL_E2E_RUN_ID and keeps the GITHUB_RUN_ID marker.
 const runId = String(process.env.QA_PORTAL_E2E_RUN_ID || process.env.GITHUB_RUN_ID || Date.now());
 const marker = `qa-e2e-${runId}`;
 
@@ -240,10 +250,26 @@ async function provision() {
         enrolled_at: new Date().toISOString(),
         started_at: new Date().toISOString(),
         access_granted_at: new Date().toISOString(),
+        // The apprentice layout admits only enrollments that pass
+        // hasApprovedPaidLearnerEnrollment (lib/learner/approved-paid-admission.mjs):
+        // access_status active/granted + access_granted_at + (manual approval
+        // OR verified self-pay with a payment reference) + a paid payment
+        // status. The fixture is self-pay QA, so it carries the verified
+        // self-pay grant — the same fields PR #2822's paid-access grant
+        // writes for real paid enrollments. The old row set access_granted_at
+        // but no access_status, payment_status 'qa_test' (which the admission
+        // test explicitly lists as non-admitting), and no approval or
+        // verification, so the disposable apprentice landed on
+        // /lms/access-pending and no apprentice surface could be certified
+        // (run 45266295624, shard 4/4). The QA marker survives on
+        // funding_pathway 'qa_e2e', draft_data and source 'qa_e2e'.
+        access_status: 'active',
+        self_pay_application_verified_at: new Date().toISOString(),
+        payment_reference: `qa-e2e-${runId}`,
         funding_source: 'SELF_PAY',
         funding_pathway: 'qa_e2e',
         funding_status: 'unfunded_self_continuing',
-        payment_status: 'qa_test',
+        payment_status: 'paid',
         ...isolatedAccess,
         funding_verified: false,
         organization_id: program.organization_id,

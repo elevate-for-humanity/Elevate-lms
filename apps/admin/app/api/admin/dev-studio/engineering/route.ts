@@ -34,8 +34,8 @@ export async function POST(request: NextRequest) {
     if(existing.data?.actor_id!==auth.id || existing.data?.goal!==task)return NextResponse.json({error:'This request key belongs to a different repair.'},{status:409});
     status=existing.data.status;
   }
-  return NextResponse.json({repairId:repair.id,status,executed:false,engine:'openhands',
-    summary:'Repair saved for OpenHands. PARIS will verify its commits, run independent checks, open a protected pull request, and verify the production release.'},{status:202});
+  return NextResponse.json({repairId:repair.id,status,executed:false,engine:'paris',
+    summary:'Repair saved. PARIS runs it on the owned engine and verifies its commits, runs independent checks, opens a protected pull request, and verifies the production release. OpenHands is opt-in only and is not used unless PARIS_REPAIR_ENGINE=openhands.'},{status:202});
 }
 
 /** Dashboard status reads never dispatch, approve, publish or replay work. */

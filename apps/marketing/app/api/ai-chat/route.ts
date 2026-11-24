@@ -14,11 +14,15 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import { VERIFIED_WORKFORCE_FUNDED_PROGRAMS } from '@/lib/programs/funding-registry';
 
 export const runtime = 'nodejs';
-export const maxDuration = 60;
+export const maxDuration = 180;
 export const dynamic = 'force-dynamic';
 
-// Leave time for gateway cleanup and the guided response before the route expires.
-const INFERENCE_TIMEOUT_MS = 45_000;
+// Warm-model budget: a warm 7B CPU reply of up to 700 tokens can take over a
+// minute to generate, so the route must not abort at 45s. Cold starts are not
+// the route's job — one model instance stays warm (see
+// scripts/gcp/deploy-owned-cpu-model.mjs) — but the route still leaves time
+// for gateway cleanup and the guided response before it expires.
+const INFERENCE_TIMEOUT_MS = 120_000;
 
 type ParisSurface = 'public' | 'learner' | 'store';
 

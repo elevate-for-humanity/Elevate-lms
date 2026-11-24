@@ -52,10 +52,54 @@ test('stopping a ringing call clears repeats and immediately stops its active to
  }finally{f.restore();}
 });
 
-test('unavailable browser audio returns false without an unhandled ringtone failure',async()=>{
+test('unavailable browser audio reports unavailable without starting a ringtone',async()=>{
  const f=await fixture({broken:true});try {
   assert.equal(await f.api.unlockAudio(),false);
-  f.api.startRingtone();await f.flush();assert.equal(f.timers.size,0);
+  assert.equal(await f.api.startRingtone(),'unavailable');
+  assert.equal(f.api.getRingtoneStatus(),'unavailable');
+  await f.flush();assert.equal(f.timers.size,0);
+ }finally{f.restore();}
+});
+
+test('a ring requested before any gesture starts on the first gesture',async()=>{
+ const f=await fixture();try {
+  assert.equal(await f.api.startRingtone(),'pending');
+  assert.equal(f.api.getRingtoneStatus(),'pending');
+  assert.equal(f.tones.length,0);
+  f.api.installAudioUnlock();
+  f.listeners.get('pointerdown')();
+  await f.flush();
+  assert.equal(f.tones.length,0);
+  // Resolve only the gesture's own resumes: the ringtone's first unlock
+  // attempt stays pending, so the beep can only start via the gesture.
+  for(const resolve of f.pending.slice(1))resolve();
+  await f.flush();
+  assert.equal(f.tones.length,1);assert.equal(f.tones[0].starts,1);
+  assert.equal(f.timers.size,1);assert.equal(f.api.getRingtoneStatus(),'ringing');
+ }finally{f.restore();}
+});
+
+test('a gesture after the call ends does not start a cancelled pending ring',async()=>{
+ const f=await fixture();try {
+  await f.api.startRingtone();
+  f.api.installAudioUnlock();
+  f.api.stopRingtone();
+  f.listeners.get('pointerdown')();
+  for(const resolve of f.pending)resolve();
+  await f.flush();
+  assert.equal(f.tones.length,0);assert.equal(f.timers.size,0);
+ }finally{f.restore();}
+});
+
+test('ringtone status reports pending then ringing as audio unlocks',async()=>{
+ const f=await fixture();try {
+  const seen=[];const remove=f.api.onRingtoneStatusChange(status=>seen.push(status));
+  assert.equal(await f.api.startRingtone(),'pending');
+  assert.deepEqual(seen,['pending']);
+  f.pending.shift()();await f.flush();
+  assert.deepEqual(seen,['pending','ringing']);
+  remove();f.api.stopRingtone();
+  assert.deepEqual(seen,['pending','ringing']);
  }finally{f.restore();}
 });
 

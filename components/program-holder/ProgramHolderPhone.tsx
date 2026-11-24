@@ -27,7 +27,14 @@ import {
 } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { getPushNotificationClient } from '@/lib/notifications/push-client';
-import { installAudioUnlock, startRingtone, stopRingtone } from '@/lib/notifications/audio-unlock';
+import {
+  installAudioUnlock,
+  onRingtoneStatusChange,
+  startRingtone,
+  stopRingtone,
+  type RingtoneStatus,
+} from '@/lib/notifications/audio-unlock';
+import { log } from '@/lib/logger';
 import { PhoneRecordingPlayer } from '@/components/communications/PhoneRecordingPlayer';
 import { ProgramHolderPhoneIntroduction } from '@/components/program-holder/ProgramHolderPhoneIntroduction';
 import { phonePresenceDisplay } from '@/lib/phone/presence-display';
@@ -150,6 +157,20 @@ export function ProgramHolderPhone({
   const registeredRef = useRef(false);
   const ringModeRef = useRef<RingMode>('ring');
   const autoConnectAttemptedRef = useRef(false);
+  const [ringtoneStatus, setRingtoneStatus] = useState<RingtoneStatus>('idle');
+  const [testingRing, setTestingRing] = useState(false);
+  const fallbackRingingRef = useRef(false);
+  const testRingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Cancels a test ring's auto-stop timer. The beep itself is stopped by the
+  // caller (startRingtone stops any previous ring; answer/hangup stop it too).
+  const stopTestRing = useCallback(() => {
+    if (testRingTimerRef.current) {
+      clearTimeout(testRingTimerRef.current);
+      testRingTimerRef.current = null;
+    }
+    setTestingRing(false);
+  }, []);
 
   useEffect(() => {
     if (data) ringModeRef.current = data.extension.ringMode;
@@ -159,8 +180,20 @@ export function ProgramHolderPhone({
   // an inbound call can ring without the operator touching the phone first.
   useEffect(() => {
     const removeAudioUnlock = installAudioUnlock();
+    const removeRingtoneStatus = onRingtoneStatusChange((status) => {
+      setRingtoneStatus(status);
+      if (status === 'ringing' && fallbackRingingRef.current) {
+        // The primary beep is sounding; silence the SIP fallback.
+        fallbackRingingRef.current = false;
+        log.info('[phone] ringtone: primary beep sounding; stopping SIP fallback');
+        callRef.current?.stopRingtone();
+      }
+    });
     return () => {
+      removeRingtoneStatus();
       removeAudioUnlock();
+      if (testRingTimerRef.current) clearTimeout(testRingTimerRef.current);
+      testRingTimerRef.current = null;
       stopRingtone();
     };
   }, []);
@@ -359,13 +392,34 @@ export function ProgramHolderPhone({
           );
           setCallState('ringing');
           if (ringModeRef.current === 'ring') {
-            // Use the gesture-primed context once, rather than also starting a
-            // second SDK AudioContext that mobile autoplay may keep suspended.
-            startRingtone();
+            // A test ring must never outlive a real call: cancel its timer so
+            // it cannot stop the real ringtone.
+            stopTestRing();
+            void Promise.resolve(startRingtone()).then((status) => {
+              if (callRef.current?.id !== call.id) return;
+              if (status === 'ringing') {
+                log.info('[phone] ringtone: primary beep sounding');
+                return;
+              }
+              // The primary beep did not start (audio still locked or this
+              // browser has no audio): fall back to the SIP ringtone, which
+              // retries on its own interval. The fallback is silenced as soon
+              // as the primary beep starts.
+              log.info('[phone] ringtone: primary beep did not start; starting SIP fallback', {
+                status,
+              });
+              try {
+                call.playRingtone();
+                fallbackRingingRef.current = true;
+              } catch {
+                log.info('[phone] ringtone: SIP fallback could not start');
+              }
+            });
           }
           if (ringModeRef.current === 'vibrate') navigator.vibrate?.([350, 150, 350, 150, 700]);
         } else if (state === 'active') {
           stopRingtone();
+          fallbackRingingRef.current = false;
           callRef.current = call;
           setCallState('active');
           setMuted(false);
@@ -373,6 +427,7 @@ export function ProgramHolderPhone({
           navigator.vibrate?.(0);
         } else if (state === 'hangup' || state === 'destroy' || state === 'purge') {
           stopRingtone();
+          fallbackRingingRef.current = false;
           if (callRef.current?.id === call.id) {
             callRef.current = null;
             setCallState('idle');
@@ -400,7 +455,7 @@ export function ProgramHolderPhone({
       clearDeadline();
       controller.signal.removeEventListener('abort', clearDeadline);
     }
-  }, [connected, connecting, data, disconnect, heartbeat]);
+  }, [connected, connecting, data, disconnect, heartbeat, stopTestRing]);
 
   useEffect(() => {
     if (
@@ -465,6 +520,7 @@ export function ProgramHolderPhone({
       );
       if (mode !== 'ring') {
         callRef.current?.stopRingtone();
+        fallbackRingingRef.current = false;
         stopRingtone();
       }
       if (mode !== 'vibrate') navigator.vibrate?.(0);
@@ -488,6 +544,39 @@ export function ProgramHolderPhone({
     }
   }
 
+  /**
+   * Play the actual inbound ringtone for five seconds so the operator can
+   * verify sound before a real call. Starting a real call, answering, or
+   * hanging up always stops a test ring first.
+   */
+  async function testRing() {
+    if (testingRing) {
+      stopTestRing();
+      stopRingtone();
+      setMessage('Test ring stopped.');
+      return;
+    }
+    setError('');
+    const status = await Promise.resolve(startRingtone());
+    if (status === 'unavailable') {
+      setError(
+        'The test ring could not play on this device. Check the volume and that this browser allows sound, then try again.',
+      );
+      return;
+    }
+    setTestingRing(true);
+    setMessage(
+      status === 'pending'
+        ? 'Waiting for audio — tap anywhere on the page if you do not hear the ring.'
+        : 'Test ring playing — you should hear a repeating beep.',
+    );
+    testRingTimerRef.current = setTimeout(() => {
+      testRingTimerRef.current = null;
+      stopRingtone();
+      setTestingRing(false);
+    }, 5000);
+  }
+
   async function enableNotifications() {
     if (data?.readOnly) return;
     setError('');
@@ -507,6 +596,7 @@ export function ProgramHolderPhone({
     const call = callRef.current;
     if (!call) return;
     call.stopRingtone();
+    fallbackRingingRef.current = false;
     stopRingtone();
     navigator.vibrate?.(0);
     try {
@@ -520,6 +610,7 @@ export function ProgramHolderPhone({
     const call = callRef.current;
     if (!call) return;
     call.stopRingtone();
+    fallbackRingingRef.current = false;
     stopRingtone();
     navigator.vibrate?.(0);
     await call.hangup();
@@ -936,6 +1027,9 @@ export function ProgramHolderPhone({
                 : 'Call connected'}
           </p>
           <h2 className="mt-2 text-3xl font-black">{friendlyNumber(incomingNumber)}</h2>
+          {callState === 'ringing' && ringtoneStatus === 'pending' && (
+            <p className="mt-3 text-sm font-bold text-amber-300">Tap anywhere to hear the ring.</p>
+          )}
           <div className="mt-6 flex flex-wrap justify-center gap-3">
             {callState === 'ringing' && (
               <button
@@ -1158,6 +1252,14 @@ export function ProgramHolderPhone({
               )}
               {notificationsEnabled ? 'Alerts enabled' : 'Enable missed-call alerts'}
             </button>
+            <button
+              onClick={() => void testRing()}
+              disabled={data.readOnly || callState !== 'idle'}
+              className="min-h-12 rounded-xl border border-slate-300 bg-white px-5 font-black text-slate-900 disabled:opacity-50"
+            >
+              <BellRing className="mr-2 inline h-5 w-5" />
+              {testingRing ? 'Stop test ring' : 'Test ring'}
+            </button>
           </div>
           <label className="mt-4 flex items-start gap-3 rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm font-bold text-slate-800">
             <input
@@ -1214,7 +1316,8 @@ export function ProgramHolderPhone({
           <p className="mt-4 text-xs leading-5 text-slate-500">
             For the most reliable live ringing, install the PWA and keep it open or recently active.
             If the phone is asleep, offline, outside your hours, or unanswered, PARIS takes the call
-            and sends a secure missed-call alert.
+            and sends a secure missed-call alert. Test ring plays the incoming-call sound on this
+            device so you can check the volume before a real call.
           </p>
         </section>
       </div>

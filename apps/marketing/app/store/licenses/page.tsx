@@ -62,7 +62,7 @@ export default function LicensesPage() {
 
                 {product.slug === 'school-license' ? (
                   <>
-                    <Link href="/store/licenses/checkout/school-license" className="mt-7 inline-flex items-center justify-center rounded-xl bg-brand-red-600 px-6 py-3 font-bold text-white hover:bg-brand-red-700">Purchase Now <ArrowRight className="ml-2 h-4 w-4" /></Link>
+                    <Link href="/store/cart?add=school-license" className="mt-7 inline-flex items-center justify-center rounded-xl bg-brand-red-600 px-6 py-3 font-bold text-white hover:bg-brand-red-700">Purchase Now <ArrowRight className="ml-2 h-4 w-4" /></Link>
                     <Link href={`/contact?topic=platform-licensing&product=${encodeURIComponent(product.slug)}`} className="mt-3 inline-flex items-center justify-center text-sm font-bold text-slate-600 hover:text-slate-900">or request a scoped quote <ArrowRight className="ml-1 h-3.5 w-3.5" /></Link>
                   </>
                 ) : (
@@ -94,7 +94,7 @@ export default function LicensesPage() {
                       <p key={feature} className="flex items-start gap-2 text-sm text-slate-800"><Check className="mt-0.5 h-4 w-4 shrink-0 text-brand-green-700" /> {feature}</p>
                     ))}
                   </div>
-                  <Link href={`/store/licenses/checkout/${license.slug}`} className="mt-7 inline-flex w-full items-center justify-center rounded-xl bg-purple-700 px-6 py-3 font-bold text-white hover:bg-purple-800">Purchase Now <ArrowRight className="ml-2 h-4 w-4" /></Link>
+                  <Link href={`/store/cart?add=${license.slug}`} className="mt-7 inline-flex w-full items-center justify-center rounded-xl bg-purple-700 px-6 py-3 font-bold text-white hover:bg-purple-800">Purchase Now <ArrowRight className="ml-2 h-4 w-4" /></Link>
                   <Link href={`/contact?topic=source-license&product=${encodeURIComponent(license.slug)}`} className="mt-3 inline-flex w-full items-center justify-center text-sm font-bold text-slate-600 hover:text-slate-900">Questions? Talk to Sales</Link>
                 </article>
               ))}

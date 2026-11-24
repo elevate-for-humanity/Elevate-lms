@@ -49,7 +49,7 @@ export async function verifyCourseAccess(courseId: string): Promise<CourseAccess
     // rows are excluded, so no payment check is bypassed here.
     const { data: direct, error: directError } = await supabase
       .from('course_enrollments')
-      .select('id, status, revoked_at, end_date')
+      .select('id, status, revoked_at')
       .eq('student_id', user.id)
       .eq('course_id', courseId)
       .is('revoked_at', null)
@@ -97,10 +97,12 @@ export async function verifyCourseAccess(courseId: string): Promise<CourseAccess
     }
     // A resolved program link must fall through to the approved-paid check.
     // Only an actual, successfully read direct row can take this branch.
+    // (Direct course_enrollments rows carry no end_date column — verified
+    // paid fulfillment creates them with student_id/course_id/status only —
+    // so there is no expiry to enforce here. Selecting a nonexistent
+    // end_date made PostgREST error and the direct path never admitted
+    // anyone; it also failed the schema-drift gate.)
     if (!directError && direct) {
-      if (direct.end_date && new Date(direct.end_date) < new Date()) {
-        return { hasAccess: false, enrollment: direct, reason: 'expired' };
-      }
       return { hasAccess: true, enrollment: direct };
     }
   }

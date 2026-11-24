@@ -77,10 +77,7 @@ function normalizeName(name: string): string {
  * platform user id, the email, and the normalized name (+ phone when
  * present). Two rows are the same person when ANY key matches — the admin
  * list contains the same applicant twice under different emails, so a
- * single email key would miss those. Name-only collisions between two
- * different people are possible but rare in a small batch, and duplicates
- * are reported in the preview (not silently dropped), so an admin can
- * review them and assign anyone wrongly skipped by id.
+ * single email key would miss those.
  */
 export function applicantIdentityKeys(app: ApplicantRow): string[] {
   const keys: string[] = [];
@@ -91,7 +88,6 @@ export function applicantIdentityKeys(app: ApplicantRow): string[] {
   if (userId) keys.push(`user:${userId}`);
   if (email) keys.push(`email:${email}`);
   if (name && phone) keys.push(`name-phone:${name}:${phone}`);
-  else if (name) keys.push(`name:${name}`);
   if (!keys.length) keys.push(`application:${app.id}`);
   return keys;
 }

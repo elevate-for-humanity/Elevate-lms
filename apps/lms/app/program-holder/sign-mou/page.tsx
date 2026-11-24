@@ -1,4 +1,4 @@
-import { ACHIEVE_HOLDER_ID, achieveCnaAgreements, achieveDocumentVersion, hasCurrentAchieveSignature } from '@/lib/program-holder/achieve-cna-agreements';
+import { ACHIEVE_HOLDER_ID, achieveCnaAgreements, achieveCnaRevisionId, achieveDocumentVersion, hasCurrentAchieveSignature } from '@/lib/program-holder/achieve-cna-agreements';
 import { PrintDocumentControl } from '@/components/program-holder/PrintDocumentControl';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
@@ -22,6 +22,7 @@ export default async function SignMouPage() {
   if (error || !holder) throw new Error('Program Holder agreement could not load.');
   const isAchieve = holder.id === ACHIEVE_HOLDER_ID;
   const packet = isAchieve ? achieveCnaAgreements(holder.features) : null;
+  const revisionId = isAchieve ? achieveCnaRevisionId(holder.features) : null;
   const signed = holder.mou_signed && (!isAchieve || hasCurrentAchieveSignature(holder.features, 'mou', packet?.digest));
   const executedUrl = typeof holder.mou_final_pdf_url === 'string' && /^https:\/\//i.test(holder.mou_final_pdf_url) ? holder.mou_final_pdf_url : null;
   const approvalReady = ['approved', 'active', 'approved_pending_mou'].includes(holder.status) && Boolean(holder.approved_at);
@@ -96,14 +97,16 @@ export default async function SignMouPage() {
           </div>
         ) : context.mode === 'preview' ? (
           <p className="mt-6 rounded-xl bg-blue-50 p-5">Administrator preview is read only. The Program Holder must sign from their own account.</p>
-        ) : isAchieve && !packet ? (
+        ) : isAchieve && (!packet || !revisionId) ? (
           <p className="mt-6 rounded-xl bg-amber-50 p-5">Signing opens when Elevate publishes the finalized CNA MOU and Schedule A.</p>
         ) : !approvalReady ? (
           <p className="mt-6 rounded-xl bg-amber-50 p-5">Review these documents while Elevate completes your application approval. Your signature is not recorded by viewing this page.</p>
         ) : (
           <DocumentSignatureBlock
             agreementType="program_holder_mou"
-            agreementVersion={packet ? achieveDocumentVersion('mou', packet.digest) : `3.0-${holder.id}`}
+            agreementVersion={packet && revisionId
+              ? achieveDocumentVersion('mou', packet.digest, revisionId)
+              : `3.0-${holder.id}`}
             buttonLabel="Sign Program Holder MOU & Continue"
             nextUrl="/program-holder/dashboard"
           />

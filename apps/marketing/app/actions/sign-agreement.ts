@@ -12,6 +12,7 @@ import { checkAndSendOnboardingCompleteEmail } from '@/lib/program-holder/onboar
 import {
   ACHIEVE_HOLDER_ID,
   achieveCnaAgreements,
+  achieveCnaRevisionId,
   achieveDocumentVersion,
   type AchieveDocument,
 } from '@/lib/program-holder/achieve-cna-agreements';
@@ -46,6 +47,7 @@ export async function signAgreement(data: {
     kind: AchieveDocument;
     features: Record<string, unknown>;
     packet: Record<string, unknown>;
+    revisionId: string;
     updatedAt: string | null;
   } | undefined;
   if (signingMou || signingAchieveNda) {
@@ -65,8 +67,10 @@ export async function signAgreement(data: {
         return { success: false, error: 'Your agreement will be available after approval.' };
       }
       const approved = achieveCnaAgreements(holder.features);
+      const revisionId = achieveCnaRevisionId(holder.features);
       const kind = signingAchieveNda ? 'nda' : 'mou';
-      if (!approved || data.agreementVersion !== achieveDocumentVersion(kind, approved.digest)) {
+      if (!approved || !revisionId ||
+          data.agreementVersion !== achieveDocumentVersion(kind, approved.digest, revisionId)) {
         return { success: false, error: 'The finalized CNA agreement is unavailable or changed. Open the current agreement before signing.' };
       }
       if (!['checkbox', 'typed', 'drawn'].includes(data.method) ||
@@ -74,7 +78,13 @@ export async function signAgreement(data: {
           (data.method === 'drawn' && !data.signature?.startsWith('data:image/png;base64,'))) {
         return { success: false, error: 'Enter a valid signature for the current agreement.' };
       }
-      achieveSignature = { kind, features: holder.features, packet: approved.packet, updatedAt: holder.updated_at };
+      achieveSignature = {
+        kind,
+        features: holder.features,
+        packet: approved.packet,
+        revisionId,
+        updatedAt: holder.updated_at,
+      };
     } else if (signingAchieveNda || (!signingPaymentAddendum && data.agreementVersion !== `3.0-${holderId}`)) {
       return { success: false, error: 'The agreement changed. Reload and review the current terms before signing.' };
     }
@@ -102,7 +112,10 @@ export async function signAgreement(data: {
     signatureData: data.method === 'drawn' ? data.signature : undefined,
     ipAddress,
     userAgent,
-    context: achieveSignature ? `achieve-cna-${achieveSignature.kind}` : 'onboarding',
+    context: achieveSignature ? `achieve-cna-${achieveSignature.kind}:${achieveSignature.revisionId}` : 'onboarding',
+    documentUrl: achieveSignature
+      ? `db://public.achieve_cna_packet_revisions/${achieveSignature.revisionId}`
+      : undefined,
     organizationId: profile?.organization_id || undefined,
     tenantId: profile?.tenant_id || undefined,
   });
@@ -129,6 +142,7 @@ export async function signAgreement(data: {
           ...achieveSignature.features,
           [`achieve_cna_signed_${achieveSignature.kind}`]: {
             packet: achieveSignature.packet,
+            revision_id: achieveSignature.revisionId,
             version: data.agreementVersion,
             acceptance_id: result.id,
             signed_at: signedAt,

@@ -50,12 +50,16 @@ export default async function AchieveCnaAgreementPublication({
       approval_reference: text('approval_reference'),
       schedule_a: Object.fromEntries(Object.keys(ACHIEVE_SCHEDULE_FIELDS).map((key) => [key, text(key)])),
     };
-    if (form.get('confirm_approval') !== 'yes' || !achieveCnaAgreements({ achieve_cna_agreements: packet })) {
+    const approvedPacket = achieveCnaAgreements({ achieve_cna_agreements: packet });
+    if (form.get('confirm_approval') !== 'yes' || !approvedPacket) {
       redirect(`${destination}?result=incomplete`);
     }
     const admin = await requireAdminClient();
     const { error: publishError } = await admin.rpc('publish_achieve_cna_packet_v1', {
-      p_actor_id: user.id, p_expected: expected, p_packet: packet,
+      p_actor_id: user.id,
+      p_expected: expected,
+      p_packet: packet,
+      p_packet_digest: approvedPacket.digest,
     });
     if (publishError) redirect(`${destination}?result=${publishError.code === '23514' ? 'changed' : 'failed'}`);
     redirect(`${destination}?result=published`);

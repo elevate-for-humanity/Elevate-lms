@@ -33,8 +33,16 @@ export function achieveCnaAgreements(features: Record<string, unknown> | null | 
   return { packet, mou, nda, scheduleTerms, digest, approvalReference };
 }
 
-export function achieveDocumentVersion(kind: AchieveDocument, digest: string) {
-  return `achieve-cna-${kind}-${digest}`;
+export function achieveDocumentVersion(kind: AchieveDocument, digest: string, revisionId: string) {
+  return `achieve-cna-${kind}-${digest}-${revisionId}`;
+}
+
+export function achieveCnaRevisionId(features: Record<string, unknown> | null | undefined) {
+  const value = features?.achieve_cna_current_revision_id;
+  return typeof value === 'string' &&
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value)
+    ? value
+    : null;
 }
 
 export function hasCurrentAchieveSignature(
@@ -42,6 +50,12 @@ export function hasCurrentAchieveSignature(
   kind: AchieveDocument,
   digest: string | undefined,
 ): boolean {
-  const signed = features?.[`achieve_cna_signed_${kind}`] as { version?: string; acceptance_id?: string } | undefined;
-  return Boolean(signed?.acceptance_id && digest && signed.version === achieveDocumentVersion(kind, digest));
+  const revisionId = achieveCnaRevisionId(features);
+  const signed = features?.[`achieve_cna_signed_${kind}`] as {
+    version?: string;
+    revision_id?: string;
+    acceptance_id?: string;
+  } | undefined;
+  return Boolean(signed?.acceptance_id && digest && revisionId && signed.revision_id === revisionId &&
+    signed.version === achieveDocumentVersion(kind, digest, revisionId));
 }

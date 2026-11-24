@@ -47,6 +47,7 @@ export interface RecordAgreementParams {
   organizationId?: string;
   tenantId?: string;
   programId?: string;
+  documentUrl?: string;
 }
 
 export interface RecordAgreementResult {
@@ -86,6 +87,7 @@ export async function recordAgreementAcceptance(
     organizationId,
     tenantId,
     programId,
+    documentUrl,
   } = params;
 
   // Validate email match
@@ -132,6 +134,7 @@ export async function recordAgreementAcceptance(
       organization_id: organizationId || null,
       tenant_id: tenantId || null,
       program_id: programId || null,
+      document_url: documentUrl || null,
       role_at_signing: userRole,
       legal_acknowledgment: true,
       is_immutable: true,

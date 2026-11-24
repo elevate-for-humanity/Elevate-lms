@@ -25,7 +25,12 @@ it('blocks signing until the finalized packet includes all Schedule A terms', ()
 it('binds each signature to its own agreement and the current packet', () => {
   const approved = achieveCnaAgreements({ achieve_cna_agreements: packet })!;
   const features = {
-    achieve_cna_signed_mou: { version: achieveDocumentVersion('mou', approved.digest), acceptance_id: 'mou-receipt' },
+    achieve_cna_current_revision_id: '11111111-1111-4111-8111-111111111111',
+    achieve_cna_signed_mou: {
+      version: achieveDocumentVersion('mou', approved.digest, '11111111-1111-4111-8111-111111111111'),
+      revision_id: '11111111-1111-4111-8111-111111111111',
+      acceptance_id: 'mou-receipt',
+    },
     nda: true,
   };
   expect(hasCurrentAchieveSignature(features, 'mou', approved.digest)).toBe(true);
@@ -34,4 +39,8 @@ it('binds each signature to its own agreement and the current packet', () => {
     ...packet, schedule_a: { ...packet.schedule_a, payment_timing: 'Revised timing' },
   } })!;
   expect(hasCurrentAchieveSignature(features, 'mou', revised.digest)).toBe(false);
+  expect(hasCurrentAchieveSignature({
+    ...features,
+    achieve_cna_current_revision_id: '22222222-2222-4222-8222-222222222222',
+  }, 'mou', approved.digest)).toBe(false);
 });

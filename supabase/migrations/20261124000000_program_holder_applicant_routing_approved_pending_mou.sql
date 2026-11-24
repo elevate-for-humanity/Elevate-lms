@@ -10,8 +10,11 @@ as $$
   select coalesce(
     p_mou_signed
     and jsonb_typeof(p_features->'achieve_cna_agreements') = 'object'
+    and nullif(p_features->>'achieve_cna_current_revision_id', '') is not null
     and p_features->'achieve_cna_signed_mou'->'packet' = p_features->'achieve_cna_agreements'
     and p_features->'achieve_cna_signed_nda'->'packet' = p_features->'achieve_cna_agreements'
+    and p_features->'achieve_cna_signed_mou'->>'revision_id' = p_features->>'achieve_cna_current_revision_id'
+    and p_features->'achieve_cna_signed_nda'->>'revision_id' = p_features->>'achieve_cna_current_revision_id'
     and nullif(p_features->'achieve_cna_signed_mou'->>'acceptance_id', '') is not null
     and nullif(p_features->'achieve_cna_signed_nda'->>'acceptance_id', '') is not null,
     false

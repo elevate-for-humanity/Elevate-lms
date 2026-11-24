@@ -151,12 +151,19 @@ describe('fixed provider verification callback boundary', () => {
     expect(response.headers.get('set-cookie')).toContain('Max-Age=0');
   });
 
-  it.each(['expired', 'wrong_browser', 'failed'] as const)('returns only the finite %s marker and clears the nonce', async marker => {
+  it.each(['expired', 'wrong_browser', 'failed'] as const)('preserves the pending nonce when %s occurs before a matching claim', async marker => {
     mocks.complete.mockRejectedValue(new ProviderVerificationFailure(marker));
     const response = await GET(callback());
     expect(new URL(response.headers.get('location')!).searchParams.get('provider_email_verification')).toBe(marker);
-    expect(response.headers.get('set-cookie')).toContain('Max-Age=0');
+    expect(response.headers.get('set-cookie')).toBeNull();
     expect(await response.text()).not.toContain(nonce);
+  });
+
+  it.each(['expired', 'failed'] as const)('clears the spent nonce after a matching claim even when completion is %s', async marker => {
+    mocks.complete.mockRejectedValue(new ProviderVerificationFailure(marker, true));
+    const response = await GET(callback());
+    expect(new URL(response.headers.get('location')!).searchParams.get('provider_email_verification')).toBe(marker);
+    expect(response.headers.get('set-cookie')).toContain('Max-Age=0');
   });
 
   it('does not expose arbitrary Auth/database failures in a redirect', async () => {
@@ -164,12 +171,14 @@ describe('fixed provider verification callback boundary', () => {
     const response = await GET(callback());
     expect(response.headers.get('location')).toBe(`${origin}/sites/2exclusive-platinum-cleaning/provider?provider_email_verification=failed`);
     expect([...response.headers].join()).not.toContain('SECRET_PKCE');
+    expect(response.headers.get('set-cookie')).toBeNull();
   });
 
   it.each(['state', 'code'])('rejects duplicate %s query values instead of choosing one', async field => {
     mocks.complete.mockRejectedValue(new ProviderVerificationFailure('expired'));
-    await GET(callback(`state=${state}&code=${code}&${field}=different`));
+    const response = await GET(callback(`state=${state}&code=${code}&${field}=different`));
     expect(mocks.complete.mock.calls[0][0][field]).toBeNull();
+    expect(response.headers.get('set-cookie')).toBeNull();
   });
 
   it.each(['unpublished', 'disabled', 'hosting-unavailable', 'wrong-host'])('rechecks fixed site availability before proof completion (%s)', async kind => {
@@ -179,5 +188,6 @@ describe('fixed provider verification callback boundary', () => {
     const response = await GET(callback(undefined, nonce, kind === 'wrong-host' ? 'https://attacker.invalid' : origin));
     expect(new URL(response.headers.get('location')!).searchParams.get('provider_email_verification')).toBe('failed');
     expect(mocks.complete).not.toHaveBeenCalled();
+    expect(response.headers.get('set-cookie')).toBeNull();
   });
 });

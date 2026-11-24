@@ -34,7 +34,7 @@ export default async function ProgramHolderApplicationsPage() {
   const [{ data: applications, error: applicationError }, { data: catalog, error: catalogError }] = await Promise.all([
     supabase.from('program_holder_applications').select('*').order('created_at', { ascending: false }).limit(200),
     supabase.from('programs').select('id,slug,title,name,is_active,status')
-      .eq('is_active', true).eq('status', 'active').order('title'),
+      .eq('is_active', true).in('status', ['active', 'published']).order('title'),
   ]);
   if (applicationError) throw new Error('Program Holder applications are temporarily unavailable.');
   const programs = (catalogError ? [] : catalog || []).filter(isActiveProgramHolderScopeProgram)

@@ -32,6 +32,9 @@ This repair:
 - Keeps authenticated general community outside the learner admission layout.
   Approved business roles retain their respective portals; student course access
   still requires the existing admission checks.
+- Gives the visible signup form ownership of its sign-in destination. The
+  page-level fallback appears only when registration is unavailable, so selecting
+  Community cannot leave a second link pointing at learner admission.
 - Preserves safe return destinations across signup, verification, resend, OAuth
   and login. Public role selections record interest, not authority.
 - Lets the Auth SDK finish its URL initialization before completing the callback,
@@ -45,6 +48,10 @@ This repair:
 - Captures a Janitorial / Building Services Technician program-holder request as
   `requested_program_interest: janitorial`, separate from learner program slugs.
   Approval requires an actual active program link before account/role provisioning.
+- Accepts canonical catalog programs with `is_active = true` and status `active`
+  or `published`, matching the program publisher. The picker, scope resolution
+  and final approval use the same eligibility rule and reject unavailable or
+  noncanonical programs.
 - Sends role-appropriate generic approval instructions. Gary's custom notice is
   used only for an explicitly assigned Gary site coordinator; its compensation is
   never applied to an ordinary Program Holder.
@@ -86,6 +93,14 @@ cancel a challenge. Expired, replayed, wrong-browser and mismatched identities
 fail closed. Callback status parameters provide feedback only; they cannot
 unlock private data. No new signing secret or alternative email transport is
 introduced.
+
+Provider profile requests, callbacks and email sends use distinct server-owned
+rate-limit buckets. Mail sends remain limited to three per minute for both the
+visitor and the verified user; profile reads/saves and callbacks cannot consume
+that allowance. Provider buckets do not inherit the general internal-IP bypass.
+Rate-limit responses retain their retry timing. An invalid callback preserves a
+pending browser nonce; only a successfully claimed challenge can cause its nonce
+to be cleared on completion or a subsequent failure.
 
 ## Program and payment boundary
 

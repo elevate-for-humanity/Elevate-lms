@@ -93,9 +93,11 @@ export default async function SignupPage({
         </div>
 
         <div className="mt-6 flex flex-wrap gap-4 text-sm text-black">
-          <Link href={`/login?redirect=${encodeURIComponent(destination)}`} className="underline hover:text-brand-blue-600">
-            Already have an account? Log in
-          </Link>
+          {!signupsEnabled && (
+            <Link href={`/login?redirect=${encodeURIComponent(destination)}`} className="underline hover:text-brand-blue-600">
+              Already have an account? Log in
+            </Link>
+          )}
           <Link href="/start" aria-label="Link" className="underline hover:text-brand-blue-600">
             Not ready to create an account? Apply first
           </Link>

@@ -1,15 +1,18 @@
-const ISOLATED_QA_HOST = 'isdgjcdabhxxozarmxta.supabase.co';
+const ISOLATED_QA_ORIGIN = 'https://isdgjcdabhxxozarmxta.supabase.co';
+const PRODUCTION_ORIGIN = 'https://cuxzzpsyufcewtmicszk.supabase.co';
 
 /**
- * Give the isolated roster a representative learner profile without changing
+ * Give a disposable roster a representative learner profile without changing
  * its @qa.invalid Auth identity or the production roster's QA exclusions.
  * The profile-only address is reserved, cannot receive mail, and remains
  * visibly associated with this disposable QA run.
  */
-export async function prepareQaHolderRosterProfile({ db, supabaseUrl, runId, userId }) {
+export async function prepareQaHolderRosterProfile({ db, supabaseUrl, runId, userId, allowProductionDisposables = false }) {
   const url = new URL(supabaseUrl);
-  if (url.protocol !== 'https:' || url.hostname !== ISOLATED_QA_HOST)
-    throw new Error('Holder roster fixtures require the isolated QA project');
+  const allowedOrigin = url.origin === ISOLATED_QA_ORIGIN ||
+    (allowProductionDisposables === true && url.origin === PRODUCTION_ORIGIN);
+  if (!allowedOrigin || url.username || url.password || url.pathname !== '/' || url.search || url.hash)
+    throw new Error('Holder roster fixtures require the isolated QA project or explicitly enabled production disposables');
   if (!/^[a-z0-9-]+$/i.test(String(runId)) || typeof userId !== 'string' || !userId)
     throw new Error('Holder roster fixture identity is invalid');
 

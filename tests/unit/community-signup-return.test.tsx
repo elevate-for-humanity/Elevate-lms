@@ -3,6 +3,7 @@ import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 
 const state = vi.hoisted(() => ({
   params: new URLSearchParams(), signUp: vi.fn(), resend: vi.fn(), oauth: vi.fn(), push: vi.fn(), refresh: vi.fn(),
+  settings: vi.fn(),
 }));
 vi.mock('@/hooks/useSafeSearchParams', () => ({ useSafeSearchParams: () => state.params }));
 vi.mock('next/navigation', () => ({ useRouter: () => ({ push: state.push, refresh: state.refresh }) }));
@@ -10,7 +11,13 @@ vi.mock('@/lib/supabase/public-config', () => ({ isSupabaseAuthConfigured: () =>
 vi.mock('@/lib/supabase/client', () => ({
   createBrowserClient: () => ({ auth: { signUp: state.signUp, resend: state.resend, signInWithOAuth: state.oauth } }),
 }));
+vi.mock('@/lib/supabase/server', () => ({
+  createClient: async () => ({
+    from: () => ({ select: () => ({ eq: () => ({ maybeSingle: state.settings }) }) }),
+  }),
+}));
 import SignupForm from '@/apps/lms/app/signup/SignupForm';
+import SignupPage from '@/apps/lms/app/signup/page';
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -18,6 +25,7 @@ beforeEach(() => {
   state.signUp.mockResolvedValue({ data: { session: null, user: { id: 'new-network-member' } }, error: null });
   state.resend.mockResolvedValue({ error: null });
   state.oauth.mockResolvedValue({ error: null });
+  state.settings.mockResolvedValue({ data: { value: true }, error: null });
 });
 afterEach(() => { cleanup(); vi.useRealTimers(); });
 
@@ -37,6 +45,56 @@ function expectCallback(value: string, destination = '/community') {
   expect(url.pathname).toBe('/auth/callback');
   expect(url.searchParams.get('next')).toBe(destination);
 }
+
+async function renderSignupPage(query: Record<string, string> = {}) {
+  state.params = new URLSearchParams(query);
+  render(await SignupPage({ searchParams: Promise.resolve(query) }));
+}
+
+function expectEveryLoginLink(destination: string) {
+  const links = screen.getAllByRole('link').filter(link =>
+    new URL(link.getAttribute('href')!, window.location.origin).pathname === '/login',
+  );
+  expect(links).toHaveLength(1);
+  for (const link of links) {
+    expect(link).toHaveAttribute('href', `/login?redirect=${encodeURIComponent(destination)}`);
+  }
+}
+
+it('keeps every full-page login link aligned with selected Community before and after signup', async () => {
+  await renderSignupPage();
+  fireEvent.change(screen.getByLabelText('I am interested in'), { target: { value: 'community' } });
+  expectEveryLoginLink('/community');
+  fillAndSubmit('community');
+  await screen.findByText('Account Created!');
+  expectEveryLoginLink('/community');
+});
+
+const explicitPageReturns: Record<string, string>[] = [
+  { next: '/lms/dashboard' },
+  { redirect: 'https://www.elevateforhumanity.org/sites/2exclusive-platinum-cleaning/provider?source=network' },
+  { next: '/community', redirect: '/lms/dashboard' },
+];
+it.each(explicitPageReturns)('preserves an explicit return in every full-page login link for %j', async query => {
+  await renderSignupPage(query);
+  fireEvent.change(screen.getByLabelText('I am interested in'), { target: { value: 'community' } });
+  expectEveryLoginLink(query.next || query.redirect!);
+});
+
+const unavailablePageReturns: [Record<string, string>, string][] = [
+  [{}, '/lms/dashboard'],
+  [{ next: '/community' }, '/community'],
+  [{ redirect: 'https://www.elevateforhumanity.org/sites/2exclusive-platinum-cleaning/provider' },
+    'https://www.elevateforhumanity.org/sites/2exclusive-platinum-cleaning/provider'],
+  [{ next: '/%malformed' }, '/lms/dashboard'],
+];
+it.each(unavailablePageReturns)('retains the page login link when registration is unavailable for %j', async (query, destination) => {
+  state.settings.mockResolvedValue({ data: { value: false }, error: null });
+  await renderSignupPage(query);
+  expect(screen.queryByLabelText('I am interested in')).not.toBeInTheDocument();
+  expect(screen.getByRole('status')).toHaveTextContent('Account registration is temporarily unavailable');
+  expectEveryLoginLink(destination);
+});
 
 it('keeps the community destination in verification and stores employer interest without granting a role', async () => {
   render(<SignupForm />);

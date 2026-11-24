@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
     requireProviderVerificationOrigin(request);
     z.object({}).strict().parse(await request.json());
     const { db, user, session } = await cleaningContext(request, false, 'provider-onboarding');
-    const { browserNonce } = await requestProviderEmailVerification({ db, user, session });
+    const { browserNonce } = await requestProviderEmailVerification({ db, user, session, request });
     const response = reply({ sent: true });
     const cookie = providerVerificationCookie();
     response.cookies.set(cookie.name, browserNonce, cookie.options);

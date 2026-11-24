@@ -1,19 +1,31 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { beforeEach, expect, it, vi } from 'vitest';
 
-const state = vi.hoisted(() => ({ fetch: vi.fn(), refresh: vi.fn(), success: vi.fn(), error: vi.fn(), requireRole: vi.fn(), catalogError: null as unknown }));
+const state = vi.hoisted(() => ({
+  fetch: vi.fn(), refresh: vi.fn(), success: vi.fn(), error: vi.fn(), requireRole: vi.fn(),
+  catalogError: null as unknown, catalog: [] as any[], scopePayload: {} as Record<string, unknown>,
+}));
 vi.mock('next/navigation', () => ({ useRouter: () => ({ refresh: state.refresh }) }));
 vi.mock('react-hot-toast', () => ({ default: { success: state.success, error: state.error } }));
 vi.mock('next/link', () => ({ default: ({ children, href }: any) => <a href={href}>{children}</a> }));
 vi.mock('@/lib/auth/require-role', () => ({ requireRole: state.requireRole }));
 vi.mock('@/lib/supabase/admin', () => ({ requireAdminClient: async () => ({
   from: (table: string) => {
+    const filters: Array<[string, unknown]> = [];
     const query: any = {
-      select: () => query, eq: () => query, in: () => query, order: () => query, limit: () => query,
-      then: (resolve: any) => Promise.resolve(table === 'program_holder_applications'
-        ? { data: [{ id: applicationId, organization_name: 'Fixture organization', status: 'pending', data: reviewedData, created_at: updatedAt, updated_at: updatedAt }], error: null }
-        : table === 'application_intake' ? { data: [{ id: 'intake-1', application_type: 'program_holder', destination_table: 'program_holder_applications', destination_id: applicationId, status: 'processed', payload: reviewedData }], error: null }
-        : { data: [{ ...program, is_active: true, status: 'active' }, { id: 'archived-program', slug: 'hvac-technician', title: 'Archived fixture', is_active: true, status: 'archived' }], error: state.catalogError }).then(resolve),
+      select: () => query, order: () => query, limit: () => query,
+      eq: (key: string, value: unknown) => { filters.push([key, value]); return query; },
+      in: (key: string, values: unknown[]) => { filters.push([key, values]); return query; },
+      then: (resolve: any) => {
+        const rows = table === 'program_holder_applications'
+          ? [{ id: applicationId, organization_name: 'Fixture organization', status: 'pending', data: state.scopePayload, created_at: updatedAt, updated_at: updatedAt }]
+          : table === 'application_intake'
+            ? [{ id: 'intake-1', application_type: 'program_holder', destination_table: 'program_holder_applications', destination_id: applicationId, status: 'processed', payload: state.scopePayload }]
+            : state.catalog;
+        const data = rows.filter((row: any) => filters.every(([key, value]) =>
+          Array.isArray(value) ? value.includes(row[key]) : row[key] === value));
+        return Promise.resolve({ data, error: table === 'programs' ? state.catalogError : null }).then(resolve);
+      },
     };
     return query;
   },
@@ -41,6 +53,43 @@ beforeEach(() => {
   vi.stubGlobal('fetch', state.fetch);
   state.fetch.mockResolvedValue(Response.json({ success: true }));
   state.catalogError = null;
+  state.catalog = [
+    { ...program, is_active: true, status: 'active' },
+    { id: 'archived-program', slug: 'hvac-technician', title: 'Archived fixture', is_active: true, status: 'archived' },
+  ];
+  state.scopePayload = reviewedData;
+});
+
+it.each(['active', 'published'])('offers an eligible %s program, submits its scope choice and enables separate approval after protected review', async (status) => {
+  state.scopePayload = originalData;
+  state.catalog = [
+    { ...program, is_active: true, status },
+    { id: 'inactive-program', slug: 'hvac-technician', title: 'Inactive fixture', is_active: false, status: 'published' },
+    { id: 'draft-program', slug: 'hvac-technician', title: 'Draft fixture', is_active: true, status: 'draft' },
+    { id: 'unpublished-program', slug: 'hvac-technician', title: 'Unpublished fixture', is_active: true, status: 'unpublished' },
+    { id: 'archived-program', slug: 'hvac-technician', title: 'Archived fixture', is_active: true, status: 'archived' },
+    { id: 'unregistered-program', slug: 'commercial-cleaning', title: 'Unregistered fixture', is_active: true, status: 'published' },
+    { id: 'alias-program', slug: 'BUILDING-MAINTENANCE-WRG', title: 'Noncanonical fixture', is_active: true, status: 'published' },
+  ];
+  const view = render(await ProgramHolderApplicationsPage());
+  expect(screen.getAllByRole('option').map((option) => (option as HTMLOptionElement).value)).toEqual(['', program.id]);
+  expect(screen.getByRole('button', { name: 'Approve' })).toBeDisabled();
+  fireEvent.change(screen.getByLabelText('Verified active program'), { target: { value: program.id } });
+  fireEvent.change(screen.getByLabelText('Scope review note'), { target: { value: reviewedData.program_scope_review.note } });
+  fireEvent.click(screen.getByRole('checkbox'));
+  fireEvent.click(screen.getByRole('button', { name: 'Save scope review' }));
+  await waitFor(() => expect(state.refresh).toHaveBeenCalledTimes(1));
+  expect(state.fetch).toHaveBeenCalledWith(`/api/program-holder/applications/${applicationId}/resolve-scope`, expect.objectContaining({
+    method: 'POST',
+    body: JSON.stringify({ programId: program.id, note: reviewedData.program_scope_review.note, confirmReviewed: true, expectedUpdatedAt: updatedAt }),
+  }));
+  expect(screen.getByRole('button', { name: 'Approve' })).toBeDisabled();
+
+  state.scopePayload = reviewedData;
+  view.rerender(await ProgramHolderApplicationsPage());
+  expect(screen.getByRole('button', { name: 'Approve' })).toBeEnabled();
+  fireEvent.click(screen.getByRole('button', { name: 'Approve' }));
+  await waitFor(() => expect(state.fetch).toHaveBeenCalledWith(`/api/program-holder/applications/${applicationId}/approve`, { method: 'POST' }));
 });
 
 it('requires an explicit program, note and confirmation; saving scope never approves automatically', async () => {

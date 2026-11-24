@@ -1,11 +1,24 @@
 // @vitest-environment node
 import { createHash, generateKeyPairSync, sign } from 'node:crypto';
 import { createServerClient } from '@supabase/ssr';
+import { NextRequest } from 'next/server';
 import { describe, expect, it, vi } from 'vitest';
+
+const boundary = vi.hoisted(() => ({ admin: vi.fn(), session: vi.fn(), config: vi.fn(), fetch: vi.fn() }));
+vi.mock('@/lib/supabase/admin', () => ({ requireAdminClient: boundary.admin }));
+vi.mock('@/lib/supabase/server', () => ({ createClient: boundary.session }));
+vi.mock('@/lib/supabase/public-config', () => ({ getServerPublicSupabaseConfig: boundary.config }));
+vi.mock('@/lib/supabase/timed-fetch', () => ({ timedFetch: boundary.fetch }));
+vi.mock('@/lib/apps/website-builder-access', () => ({ getWebsiteBuilderAccess: async () => ({ allowed: true }) }));
+// This suite isolates real SDK/cookie/claim behavior. The complete HTTP flow and
+// all rate budgets are exercised without limiter mocks in rate-limit-flow.test.
+vi.mock('@/lib/api/withRateLimit', () => ({ applyRateLimit: async () => null }));
+
 import { sessionCookieOptions } from '@/lib/auth/session-cookie-options';
 import { CLEANING_SITE } from '@/lib/cleaning/server';
 import { verifiedProviderEmail } from '@/lib/cleaning/provider-email-proof';
-import { completeProviderEmailVerification, requestProviderEmailVerification } from '@/lib/cleaning/provider-email-verification';
+import { completeProviderEmailVerification, requestProviderEmailVerification, providerVerificationCookie } from '@/lib/cleaning/provider-email-verification';
+import { GET as verificationCallback } from '@/apps/marketing/app/api/tenant-sites/cleaning/provider/verification/callback/route';
 
 const { publicKey, privateKey } = generateKeyPairSync('rsa', { modulusLength: 2048 });
 const jwk = { ...publicKey.export({ format: 'jwk' }), kid: 'provider-server-pkce', alg: 'RS256', use: 'sig' };
@@ -132,10 +145,21 @@ async function harness() {
   cookieWrites.length = 0;
   requests.length = 0;
   const session = makeSession();
+  boundary.config.mockReturnValue(config);
+  boundary.fetch.mockImplementation(fetchImpl);
+  boundary.session.mockImplementation(async () => makeSession());
+  boundary.admin.mockResolvedValue({ ...db, from: () => {
+    const query: any = { select: () => query, eq: () => query, maybeSingle: async () => ({
+      data: { id: CLEANING_SITE, user_id: 'website-owner', is_published: true, site_config: { meta: { cleaningProviderOnboardingEnabled: true } } }, error: null,
+    }) };
+    return query;
+  } });
   let browserNonce: string | undefined;
   const start = async () => {
     const current = await session.auth.getUser();
-    const result = await requestProviderEmailVerification({ db, user: current.data.user, session, config, fetchImpl });
+    const result = await requestProviderEmailVerification({ db, user: current.data.user, session, config, fetchImpl,
+      request: new Request('https://www.elevateforhumanity.org/api/tenant-sites/cleaning/provider/verification', { method: 'POST' }),
+    });
     browserNonce = result.browserNonce;
     return result;
   };
@@ -172,6 +196,64 @@ describe('provider mailbox proof through the real installed PKCE and SSR clients
     const current = await nextRequest.auth.getUser();
     await expect(verifiedProviderEmail(current.data.user, nextRequest, f.db)).resolves.toEqual({ id: userId, email });
     expect(f.requests.filter(request => request.path.endsWith('/token'))).toHaveLength(1);
+  });
+
+  it('preserves a legitimate pending cookie through invalid navigation, then accepts the real link', async () => {
+    const f = await harness(); await f.start();
+    const name = providerVerificationCookie().name;
+    f.cookies.set(name, f.browserNonce());
+    const navigate = async (url: URL) => {
+      const response = await verificationCallback(new NextRequest(url, {
+        headers: { cookie: [...f.cookies].map(([key, value]) => `${key}=${value}`).join('; ') },
+      }));
+      for (const cookie of response.cookies.getAll()) {
+        cookie.value ? f.cookies.set(cookie.name, cookie.value) : f.cookies.delete(cookie.name);
+      }
+      return response;
+    };
+    const legitimate = new URL(f.emailRequest().redirect);
+    legitimate.searchParams.set('code', authCode);
+    const invalid = new URL(legitimate);
+    invalid.searchParams.set('state', 'f'.repeat(64));
+    const rejected = await navigate(invalid);
+    expect(rejected.headers.get('location')).toContain('provider_email_verification=expired');
+    expect(rejected.headers.get('set-cookie')).toBeNull();
+    expect(f.cookies.get(name)).toBe(f.browserNonce());
+    expect([...f.challenges.values()][0]).toMatchObject({ claimed: false });
+    expect(f.requests.filter(request => request.path.endsWith('/token'))).toHaveLength(0);
+
+    const completed = await navigate(legitimate);
+    expect(completed.headers.get('location')).toContain('provider_email_verification=success');
+    expect(completed.headers.get('set-cookie')).toContain('Max-Age=0');
+    expect(f.cookies.has(name)).toBe(false);
+    expect(f.state.proof?.session_id).toBe(newSessionId);
+    const next = f.makeSession();
+    await expect(verifiedProviderEmail((await next.auth.getUser()).data.user, next, f.db)).resolves.toEqual({ id: userId, email });
+    expect(f.requests.filter(request => request.path.endsWith('/token'))).toHaveLength(1);
+  });
+
+  it.each(['malformed', 'unknown', 'wrong-browser', 'expired', 'wrong-session'])('does not report an unclaimed challenge as consumed (%s)', async variant => {
+    const f = await harness(); await f.start();
+    const options: Row = {};
+    if (variant === 'malformed') options.state = 'bad';
+    if (variant === 'unknown') options.state = 'f'.repeat(64);
+    if (variant === 'wrong-browser') options.browserNonce = 'f'.repeat(64);
+    if (variant === 'expired') [...f.challenges.values()][0].expires_at = '2000-01-01T00:00:00Z';
+    if (variant === 'wrong-session') await f.session.auth.setSession({ access_token: token('another-session', email, 'password'), refresh_token: 'other-local-test-token' });
+    await expect(f.finish(options)).rejects.toMatchObject({ challengeConsumed: false });
+    expect([...f.challenges.values()][0].claimed).toBe(false);
+  });
+
+  it.each(['claimed-fields', 'claimed-expiry', 'exchange', 'proof', 'set-session'])('reports consumed challenges after later failure (%s)', async variant => {
+    const f = await harness(); await f.start();
+    const options: Row = {};
+    if (variant === 'claimed-fields') f.state.claimOverride = { email: 'wrong@example.invalid' };
+    if (variant === 'claimed-expiry') f.state.claimOverride = { expires_at: '2000-01-01T00:00:00Z' };
+    if (variant === 'exchange') options.code = 'wrong-auth-code';
+    if (variant === 'proof') f.state.beforeComplete = () => { f.state.currentEmail = 'changed@example.invalid'; };
+    if (variant === 'set-session') vi.spyOn(f.session.auth, 'setSession').mockRejectedValue(new Error('Session cookie storage unavailable'));
+    await expect(f.finish(options)).rejects.toMatchObject({ challengeConsumed: true });
+    expect([...f.challenges.values()][0]).toMatchObject({ claimed: true, verifier: null });
   });
 
   it('supports a valid exchange that revokes the original login under single-session Auth', async () => {

@@ -19,6 +19,14 @@ export interface ManualInvoiceInput {
   idempotencyKey: string;
   /** Only the authenticated program checkout may revise its own wholly unpaid invoice. */
   allowUnpaidProgramRevision?: boolean;
+  /**
+   * Billing schedule this invoice covers, when the invoice is created for a
+   * schedule. Recorded on the local invoice row so the weekly duplicate
+   * detector can find invoices by schedule instead of relying on the
+   * idempotency key alone. Optional: most checkout flows are not schedule
+   * backed.
+   */
+  billingScheduleId?: string;
   customer: BillingCustomerInput;
   lines: BillingLineInput[];
   dueDate: string;

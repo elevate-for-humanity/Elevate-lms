@@ -3,6 +3,7 @@ import ts from 'typescript';
 const SERVER = '@/lib/cleaning/server';
 const PROOF = '@/lib/cleaning/provider-email-proof';
 const VERIFICATION = '@/lib/cleaning/provider-email-verification';
+const RATE_LIMIT = '@/lib/cleaning/provider-rate-limit';
 const METHODS = new Set(['POST', 'PUT', 'PATCH', 'DELETE']);
 const modifier = (node, kind) => node.modifiers?.some(value => value.kind === kind);
 const identifier = (node, name) => !!node && ts.isIdentifier(node) && node.text === name;
@@ -173,12 +174,27 @@ function verificationHelperIsGuarded(file) {
   const fn = exportedFunction(file, 'requestProviderEmailVerification');
   if (!fn?.body || fn.parameters.length !== 1 || fn.parameters[0].initializer) return false;
   const fields = objectBindings(fn.parameters[0].name, true);
-  const call = awaited(declaration(fn.body.statements[0]));
-  return !!fields?.user && !!fields.session &&
+  const actor = declaration(fn.body.statements[0]);
+  const call = awaited(actor);
+  if (!(!!fields?.user && !!fields.session && !!fields.request && actor && ts.isIdentifier(actor.name) &&
     [PROOF, './provider-email-proof'].some(module => importedCall(file, call, module, 'verifiedProviderSession', [fn])) &&
     call.arguments.length === 3 &&
     identifier(call.arguments[0], fields.user) && identifier(call.arguments[1], fields.session) &&
-    call.arguments[2].kind === ts.SyntaxKind.FalseKeyword;
+    call.arguments[2].kind === ts.SyntaxKind.FalseKeyword)) return false;
+  const limited = declaration(fn.body.statements[1]);
+  const budget = awaited(limited);
+  if (!limited || !ts.isIdentifier(limited.name) ||
+      ![RATE_LIMIT, './provider-rate-limit'].some(module => importedCall(file, budget, module, 'applyProviderEmailSendLimit', [fn])) ||
+      budget.arguments.length !== 2 || !identifier(budget.arguments[0], fields.request) ||
+      !member(budget.arguments[1], actor.name.text, 'id')) return false;
+  const denied = fn.body.statements[2];
+  if (!ts.isIfStatement(denied) || denied.elseStatement || !identifier(denied.expression, limited.name.text) ||
+      !ts.isThrowStatement(denied.thenStatement) || !ts.isNewExpression(denied.thenStatement.expression)) return false;
+  const failure = denied.thenStatement.expression;
+  return ts.isIdentifier(failure.expression) &&
+    [SERVER, './server'].some(module => namedImport(file, failure.expression.text, module, 'CleaningError')) &&
+    !shadows(fn, failure.expression.text) && failure.arguments?.[1] &&
+    ts.isNumericLiteral(failure.arguments[1]) && failure.arguments[1].text === '429';
 }
 
 function emptyBodyValidation(file, statement, request, scopes) {
@@ -235,8 +251,9 @@ function handlerIsGuarded(file, fn, sources) {
   const guard = awaited(declaration(statements[index]));
   if (startsVerification) {
     const args = guard?.arguments.length === 1 && objectValues(guard.arguments[0]);
-    return !!args && Object.keys(args).sort().join(',') === 'db,session,user' &&
+    return !!args && Object.keys(args).sort().join(',') === 'db,request,session,user' &&
       ['db', 'user', 'session'].every(key => identifier(args[key], fields[key])) &&
+      identifier(args.request, request) &&
       importedCall(file, guard, VERIFICATION, 'requestProviderEmailVerification', scopes) &&
       !!exportedFunction(sources.proof, 'verifiedProviderSession') &&
       verificationHelperIsGuarded(sources.verification);

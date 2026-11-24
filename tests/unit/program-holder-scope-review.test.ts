@@ -146,7 +146,8 @@ beforeEach(() => {
 });
 
 describe('program-holder scope decision', () => {
-  it('carries intake through explicit scope review into separate approval without changing original interest', async () => {
+  it.each(['active', 'published'])('carries a %s catalog program through protected scope review into separate approval without changing original interest', async (status) => {
+    state.tables.programs[0].status = status;
     state.tables.program_holder_applications = [];
     state.tables.application_intake = [];
     const submitted = await submit(submitRequest({ program_scope_review: { program_slug: 'untrusted-client-choice' } }));
@@ -182,7 +183,9 @@ describe('program-holder scope decision', () => {
   });
 
   it.each([
-    { is_active: false }, { is_active: true, status: 'archived' }, { status: 'draft' },
+    { is_active: false }, { is_active: false, status: 'published' },
+    { is_active: true, status: 'archived' }, { status: 'draft' },
+    { status: 'inactive' }, { status: 'unpublished' }, { status: null },
     { slug: 'commercial-cleaning' }, { slug: 'BUILDING-MAINTENANCE-WRG' }, { id: 'missing-program' },
   ])('rejects unverified or unavailable catalog choice %j without a write', async (change) => {
     Object.assign(state.tables.programs[0], change);
@@ -250,7 +253,11 @@ describe('program-holder scope decision', () => {
     expectNoProvisioning();
   });
 
-  it.each([{ is_active: false }, { status: 'archived' }, { id: 'replacement-program-id' }])('revalidates the reviewed program before any approval side effects: %j', async (change) => {
+  it.each([
+    { is_active: false }, { status: 'archived' }, { status: 'draft' },
+    { status: 'inactive' }, { status: 'unpublished' }, { id: 'replacement-program-id' },
+  ])('revalidates the reviewed published program before any approval side effects: %j', async (change) => {
+    state.tables.programs[0].status = 'published';
     expect((await resolveScope(reviewRequest(), context)).status).toBe(200);
     Object.assign(state.tables.programs[0], change);
     expect((await approve(approveRequest(), context)).status).toBe(409);

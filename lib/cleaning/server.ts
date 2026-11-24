@@ -7,10 +7,11 @@ import { createClient } from '@/lib/supabase/server';
 import { resolvePublishedTenantFromRequest } from '@/lib/tenant/resolve-public-tenant';
 import { canManageHostedWebsite } from '@/lib/websites/can-manage-hosted-website';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { applyProviderRequestLimit } from './provider-rate-limit';
 export const CLEANING_SITE = 'e0fcb1f1-33f8-4b2c-abeb-ec8e0a819231';
 export const CLEANING_URL = 'https://www.elevateforhumanity.org/sites/2exclusive-platinum-cleaning';
 export const serviceSchema = z.enum(['standard','deep','moveout','commercial','event','carpet','valet-trash']);
-export class CleaningError extends Error { constructor(message: string, readonly status = 400, readonly code?: string) { super(message); } }
+export class CleaningError extends Error { constructor(message: string, readonly status = 400, readonly code?: string, readonly retryAfter?: string | null) { super(message); } }
 export const hashCapability = (token: string) => createHash('sha256').update(token).digest('hex');
 export const newCapability = () => randomBytes(32).toString('hex');
 export const reply = (body: unknown, status = 200) => NextResponse.json(body, { status, headers: { 'Cache-Control': 'no-store' } });
@@ -22,8 +23,10 @@ export async function cleaningContext(
   owner = false,
   capability: 'commerce' | 'provider-onboarding' = 'commerce',
 ) {
-  const limited = await applyRateLimit(request, 'contact');
-  if (limited) throw new CleaningError('Please wait before trying again.',429);
+  const limited = capability === 'provider-onboarding'
+    ? await applyProviderRequestLimit(request, 'profile')
+    : await applyRateLimit(request, 'contact');
+  if (limited) throw new CleaningError('Please wait before trying again.',429,undefined,limited.headers.get('Retry-After'));
   const db = await requireAdminClient();
   const { data: site, error } = await db.from('user_websites').select('id,site_config,is_published').eq('id',CLEANING_SITE).maybeSingle();
   if (error || !site?.is_published) throw new CleaningError('Cleaning website unavailable.',503);
@@ -58,7 +61,11 @@ export async function rpc(db: any, name: string, args: Record<string,unknown>) {
 export async function cleaningHandler(work: () => Promise<NextResponse>) {
   try { return await work(); }
   catch(error) {
-    if (error instanceof CleaningError) return reply({ error:error.message, ...(error.code ? { code: error.code } : {}) },error.status);
+    if (error instanceof CleaningError) {
+      const response = reply({ error:error.message, ...(error.code ? { code: error.code } : {}) },error.status);
+      if (error.retryAfter) response.headers.set('Retry-After', error.retryAfter);
+      return response;
+    }
     if (error instanceof z.ZodError) return reply({ error:error.issues[0]?.message || 'Check the form.' },400);
     return reply({ error:'Cleaning service is temporarily unavailable. Your payment or assignment has not been confirmed here.' },503);
   }

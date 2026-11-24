@@ -163,8 +163,9 @@ const providerSources = {
   verification: readFileSync(join(repoRoot, 'lib/cleaning/provider-email-verification.ts'), 'utf8'),
 };
 const providerCall = 'const actor = await verifiedProviderEmail(user, session, db);';
-const requestCall = 'const { browserNonce } = await requestProviderEmailVerification({ db, user, session });';
+const requestCall = 'const { browserNonce } = await requestProviderEmailVerification({ db, user, session, request });';
 const signedCall = 'const actor = await verifiedProviderSession(user, session, false);';
+const sendLimitCall = 'const limited = await applyProviderEmailSendLimit(request, actor.id);';
 
 function routeAudit(overrides = {}) {
   const cwd = mkdtempSync(join(tmpdir(), 'provider-route-authority-'));
@@ -240,14 +241,16 @@ for (const [label, target, transform] of [
   ['another unprotected mutation export', 'provider', source => source + '\nexport async function DELETE(request: NextRequest) { return reply({ok:true}); }'],
   ['a request without an awaited verifier', 'verification', source => source.replace(requestCall, "const browserNonce = 'unverified';")],
   ['an unawaited verification request', 'verification', source => source.replace('await requestProviderEmailVerification(', 'requestProviderEmailVerification(')],
-  ['swallowed request authorization', 'verification', source => source.replace(requestCall, 'const { browserNonce } = await requestProviderEmailVerification({ db, user, session }).catch(() => ({}));')],
+  ['swallowed request authorization', 'verification', source => source.replace(requestCall, 'const { browserNonce } = await requestProviderEmailVerification({ db, user, session, request }).catch(() => ({}));')],
   ['a request imported from another module', 'verification', source => source.replace("'@/lib/cleaning/provider-email-verification'", "'./untrusted-verification'")],
   ['a local function shadowing the verifier', 'verification', source => source.replace(requestCall, requestCall + '\nfunction requestProviderEmailVerification() { return {}; }')],
   ['a private read before verification', 'verification', source => source.replace(requestCall, "await db.from('private').select('*');\n" + requestCall)],
-  ['client-owned email in the verification request', 'verification', source => source.replace('{ db, user, session });', '{ db, user: { ...user, email: suppliedEmail }, session });')],
-  ['client-owned flow options in the verification request', 'verification', source => source.replace('{ db, user, session });', '{ db, user, session, config: suppliedConfig });')],
-  ['duplicate flow keys hiding earlier execution', 'verification', source => source.replace('{ db, user, session });', '{ db: readPrivateData(), db, user, session });')],
-  ['a prototype key hiding earlier execution', 'verification', source => source.replace('{ db, user, session });', '{ db, user, session, __proto__: readPrivateData() });')],
+  ['client-owned email in the verification request', 'verification', source => source.replace('{ db, user, session, request });', '{ db, user: { ...user, email: suppliedEmail }, session, request });')],
+  ['client-owned flow options in the verification request', 'verification', source => source.replace('{ db, user, session, request });', '{ db, user, session, request, config: suppliedConfig });')],
+  ['client-substituted request in the verification call', 'verification', source => source.replace('{ db, user, session, request });', '{ db, user, session, request: suppliedRequest });')],
+  ['a missing request binding in the verification call', 'verification', source => source.replace('{ db, user, session, request });', '{ db, user, session });')],
+  ['duplicate flow keys hiding earlier execution', 'verification', source => source.replace('{ db, user, session, request });', '{ db: readPrivateData(), db, user, session, request });')],
+  ['a prototype key hiding earlier execution', 'verification', source => source.replace('{ db, user, session, request });', '{ db, user, session, request, __proto__: readPrivateData() });')],
   ['missing fixed-origin enforcement', 'verification', source => source.replace('requireProviderVerificationOrigin(request);', '')],
   ['missing strict empty body validation', 'verification', source => source.replace('z.object({}).strict().parse(await request.json());', '')],
   ['accepting a client email in the request body', 'verification', source => source.replace('z.object({}).strict()', 'z.object({ email: z.string() }).strict()')],
@@ -257,7 +260,13 @@ for (const [label, target, transform] of [
   ['a verification helper reading private data first', 'helper', source => source.replace(signedCall, "await db.from('private').select('*');\n" + signedCall)],
   ['a verification helper shadowing canonical authorization', 'helper', source => source.replace(signedCall, signedCall + '\nfunction verifiedProviderSession() { return {}; }')],
   ['a verification helper importing false authority', 'helper', source => source.replace("'./provider-email-proof'", "'./false-authority'")],
-  ['a verification helper with executable parameter defaults', 'helper', source => source.replace('({ db, user, session, ...options }:', '({ db, user = readPrivateData(), session, ...options }:')],
+  ['a verification helper with executable parameter defaults', 'helper', source => source.replace('({ db, user, session, request, ...options }:', '({ db, user = readPrivateData(), session, request, ...options }:')],
+  ['a verification helper without the mail budget', 'helper', source => source.replace(sendLimitCall, 'const limited = null;')],
+  ['a verification helper with an unawaited mail budget', 'helper', source => source.replace(sendLimitCall, 'const limited = applyProviderEmailSendLimit(request, actor.id);')],
+  ['a verification helper with a substituted visitor request', 'helper', source => source.replace(sendLimitCall, 'const limited = await applyProviderEmailSendLimit(suppliedRequest, actor.id);')],
+  ['a verification helper using an unverified mail subject', 'helper', source => source.replace(sendLimitCall, 'const limited = await applyProviderEmailSendLimit(request, user.id);')],
+  ['a verification helper with shadowed mail budget', 'helper', source => source.replace(sendLimitCall, sendLimitCall + '\nfunction applyProviderEmailSendLimit() { return null; }')],
+  ['a verification helper ignoring exhausted mail budget', 'helper', source => source.replace("if (limited) throw new CleaningError('Please wait before requesting another verification email.', 429, undefined, limited.headers.get('Retry-After'));", 'if (limited) return { browserNonce: "unverified" };')],
   ['a proof helper skipping magic-link authorization', 'proof', source => source.replace('const actor = await verifiedProviderSession(user, session);', 'const actor = await verifiedProviderSession(user, session, false);')],
   ['a proof helper using another receipt RPC', 'proof', source => source.replace("'cleaning_provider_proof_valid'", "'always_allow'")],
   ['a proof helper accepting truthy receipt data', 'proof', source => source.replace('if (error || data !== true)', 'if (error || !data)')],

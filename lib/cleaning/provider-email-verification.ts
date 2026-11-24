@@ -5,10 +5,10 @@ import { getServerPublicSupabaseConfig, type SupabasePublicConfig } from '@/lib/
 import { timedFetch } from '@/lib/supabase/timed-fetch';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { getWebsiteBuilderAccess } from '@/lib/apps/website-builder-access';
-import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { MARKETING_HOST } from '@/lib/routing/portal-map';
 import { CLEANING_SITE, CLEANING_URL, CleaningError, hashCapability, newCapability } from './server';
 import { verifiedProviderSession, type ProviderProofDatabase } from './provider-email-proof';
+import { applyProviderEmailSendLimit, applyProviderRequestLimit } from './provider-rate-limit';
 
 export const PROVIDER_VERIFICATION_PATH = '/api/tenant-sites/cleaning/provider/verification';
 export const PROVIDER_VERIFICATION_CALLBACK = `${PROVIDER_VERIFICATION_PATH}/callback`;
@@ -23,7 +23,10 @@ type SessionClient = Pick<SupabaseClient, 'auth'>;
 type FlowOptions = { config?: SupabasePublicConfig; fetchImpl?: typeof fetch };
 
 export class ProviderVerificationFailure extends Error {
-  constructor(readonly marker: Exclude<ProviderVerificationMarker, 'success'>) {
+  constructor(
+    readonly marker: Exclude<ProviderVerificationMarker, 'success'>,
+    readonly challengeConsumed = false,
+  ) {
     super('Provider email verification could not be completed.');
   }
 }
@@ -58,7 +61,8 @@ export function providerVerificationReturn(marker: ProviderVerificationMarker) {
 /** An email callback has no tenant-site Referer. Its site and origin are fixed. */
 export async function providerVerificationCallbackDatabase(request: NextRequest) {
   requireProviderVerificationOrigin(request);
-  if (await applyRateLimit(request, 'contact')) throw new CleaningError('Please wait before trying again.', 429);
+  const limited = await applyProviderRequestLimit(request, 'callback');
+  if (limited) throw new CleaningError('Please wait before trying again.', 429, undefined, limited.headers.get('Retry-After'));
   const db = await requireAdminClient();
   const { data: site, error } = await db.from('user_websites')
     .select('id,user_id,is_published,site_config').eq('id', CLEANING_SITE).maybeSingle();
@@ -113,10 +117,12 @@ function flowClient(options: FlowOptions, verifier?: string, storeVerifier?: (va
   return { client, clear: () => values.clear() };
 }
 
-export async function requestProviderEmailVerification({ db, user, session, ...options }: FlowOptions & {
-  db: ProviderProofDatabase; user: User | null; session: SessionClient;
+export async function requestProviderEmailVerification({ db, user, session, request, ...options }: FlowOptions & {
+  db: ProviderProofDatabase; user: User | null; session: SessionClient; request: Request;
 }) {
   const actor = await verifiedProviderSession(user, session, false);
+  const limited = await applyProviderEmailSendLimit(request, actor.id);
+  if (limited) throw new CleaningError('Please wait before requesting another verification email.', 429, undefined, limited.headers.get('Retry-After'));
   const state = newCapability(), browserNonce = newCapability();
   const stateHash = hashCapability(state);
   const callback = new URL(PROVIDER_VERIFICATION_CALLBACK, marketingOrigin());
@@ -174,10 +180,13 @@ export async function completeProviderEmailVerification({ db, session, state, br
   if (challenge.user_id !== original.id || challenge.email !== original.email || challenge.session_id !== original.sessionId ||
       typeof challenge.challenge_id !== 'string' || typeof challenge.verifier !== 'string' || !VERIFIER.test(challenge.verifier) ||
       typeof challenge.expires_at !== 'string' || !Number.isFinite(Date.parse(challenge.expires_at)) || Date.parse(challenge.expires_at) <= Date.now()) {
-    throw new ProviderVerificationFailure('expired');
+    throw new ProviderVerificationFailure('expired', true);
   }
-  const flow = flowClient(options, challenge.verifier);
+  // Only this successfully matched claim consumed the challenge. Invalid
+  // callback navigation must not erase a different, still-pending browser nonce.
+  let flow: ReturnType<typeof flowClient> | undefined;
   try {
+    flow = flowClient(options, challenge.verifier);
     const initialized = await flow.client.auth.initialize();
     if (initialized.error) throw new ProviderVerificationFailure('failed');
     const exchanged = await flow.client.auth.exchangeCodeForSession(code);
@@ -204,5 +213,7 @@ export async function completeProviderEmailVerification({ db, session, state, br
     if (installed.id !== mailbox.id || installed.email !== mailbox.email || installed.sessionId !== mailbox.sessionId) {
       throw new ProviderVerificationFailure('failed');
     }
-  } finally { flow.clear(); }
+  } catch (error) {
+    throw new ProviderVerificationFailure(error instanceof ProviderVerificationFailure ? error.marker : 'failed', true);
+  } finally { flow?.clear(); }
 }

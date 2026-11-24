@@ -55,14 +55,14 @@ export function programHolderApplicationScope(
   };
 }
 
-/** Scope choices must exist in both the canonical registry and the active catalog. */
+/** Canonical scope choices include active catalog rows and programs made live by publishing. */
 export function isActiveProgramHolderScopeProgram(program: {
   id?: unknown; slug?: unknown; is_active?: unknown; status?: unknown;
 }): boolean {
   return typeof program.id === 'string' && Boolean(program.id) &&
     typeof program.slug === 'string' && resolveProgram(program.slug)?.active === true &&
     resolveProgram(program.slug)?.slug === program.slug &&
-    program.is_active === true && program.status === 'active';
+    program.is_active === true && (program.status === 'active' || program.status === 'published');
 }
 
 /** Original applicant interest and requested slugs remain unchanged by staff review. */

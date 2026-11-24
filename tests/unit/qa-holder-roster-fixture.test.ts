@@ -38,12 +38,18 @@ function fixture() {
   return { input, user, query, filters, getProfile: () => profile };
 }
 
+const productionUrl = 'https://cuxzzpsyufcewtmicszk.supabase.co';
+const environments = [
+  { name: 'isolated QA', supabaseUrl: 'https://isdgjcdabhxxozarmxta.supabase.co', allowProductionDisposables: false },
+  { name: 'explicit production disposable', supabaseUrl: productionUrl, allowProductionDisposables: true },
+];
+
 describe('isolated Program Holder roster fixture', () => {
-  it('provides a selectable learner without changing the QA Auth identity or production filtering', async () => {
+  it.each(environments)('provides a selectable learner without changing Auth identity or roster filtering in $name', async environment => {
     const f = fixture();
     const originalAuth = structuredClone(f.user);
     expect(isLearnerRosterProfile(f.getProfile())).toBe(false);
-    const profile = await prepareQaHolderRosterProfile(f.input);
+    const profile = await prepareQaHolderRosterProfile({ ...f.input, ...environment });
     expect(isLearnerRosterProfile(profile)).toBe(true);
     expect(profile.full_name).toBe(`Portal QA Holder Student ${f.input.runId}`);
     expect(profile.email).toBe(`qa-portal-e2e-${f.input.runId}-holder-student@roster.qa.invalid`);
@@ -51,6 +57,30 @@ describe('isolated Program Holder roster fixture', () => {
     expect(f.user).toEqual(originalAuth);
     expect(f.input.db.auth.admin.updateUserById).not.toHaveBeenCalled();
     expect(isLearnerRosterProfile({ ...profile, email: f.user.email })).toBe(false);
+  });
+
+  it.each([undefined, false, '1', 1])('requires a literal trusted opt-in for production (received %s)', async allowProductionDisposables => {
+    const f = fixture();
+    await expect(prepareQaHolderRosterProfile({
+      ...f.input, supabaseUrl: productionUrl, allowProductionDisposables: allowProductionDisposables as boolean | undefined,
+    })).rejects.toThrow('isolated QA project');
+    expect(f.input.db.auth.admin.getUserById).not.toHaveBeenCalled();
+    expect(f.input.db.from).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    'https://other.supabase.co',
+    'http://cuxzzpsyufcewtmicszk.supabase.co',
+    'https://cuxzzpsyufcewtmicszk.supabase.co.attacker.invalid',
+    'https://cuxzzpsyufcewtmicszk.supabase.co:8443',
+    'https://someone:secret@cuxzzpsyufcewtmicszk.supabase.co',
+    'https://cuxzzpsyufcewtmicszk.supabase.co/another-project',
+  ])('refuses a noncanonical production target despite opt-in: %s', async supabaseUrl => {
+    const f = fixture();
+    await expect(prepareQaHolderRosterProfile({ ...f.input, supabaseUrl, allowProductionDisposables: true }))
+      .rejects.toThrow('isolated QA project');
+    expect(f.input.db.auth.admin.getUserById).not.toHaveBeenCalled();
+    expect(f.input.db.from).not.toHaveBeenCalled();
   });
 
   it.each([
@@ -64,28 +94,30 @@ describe('isolated Program Holder roster fixture', () => {
     expect(f.input.db.from).not.toHaveBeenCalled();
   });
 
-  it.each(['qa-marker', 'wrong-run', 'wrong-role', 'wrong-email', 'wrong-id'])('refuses an unverified Auth fixture: %s', async (reason) => {
+  it.each(environments.flatMap(environment =>
+    ['qa-marker', 'wrong-run', 'wrong-role', 'wrong-email', 'wrong-id'].map(reason => ({ ...environment, reason })),
+  ))('refuses an unverified Auth fixture in $name: $reason', async ({ reason, ...environment }) => {
     const f = fixture();
     if (reason === 'qa-marker') f.user.app_metadata.qa_e2e = false;
     if (reason === 'wrong-run') f.user.app_metadata.qa_run_id = 'another-run';
     if (reason === 'wrong-role') f.user.app_metadata.role = 'admin';
     if (reason === 'wrong-email') f.user.email = 'student@example.invalid';
     if (reason === 'wrong-id') f.user.id = 'another-user';
-    await expect(prepareQaHolderRosterProfile(f.input)).rejects.toThrow('non-fixture');
+    await expect(prepareQaHolderRosterProfile({ ...f.input, ...environment })).rejects.toThrow('non-fixture');
     expect(f.input.db.from).not.toHaveBeenCalled();
   });
 
-  it('fails closed if the expected profile changed before the conditional update', async () => {
+  it.each(environments)('fails closed if the $name profile changed before the conditional update', async environment => {
     const f = fixture();
     f.getProfile().role = 'admin';
-    await expect(prepareQaHolderRosterProfile(f.input)).rejects.toThrow('could not be verified');
+    await expect(prepareQaHolderRosterProfile({ ...f.input, ...environment })).rejects.toThrow('could not be verified');
     expect(f.getProfile().email).toBe(f.user.email);
     expect(f.getProfile().full_name).toBe('[QA E2E] Holder Student');
   });
 
-  it('fails closed if a returned profile does not match the exact fixture', async () => {
+  it.each(environments)('fails closed if a returned $name profile does not match the exact fixture', async environment => {
     const f = fixture();
     f.query.single.mockResolvedValue({ data: { ...f.getProfile(), id: 'other-student' }, error: null });
-    await expect(prepareQaHolderRosterProfile(f.input)).rejects.toThrow('could not be verified');
+    await expect(prepareQaHolderRosterProfile({ ...f.input, ...environment })).rejects.toThrow('could not be verified');
   });
 });

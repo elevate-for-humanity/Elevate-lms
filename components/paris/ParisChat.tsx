@@ -19,6 +19,7 @@ import {
   VolumeX,
 } from 'lucide-react';
 import { useNaturalVoice } from '@/components/voice/useNaturalVoice';
+import ParisAvatar from './ParisAvatar';
 import { usePathname, useRouter } from 'next/navigation';
 import { resolvePortalNavigation } from '@/lib/paris/portal-navigation';
 import type { PortalSupportIssue } from '@/lib/paris/portal-support';
@@ -42,6 +43,79 @@ function plainTextForSpeech(content: string): string {
     .replace(/[*_`#>~-]/g, '')
     .replace(/\s+/g, ' ')
     .trim();
+}
+
+interface StreamedReply {
+  text: string;
+  mode: 'ai' | 'guided';
+  liveAiAvailable: boolean;
+}
+
+/**
+ * Read a PARIS server-sent-events stream, calling onDelta for each text
+ * chunk as it arrives so the answer appears word by word. Returns the full
+ * assembled text plus the stream's final mode. A stream that dies after
+ * some text arrived returns the partial text; one that yields nothing throws
+ * so the caller can show the usual fallback message.
+ */
+async function readStreamedReply(
+  body: ReadableStream<Uint8Array>,
+  onDelta: (text: string) => void,
+): Promise<StreamedReply> {
+  const reader = body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = '';
+  let assembled = '';
+  let mode: 'ai' | 'guided' = 'ai';
+  let liveAiAvailable = true;
+  let sawDone = false;
+  try {
+    for (;;) {
+      const { done, value } = await reader.read();
+      if (value) buffer += decoder.decode(value, { stream: true });
+      let boundary = buffer.indexOf('\n\n');
+      while (boundary !== -1) {
+        const rawEvent = buffer.slice(0, boundary);
+        buffer = buffer.slice(boundary + 2);
+        const data = rawEvent
+          .split(/\r?\n/)
+          .filter((line) => line.startsWith('data:'))
+          .map((line) => line.slice(5).trim())
+          .join('\n');
+        if (data) {
+          try {
+            const event = JSON.parse(data) as {
+              delta?: string;
+              done?: boolean;
+              mode?: string;
+              liveAiAvailable?: boolean;
+              reply?: string;
+            };
+            if (typeof event.delta === 'string' && event.delta) {
+              assembled += event.delta;
+              onDelta(event.delta);
+            }
+            if (event.done) {
+              sawDone = true;
+              if (event.mode === 'guided') mode = 'guided';
+              if (event.liveAiAvailable === false) liveAiAvailable = false;
+              if (typeof event.reply === 'string' && event.reply) assembled = event.reply;
+            }
+          } catch {
+            // One malformed event must not kill the stream.
+          }
+        }
+        boundary = buffer.indexOf('\n\n');
+      }
+      if (done) break;
+    }
+  } catch (error) {
+    if (!assembled) throw error;
+  } finally {
+    reader.releaseLock();
+  }
+  if (!assembled) throw new Error('PARIS stream ended before completion');
+  return { text: assembled, mode, liveAiAvailable };
 }
 
 interface ParisChatProps {
@@ -311,7 +385,7 @@ export default function ParisChat({
         }
         const response = await fetch('/api/ai-chat', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'application/json', Accept: 'text/event-stream' },
           credentials: 'same-origin',
           cache: 'no-store',
           body: JSON.stringify({
@@ -332,6 +406,54 @@ export default function ParisChat({
             },
           }),
         });
+
+        // Streamed replies arrive as server-sent events: show each chunk as
+        // it comes in so the first words appear in seconds. Anything else
+        // (guided JSON, 503) falls through to the existing handling below.
+        const contentType = response.headers.get('content-type') || '';
+        if (response.ok && contentType.includes('text/event-stream') && response.body) {
+          let messageStarted = false;
+          const appendDelta = (delta: string) => {
+            if (messageStarted) {
+              setMessages((previous) => {
+                const next = [...previous];
+                const last = next[next.length - 1];
+                if (last && last.role === 'assistant') {
+                  next[next.length - 1] = { ...last, content: last.content + delta };
+                }
+                return next;
+              });
+            } else {
+              messageStarted = true;
+              setMessages((previous) => [...previous, { role: 'assistant', content: delta }]);
+            }
+          };
+          const streamed = await readStreamedReply(response.body, appendDelta);
+          const reply =
+            streamed.mode === 'guided' || streamed.liveAiAvailable === false
+              ? `Live AI is temporarily unavailable. This is basic program guidance, not a live AI answer.\n\n${streamed.text}`
+              : streamed.text;
+          setMessages((previous) => {
+            const next = [...previous];
+            const last = next[next.length - 1];
+            if (last && last.role === 'assistant') {
+              next[next.length - 1] = { ...last, content: reply };
+            } else {
+              next.push({ role: 'assistant', content: reply });
+            }
+            return next;
+          });
+          if (autoSpeak) {
+            void voice.play(plainTextForSpeech(reply), {
+              voice: 'coral',
+              style: storeSurface ? 'commercial' : 'assistant',
+              rate: 1,
+              allowBrowserFallback: false,
+            });
+          }
+          onComplete?.([]);
+          return;
+        }
 
         const data = await response.json().catch(() => ({}));
         if (!response.ok && response.status === 503 && typeof data.error === 'string') {
@@ -413,8 +535,8 @@ export default function ParisChat({
       {showHeader && (
         <div className="shrink-0 bg-slate-950 px-6 py-4 text-white">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-white/10">
-              <GraduationCap className="h-6 w-6" aria-hidden="true" />
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full border border-white/20">
+              <ParisAvatar size={40} className="h-10 w-10" fallbackIconClassName="h-6 w-6" />
             </div>
             <div>
               <h2 className="text-lg font-bold">
@@ -453,7 +575,7 @@ export default function ParisChat({
               {message.role === 'user' ? (
                 <User className="h-4 w-4" aria-hidden="true" />
               ) : (
-                <Bot className="h-4 w-4" aria-hidden="true" />
+                <ParisAvatar size={32} className="h-8 w-8" fallbackIconClassName="h-4 w-4" />
               )}
             </div>
             <div
@@ -496,8 +618,8 @@ export default function ParisChat({
 
         {isLoading && (
           <div className="flex gap-3">
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-950 text-white">
-              <Bot className="h-4 w-4" aria-hidden="true" />
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full bg-slate-950 text-white">
+              <ParisAvatar size={32} className="h-8 w-8" fallbackIconClassName="h-4 w-4" />
             </div>
             <div className="rounded-2xl rounded-tl-sm border border-slate-200 bg-white px-4 py-3 shadow-sm">
               <div className="flex items-center gap-2 text-slate-700">

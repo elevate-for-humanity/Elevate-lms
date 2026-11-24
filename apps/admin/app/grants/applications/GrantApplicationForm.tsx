@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
+  type LucideIcon,
   Save, Loader2, CheckCircle2, AlertTriangle, X,
   Sparkles, Building2, FileText, DollarSign, Users,
   Send, ChevronDown, ChevronUp,
@@ -47,7 +48,7 @@ function orgAddress(org: Org): string {
 type Section = {
   id: string;
   label: string;
-  icon: React.ElementType;
+  icon: LucideIcon;
   fields: { key: string; label: string; type?: 'text' | 'textarea' | 'date' | 'number'; placeholder?: string; locked?: boolean }[];
 };
 

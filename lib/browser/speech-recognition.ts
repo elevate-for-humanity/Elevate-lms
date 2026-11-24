@@ -42,3 +42,21 @@ export function speechSessionText(prefix: string, results: BrowserSpeechRecognit
   const before = prefix.trimEnd();
   return `${before}${before && transcript ? ' ' : ''}${transcript}`;
 }
+
+/** Append final email dictation, treating a standalone result as a body command. */
+export function appendEmailDictation(value: string, phrases: string[], field: 'subject' | 'body'): string {
+  for (const spoken of phrases) {
+    const phrase = spoken.trim();
+    if (!phrase) continue;
+
+    const command = field === 'body'
+      ? /^command\s+new\s+(paragraph|line)[.,!?;:]?$/i.exec(phrase)
+      : null;
+    if (command) {
+      value += command[1].toLowerCase() === 'paragraph' ? '\n\n' : '\n';
+    } else {
+      value += (value && !/\s$/.test(value) ? ' ' : '') + phrase;
+    }
+  }
+  return value;
+}

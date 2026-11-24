@@ -2,8 +2,8 @@
 """Read voicemail prerequisites and fixed error classes; never emit PINs, callers or audio."""
 import csv,io,json,re,subprocess
 
-def run(args):
- p=subprocess.run(args,capture_output=True,text=True,timeout=15)
+def run(args, *, errors='strict'):
+ p=subprocess.run(args,capture_output=True,encoding='utf-8',errors=errors,timeout=15)
  return p.returncode,p.stdout+p.stderr
 
 def main():
@@ -35,7 +35,9 @@ def main():
   if section=='general' and match:general[match[1]]=match[2]
  logs=run(['docker','logs','--since','15m','--tail','1500','pbx_asterisk_1'])[1]
  for path in ['/var/log/asterisk/messages','/var/log/asterisk/messages.log','/var/log/asterisk/full','/var/log/asterisk/full.log']:
-  logs+=run(['docker','exec','pbx_asterisk_1','tail','-n','1500',path])[1]
+  # A bounded tail can start mid-character. Decode the remaining log lines.
+  _,recent=run(['docker','exec','pbx_asterisk_1','tail','-c','262144',path],errors='replace')
+  logs+='\n'+'\n'.join(recent.splitlines()[-1500:])
  logs=re.sub(r'\x1b\[[0-9;]*[A-Za-z]','',logs)
  reasons={label:len(re.findall(pattern,logs,re.I)) for label,pattern in {
   'permissionDenied':r'Permission denied',

@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { headers } from 'next/headers';
 import Link from 'next/link';
 import { EmailWorkspace } from '@/components/communications/EmailWorkspace';
 import { requireRole } from '@/lib/auth/require-role';
@@ -14,6 +15,7 @@ export default async function AdminEmailPage({
 }) {
   const params = await searchParams;
   const { effectiveRoles } = await requireRole(COMMUNICATION_MEMBER_ROLES);
+  const staffInbox = (await headers()).get('x-elevate-staff-inbox') === '1';
   const canViewDirectory = effectiveRoles.some((role) => ['admin', 'super_admin'].includes(role));
   return (
     <main className="space-y-5 bg-slate-50 p-4 sm:p-6">
@@ -25,12 +27,19 @@ export default async function AdminEmailPage({
           <h1 className="mt-1 text-3xl font-black text-slate-950">Elevate Email</h1>
         </div>
         <div className="flex gap-2">
-          <Link
-            href="/phone"
-            className="rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-black text-slate-800"
-          >
-            Phone & meetings
-          </Link>
+          {staffInbox && (
+            <Link href="/staff-portal" className="rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-black text-slate-800">
+              Staff portal
+            </Link>
+          )}
+          {!staffInbox ? (
+            <Link
+              href="/phone"
+              className="rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-black text-slate-800"
+            >
+              Phone & meetings
+            </Link>
+          ) : null}
           {canViewDirectory ? (
             <Link
               href="/phone/email/accounts"
@@ -41,7 +50,11 @@ export default async function AdminEmailPage({
           ) : null}
         </div>
       </div>
-      <EmailWorkspace initialMailboxId={params.mailboxId} initialThreadId={params.threadId} />
+      <EmailWorkspace
+        initialMailboxId={params.mailboxId}
+        initialThreadId={params.threadId}
+        communicationLinks={staffInbox ? null : undefined}
+      />
     </main>
   );
 }

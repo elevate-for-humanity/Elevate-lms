@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { cleanup, render, screen } from '@testing-library/react';
-const state = vi.hoisted(() => ({ assigned: true, error: false, calls: [] as unknown[][] }));
+const state = vi.hoisted(() => ({ assigned: true, hvacAssigned: false, error: false, calls: [] as unknown[][] }));
 vi.mock('@/lib/auth/require-role', () => ({ requireRole: async () => ({ user: { id: 'instructor' }, profile: { full_name: 'Instructor' }, effectiveRoles: ['instructor'] }) }));
 vi.mock('@/lib/supabase/server', () => ({ createClient: async () => ({ from: (table: string) => {
   const query: any = {
@@ -29,6 +29,10 @@ vi.mock('@/lib/supabase/admin', () => ({ requireAdminClient: async () => ({ from
     eq: (...args: unknown[]) => { state.calls.push([table, 'eq', ...args]); return query; },
     in: (...args: unknown[]) => { state.calls.push([table, 'in', ...args]); return query; },
     order: () => query, limit: () => query,
+    maybeSingle: async () => {
+      expect(table).toBe('instructor_assignments');
+      return { data: state.hvacAssigned ? { id: 'hvac-assignment' } : null, error: null };
+    },
     then: (resolve: (value: unknown) => unknown) => {
       const data: Record<string, unknown[]> = {
         competency_log: [{ id: 'ojt', student_id: 'learner', created_at: '2026-10-27' }],
@@ -40,7 +44,7 @@ vi.mock('@/lib/supabase/admin', () => ({ requireAdminClient: async () => ({ from
   return query;
 } }) }));
 import InstructorDashboard from '@/apps/admin/app/instructor/dashboard/page';
-beforeEach(() => { state.assigned = true; state.error = false; state.calls = []; });
+beforeEach(() => { state.assigned = true; state.hvacAssigned = false; state.error = false; state.calls = []; });
 afterEach(cleanup);
 it('loads each review with its real learner key and hydrates the learner identity', async () => {
   render(await InstructorDashboard());
@@ -48,6 +52,12 @@ it('loads each review with its real learner key and hydrates the learner identit
   expect(state.calls).toContainEqual(['competency_log', 'in', 'apprentice_id', ['learner']]);
   expect(state.calls).toContainEqual(['barber_instructor_signoffs', 'in', 'user_id', ['learner']]);
   expect(state.calls).toContainEqual(['profiles', 'in', 'id', ['learner']]);
+  expect(screen.queryByRole('link', { name: 'HVAC syllabus and simulator' })).not.toBeInTheDocument();
+});
+it('shows the HVAC workspace for an instructor assigned to the course', async () => {
+  state.hvacAssigned = true;
+  render(await InstructorDashboard());
+  expect(screen.getByRole('link', { name: 'HVAC syllabus and simulator' })).toBeVisible();
 });
 it('does not query review records when the instructor has no assigned learners', async () => {
   state.assigned = false;

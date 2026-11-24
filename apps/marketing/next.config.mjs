@@ -179,7 +179,9 @@ const nextConfig = {
         path.join(__dirname, dev ? 'styles/empty.css' : `app/generated-css/marketing-${index}.css`),
       ])),
     };
-    // Keep Next.js-managed webpack caching. CI can reuse its build cache when persisted.
+    // Keep Next-managed cache unless the bounded builder opts out to avoid
+    // retaining/serializing a second graph in memory-constrained containers.
+    if (process.env.DISABLE_WEBPACK_FILESYSTEM_CACHE === '1') config.cache = false;
     if (!isServer) {
       config.resolve.fallback = {
         ...(config.resolve.fallback ?? {}),

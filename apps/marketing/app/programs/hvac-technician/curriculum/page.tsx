@@ -78,6 +78,10 @@ export default function HVACCurriculumPage() {
           diagnostics, installation practice, certification testing, and career readiness.
         </p>
 
+        <Link href="/docs/syllabi/hvac-technician.md" className="mt-4 inline-flex min-h-11 items-center font-bold text-brand-blue-800 underline">
+          Open the six-week syllabus
+        </Link>
+
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6 bg-slate-50 rounded-lg p-4">
           <div className="text-center">
             <div className="text-2xl font-bold text-slate-900">{course.modules.length}</div>

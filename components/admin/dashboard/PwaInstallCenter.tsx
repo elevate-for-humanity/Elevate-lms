@@ -1,5 +1,6 @@
 'use client';
 
+import { ADMIN_WORKSPACE_PWAS } from '@/lib/pwa/registry';
 import { useEffect, useState } from 'react';
 import { Download, ExternalLink, Smartphone } from 'lucide-react';
 
@@ -20,8 +21,6 @@ type InstallableApp = {
 const LMS_ORIGIN = process.env.NEXT_PUBLIC_APP_URL || 'https://app.elevateforhumanity.org';
 const apps: readonly InstallableApp[] = [
   { name: 'Admin', description: 'Administrative operations and Dev Studio', manageHref: '/dashboard', installHref: '/install', local: true },
-  { name: 'Dev Studio with PARIS', description: 'Prepare PARIS instructions offline and open the secure Studio when connected.', manageHref: '/studio', manageLabel: 'Open app', installHref: '/install/dev-studio.html', local: false },
-  { name: 'Course Builder', description: 'Draft lesson outlines offline and open Course Production Studio when connected.', manageHref: '/studio/courses', manageLabel: 'Open app', installHref: '/install/course-builder.html', local: false },
   { name: 'PARIS', description: 'Open the signed-in PARIS assistant and install it from the browser menu.', manageHref: '/paris', manageLabel: 'Open app', installHref: '/paris', local: false },
   { name: 'Student / Learner', description: 'Select a real learner for an audited dashboard preview.', manageHref: '/students', installHref: `${LMS_ORIGIN}/install/learner`, local: false },
   { name: 'Apprentice', description: 'Select an enrolled apprentice before opening hours, RTI, and progress.', manageHref: '/students', installHref: `${LMS_ORIGIN}/install/apprentice`, local: false },
@@ -30,7 +29,19 @@ const apps: readonly InstallableApp[] = [
   { name: 'Host Shop', description: 'Use the live Host Shop selector below to open a connected shop.', manageHref: '/partners', installHref: `${LMS_ORIGIN}/install/host-shop`, local: false },
 ];
 
-export function PwaInstallCenter() {
+const workspaceApps: readonly InstallableApp[] = Object.values(ADMIN_WORKSPACE_PWAS).map((app) => ({
+  name: app.name,
+  description: app.name === 'Email' ? 'Open your staff inbox.' : 'Open the secure workspace or install it for offline drafting.',
+  manageHref: app.openPath,
+  installHref: app.installPath,
+  manageLabel: 'Open app',
+  local: false,
+}));
+
+export function PwaInstallCenter({ showWorkspaceApps = false }: { showWorkspaceApps?: boolean }) {
+  const visibleApps = showWorkspaceApps
+    ? [apps[0], ...workspaceApps, ...apps.slice(1)]
+    : apps;
   const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [installed, setInstalled] = useState(false);
 
@@ -76,7 +87,7 @@ export function PwaInstallCenter() {
         </div>
       </div>
       <div className="grid min-w-0 grid-cols-1 gap-4 p-4 sm:grid-cols-2 sm:p-8 xl:grid-cols-3">
-        {apps.map((app) => (
+        {visibleApps.map((app) => (
           <article key={app.name} className="flex min-w-0 max-w-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-slate-50 p-4 sm:p-5">
             <h3 className="font-black text-slate-950">{app.name}</h3>
             <p className="mt-2 flex-1 text-sm font-medium leading-5 text-slate-700">{app.description}</p>

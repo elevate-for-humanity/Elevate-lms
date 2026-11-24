@@ -1,12 +1,17 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
+import {load} from 'js-yaml';
 
 const workflow=readFileSync(new URL('../../.github/workflows/paris-code-repair.yml',import.meta.url),'utf8');
 const monitor=workflow.split(/\n  monitor:\n/)[1]?.split(/\n  prepare:\n/)[0]??'';
 
 test('PARIS monitor wakes on both successful and failed completed prerequisites',()=>{
- assert.match(workflow,/workflow_run:\s*\n\s*workflows:/);
+ const trigger=load(workflow).on.workflow_run;
+ assert.deepEqual(trigger.branches,['main']);
+ assert.deepEqual(trigger.types,['completed']);
+ assert.ok(trigger.workflows.includes('CI'));
+ assert.ok(trigger.workflows.includes('Deploy Admin'));
  assert.match(monitor,/github\.event\.workflow_run\.conclusion == 'success'/);
  assert.match(monitor,/github\.event\.workflow_run\.conclusion == 'failure'/);
  assert.doesNotMatch(monitor,/workflow_run\.name == 'Deploy Admin' && github\.event\.workflow_run\.conclusion == 'success'/);

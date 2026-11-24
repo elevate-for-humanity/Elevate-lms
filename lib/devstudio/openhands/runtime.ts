@@ -1,4 +1,5 @@
 import 'server-only';
+import { shouldExpireOpenHandsWithoutReceipt } from './studio-timeout-policy.mjs';
 import { reconcileStudioRunFromTask } from '@/lib/devstudio/studio-run-reconciler';
 
 import { requireAdminClient } from '@/lib/supabase/admin';
@@ -452,11 +453,11 @@ export async function reconcileOpenHandsTasks(
       const timeoutMinutes = Number.isFinite(configuredTimeout)
         ? Math.max(30, configuredTimeout)
         : 360;
-      const startedAt = new Date(candidate.started_at ?? candidate.created_at).getTime();
-      const expired =
-        candidate.status === 'running' &&
-        Number.isFinite(startedAt) &&
-        startedAt < Date.now() - timeoutMinutes * 60_000;
+      // Only unaccepted/unapproved local dispatch may expire. The durable
+      // provider receipt remains subject to independent provider/GitHub review.
+      const expired = shouldExpireOpenHandsWithoutReceipt(
+        candidate, Date.now(), timeoutMinutes,
+      );
       if (expired) {
         const timeoutMessage = `OpenHands execution exceeded the ${timeoutMinutes}-minute runtime limit and was closed instead of remaining stuck.`;
         const { data: timedOut, error: timeoutError } = await db
@@ -581,6 +582,17 @@ export async function refreshOpenHandsTask(input: {
     recordedSandboxId: typeof external.sandbox_id === 'string' ? external.sandbox_id : null,
   });
 
+  if (['completed', 'failed', 'cancelled'].includes(task.status)) {
+    // Observe the original accepted provider receipt even after a Studio
+    // timeout, but never reopen an already terminal canonical task.
+    await appendLog(
+      task.id,
+      `OpenHands observed ${lifecycle.status} after canonical ${task.status}; terminal state preserved.`,
+      'info', task.tenant_id, input.actorId ?? task.user_id,
+    );
+    return lifecycle;
+  }
+
   let githubEvidence: OpenHandsGitHubEvidence | null = null;
   if (lifecycle.status === 'completed') {
     try {
@@ -636,7 +648,12 @@ export async function refreshOpenHandsTask(input: {
   const needsHumanApproval =
     evaluation.status === 'REQUIRES_HUMAN_REVIEW' &&
     !verificationStillRunning && !parisProviderCandidatePendingValidation;
+  // Pending approval is a higher-priority canonical state than provider
+  // queued/running. Observations never authorize execution or clear a decision.
+  const pendingApproval = task.requires_approval === true &&
+    task.approval_status === 'pending' && !resolvedProviderConfirmation;
   const taskStatus =
+    pendingApproval ? 'awaiting_approval' :
     executionStillRunning || parisProviderCandidatePendingValidation
       ? 'running'
       : evaluation.status === 'PASS'
@@ -682,9 +699,9 @@ export async function refreshOpenHandsTask(input: {
           ? { provider: 'openhands', lifecycle, githubEvidence, evaluation }
           : task.result,
       error_message: evaluation.status === 'FAIL_BLOCKING' ? evaluation.reasons.join(' ') : null,
-      requires_approval: resolvedProviderConfirmation ? false : staleProviderConfirmation ? true : needsHumanApproval,
-      approval_status: resolvedProviderConfirmation ? 'not_required' : needsHumanApproval ? 'pending' : task.approval_status,
-      approval_reason: resolvedProviderConfirmation ? null : needsHumanApproval ? evaluation.reasons.join(' ') : task.approval_reason,
+      requires_approval: resolvedProviderConfirmation ? false : pendingApproval ? true : staleProviderConfirmation ? true : needsHumanApproval,
+      approval_status: resolvedProviderConfirmation ? 'not_required' : pendingApproval ? 'pending' : needsHumanApproval ? 'pending' : task.approval_status,
+      approval_reason: resolvedProviderConfirmation ? null : pendingApproval ? task.approval_reason : needsHumanApproval ? evaluation.reasons.join(' ') : task.approval_reason,
       completed_at: ['completed', 'failed'].includes(taskStatus) ? now : null,
       updated_at: now,
     })
@@ -692,17 +709,23 @@ export async function refreshOpenHandsTask(input: {
 
   // A human rejection/approval arriving during provider/GitHub reads wins.
   // Never clear a newer decision using an older provider-wait snapshot.
-  const { data: updatedTask, error: taskUpdateError } = await (
-    resolvedProviderConfirmation
-      ? taskUpdate.eq('approval_status', 'pending')
-        .eq('requires_approval', task.requires_approval)
-        .eq('approval_reason', task.approval_reason)
-        .eq('updated_at', task.updated_at).select('id').maybeSingle()
-      : taskUpdate
-  );
+  // Fail closed if a timeout, approval, or newer observation changed the
+  // canonical task while the provider/GitHub read was in flight.
+  let guardedTaskUpdate = taskUpdate
+    .eq('status', task.status)
+    .eq('attempts', task.attempts)
+    .eq('updated_at', task.updated_at);
+  if (resolvedProviderConfirmation || pendingApproval) {
+    guardedTaskUpdate = guardedTaskUpdate
+      .eq('approval_status', 'pending')
+      .eq('requires_approval', task.requires_approval)
+      .eq('approval_reason', task.approval_reason);
+  }
+  const { data: updatedTask, error: taskUpdateError } = await guardedTaskUpdate
+    .select('id').maybeSingle();
   if (taskUpdateError) throw taskUpdateError;
-  if (resolvedProviderConfirmation && !updatedTask) {
-    throw new Error('OPENHANDS_APPROVAL_STATE_CHANGED_DURING_REFRESH');
+  if (!updatedTask?.id) {
+    throw new Error('OPENHANDS_TASK_STATE_CHANGED_DURING_REFRESH');
   }
 
   const { data: steps } = await db
@@ -722,8 +745,10 @@ export async function refreshOpenHandsTask(input: {
       .from('ai_task_steps')
       .update({
         status:
-          lifecycle.status === 'completed'
-            ? 'completed'
+          pendingApproval
+            ? 'awaiting_approval'
+            : lifecycle.status === 'completed'
+              ? 'completed'
             : lifecycle.status === 'failed'
               ? 'failed'
               : lifecycle.status === 'approval_required'
@@ -743,8 +768,10 @@ export async function refreshOpenHandsTask(input: {
       .from('ai_task_steps')
       .update({
         status:
-          executionStillRunning
-            ? 'pending'
+          pendingApproval
+            ? 'awaiting_approval'
+            : executionStillRunning
+              ? 'pending'
             : evaluation.status === 'PASS'
               ? 'completed'
               : needsHumanApproval

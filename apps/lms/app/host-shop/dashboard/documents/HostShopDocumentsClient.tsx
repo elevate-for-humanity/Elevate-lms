@@ -32,6 +32,7 @@ type PartnerDocument = {
 
 type Props = {
   partnerId: string;
+  readOnly?: boolean;
   programType: string;
   partnerState: string;
   requirements: Requirement[];
@@ -49,7 +50,7 @@ function fileLink(id: string) {
   return `/api/host-shop/documents/${encodeURIComponent(id)}/download?open=1`;
 }
 
-export default function HostShopDocumentsClient({ requirements, uploads }: Props) {
+export default function HostShopDocumentsClient({ requirements, uploads, readOnly = false }: Props) {
   const shown = new Set(requirements.map((item) => item.document?.id));
   const otherFiles = uploads.filter((file) => !shown.has(file.id));
   return (
@@ -121,13 +122,13 @@ export default function HostShopDocumentsClient({ requirements, uploads }: Props
                       View file
                     </a>
                   )}
-                  <Link
+                  {!readOnly && <Link
                     href={`/host-shop/onboarding/documents?document=${encodeURIComponent(requirement.document_type)}#upload-${encodeURIComponent(requirement.document_type)}`}
                     className="inline-flex cursor-pointer items-center gap-2 rounded-lg bg-brand-blue-700 px-3 py-2 text-sm font-semibold text-white hover:bg-brand-blue-800"
                   >
                     <Upload className="h-4 w-4" />
                     {document ? 'Replace' : 'Upload'}
-                  </Link>
+                  </Link>}
                 </div>
               </div>
             </article>

@@ -61,12 +61,17 @@ export async function probeRedirect(origin,{request=fetch}={}) {
       locationPath:target?.pathname || null,reason:approved?undefined:'unexpected_redirect'};
   } catch(e) { return {path,...problem(e)}; }
 }
-export async function probeDns(host) {
+// A successful resolver promise is not necessarily a usable DNS answer.
+// Fail closed when both families have no addresses; do not mistake a partial
+// lookup failure for an application outage. Resolvers are injectable for tests.
+export async function probeDns(host,{resolveIpv4=resolve4,resolveIpv6=resolve6}={}) {
   try {
-    const [v4,v6]=await Promise.allSettled([resolve4(host),resolve6(host)]);
-    if(v4.status==='rejected' && v6.status==='rejected')
-      return {state:'inconclusive',reason:'dns_lookup_unavailable'};
-    return {state:'passed',ipv4:v4.status==='fulfilled'?v4.value:[],ipv6:v6.status==='fulfilled'?v6.value:[]};
+    const [v4,v6]=await Promise.allSettled([resolveIpv4(host),resolveIpv6(host)]);
+    const ipv4=v4.status==='fulfilled' && Array.isArray(v4.value)?v4.value:[];
+    const ipv6=v6.status==='fulfilled' && Array.isArray(v6.value)?v6.value:[];
+    if(!ipv4.length && !ipv6.length)
+      return {state:'inconclusive',reason:'dns_lookup_unavailable',ipv4,ipv6};
+    return {state:'passed',ipv4,ipv6};
   } catch(e){return problem(e);}
 }
 export function probeTls(host,{connect=tls.connect}={}) {

@@ -1,7 +1,6 @@
 import { verifyPaidApplication, activatePaidApplication } from '@/lib/enrollment/paid-application';
-import { paidApplicationStatusForUrl } from '@/lib/enrollment/paid-admission-response';
 import { POST as submitProgramInquiry } from '../inquiries/route';
-import { resolveCanonicalSlug } from '@/lib/programs/slug';
+import { applicationMatchesProgram, resolveCanonicalSlug } from '@/lib/programs/slug';
 import { paidInvoiceMatchesProgram, requiresSelfPayProgramPayment } from '@/lib/programs/paid-intake-policy.mjs';
 import { copyApplicationToProgramHolders } from '@/lib/program-holder/application-copy';
 import {
@@ -290,7 +289,14 @@ async function _POST(req: Request) {
       return NextResponse.json({ error: 'Program not found.' },
         { status: 404, headers: corsHeadersForOrigin(origin, allowedOrigins) });
     const requiresSelfPayPayment = requiresSelfPayProgramPayment(catalogResult.data, body.fundingType);
+    const requestedFunding = String(body.fundingType || '').trim().toLowerCase();
+    const usesWorkOne = ['wioa', 'wrg', 'workone'].includes(requestedFunding);
+    const isFunded = usesWorkOne || requestedFunding === 'jri';
     const billingInvoiceId = String(body.billingInvoiceId || body.billing_invoice_id || '').trim();
+    if (isFunded && billingInvoiceId) {
+      return NextResponse.json({ error: 'Submit a state-funded application without a self-pay invoice.' },
+        { status: 400, headers: corsHeadersForOrigin(origin, allowedOrigins) });
+    }
     let verifiedPaidInvoice: any = null;
     if (billingInvoiceId) {
       if (!await verifyPaidApplication(program, billingInvoiceId))
@@ -328,8 +334,8 @@ async function _POST(req: Request) {
     }
 
     const fullEnrollment = body.applicationIntent === 'enrollment';
-    const paidEvidence = fullEnrollment ? await verifyPaidApplication(program, billingInvoiceId) : null;
-    if (fullEnrollment && catalogResult.data.is_free !== true && !paidEvidence) {
+    const paidEvidence = fullEnrollment && !isFunded ? await verifyPaidApplication(program, billingInvoiceId) : null;
+    if (fullEnrollment && catalogResult.data.is_free !== true && !isFunded && !paidEvidence) {
       return NextResponse.json({ error: 'Verified payment is required before submitting the Full Enrollment Application.',
         paymentRequired: true, nextStepUrl: `/enroll/${encodeURIComponent(program)}` }, { status: 402 });
     }
@@ -351,7 +357,7 @@ async function _POST(req: Request) {
         ...inquiry, applicationStatus: 'inquiry',
         referenceNumber: inquiry.leadId, paymentRequired: true,
         nextStepUrl: `/enroll/${encodeURIComponent(program)}`,
-        message: 'Intake Application received. Pay the required deposit, then complete the Full Enrollment Application for admissions review. Dashboard access requires administrator approval.',
+        message: 'Intake application received. For self-pay, verify payment and submit the full application to activate dashboard access. Funded applications require Admissions review.',
       } : inquiry, {
         status: inquiryResponse.status, headers: corsHeadersForOrigin(origin, allowedOrigins),
       });
@@ -366,48 +372,39 @@ async function _POST(req: Request) {
       if (missing) return NextResponse.json({ error: `Complete the full enrollment application: ${missing} is required.` }, { status: 400 });
     }
 
-    // Dedup: block same email + program within 24 hours.
-    // Excludes intake-form mirrors - those are pre-application inquiries, not submissions.
-    // Allows re-application after the window (e.g. student applies months later).
+    // Match historical names only when the record has no authoritative program ID.
+    const programId = catalogResult.data.id;
+    const closedStatuses = '("rejected","withdrawn","duplicate")';
     const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
-    const { data: recentApp } = await supabase
-      .from('applications')
-      .select('id')
-      .ilike('email', body.email.toLowerCase().trim())
-      .eq('program_interest', program)
-      .neq('source', 'intake-form')
-      .gte('created_at', oneDayAgo)
-      .limit(1)
-      .maybeSingle();
+    const [emailMatches, phoneMatches] = await Promise.all([
+      supabase.from('applications')
+        .select('id, reference_number, status, program_id, program_slug, program_interest, funding_type, payment_status, normalized_phone, phone, metadata')
+        .eq('normalized_email', body.email.toLowerCase().trim())
+        .or(`program_id.eq.${programId},program_id.is.null`)
+        .not('status', 'in', closedStatuses)
+        .order('created_at', { ascending: false }),
+      normalizedPhone.length >= 10
+        ? supabase.from('applications')
+            .select('program_id, program_slug, program_interest')
+            .eq('normalized_phone', normalizedPhone)
+            .or(`program_id.eq.${programId},program_id.is.null`)
+            .not('status', 'in', closedStatuses)
+            .neq('source', 'intake-form')
+            .gte('created_at', oneDayAgo)
+        : null,
+    ]);
 
-    let recentByPhone: { id: string } | null = null;
-    if (normalizedPhone.length >= 10) {
-      const phoneQuery = await supabase
-        .from('applications')
-        .select('id')
-        .eq('normalized_phone', normalizedPhone)
-        .eq('program_interest', program)
-        .neq('source', 'intake-form')
-        .gte('created_at', oneDayAgo)
-        .limit(1)
-        .maybeSingle();
-      if (!phoneQuery.error) {
-        recentByPhone = phoneQuery.data;
-      }
+    const lookupError = emailMatches.error || phoneMatches?.error;
+    if (lookupError) {
+      logger.warn('[api/applications] existing application lookup failed', { code: lookupError.code });
+      return NextResponse.json(
+        { error: 'We could not verify existing applications. Please try again.' },
+        { status: 503, headers: corsHeadersForOrigin(origin, allowedOrigins) },
+      );
     }
 
-    // Reuse an existing active application for the same applicant/program.
-    // A WorkOne or document update must advance the original application, not
-    // create a second admissions record.
-    const { data: activeApp } = await supabase
-      .from('applications')
-      .select('id, reference_number, status, program_interest, funding_type, payment_status, normalized_phone, phone, metadata')
-      .ilike('email', body.email.toLowerCase().trim())
-      .eq('program_interest', program)
-      .not('status', 'in', '("rejected","withdrawn","duplicate")')
-      .order('created_at', { ascending: false })
-      .limit(1)
-      .maybeSingle();
+    const activeApp = emailMatches.data?.find(application => applicationMatchesProgram(application, programId, program));
+    const recentByPhone = phoneMatches?.data?.some(application => applicationMatchesProgram(application, programId, program));
 
     if (activeApp && paidEvidence) {
       const saved = await supabase.from('applications').update({
@@ -425,7 +422,7 @@ async function _POST(req: Request) {
       if (saved.error) throw new Error('Full application could not be saved.');
       const dashboardUrl = await activatePaidApplication(paidEvidence, activeApp.id);
       return NextResponse.json({ ok: true, existing: true, id: activeApp.id,
-        program, referenceNumber: activeApp.reference_number, applicationStatus: paidApplicationStatusForUrl(dashboardUrl),
+        program, referenceNumber: activeApp.reference_number, applicationStatus: 'enrolled',
         nextStepUrl: dashboardUrl });
     }
     if (activeApp) {
@@ -441,7 +438,7 @@ async function _POST(req: Request) {
           ok: true,
           existing: true,
           id: activeApp.id,
-          program: activeApp.program_interest ?? program,
+          program,
           referenceNumber: activeApp.reference_number ?? activeApp.id,
           applicationStatus: activeApp.status,
           nextStepUrl:
@@ -450,17 +447,17 @@ async function _POST(req: Request) {
               : String(activeApp.funding_type || '').startsWith('self_pay') &&
                   activeApp.payment_status !== 'paid' &&
                   requiresSelfPayPayment
-                ? `/programs/${encodeURIComponent(activeApp.program_interest ?? program)}/payment-setup?ref=${encodeURIComponent(activeApp.reference_number ?? activeApp.id)}`
+                ? `/programs/${encodeURIComponent(program)}/payment-setup?ref=${encodeURIComponent(activeApp.reference_number ?? activeApp.id)}`
                 : `/apply/track?id=${encodeURIComponent(activeApp.reference_number ?? activeApp.id)}`,
         },
         { status: 200, headers: corsHeadersForOrigin(origin, allowedOrigins) },
       );
     }
 
-    if (recentApp || recentByPhone) {
+    if (recentByPhone) {
       return NextResponse.json(
         {
-          error: `An application for this program was already submitted with this email in the last 24 hours. Please call ${PLATFORM_DEFAULTS.mainPhone} if you need to make changes.`,
+          error: `An application for this program was already submitted with this phone number in the last 24 hours. Please call ${PLATFORM_DEFAULTS.mainPhone} if you need to make changes.`,
         },
         { status: 409, headers: corsHeadersForOrigin(origin, allowedOrigins) },
       );
@@ -526,10 +523,8 @@ async function _POST(req: Request) {
     // Determine application status based on the actual funding/intake state.
     // WIOA / WRG applications remain the same application while WorkOne work is
     // completed; the applicant must never be told to submit a replacement one.
-    const FUNDED_TYPES = ['wioa', 'wrg'];
-    const fundingType = body.fundingType || body.fundingInterest || null;
+    const fundingType = paidEvidence ? 'self_pay' : requestedFunding || null;
     const eligibilityStatus = body.fundingEligibilityStatus || null;
-    const isFunded = FUNDED_TYPES.includes(fundingType);
     const workOneReferral = String(body.hasWorkOneReferral || '')
       .trim()
       .toLowerCase();
@@ -537,7 +532,7 @@ async function _POST(req: Request) {
       .trim()
       .toLowerCase();
     const needsWorkOne =
-      isFunded &&
+      usesWorkOne &&
       (eligibilityStatus === 'needs_appointment' ||
         workOneReferral === 'no' ||
         workOneIntake === 'not_started');
@@ -563,6 +558,7 @@ async function _POST(req: Request) {
       state: body.state || null,
       address: body.address || null,
       zip: body.zip || '00000',
+      program_id: catalogResult.data.id,
       program_interest: program,
       program_slug: body.programSlug || body.program_slug || null,
       support_notes: notes,
@@ -707,6 +703,7 @@ async function _POST(req: Request) {
           email: body.email,
           city: body.city || 'Not provided',
           zip: body.zip || '00000',
+          program_id: catalogResult.data.id,
           program_interest: program,
           support_notes: notes,
           status: 'submitted',
@@ -718,6 +715,13 @@ async function _POST(req: Request) {
         .maybeSingle();
       data = tier3.data;
       error = tier3.error;
+    }
+
+    if (error?.code === '23505' && String(error.message).includes('unique_applicant_per_program')) {
+      return NextResponse.json(
+        { error: 'An application already exists for this program. Check your application status or contact Admissions.' },
+        { status: 409, headers: corsHeadersForOrigin(origin, allowedOrigins) },
+      );
     }
 
     if (error || !data) {
@@ -738,71 +742,73 @@ async function _POST(req: Request) {
       );
     }
 
-    // Provision auth account immediately so the applicant can access the portal
-    // and complete onboarding while their application is under review.
-    // Admin still approves before enrollment is activated.
-    let userId: string | null = null;
+    // Activate verified self-pay enrollment before sending admission notices.
+    const dashboardUrl = paidEvidence ? await activatePaidApplication(paidEvidence, data.id) : null;
+    if (dashboardUrl) applicationStatus = 'enrolled';
+    let userId: string | null = paidEvidence?.user.id ?? null;
     let passwordSetupLink: string | null = null;
 
-    try {
-      const programSlug = body.programSlug || body.preferredProgramId || '';
-      const { data: programRow } = await supabase
-        .from('programs')
-        .select('title')
-        .eq('slug', programSlug)
-        .maybeSingle();
-      const programName =
-        programRow?.title ||
-        programSlug.replace(/-/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase()) ||
-        'your program';
+    if (!paidEvidence) {
+      try {
+        const programSlug = body.programSlug || body.preferredProgramId || '';
+        const { data: programRow } = await supabase
+          .from('programs')
+          .select('title')
+          .eq('slug', programSlug)
+          .maybeSingle();
+        const programName =
+          programRow?.title ||
+          programSlug.replace(/-/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase()) ||
+          'your program';
 
-      const provision = await provisionAccount({
-        db: supabase,
-        email: body.email,
-        fullName: (body.firstName + ' ' + body.lastName).trim() || body.email,
-        phone: body.phone || null,
-        programName,
-        programSlug,
-        postLoginUrl: '/onboarding/learner',
-        enrollmentStatus: 'pending',
-        sendWelcomeEmail: false,
-      });
-
-      if (provision.error) {
-        logger.warn('[Applications] provisionAccount non-fatal', {
-          error: provision.error,
+        const provision = await provisionAccount({
+          db: supabase,
           email: body.email,
+          fullName: (body.firstName + ' ' + body.lastName).trim() || body.email,
+          phone: body.phone || null,
+          programName,
+          programSlug,
+          postLoginUrl: '/onboarding/learner',
+          enrollmentStatus: 'pending',
+          sendWelcomeEmail: false,
         });
-      } else {
-        userId = provision.userId ?? null;
-        passwordSetupLink = provision.passwordSetupLink ?? null;
-        logger.info('[Applications] Account provisioned', {
-          userId,
-          isNewUser: provision.isNewUser,
-        });
-      }
 
-      // Link provisioned userId back to the application row
-      if (userId && data?.id) {
-        const { error: linkError } = await supabase
-          .from('applications')
-          .update({ user_id: userId })
-          .eq('id', data.id);
-        if (linkError) {
-          // PostgREST resolves with { error } on failed writes; a rejected
-          // Promise handler alone silently lost this critical binder linkage.
-          logger.warn('[Applications] Failed to link user_id', {
-            applicationId: data.id, code: linkError.code,
+        if (provision.error) {
+          logger.warn('[Applications] provisionAccount non-fatal', {
+            error: provision.error,
+            email: body.email,
+          });
+        } else {
+          userId = provision.userId ?? null;
+          passwordSetupLink = provision.passwordSetupLink ?? null;
+          logger.info('[Applications] Account provisioned', {
+            userId,
+            isNewUser: provision.isNewUser,
           });
         }
+
+        // Link provisioned userId back to the application row
+        if (userId && data?.id) {
+          const { error: linkError } = await supabase
+            .from('applications')
+            .update({ user_id: userId })
+            .eq('id', data.id);
+          if (linkError) {
+            // PostgREST resolves with { error } on failed writes; a rejected
+            // Promise handler alone silently lost this critical binder linkage.
+            logger.warn('[Applications] Failed to link user_id', {
+              applicationId: data.id, code: linkError.code,
+            });
+          }
+        }
+      } catch (provisionError) {
+        // The application is already committed. Ancillary account failures must
+        // never tell the applicant the submission failed or make them reapply.
+        logger.warn('[Applications] Account provisioning failed after application saved', {
+          applicationId: data.id,
+          error: provisionError instanceof Error ? provisionError.message : String(provisionError),
+        });
       }
-    } catch (provisionError) {
-      // The application is already committed. Ancillary account failures must
-      // never tell the applicant the submission failed or make them reapply.
-      logger.warn('[Applications] Account provisioning failed after application saved', {
-        applicationId: data.id,
-        error: provisionError instanceof Error ? provisionError.message : String(provisionError),
-      });
     }
 
     logger.info('[Applications] Saved', {
@@ -848,11 +854,15 @@ async function _POST(req: Request) {
       const fundingLabel: Record<string, string> = {
         wioa: 'WIOA (Workforce Innovation and Opportunity Act)',
         wrg: 'Workforce Ready Grant / Next Level Jobs',
+        workone: 'WorkOne',
+        jri: 'Job Ready Indy / Reentry funding',
       };
       const fundingName = fundingType ? fundingLabel[fundingType] || fundingType : null;
       const pendingWorkOneUrl = `${siteUrl}/apply/pending-workone?ref=${encodeURIComponent(referenceNumber)}&funding=${encodeURIComponent(fundingType || 'workone')}`;
 
-      const nextStepsHtml = needsWorkOne
+      const nextStepsHtml = dashboardUrl
+        ? `<p><a href="${dashboardUrl}">Open your student dashboard</a> to complete onboarding.</p>`
+        : needsWorkOne
         ? `
         <div style="background: #fffbeb; border: 2px solid #f59e0b; border-radius: 8px; padding: 20px; margin: 20px 0;">
           <h3 style="margin-top: 0; color: #92400e;">Action Required - Complete Your WorkOne Intake</h3>
@@ -878,7 +888,7 @@ async function _POST(req: Request) {
           <h4 style="color: #1e40af; margin-bottom: 8px;">What happens next:</h4>
           <ol style="color: #1e3a8a; padding-left: 20px; line-height: 1.8;">
             <li>Our enrollment team reviews your application (1–2 business days)</li>
-            <li>We verify your funding status with ${fundingType === 'wioa' ? 'WorkOne' : 'Indiana Career Connect'}</li>
+            <li>We verify your funding status with ${usesWorkOne ? 'WorkOne' : 'your funding partner'}</li>
             <li>Once verified, we contact you to complete enrollment and schedule your start date</li>
             <li>You begin training - no tuition due until funding is confirmed</li>
           </ol>
@@ -916,12 +926,12 @@ async function _POST(req: Request) {
             </div>
             <div style="padding: 24px; background: #ffffff; border: 1px solid #e2e8f0; border-top: none; border-radius: 0 0 8px 8px;">
               <p style="font-size: 16px;">Hi ${body.firstName},</p>
-              <p>Your application for <strong>${body.program}</strong> has been received${needsWorkOne ? ', and it is being held while you complete the WorkOne step.' : isFunded ? ' and is pending admin review.' : ' and is under review.'}</p>
+              <p>Your application for <strong>${body.program}</strong> has been received${dashboardUrl ? ', your payment is verified, and your enrollment is active.' : needsWorkOne ? ', and it is being held while you complete the WorkOne step.' : isFunded ? ' and is pending admin review.' : ' and is under review.'}</p>
 
               ${nextStepsHtml}
 
               ${
-                !needsWorkOne
+                !needsWorkOne && !dashboardUrl
                   ? `
               <div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; margin: 20px 0;">
                 <h3 style="margin-top: 0; color: #ea580c;">Want to Talk Sooner?</h3>
@@ -1046,7 +1056,6 @@ async function _POST(req: Request) {
       logger.error('[Applications] Program Holder copy failed', copyError instanceof Error ? copyError : undefined, { applicationId: data.id });
     }
 
-    const dashboardUrl = paidEvidence ? await activatePaidApplication(paidEvidence, data.id) : null;
     const requiresSelfPayCheckout =
       !verifiedPaidInvoice &&
       String(fundingType || '').startsWith('self_pay') &&
@@ -1064,7 +1073,7 @@ async function _POST(req: Request) {
         email: data.email,
         program: data.program_interest ?? program,
         referenceNumber: referenceNumber,
-        applicationStatus: dashboardUrl ? paidApplicationStatusForUrl(dashboardUrl) : applicationStatus,
+        applicationStatus: dashboardUrl ? 'enrolled' : applicationStatus,
         nextStepUrl: dashboardUrl || nextStepUrl,
         emailStatus,
       },

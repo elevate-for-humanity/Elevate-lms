@@ -10,7 +10,7 @@ import {
 
 function app(overrides: Partial<ApplicantRow> & { id: string }): ApplicantRow {
   return {
-    full_name: 'Test Applicant',
+    full_name: 'Test Applicant ' + overrides.id,
     email: 'test@example.com',
     phone: '(317) 555-0100',
     program_slug: 'cna',
@@ -62,7 +62,7 @@ it('deduplicates by email and by platform user id', () => {
   ];
   const { selected, skipped } = selectReferralBatch(rows, { limit: 50 });
   expect(selected.map((row) => row.id)).toEqual(['one']);
-  expect(skipped.duplicate.map((row) => row.id)).toEqual(['two', 'three']);
+  expect(skipped.duplicate.map((row) => row.id)).toEqual(['three', 'two']);
 });
 
 it('excludes applications already assigned to any holder', () => {

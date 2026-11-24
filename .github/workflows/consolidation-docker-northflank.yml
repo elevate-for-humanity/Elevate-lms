@@ -10,13 +10,14 @@ on:
       - 'release/production-recovery-*'
     paths:
       - 'Dockerfile.marketing'
-      - 'Dockerfile.northflank-lms'
+      - 'Dockerfile.google-lms'
       - 'Dockerfile.admin'
       - 'apps/marketing/**'
       - 'apps/admin/**'
       - 'apps/lms/**'
       - 'packages/**'
       - 'scripts/northflank/**'
+      - 'scripts/container-build-policy.mjs'
       - 'package.json'
       - 'pnpm-lock.yaml'
       - 'pnpm-workspace.yaml'
@@ -40,13 +41,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - service: marketing
-            dockerfile: Dockerfile.marketing
-          - service: lms
-            dockerfile: Dockerfile.northflank-lms
-          - service: admin
-            dockerfile: Dockerfile.admin
+        service: [marketing, lms, admin]
     env:
       NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
       NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
@@ -72,8 +67,9 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          FILE="$(node scripts/container-build-policy.mjs "${{ matrix.service }}")"
           docker build \
-            -f "${{ matrix.dockerfile }}" \
+            -f "$FILE" \
             --build-arg NEXT_PUBLIC_SITE_URL=https://www.elevateforhumanity.org \
             --build-arg NEXT_PUBLIC_APP_URL=https://app.elevateforhumanity.org \
             --build-arg NEXT_PUBLIC_ADMIN_URL=https://admin.elevateforhumanity.org \

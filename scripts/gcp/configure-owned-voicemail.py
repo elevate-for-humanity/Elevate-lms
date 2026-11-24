@@ -1,3 +1,4 @@
+# Branch refreshed to pick up main (71e31a22): /apply/student E2E fix + Dockerfile.google-lms.
 #!/usr/bin/env python3
 """Configure owned operator and assigned mailboxes without changing public carrier routing."""
 import base64

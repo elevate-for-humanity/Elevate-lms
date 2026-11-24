@@ -268,5 +268,16 @@ export type CredentialBlueprint = {
   externalCourses?: BlueprintExternalCourse[];
   apprenticeshipConfig?: BlueprintApprenticeshipConfig;
   certificationPathway?: BlueprintCertificationPathway;
+  /**
+   * O*NET-SOC code for the occupation this course trains for, carried from
+   * ProgramBuilderTemplate.socCode by adaptProgramTemplateToBlueprint.
+   */
+  socCode?: string | null;
+  /**
+   * Government job-feed evidence (O*NET, CareerOneStop, USAJobs, BLS)
+   * stored on the course by the single Course Builder. Shape:
+   * JobFeedEvidence in lib/course-builder/schema.ts.
+   */
+  workforceEvidence?: Record<string, unknown> | null;
   [key: string]: unknown;
 };

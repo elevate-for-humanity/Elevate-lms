@@ -9,6 +9,7 @@ import {
 import { dispatchOpenHandsTask, refreshOpenHandsTask } from '@/lib/devstudio/openhands/runtime';
 import { findOwnedOpenHandsTask } from '@/lib/devstudio/openhands/task-access';
 import { publicOpenHandsLifecycle } from '@/lib/devstudio/openhands/public-lifecycle';
+import { isOpenHandsOptedIn } from '@/lib/devstudio/openhands-opt-in';
 
 function canAccessDevTools(effectiveRoles: readonly string[]): boolean {
   return normalizeRoles([...effectiveRoles]).some((role) =>
@@ -29,6 +30,15 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       { error: 'Admin dev-tool access is required for autonomous agent execution' },
       { status: 403 },
+    );
+  }
+
+  // OpenHands is opt-in-only (PARIS_REPAIR_ENGINE=openhands). New dispatches
+  // fail closed without the opt-in; use the owned engine instead.
+  if (!isOpenHandsOptedIn()) {
+    return NextResponse.json(
+      { error: 'OpenHands is opt-in only; set PARIS_REPAIR_ENGINE=openhands to enable it' },
+      { status: 503 },
     );
   }
 
@@ -132,7 +142,10 @@ export async function GET(request: NextRequest) {
 
   return NextResponse.json({
     configured: config.configured,
-    executable: canAccessDevTools(auth.effectiveRoles),
+    // Executable only with the explicit OpenHands opt-in; otherwise the
+    // owned engine is the execution path and this route reports status only.
+    executable: canAccessDevTools(auth.effectiveRoles) && isOpenHandsOptedIn(),
+    optInRequired: !isOpenHandsOptedIn(),
     provider: 'openhands',
     apiVersion: 'v1',
     baseUrl: config.origin,

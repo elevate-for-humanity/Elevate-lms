@@ -50,15 +50,12 @@ test.describe('Public routes', () => {
   });
 
   test('Marketing learner onboarding redirects unauthenticated users to /login', async ({ page }) => {
-    // This onboarding route is owned by Marketing, not the LMS application.
-    // Validate the actual protected page instead of an unmatched LMS route.
+    // The onboarding route belongs to Marketing; the LMS app does not own it.
     const marketing = peerOrigin('marketing');
     const response = await page.goto(`${marketing}/onboarding/learner`, { waitUntil: 'domcontentloaded' });
     expect(response, 'Marketing learner onboarding must respond').not.toBeNull();
-    await expect(page).toHaveURL(new RegExp(`^${marketing.replace(/[.*+?^${}()|[\]\\]/g, '\\  test('/onboarding/learner redirects unauthenticated users to /login', async ({ page }) => {
-    await page.goto(`${BASE}/onboarding/learner`, { waitUntil: 'domcontentloaded' });
-    await expect(page).toHaveURL(/\/login/);
-  });')}/login(?:[?#]|$)`));
+    await expect(page).toHaveURL(/\/login(?:[?#]|$)/);
+    expect(new URL(page.url()).origin).toBe(marketing);
   });
 });
 

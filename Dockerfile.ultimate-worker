@@ -26,6 +26,7 @@ COPY tsconfig.ultimate-worker.json ./tsconfig.json
 ENV TSX_TSCONFIG_PATH=/app/tsconfig.json
 COPY workers/ultimate-course-builder.ts workers/worker-loop.mjs ./workers/
 COPY lib/ultimate-course-builder ./lib/ultimate-course-builder
+COPY lib/lms/manufacturing-simulation.ts lib/lms/manufacturing-simulation-reference.mjs lib/lms/manufacturing-simulation-store.ts ./lib/lms/
 COPY lib/apprenticeship/registered-program-contract.ts ./lib/apprenticeship/registered-program-contract.ts
 COPY lib/compliance/appendix-a-standards.ts ./lib/compliance/appendix-a-standards.ts
 COPY lib/curriculum/blueprints ./lib/curriculum/blueprints

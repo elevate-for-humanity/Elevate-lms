@@ -2,13 +2,13 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { JSDOM } from 'jsdom';
-import { getByTestId } from './cdp-dom.mjs';
-import { canonicalHash, completeStagedLesson } from './learner-runthrough.mjs';
-import { solvePublicManufacturingSimulation, runStagedManufacturingWorkflow } from './manufacturing-runthrough.mjs';
+import { getByTestId } from '../../services/studio-browser/cdp-dom.mjs';
+import { canonicalHash, completeStagedLesson } from '../../services/studio-browser/learner-runthrough.mjs';
+import { solvePublicManufacturingSimulation, runStagedManufacturingWorkflow } from '../../services/studio-browser/manufacturing-runthrough.mjs';
 
 // Exact saved public problem statements. There are no protected answers or keys
 // in this fixture; gradingKeyId is only the immutable public reference.
-const cases = JSON.parse(fs.readFileSync(new URL('./fixtures/manufacturing-public-cases.json', import.meta.url), 'utf8'));
+const cases = JSON.parse(fs.readFileSync(new URL('../fixtures/manufacturing-public-cases.json', import.meta.url), 'utf8'));
 const clone = (value) => structuredClone(value);
 const byId = (id) => clone(cases.find((spec) => spec.id === id));
 

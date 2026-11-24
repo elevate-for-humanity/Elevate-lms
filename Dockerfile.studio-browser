@@ -39,6 +39,7 @@ COPY services/studio-browser/terminal-init.sh ./terminal-init.sh
 COPY services/studio-browser/provider-verification.mjs ./provider-verification.mjs
 COPY services/studio-browser/course-video-download.mjs ./course-video-download.mjs
 COPY services/studio-browser/learner-runthrough.mjs ./learner-runthrough.mjs
+COPY services/studio-browser/manufacturing-runthrough.mjs ./manufacturing-runthrough.mjs
 RUN node --input-type=module -e "await import('./server.mjs')"
 
 ENV NODE_ENV=production PORT=3100 GIT_SHA=${NF_GIT_SHA}

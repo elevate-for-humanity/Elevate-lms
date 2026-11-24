@@ -84,11 +84,6 @@ const hostShops: Card[] = [
   },
 ];
 
-const additionalHosts = [
-  'J Noelle & Co.', 'Styles & Scissors', 'Top Shelf Barber Lounge',
-  'Studio Fresh LLC', 'DBO Hair Studios', 'Barbershop 32',
-];
-
 const categories = [
   { title: 'Barber & beauty apprenticeships', details: 'Related instruction and supervised learning at approved host sites; specific occupation, supervisor and location depend on each participant’s placement.', href: '/apprenticeships' },
   { title: 'HVAC & skilled trades', details: 'HVAC foundations, practical training and EPA Section 608 examination preparation; certification depends on the applicable examination.', href: '/programs' },
@@ -153,12 +148,9 @@ export default function FacultyNetworkPage() {
       <p className="mb-8 mt-3 max-w-3xl leading-7 text-slate-700">Host shops are independent businesses offering or coordinating supervised practical experiences. Their inclusion does not imply they are Elevate employees or that every location currently has an available apprenticeship seat.</p>
       <Cards items={hostShops} />
       <div className="mt-8 rounded-xl bg-slate-50 p-6">
-        <h3 className="text-xl font-bold">Additional host-shop network</h3>
-        <ul className="mt-4 grid list-disc gap-2 pl-5 text-slate-700 sm:grid-cols-2">
-          {additionalHosts.map(name => <li key={name}>{name}</li>)}
-        </ul>
+        <h3 className="text-xl font-bold">Full approved Host Shop directory</h3>
         <p className="mt-4 text-sm text-slate-600">Individual logos, location-specific offerings, public headshots, and availability are added only after confirming public-use permission and current host status.</p>
-        <Link href="/partners/host-shops" className="mt-3 inline-flex min-h-11 items-center font-semibold text-brand-red-700 underline">Explore host-shop opportunities</Link>
+        <Link href="/partners/host-shops" className="mt-3 inline-flex min-h-11 items-center font-semibold text-brand-red-700 underline">View all approved Host Shops</Link>
       </div>
     </section>
     <section className="bg-slate-50 px-4 py-12" id="offerings"><div className="mx-auto max-w-6xl">

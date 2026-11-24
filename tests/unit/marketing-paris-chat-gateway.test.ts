@@ -1,12 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { NextRequest } from 'next/server';
 
-const { aiChat, aiChatStream, getActiveProviderName } = vi.hoisted(() => ({
-  aiChat: vi.fn(),
-  aiChatStream: vi.fn(),
-  getActiveProviderName: () => 'elevate',
-}));
-vi.mock('@/lib/ai/ai-service', () => ({ aiChat, aiChatStream, getActiveProviderName, isAIAvailable: () => true }));
+const { aiChat, aiChatStream } = vi.hoisted(() => ({ aiChat: vi.fn(), aiChatStream: vi.fn() }));
+vi.mock('@/lib/ai/ai-service', () => ({ aiChat, aiChatStream, isAIAvailable: () => true }));
 vi.mock('@/lib/config/platform-config', () => ({ PLATFORM_DEFAULTS: {} }));
 
 import { POST, maxDuration } from '../../apps/marketing/app/api/ai-chat/route';
@@ -21,31 +17,58 @@ function storeQuestion() {
   });
 }
 
-function streamQuestion() {
-  return new NextRequest('https://www.elevateforhumanity.org/api/ai-chat', {
-    method: 'POST',
-    body: JSON.stringify({
-      stream: true,
-      context: { surface: 'public' },
-      messages: [{ role: 'user', content: 'Tell me about the barber program.' }],
-    }),
-  });
-}
-
-function sseEvents(text: string) {
-  return text
-    .split('\n\n')
-    .filter(Boolean)
-    .map((block) => {
-      const line = block.split('\n').find((entry) => entry.startsWith('data:'));
-      return JSON.parse(line.slice(5).trim());
-    });
-}
-
 describe('Marketing PARIS gateway', () => {
   beforeEach(() => {
     aiChat.mockReset();
     aiChatStream.mockReset();
+  });
+
+  it('streams the live provider reply as server-sent events', async () => {
+    aiChatStream.mockImplementation(async function* () {
+      yield 'Compare plans ';
+      yield 'on the Store plans page.';
+    });
+    const request = new NextRequest('https://store.elevateforhumanity.org/api/ai-chat', {
+      method: 'POST',
+      headers: { Accept: 'text/event-stream' },
+      body: JSON.stringify({
+        context: { surface: 'store' },
+        messages: [{ role: 'user', content: 'How do I compare plans?' }],
+      }),
+    });
+    const response = await POST(request);
+    expect(response.status).toBe(200);
+    expect(response.headers.get('content-type')).toContain('text/event-stream');
+    expect(response.headers.get('cache-control')).toBe('no-store');
+    const text = await response.text();
+    expect(text).toContain('data: {"delta":"Compare plans "}');
+    expect(text).toContain('data: {"delta":"on the Store plans page."}');
+    expect(text).toContain('"done":true');
+    expect(text).toContain('"mode":"ai"');
+    expect(text).toContain('"reply":"Compare plans on the Store plans page."');
+    expect(aiChat).not.toHaveBeenCalled();
+  });
+
+  it('streams the guided fallback when live inference fails before any token', async () => {
+    aiChatStream.mockImplementation(async function* () {
+      throw new Error('MODEL_OFFLINE');
+    });
+    const request = new NextRequest('https://www.elevateforhumanity.org/api/ai-chat', {
+      method: 'POST',
+      headers: { Accept: 'text/event-stream' },
+      body: JSON.stringify({
+        context: { surface: 'public' },
+        messages: [{ role: 'user', content: 'Tell me about the barber program.' }],
+      }),
+    });
+    const response = await POST(request);
+    expect(response.status).toBe(200);
+    expect(response.headers.get('content-type')).toContain('text/event-stream');
+    const text = await response.text();
+    expect(text).toContain('"done":true');
+    expect(text).toContain('"mode":"guided"');
+    expect(text).toContain('"liveAiAvailable":false');
+    expect(aiChat).not.toHaveBeenCalled();
   });
 
   it('returns the live provider reply', async () => {
@@ -59,38 +82,6 @@ describe('Marketing PARIS gateway', () => {
       liveAiAvailable: true,
     });
     expect(response.headers.get('cache-control')).toBe('no-store');
-  });
-
-  it('streams tokens as server-sent events and ends with done metadata', async () => {
-    aiChatStream.mockImplementation(async function* () {
-      yield 'Barber is ';
-      yield 'RAPIDS 0030CB.';
-    });
-    const response = await POST(streamQuestion());
-    expect(response.status).toBe(200);
-    expect(response.headers.get('content-type')).toContain('text/event-stream');
-    expect(sseEvents(await response.text())).toEqual([
-      { token: 'Barber is ' },
-      { token: 'RAPIDS 0030CB.' },
-      { provider: 'elevate', mode: 'ai', liveAiAvailable: true, done: true },
-    ]);
-    expect(aiChat).not.toHaveBeenCalled();
-  });
-
-  it('streams the guided fallback when live inference fails before any token', async () => {
-    aiChatStream.mockImplementation(async function* () {
-      throw new Error('MODEL_OFFLINE');
-    });
-    const response = await POST(streamQuestion());
-    expect(response.status).toBe(200);
-    const events = sseEvents(await response.text());
-    expect(events[events.length - 1]).toMatchObject({
-      mode: 'guided',
-      liveAiAvailable: false,
-      done: true,
-    });
-    expect(events.map((event) => event.token ?? '').join('')).toContain('RAPIDS 0030CB');
-    expect(aiChat).not.toHaveBeenCalled();
   });
 
   it('cancels an unfinished completion before the route expires', async () => {

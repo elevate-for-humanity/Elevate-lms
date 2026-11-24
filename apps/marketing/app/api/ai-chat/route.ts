@@ -8,8 +8,7 @@ import { PARIS_SYSTEM_IDENTITY } from '@/lib/ai/paris-identity';
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { aiChat, aiChatStream, getActiveProviderName, isAIAvailable } from '@/lib/ai/ai-service';
-import { studioTextStreamResponse } from '@/lib/devstudio/studio-text-stream';
+import { aiChat, aiChatStream, isAIAvailable } from '@/lib/ai/ai-service';
 import { findSiteFacts, formatProgramIndex, formatSiteFacts } from '@/lib/ai/paris-site-facts';
 import { hydrateProcessEnv } from '@/lib/secrets';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
@@ -163,17 +162,71 @@ function validMessages(value: unknown): Message[] {
     .slice(-20);
 }
 
+/**
+ * Stream a PARIS reply as server-sent events so the visitor sees the first
+ * words as soon as the model produces them, instead of staring at a spinner
+ * for the whole 700-token generation (over a minute on the warm 7B CPU
+ * model). The JSON path below stays the default for non-stream clients and
+ * for the gateway tests.
+ */
+function streamReplyResponse(
+  stream: AsyncIterable<string> | null,
+  lastUserMessage: string,
+  context: ParisContext,
+): Response {
+  const encoder = new TextEncoder();
+  const readable = new ReadableStream({
+    async start(controller) {
+      if (!stream) {
+        controller.enqueue(
+          encoder.encode(
+            `data: ${JSON.stringify({ done: true, mode: 'guided', liveAiAvailable: false, reply: fallbackReply(lastUserMessage, context) })}\n\n`,
+          ),
+        );
+        controller.close();
+        return;
+      }
+      let assembled = '';
+      try {
+        for await (const chunk of stream) {
+          if (!chunk) continue;
+          assembled += chunk;
+          controller.enqueue(encoder.encode(`data: ${JSON.stringify({ delta: chunk })}\n\n`));
+        }
+        controller.enqueue(
+          encoder.encode(
+            `data: ${JSON.stringify({ done: true, mode: 'ai', liveAiAvailable: true, reply: assembled })}\n\n`,
+          ),
+        );
+        controller.close();
+      } catch (error) {
+        console.error('Canonical PARIS stream error:', error);
+        controller.enqueue(
+          encoder.encode(
+            `data: ${JSON.stringify({ done: true, mode: 'guided', liveAiAvailable: false, reply: fallbackReply(lastUserMessage, context) })}\n\n`,
+          ),
+        );
+        controller.close();
+      }
+    },
+  });
+  return new Response(readable, {
+    headers: {
+      'Content-Type': 'text/event-stream',
+      'Cache-Control': 'no-store',
+      Connection: 'keep-alive',
+    },
+  });
+}
+
 export async function POST(req: NextRequest) {
   const signal = AbortSignal.any([req.signal, AbortSignal.timeout(INFERENCE_TIMEOUT_MS)]);
+  const wantsStream = req.headers.get('accept')?.includes('text/event-stream') ?? false;
   try {
     const body = await req.json();
     const context: ParisContext = body.context && typeof body.context === 'object' ? body.context : {};
     const messages = validMessages(body.messages);
     const lastUserMessage = [...messages].reverse().find((message) => message.role === 'user')?.content;
-    // Streaming is opt-in: other /api/ai-chat callers (SuperChat, LiveChat,
-    // AIAdvisor, UnifiedChatAssistant) read one JSON reply and must keep
-    // getting it. ParisChat sends stream: true.
-    const wantsStream = body.stream === true;
 
     if (!lastUserMessage) {
       return NextResponse.json({ error: 'No message provided' }, { status: 400 });
@@ -202,6 +255,7 @@ export async function POST(req: NextRequest) {
     await hydrateProcessEnv();
     signal.throwIfAborted();
     if (!isAIAvailable()) {
+      if (wantsStream) return streamReplyResponse(null, lastUserMessage, context);
       return NextResponse.json({ reply: fallbackReply(lastUserMessage, context), mode: 'guided', liveAiAvailable: false },
         { headers: { 'Cache-Control': 'no-store' } });
     }
@@ -215,53 +269,27 @@ export async function POST(req: NextRequest) {
           ? '\n\nSITE FACTS — retrieved from Elevate\u2019s own program catalog for this question. Use these exact facts; do not invent prices, durations, credentials, or funding beyond what is written here:\n' +
             siteFacts
           : '');
-      const chatInput = {
+      if (wantsStream) {
+        return streamReplyResponse(
+          aiChatStream({
+            messages: [{ role: 'system', content: systemContent }, ...messages],
+            temperature: context.surface === 'store' ? 0.45 : 0.25,
+            maxTokens: 700,
+            signal,
+          }),
+          lastUserMessage,
+          context,
+        );
+      }
+      const result = await aiChat({
         messages: [{ role: 'system', content: systemContent }, ...messages],
         temperature: context.surface === 'store' ? 0.45 : 0.25,
         maxTokens: 700,
         signal,
-      };
-      if (!wantsStream) {
-        const result = await aiChat(chatInput);
-        return NextResponse.json({ reply: result.content, provider: result.provider, mode: 'ai', liveAiAvailable: true },
-          { headers: { 'Cache-Control': 'no-store' } });
-      }
-
-      // Streamed replies: the first tokens reach the visitor in seconds while
-      // the CPU worker is still generating the rest of the answer. When live
-      // inference fails before any token arrives, the guided fallback is
-      // streamed instead and the done event marks it guided, so the client
-      // prefixes the same "temporarily unavailable" notice as the JSON path.
-      // A failure after tokens have already streamed rethrows instead, so a
-      // partial live reply is never silently completed with canned guidance.
-      let guided = false;
-      return studioTextStreamResponse({
-        signal,
-        tokens: async function* (streamSignal) {
-          let streamedAny = false;
-          try {
-            for await (const token of aiChatStream({ ...chatInput, signal: streamSignal })) {
-              streamedAny = true;
-              yield token;
-            }
-          } catch (error) {
-            console.error('Canonical PARIS gateway error:', error);
-            if (!streamedAny) {
-              guided = true;
-              yield fallbackReply(lastUserMessage, context);
-              return;
-            }
-            throw error;
-          }
-        },
-        complete: async () => ({
-          provider: getActiveProviderName(),
-          mode: guided ? 'guided' : 'ai',
-          liveAiAvailable: !guided,
-        }),
-        onError: (error) => console.error('Canonical PARIS stream error:', error),
-        errorMessage: 'PARIS could not complete this response. Please try again shortly.',
       });
+
+      return NextResponse.json({ reply: result.content, provider: result.provider, mode: 'ai', liveAiAvailable: true },
+        { headers: { 'Cache-Control': 'no-store' } });
     } catch (error) {
       console.error('Canonical PARIS gateway error:', error);
       return NextResponse.json({ reply: fallbackReply(lastUserMessage, context), mode: 'guided', liveAiAvailable: false },

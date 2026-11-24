@@ -92,7 +92,7 @@ export default function PARISPage() {
     <div className="min-h-screen">
       <SEO
         title="PARIS AI"
-        description="Intelligent career guidance, program matching, and student support powered by Claude AI."
+        description="Intelligent career guidance, program matching, and student support powered by PARIS AI."
         breadcrumb={[{ name: 'AI Platform', url: '/ai' }, { name: 'PARIS AI', url: '/ai/paris' }]}
       />
       
@@ -107,14 +107,14 @@ export default function PARISPage() {
             <div>
               <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 rounded-full text-sm mb-6">
                 <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
-                Powered by Claude AI
+                Powered by PARIS AI
               </div>
               <h1 className="text-5xl md:text-6xl font-bold mb-6">
                 Meet <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-400">PARIS AI</span>
               </h1>
               <p className="text-xl text-slate-300 mb-8">
                 Your intelligent workforce advisor. PARIS AI guides career seekers through training programs, 
-                funding options, and career pathways—powered by Claude AI.
+                funding options, and career pathways—powered by PARIS AI.
               </p>
               <div className="flex flex-wrap gap-4">
                 <Link href="/apply" className="px-8 py-4 bg-gradient-to-r from-purple-600 to-blue-600 rounded-lg font-semibold hover:opacity-90 transition">

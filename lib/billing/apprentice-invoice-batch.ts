@@ -166,6 +166,83 @@ export function nextWeeklyInvoiceDateAfter(current: string, through: string): st
   return next;
 }
 
+/** Last day (Sunday) of the billing week that starts on the given Monday. */
+export function billingWeekEnd(weekStart: string): string {
+  const [year, month, day] = weekStart.split('-').map(Number);
+  const end = new Date(Date.UTC(year, month - 1, day));
+  end.setUTCDate(end.getUTCDate() + 6);
+  return end.toISOString().slice(0, 10);
+}
+
+/** Invoice statuses that still represent an amount owed for the week. */
+export const OPEN_INVOICE_STATUSES = ['draft', 'open', 'past_due', 'unpaid', 'pending'] as const;
+/** Invoice statuses that can receive an external payment for the week. */
+export const PAYABLE_INVOICE_STATUSES = ['open', 'past_due', 'unpaid', 'pending'] as const;
+
+export type ScheduleWeekInvoice = {
+  id: string;
+  provider_invoice_id: string | null;
+  invoice_number: string | null;
+  total_cents: number;
+  status: string;
+  due_at: string | null;
+  idempotency_key?: string | null;
+};
+
+/**
+ * Same-schedule / same-amount / same-week duplicate detector.
+ *
+ * A weekly tuition week must have exactly one invoice. The fallback writer and
+ * the PayPal reconcile writer used different idempotency keys
+ * (`apprentice-fallback:` vs `paypal:`), so neither could see the other's
+ * invoice and students were charged twice for the same week. This is the
+ * single shared lookup both writers must consult before creating an invoice:
+ *
+ * 1. Exact match on the deterministic fallback idempotency key
+ *    (`apprentice-fallback:{scheduleId}:{weekStart}`) — catches fallback
+ *    invoices created by any run, including rows written before
+ *    `billing_schedule_id` was recorded on invoices.
+ * 2. Any invoice linked to the schedule whose due date falls in the week and
+ *    whose amount matches — catches reconcile-created (`paypal:`) invoices
+ *    once they are linked to the schedule.
+ *
+ * Failed invoice rows are ignored: a failed creation is retried, not treated
+ * as a billed week. Returns the earliest matching invoice, or null.
+ */
+export async function findInvoiceForScheduleWeek(
+  db: Database,
+  input: { scheduleId: string; amountCents: number; weekStart: string },
+): Promise<ScheduleWeekInvoice | null> {
+  const weekEnd = billingWeekEnd(input.weekStart);
+  const select =
+    'id,provider_invoice_id,invoice_number,total_cents,status,due_at,idempotency_key,created_at';
+  const byKey = await db
+    .from('billing_invoices')
+    .select(select)
+    .eq('idempotency_key', `apprentice-fallback:${input.scheduleId}:${input.weekStart}`)
+    .eq('total_cents', input.amountCents)
+    .neq('status', 'failed')
+    .maybeSingle();
+  if (byKey.error) throw new Error(`Could not check for a duplicate invoice: ${byKey.error.message}`);
+  if (byKey.data) return byKey.data as ScheduleWeekInvoice;
+
+  const bySchedule = await db
+    .from('billing_invoices')
+    .select(select)
+    .eq('billing_schedule_id', input.scheduleId)
+    .eq('total_cents', input.amountCents)
+    .gte('due_at', input.weekStart)
+    .lte('due_at', weekEnd)
+    .neq('status', 'failed')
+    .order('created_at', { ascending: true })
+    .limit(1)
+    .maybeSingle();
+  if (bySchedule.error) {
+    throw new Error(`Could not check for a duplicate invoice: ${bySchedule.error.message}`);
+  }
+  return (bySchedule.data as ScheduleWeekInvoice | null) ?? null;
+}
+
 export function apprenticeInvoiceIdempotencyKey(scheduleId: string, runAt: Date): string {
   return `apprentice-fallback:${scheduleId}:${billingWeekStart(runAt)}`;
 }
@@ -238,9 +315,9 @@ export function apprenticeInvoiceEmail(input: ApprenticeInvoiceEmailInput): {
         <tbody>${invoiceRows}</tbody>
       </table>
       <div style="border:2px solid #f59e0b;border-radius:8px;background:#fffbeb;padding:14px;color:#78350f"><strong>Payment reminder:</strong> Review each invoice due date and Pay Now link. Your apprentice portal remains available while billing is resolved.</div>
-      <p style="font-size:13px;color:#475569">This invoice is the temporary weekly billing path while your PayPal recurring-payment agreement is being activated. It does not create a duplicate automatic charge.</p>
+      <p style="font-size:13px;color:#475569">This invoice is the temporary weekly billing path while your PayPal recurring-payment agreement is being activated. If your PayPal automatic payment for this week goes through, it is applied to this invoice instead of creating a second charge — you will not be charged twice for the same week.</p>
       <p style="font-size:13px;color:#475569">Questions? Reply to this email or contact billing@elevateforhumanity.org.</p>
     </div>`,
-    text: `Hi ${input.customerName},\n\nYour ${input.productName} invoice${invoiceLabel} for ${amount} is ready. Every invoice currently due is listed below:\n\n${textInvoices}\n\nPAYMENT REMINDER: Review each invoice due date and Pay Now link. Your apprentice portal remains available while billing is resolved.\n\nThis invoice is the temporary weekly billing path while your PayPal recurring-payment agreement is being activated. It does not create a duplicate automatic charge.\n\nQuestions: billing@elevateforhumanity.org`,
+    text: `Hi ${input.customerName},\n\nYour ${input.productName} invoice${invoiceLabel} for ${amount} is ready. Every invoice currently due is listed below:\n\n${textInvoices}\n\nPAYMENT REMINDER: Review each invoice due date and Pay Now link. Your apprentice portal remains available while billing is resolved.\n\nThis invoice is the temporary weekly billing path while your PayPal recurring-payment agreement is being activated. If your PayPal automatic payment for this week goes through, it is applied to this invoice instead of creating a second charge — you will not be charged twice for the same week.\n\nQuestions: billing@elevateforhumanity.org`,
   };
 }

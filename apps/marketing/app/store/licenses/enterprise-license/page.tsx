@@ -71,11 +71,7 @@ const DEMO_PAGES = [
   { name: 'Programs', path: '/programs', description: 'Training programs catalog' },
   { name: 'Courses', path: '/store', description: 'Course listings' },
   { name: 'Apply', path: '/apply', description: 'Student application' },
-  { name: 'LMS Dashboard', path: 'https://app.elevateforhumanity.org/lms/dashboard', description: 'Student portal' },
-  { name: 'Admin', path: '/admin', description: 'Admin dashboard' },
-  { name: 'Partner Portal', path: 'https://app.elevateforhumanity.org/program-holder/dashboard', description: 'Partner management' },
   { name: 'Employer Portal', path: '/employer', description: 'Employer dashboard' },
-  { name: 'AI Studio', path: '/ai-studio', description: 'AI content generation' },
 ];
 
 export default function EnterpriseLicensePage() {
@@ -165,6 +161,19 @@ export default function EnterpriseLicensePage() {
                       <div className="text-xs opacity-75">{page.description}</div>
                     </button>
                   ))}
+                </div>
+
+                {/* Full platform demos */}
+                <div className="mt-6 pt-4 border-t border-slate-700">
+                  <p className="text-slate-400 text-sm mb-3">
+                    Full platform demos — LMS, admin, and partner portals — are available on request.
+                  </p>
+                  <Link
+                    href="/demos"
+                    className="block w-full text-center bg-white text-slate-900 py-2 px-4 rounded-lg font-semibold hover:bg-slate-100 transition-colors"
+                  >
+                    Request Demo Access
+                  </Link>
                 </div>
 
                 {/* View Mode Toggle */}

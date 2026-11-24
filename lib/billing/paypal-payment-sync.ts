@@ -1,7 +1,14 @@
 import { hasVerifiedRecurringRelease } from './recurring-release';
-import { getPayPalSubscription } from './providers/paypal-subscriptions';
+import { getPayPalSubscription, listPayPalSubscriptionTransactions } from './providers/paypal-subscriptions';
 import 'server-only';
 
+import {
+  billingWeekStart,
+  findInvoiceForScheduleWeek,
+  nextWeeklyInvoiceDateAfter,
+  PAYABLE_INVOICE_STATUSES,
+  type ScheduleWeekInvoice,
+} from './apprentice-invoice-batch';
 import { createQuickBooksBillingProvider, recordQuickBooksExternalPayment } from './providers/quickbooks';
 import { nextInvoiceDate, type BillingCadence } from './schedule';
 
@@ -67,7 +74,14 @@ export async function syncPayPalSubscriptionState(
 export async function syncPayPalPaymentToQuickBooks(
   db: Database,
   payment: PayPalSubscriptionPayment,
-): Promise<{ scheduleId: string; alreadyProcessed: boolean }> {
+): Promise<{
+  scheduleId: string;
+  alreadyProcessed: boolean;
+  /** Set when the payment was applied to the week's existing invoice. */
+  appliedToInvoiceId?: string;
+  /** Set when the week's invoice was already paid and no new invoice was created. */
+  duplicateSkipped?: boolean;
+}> {
   const existing = await db
     .from('billing_invoices')
     .select('billing_schedule_id,status')
@@ -98,9 +112,37 @@ export async function syncPayPalPaymentToQuickBooks(
     );
   }
 
+  // Reconcile is the single writer. A payment for a week that already has an
+  // invoice is applied to that invoice instead of creating a second invoice
+  // for the same week — the two writers previously used different
+  // idempotency keys (`apprentice-fallback:` vs `paypal:`) and could not see
+  // each other's invoices, which is how students were charged twice.
+  const weekStart = billingWeekStart(new Date(payment.paidAt));
+  const target = await resolvePayPalPaymentTarget(db, schedule, payment);
+  if (target.action === 'skip-duplicate') {
+    // The week's invoice is already paid (e.g. the student paid the fallback
+    // invoice by hand and PayPal also collected). Creating another invoice
+    // would charge a third time. The double payment itself needs a human
+    // refund review; no new invoice is created here.
+    return { scheduleId: schedule.id, alreadyProcessed: true, duplicateSkipped: true };
+  }
+  if (target.action === 'apply') {
+    await recordQuickBooksExternalPayment(db, {
+      idempotencyKey: `paypal:${payment.paymentId}`,
+      billingInvoiceId: target.invoice.id,
+      billingScheduleId: schedule.id,
+      collectionProvider: 'paypal',
+      providerPaymentId: payment.paymentId,
+      paidAt: payment.paidAt,
+    });
+    await advanceScheduleAfterPayment(db, schedule, weekStart);
+    return { scheduleId: schedule.id, alreadyProcessed: false, appliedToInvoiceId: target.invoice.id };
+  }
+
   const idempotencyKey = `paypal:${payment.paymentId}`;
   await createQuickBooksBillingProvider(db).createManualInvoice({
     idempotencyKey,
+    billingScheduleId: schedule.id,
     customer: {
       externalKey: schedule.customer_external_key,
       displayName: schedule.customer_name,
@@ -147,4 +189,111 @@ export async function syncPayPalPaymentToQuickBooks(
     .eq('next_invoice_date', schedule.next_invoice_date);
   if (advanced.error) throw new Error(advanced.error.message);
   return { scheduleId: schedule.id, alreadyProcessed: false };
+}
+
+export type PayPalPaymentTarget =
+  | { action: 'apply'; invoice: ScheduleWeekInvoice }
+  | { action: 'skip-duplicate'; invoice: ScheduleWeekInvoice }
+  | { action: 'create' };
+
+/**
+ * Decide how a PayPal payment for one billing week is written to QuickBooks.
+ * Pure decision step (one local lookup), exported so the duplicate cases are
+ * unit-testable without QuickBooks or PayPal calls.
+ */
+export async function resolvePayPalPaymentTarget(
+  db: Database,
+  schedule: { id: string; amount_cents: number },
+  payment: PayPalSubscriptionPayment,
+): Promise<PayPalPaymentTarget> {
+  const weekStart = billingWeekStart(new Date(payment.paidAt));
+  const existingInvoice = await findInvoiceForScheduleWeek(db, {
+    scheduleId: schedule.id,
+    amountCents: payment.amountCents,
+    weekStart,
+  });
+  if (!existingInvoice) return { action: 'create' };
+  if (existingInvoice.status === 'paid') {
+    return { action: 'skip-duplicate', invoice: existingInvoice };
+  }
+  if (
+    (PAYABLE_INVOICE_STATUSES as readonly string[]).includes(existingInvoice.status) &&
+    existingInvoice.provider_invoice_id
+  ) {
+    return { action: 'apply', invoice: existingInvoice };
+  }
+  // An invoice exists for the week but it can neither take a payment (still
+  // being created) nor be treated as settled. Defer: the next reconcile run
+  // retries instead of creating a second invoice for the same week.
+  throw new Error(
+    `PayPal payment ${payment.paymentId} matches invoice ${existingInvoice.id} for week ${weekStart}, but that invoice is ${existingInvoice.status} and cannot take the payment yet.`,
+  );
+}
+
+/**
+ * Advance a schedule after its weekly payment was applied to an invoice the
+ * fallback writer already created. The fallback already consumed this week's
+ * schedule slot (remaining count and next invoice date) when it created the
+ * invoice, so advancing again would skip a week and double-count the
+ * payment. Only advance when the schedule has not already been advanced past
+ * the payment's week (e.g. the fallback's advance failed earlier).
+ */
+async function advanceScheduleAfterPayment(
+  db: Database,
+  schedule: any,
+  weekStart: string,
+): Promise<void> {
+  const alreadyAdvanced = String(schedule.next_invoice_date || '') > weekStart;
+  if (alreadyAdvanced) {
+    const touched = await db
+      .from('billing_schedules')
+      .update({
+        last_provider_sync_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', schedule.id);
+    if (touched.error) throw new Error(touched.error.message);
+    return;
+  }
+  const remaining =
+    schedule.remaining_invoices == null ? null : Math.max(0, schedule.remaining_invoices - 1);
+  const completed = remaining === 0;
+  const advanced = await db
+    .from('billing_schedules')
+    .update({
+      remaining_invoices: remaining,
+      status: completed ? 'completed' : 'active',
+      next_invoice_date: completed
+        ? schedule.next_invoice_date
+        : nextWeeklyInvoiceDateAfter(schedule.next_invoice_date, weekStart),
+      last_provider_sync_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', schedule.id)
+    .eq('next_invoice_date', schedule.next_invoice_date);
+  if (advanced.error) throw new Error(advanced.error.message);
+}
+
+/**
+ * Defense-in-depth for the fallback writer: has PayPal already collected this
+ * schedule's payment for the given billing week? The fallback route calls this
+ * before creating an invoice; a completed matching payment means the week is
+ * already paid and no fallback invoice may be created for it.
+ */
+export async function hasCompletedPayPalPaymentForWeek(
+  subscriptionId: string,
+  amountCents: number,
+  weekStart: string,
+): Promise<boolean> {
+  const start = `${weekStart}T00:00:00.000Z`;
+  const end = new Date().toISOString();
+  const result = await listPayPalSubscriptionTransactions(subscriptionId, start, end);
+  return (result.transactions || []).some((transaction) => {
+    const gross = transaction.amount_with_breakdown?.gross_amount;
+    return (
+      transaction.status === 'COMPLETED' &&
+      gross?.currency_code?.toUpperCase() === 'USD' &&
+      Math.round(Number(gross?.value || 0) * 100) === amountCents
+    );
+  });
 }

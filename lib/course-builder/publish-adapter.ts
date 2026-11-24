@@ -246,7 +246,7 @@ export function adaptProgramTemplateToBlueprint(template: ProgramBuilderTemplate
     // with the blueprint into generation (CredentialBlueprint carries them
     // via its index signature; see lib/curriculum/blueprints/types.ts).
     socCode: template.socCode ?? null,
-    workforceEvidence: template.workforceEvidence ?? null,
+    workforceEvidence: (template.workforceEvidence ?? null) as unknown as Record<string, unknown> | null,
   };
 }
 

@@ -35,11 +35,11 @@ export default async function FullOnboardingFormsPage() {
       </div>
       <section className="space-y-3 rounded-xl border bg-white p-5">
         <h2 className="text-xl font-bold">Current CNA confidentiality agreement</h2>
-        {packet ? <p className="whitespace-pre-wrap">{packet.nda}</p> : (
+        {packet?.signingArtifactComplete ? <p className="whitespace-pre-wrap">{packet.nda}</p> : (
           <p>Signing opens when Elevate publishes the finalized confidentiality agreement.</p>
         )}
         {ndaSigned && <p className="font-semibold">Your signature for this NDA is recorded.</p>}
-        {packet && revisionId && approved && !ndaSigned && context.mode === 'holder' && (
+        {packet?.signingArtifactComplete && revisionId && approved && !ndaSigned && context.mode === 'holder' && (
           <DocumentSignatureBlock agreementType="nda" agreementVersion={achieveDocumentVersion('nda', packet.digest, revisionId)}
             buttonLabel="Sign the CNA NDA" nextUrl="/program-holder/documents" />
         )}

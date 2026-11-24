@@ -28,7 +28,7 @@ export default async function SignMouPage() {
   const approvalReady = ['approved', 'active', 'approved_pending_mou'].includes(holder.status) && Boolean(holder.approved_at);
   const requirements: string[] = Array.isArray(holder.features?.custom_mou?.requirements) ? holder.features.custom_mou.requirements.filter((value: unknown): value is string => typeof value === 'string') : [];
 
-  const { data: assignments } = await db
+  const { data: assignments } = isAchieve ? { data: [] } : await db
     .from('program_holder_programs')
     .select('program_id, programs(title,name,slug,credential_name,total_hours)')
     .eq('program_holder_id', holder.id)
@@ -50,7 +50,7 @@ export default async function SignMouPage() {
           Review the assigned terms for <strong>{holder.organization_name}</strong>. Your existing signature remains on record if you have already signed. New signatures become available after Elevate approves your application.
         </p>
 
-        <section className="mt-7 rounded-xl border border-blue-200 bg-blue-50 p-5 text-sm leading-6 text-blue-950">
+        {!isAchieve && <section className="mt-7 rounded-xl border border-blue-200 bg-blue-50 p-5 text-sm leading-6 text-blue-950">
           <h2 className="font-black">Agreement incorporated by reference</h2>
           <p className="mt-2">
             This agreement is between Elevate for Humanity Career &amp; Technical Institute and
@@ -68,7 +68,7 @@ export default async function SignMouPage() {
           >
             Open the full Program Host terms incorporated into this MOU
           </Link>
-        </section>
+        </section>}
 
         {executedUrl && <a href={executedUrl} target="_blank" rel="noopener noreferrer" className="mt-6 inline-flex min-h-11 items-center rounded-xl bg-blue-700 px-5 font-bold text-white">Open your recorded MOU document</a>}
         {requirements.length > 0 && <section className="mt-6 rounded-xl border p-5"><h2 className="text-lg font-black">Your assigned agreement requirements</h2><ul className="mt-3 list-disc space-y-2 pl-5 text-sm">{requirements.map(item => <li key={item}>{item}</li>)}</ul></section>}
@@ -79,9 +79,17 @@ export default async function SignMouPage() {
           W-9, required business documents, program-specific credentials, and training plan have all been approved.
         </section>
 
-        {packet && <section className="mt-6 space-y-3 rounded-xl border p-5">
+        {packet?.signingArtifactComplete && <section className="mt-6 space-y-3 rounded-xl border p-5">
           <h2 className="text-lg font-bold">Final CNA MOU and Schedule A</h2>
           <p className="whitespace-pre-wrap">{packet.mou}</p>
+          <div>
+            <h3 className="font-bold">Approved program scope</h3>
+            <p className="whitespace-pre-wrap">{packet.programScope}</p>
+          </div>
+          <div>
+            <h3 className="font-bold">Terms incorporated into this MOU</h3>
+            <p className="whitespace-pre-wrap">{packet.incorporatedTerms}</p>
+          </div>
           <dl>{packet.scheduleTerms.map(({ label, value }) => (
             <div key={label} className="mt-2">
               <dt className="font-bold">{label}</dt><dd className="whitespace-pre-wrap">{value}</dd>
@@ -97,14 +105,14 @@ export default async function SignMouPage() {
           </div>
         ) : context.mode === 'preview' ? (
           <p className="mt-6 rounded-xl bg-blue-50 p-5">Administrator preview is read only. The Program Holder must sign from their own account.</p>
-        ) : isAchieve && (!packet || !revisionId) ? (
-          <p className="mt-6 rounded-xl bg-amber-50 p-5">Signing opens when Elevate publishes the finalized CNA MOU and Schedule A.</p>
+        ) : isAchieve && (!packet?.signingArtifactComplete || !revisionId) ? (
+          <p className="mt-6 rounded-xl bg-amber-50 p-5">Signing opens when Elevate publishes an immutable CNA packet containing the finalized MOU, exact program scope, incorporated terms, and Schedule A.</p>
         ) : !approvalReady ? (
           <p className="mt-6 rounded-xl bg-amber-50 p-5">Review these documents while Elevate completes your application approval. Your signature is not recorded by viewing this page.</p>
         ) : (
           <DocumentSignatureBlock
             agreementType="program_holder_mou"
-            agreementVersion={packet && revisionId
+            agreementVersion={packet?.signingArtifactComplete && revisionId
               ? achieveDocumentVersion('mou', packet.digest, revisionId)
               : `3.0-${holder.id}`}
             buttonLabel="Sign Program Holder MOU & Continue"

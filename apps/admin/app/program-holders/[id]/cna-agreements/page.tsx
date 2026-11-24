@@ -47,6 +47,8 @@ export default async function AchieveCnaAgreementPublication({
     const packet = {
       mou: text('mou'),
       nda: text('nda'),
+      program_scope: text('program_scope'),
+      incorporated_terms: text('incorporated_terms'),
       approval_reference: text('approval_reference'),
       schedule_a: Object.fromEntries(Object.keys(ACHIEVE_SCHEDULE_FIELDS).map((key) => [key, text(key)])),
     };
@@ -69,7 +71,7 @@ export default async function AchieveCnaAgreementPublication({
     <main className="mx-auto max-w-3xl space-y-5 p-6">
       <Link className="font-bold underline" href={`/program-holders/${id}`}>Back to Achieve</Link>
       <h1 className="text-3xl font-black">Publish the finalized Achieve CNA agreements</h1>
-      <p>Use the approved MOU, separate NDA, and Schedule A terms. Publication makes the packet available for signatures. Replacing it requires new signatures.</p>
+      <p>Use the approved MOU, separate NDA, exact program scope, incorporated terms, and Schedule A. Publication makes one immutable packet available for signatures. Replacing it requires new signatures.</p>
       {result && messages[result] && <p role="status" className="rounded-lg border p-3">{messages[result]}</p>}
       {!holder.approved_at || !['active', 'approved', 'approved_pending_mou'].includes(holder.status) ? (
         <p>Complete the program holder approval before publishing the agreement packet.</p>
@@ -87,6 +89,14 @@ export default async function AchieveCnaAgreementPublication({
             <textarea className="mt-1 w-full rounded border p-2 font-normal" name="nda" rows={9}
               defaultValue={current?.nda} maxLength={32000} required />
           </label>
+          <label className="block font-bold">Approved program scope included in the MOU
+            <textarea className="mt-1 w-full rounded border p-2 font-normal" name="program_scope" rows={5}
+              defaultValue={current?.programScope ?? ''} maxLength={32000} required />
+          </label>
+          <label className="block font-bold">Full incorporated terms included in the signed MOU artifact
+            <textarea className="mt-1 w-full rounded border p-2 font-normal" name="incorporated_terms" rows={9}
+              defaultValue={current?.incorporatedTerms ?? ''} maxLength={32000} required />
+          </label>
           <fieldset className="space-y-3 rounded border p-4">
             <legend className="px-1 font-bold">Final Schedule A</legend>
             {Object.entries(ACHIEVE_SCHEDULE_FIELDS).map(([key, label]) => (
@@ -99,7 +109,7 @@ export default async function AchieveCnaAgreementPublication({
           </fieldset>
           <label className="flex gap-2">
             <input type="checkbox" name="confirm_approval" value="yes" required />
-            I verified this packet against the approved agreement record.
+            I verified the MOU, NDA, program scope, incorporated terms, Schedule A, and approval reference against the approved agreement record.
           </label>
           <button type="submit" className="rounded-lg bg-blue-800 px-4 py-2 font-bold text-white">
             Publish for signature

@@ -69,7 +69,7 @@ export async function signAgreement(data: {
       const approved = achieveCnaAgreements(holder.features);
       const revisionId = achieveCnaRevisionId(holder.features);
       const kind = signingAchieveNda ? 'nda' : 'mou';
-      if (!approved || !revisionId ||
+      if (!approved?.signingArtifactComplete || !revisionId ||
           data.agreementVersion !== achieveDocumentVersion(kind, approved.digest, revisionId)) {
         return { success: false, error: 'The finalized CNA agreement is unavailable or changed. Open the current agreement before signing.' };
       }

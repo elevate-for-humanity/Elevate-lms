@@ -7,6 +7,8 @@ const actorId = '11111111-1111-4111-8111-111111111111';
 const packet = (timing) => ({
   mou: 'Final MOU text',
   nda: 'Separate NDA text',
+  program_scope: 'Certified Nursing Assistant program only',
+  incorporated_terms: 'Approved incorporated program-host terms',
   approval_reference: `approval-${timing}`,
   schedule_a: {
     collecting_party: 'Elevate',
@@ -111,4 +113,19 @@ test('keeps the original and replacement packet text linked as immutable revisio
     'delete from public.achieve_cna_packet_revisions where id = $1',
     [firstId],
   )).rejects.toThrow('immutable');
+});
+
+test('rejects a packet that omits the immutable MOU scope or incorporated terms', async () => {
+  const incomplete = packet('60 days');
+  Reflect.deleteProperty(incomplete, 'program_scope');
+  Reflect.deleteProperty(incomplete, 'incorporated_terms');
+  const current = await db.query(
+    `select features->'achieve_cna_agreements' as packet
+     from public.program_holders where id = $1`,
+    [holderId],
+  );
+  await expect(db.query(
+    'select public.publish_achieve_cna_packet_v1($1, $2::jsonb, $3::jsonb, $4)',
+    [actorId, JSON.stringify(current.rows[0].packet), JSON.stringify(incomplete), 'c'.repeat(64)],
+  )).rejects.toThrow('incomplete');
 });

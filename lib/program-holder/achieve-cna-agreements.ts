@@ -16,8 +16,20 @@ export function achieveCnaAgreements(features: Record<string, unknown> | null | 
   const value = features?.achieve_cna_agreements;
   if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
   const packet = value as Record<string, unknown>;
-  const { mou, nda, schedule_a: schedule, approval_reference: approvalReference } = packet;
-  if (Object.keys(packet).length !== 4 || typeof approvalReference !== 'string' || !approvalReference.trim() || approvalReference.length > 300 ||
+  const {
+    mou,
+    nda,
+    program_scope: programScope,
+    incorporated_terms: incorporatedTerms,
+    schedule_a: schedule,
+    approval_reference: approvalReference,
+  } = packet;
+  const signingArtifactComplete = typeof programScope === 'string' && Boolean(programScope.trim()) && programScope.length <= 32000 &&
+    typeof incorporatedTerms === 'string' && Boolean(incorporatedTerms.trim()) && incorporatedTerms.length <= 32000;
+  if (![4, 6].includes(Object.keys(packet).length) ||
+      (Object.keys(packet).length === 6 && !signingArtifactComplete) ||
+      (Object.keys(packet).length === 4 && (programScope !== undefined || incorporatedTerms !== undefined)) ||
+      typeof approvalReference !== 'string' || !approvalReference.trim() || approvalReference.length > 300 ||
       typeof mou !== 'string' || !mou.trim() || mou.length > 32000 ||
       typeof nda !== 'string' || !nda.trim() || nda.length > 32000 ||
       !schedule || typeof schedule !== 'object' || Array.isArray(schedule)) return null;
@@ -29,8 +41,25 @@ export function achieveCnaAgreements(features: Record<string, unknown> | null | 
   if (Object.keys(schedule).length !== fields.length || !fields.every(({ value }) => typeof value === 'string' && value.trim() && value.length <= 4000)) return null;
 
   const scheduleTerms = fields.map(({ label, value }) => ({ label, value: String(value).trim() }));
-  const digest = createHash('sha256').update(JSON.stringify({ mou, nda, scheduleTerms, approvalReference })).digest('hex');
-  return { packet, mou, nda, scheduleTerms, digest, approvalReference };
+  const digest = createHash('sha256').update(JSON.stringify({
+    mou,
+    nda,
+    programScope: signingArtifactComplete ? programScope.trim() : null,
+    incorporatedTerms: signingArtifactComplete ? incorporatedTerms.trim() : null,
+    scheduleTerms,
+    approvalReference,
+  })).digest('hex');
+  return {
+    packet,
+    mou,
+    nda,
+    programScope: signingArtifactComplete ? programScope.trim() : null,
+    incorporatedTerms: signingArtifactComplete ? incorporatedTerms.trim() : null,
+    signingArtifactComplete,
+    scheduleTerms,
+    digest,
+    approvalReference,
+  };
 }
 
 export function achieveDocumentVersion(kind: AchieveDocument, digest: string, revisionId: string) {
@@ -50,6 +79,7 @@ export function hasCurrentAchieveSignature(
   kind: AchieveDocument,
   digest: string | undefined,
 ): boolean {
+  if (!achieveCnaAgreements(features)?.signingArtifactComplete) return false;
   const revisionId = achieveCnaRevisionId(features);
   const signed = features?.[`achieve_cna_signed_${kind}`] as {
     version?: string;

@@ -63,10 +63,16 @@ begin
   end if;
   if p_packet is null or jsonb_typeof(p_packet) <> 'object'
     or p_packet_digest !~ '^[0-9a-f]{64}$'
-    or not (p_packet ?& array['mou', 'nda', 'approval_reference', 'schedule_a'])
-    or (select count(*) from jsonb_object_keys(p_packet)) <> 4
+    or not (p_packet ?& array['mou', 'nda', 'program_scope', 'incorporated_terms', 'approval_reference', 'schedule_a'])
+    or (select count(*) from jsonb_object_keys(p_packet)) <> 6
     or exists (
-      select from (values ('mou', 32000), ('nda', 32000), ('approval_reference', 300)) limits(field, max_length)
+      select from (values
+        ('mou', 32000),
+        ('nda', 32000),
+        ('program_scope', 32000),
+        ('incorporated_terms', 32000),
+        ('approval_reference', 300)
+      ) limits(field, max_length)
       where jsonb_typeof(p_packet->limits.field) is distinct from 'string'
         or length(btrim(p_packet->>limits.field)) not between 1 and limits.max_length
     )

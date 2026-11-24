@@ -17,9 +17,20 @@ const db = createClient(supabaseUrl, serviceRoleKey, {
   auth: { autoRefreshToken: false, persistSession: false },
 });
 
+// The isolated QA project is the default. The release-acceptance workflow
+// runs these fixtures against production with disposable, per-run identities
+// (owner-approved 2026-11-24: throwaway users on the live site, removed by
+// the workflow cleanup step). Production is allowed only with the explicit
+// opt-in flag, and only for the production host — any other host is rejected.
+const allowProductionDisposables =
+  process.env.QA_E2E_ALLOW_PRODUCTION_DISPOSABLES === '1';
 const qaHostname = new URL(supabaseUrl).hostname;
 if (qaHostname !== 'isdgjcdabhxxozarmxta.supabase.co') {
-  throw new Error('This fixture may run only against the isolated QA project');
+  if (!(allowProductionDisposables && qaHostname === 'cuxzzpsyufcewtmicszk.supabase.co')) {
+    throw new Error(
+      'This fixture may run only against the isolated QA project, or against production with QA_E2E_ALLOW_PRODUCTION_DISPOSABLES=1',
+    );
+  }
 }
 
 const tenantId = '6ba71334-58f4-4104-9b2a-5114f2a7614c';

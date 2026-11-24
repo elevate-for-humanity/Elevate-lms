@@ -10,7 +10,7 @@
   "vcsData": {
     "projectUrl": "https://github.com/elevate-for-humanity/Elevate-lms",
     "projectBranch": "main",
-    "dockerFilePath": "/Dockerfile.northflank-admin",
+    "dockerFilePath": "/Dockerfile.admin",
     "dockerWorkDir": "/"
   },
   "buildSecrets": {

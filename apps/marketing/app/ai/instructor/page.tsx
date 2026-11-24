@@ -4,7 +4,7 @@ import { Brain, MessageSquare, BookOpen, Clock, Users, CheckCircle, BarChart3 } 
 
 export const metadata: Metadata = {
   title: 'AI Instructor | 24/7 Personalized Learning Support',
-  description: 'AI-powered tutoring for every student, 24/7. Personalized learning assistance, instant feedback, and adaptive instruction powered by Claude AI.',
+  description: 'AI-powered tutoring for every student, 24/7. Personalized learning assistance, instant feedback, and adaptive instruction.',
 };
 
 const features = [

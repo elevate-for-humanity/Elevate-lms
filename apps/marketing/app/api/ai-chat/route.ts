@@ -9,6 +9,7 @@ import { PARIS_SYSTEM_IDENTITY } from '@/lib/ai/paris-identity';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { aiChat, isAIAvailable } from '@/lib/ai/ai-service';
+import { findSiteFacts, formatProgramIndex, formatSiteFacts } from '@/lib/ai/paris-site-facts';
 import { hydrateProcessEnv } from '@/lib/secrets';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import { VERIFIED_WORKFORCE_FUNDED_PROGRAMS } from '@/lib/programs/funding-registry';
@@ -63,13 +64,6 @@ REGISTERED BEAUTY APPRENTICESHIP FACTS — 2Exclusive LLC-S, 2025-IN-132301:
 - Hair Stylist (existing title: Cosmetologist) 0096HY V1: hybrid; 2,000–2,500-hour registered term; 154 RTI hours; 500-hour probation.
 - Never describe 500 hours as program completion. For the competency-based occupations, explain completion in terms of verified competencies plus RTI; work hours are documented training evidence. For Hair Stylist, explain the registered hybrid term plus RTI and work-process requirements.
 - Indiana examination and licensing are separate steps after registered-program completion.
-
-REGISTERED HVAC CERTIFICATION FACTS — EPA Section 608:
-- Elevate's HVAC Certification program is six-week training with hands-on lab work, EPA 608 Universal preparation, OSHA 10 General Industry, and HVAC Excellence employment-readiness preparation. Program page: /programs/hvac-technician.
-- EPA Section 608 certification is required to handle refrigerants. It has four parts: Core, Type I (small appliances), Type II (high-pressure systems), and Type III (low-pressure systems). Passing Core plus all three types earns Universal certification.
-- The EPA 608 study bundle covers Core and Types I, II, and III with narrated lessons, an illustrated workbook, virtual system exercises, and practice tests. The official EPA examination, certification fees, and supervised hands-on training are separate from the study bundle.
-- HVAC is WIOA- and WRG-eligible through Elevate (Indiana DWD INTraining Program 10002289); written authorization from the responsible agency is still required before enrollment is treated as funded.
-- Never promise exam passage, a completion time, or funding approval.
 
 Answer directly, distinguish verified facts from screening, and give the next official step. Use /programs, /funding, /apply, or /contact when appropriate. Keep responses under 180 words.`;
 
@@ -180,6 +174,24 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'No message provided' }, { status: 400 });
     }
 
+    // Retrieve verified facts from the site's own program catalog for this
+    // question. The owned model cannot browse, so facts reach it here.
+    // Retrieval never blocks the reply: a failure just means no site facts.
+    let siteFacts = '';
+    try {
+      const recentUserText = [...messages]
+        .reverse()
+        .filter((message) => message.role === 'user')
+        .slice(0, 2)
+        .reverse()
+        .map((message) => message.content)
+        .join('\n');
+      const matched = findSiteFacts(recentUserText);
+      siteFacts = matched.length > 0 ? formatSiteFacts(matched) : formatProgramIndex();
+    } catch {
+      siteFacts = '';
+    }
+
     // Marketing must hydrate the same canonical runtime connection as Admin
     // before deciding that the shared owned model is unavailable.
     await hydrateProcessEnv();
@@ -190,8 +202,16 @@ export async function POST(req: NextRequest) {
     }
 
     try {
+      const systemContent =
+        PARIS_SYSTEM_IDENTITY +
+        '\n\n' +
+        systemPrompt(context) +
+        (siteFacts
+          ? '\n\nSITE FACTS — retrieved from Elevate\u2019s own program catalog for this question. Use these exact facts; do not invent prices, durations, credentials, or funding beyond what is written here:\n' +
+            siteFacts
+          : '');
       const result = await aiChat({
-        messages: [{ role: 'system', content: PARIS_SYSTEM_IDENTITY + '\n\n' + systemPrompt(context) }, ...messages],
+        messages: [{ role: 'system', content: systemContent }, ...messages],
         temperature: context.surface === 'store' ? 0.45 : 0.25,
         maxTokens: 700,
         signal,

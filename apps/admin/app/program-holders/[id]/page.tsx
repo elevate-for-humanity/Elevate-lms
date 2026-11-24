@@ -10,6 +10,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { ProgramHolderBankingReview } from './ProgramHolderBankingReview';
 import { ProgramHolderAdminDocumentUpload } from './ProgramHolderAdminDocumentUpload';
 import { OpenPortalPreviewButton } from '@/components/admin/OpenPortalPreviewButton';
+import { AssignApplicantsPanel } from './AssignApplicantsPanel';
 
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
@@ -81,6 +82,11 @@ export default async function ProgramHolderDetailPage({
     .not('call_notes', 'is', null)
     .order('updated_at', { ascending: false })
     .limit(50);
+  const { count: assignedApplicantsCount } = await db
+    .from('program_holder_students')
+    .select('id', { count: 'exact', head: true })
+    .eq('program_holder_id', id)
+    .in('status', ['applied', 'applicant', 'pending']);
   const learnerByUserId = new Map(learners.map((learner: any) => [learner.user_id, learner]));
 
   const canDecide = ['admin', 'super_admin'].includes(String(profile.role ?? ''));
@@ -378,6 +384,20 @@ export default async function ProgramHolderDetailPage({
           )}
         </section>
 
+        {canDecide && (
+          <AssignApplicantsPanel
+            holderId={id}
+            holderName={displayName}
+            programs={(programs ?? [])
+              .filter((program: any) => program?.slug)
+              .map((program: any) => ({
+                id: program.id,
+                slug: program.slug,
+                title: program.title || program.name || program.slug,
+              }))}
+            assignedCount={assignedApplicantsCount ?? 0}
+          />
+        )}
         {canDecide && <ProgramHolderBankingReview holderId={id} />}
         {canDecide && <ProgramHolderAdminDocumentUpload holderId={id} />}
         <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">

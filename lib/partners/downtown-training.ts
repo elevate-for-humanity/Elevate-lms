@@ -1,4 +1,4 @@
-export const DOWNTOWN_TRAINING_ADDRESS = '120 East Market Street, Suite 930';
+export const DOWNTOWN_TRAINING_ADDRESS = '120 East Market Street, Suite 560';
 export const DOWNTOWN_TRAINING_CITY = 'Indianapolis, IN';
 
 export const DOWNTOWN_TRAINING_PROGRAMS = [

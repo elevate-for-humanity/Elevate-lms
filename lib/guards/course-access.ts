@@ -95,10 +95,14 @@ export async function verifyCourseAccess(courseId: string): Promise<CourseAccess
         };
       }
     }
-    if (direct.end_date && new Date(direct.end_date) < new Date()) {
-      return { hasAccess: false, enrollment: direct, reason: 'expired' };
+    // A resolved program link must fall through to the approved-paid check.
+    // Only an actual, successfully read direct row can take this branch.
+    if (!directError && direct) {
+      if (direct.end_date && new Date(direct.end_date) < new Date()) {
+        return { hasAccess: false, enrollment: direct, reason: 'expired' };
+      }
+      return { hasAccess: true, enrollment: direct };
     }
-    return { hasAccess: true, enrollment: direct };
   }
 
   // Enforce program-level approval and verified payment at the content

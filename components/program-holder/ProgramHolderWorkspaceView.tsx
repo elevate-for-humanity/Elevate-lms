@@ -16,6 +16,7 @@ import { ProgramHolderPaymentAddendum } from './ProgramHolderPaymentAddendum';
 import { filterHolderStudents } from '@/lib/program-holder/roster-filter';
 import { isApprovedDocument } from '@/lib/program-holder/document-review';
 import { programHolderDocumentStatus } from '@/lib/program-holder/document-requirements';
+import { isApprovedProgramHolderStatus } from '@/lib/program-holder/onboarding-status';
 import { requiredProgramHolderDocuments } from '@/lib/program-holder/onboarding-readiness';
 import { isEpaTestingProgram } from '@/lib/program-holder/enrollment-identity';
 import CourseSyllabus from '@/components/learner/CourseSyllabus';
@@ -42,6 +43,7 @@ import { getProgramHolderWorkspace, programTitle } from '@/lib/program-holder/wo
 import { ProgramHolderDocumentUpload } from './ProgramHolderDocumentUpload';
 import { ProgramHolderTrainingLogForm } from './ProgramHolderTrainingLogForm';
 import { ProgramHolderStudentCloseoutForm } from './ProgramHolderStudentCloseoutForm';
+import { ACHIEVE_HOLDER_ID, achieveCnaAgreements, hasCurrentAchieveSignature } from '@/lib/program-holder/achieve-cna-agreements';
 import { ProgramHolderAcknowledgements } from './ProgramHolderAcknowledgements';
 import { ProgramHolderNotificationPreferences } from './ProgramHolderNotificationPreferences';
 import { WorkOneOutreachButton } from './WorkOneOutreachButton';
@@ -120,6 +122,15 @@ export async function ProgramHolderWorkspaceView({
   );
   const holderFeatures =
     data.holder?.features && typeof data.holder.features === 'object' ? data.holder.features : {};
+  const requiresSeparateNda = data.holder?.id === ACHIEVE_HOLDER_ID;
+  const achievePacket = requiresSeparateNda ? achieveCnaAgreements(holderFeatures) : null;
+  const currentMouSigned = Boolean(data.holder?.mou_signed) &&
+    (!requiresSeparateNda || hasCurrentAchieveSignature(holderFeatures, 'mou', achievePacket?.digest));
+  const currentNdaSigned = requiresSeparateNda
+    ? hasCurrentAchieveSignature(holderFeatures, 'nda', achievePacket?.digest)
+    : data.acknowledgements.some((item) =>
+        ['nda', 'non_disclosure', 'confidentiality'].includes(item.document_type),
+      );
   const requiredDocumentTypes = requiredProgramHolderDocuments(isHvac, holderFeatures).map(
     (item) => item.type,
   );
@@ -162,13 +173,13 @@ export async function ProgramHolderWorkspaceView({
   }> = [
     {
       label: 'Program-holder approval',
-      complete: ['active', 'approved'].includes(data.holder?.status),
+      complete: isApprovedProgramHolderStatus(data.holder?.status, data.holder?.approved_at),
       required: true,
       owner: 'Elevate',
     },
     {
       label: 'Memorandum of Understanding',
-      complete: Boolean(data.holder?.mou_signed),
+      complete: currentMouSigned,
       required: true,
       owner: 'Shared',
     },
@@ -207,9 +218,7 @@ export async function ProgramHolderWorkspaceView({
     },
     {
       label: 'Non-disclosure and confidentiality agreement',
-      complete: data.acknowledgements.some((item) =>
-        ['nda', 'non_disclosure', 'confidentiality'].includes(item.document_type),
-      ),
+      complete: currentNdaSigned,
       required: true,
       owner: 'Program Holder',
     },
@@ -465,6 +474,7 @@ export async function ProgramHolderWorkspaceView({
         isHvac={isHvac}
         requiresEnchantedHeartsTerms={data.requiresEnchantedHeartsTerms}
         insuranceRequired={holderFeatures.insurance_required !== false}
+        requiresSeparateNda={requiresSeparateNda}
       />
     );
   if (section === 'reports')
@@ -577,7 +587,7 @@ export async function ProgramHolderWorkspaceView({
           },
         ]
       : []),
-    ...(!data.holder?.mou_signed
+    ...(!currentMouSigned
       ? [
           {
             title: 'Review and sign your agreement',
@@ -1764,6 +1774,7 @@ function Documents({
   isHvac,
   requiresEnchantedHeartsTerms,
   insuranceRequired,
+  requiresSeparateNda,
 }: {
   students: any[];
   rows: any[];
@@ -1771,6 +1782,7 @@ function Documents({
   isHvac: boolean;
   requiresEnchantedHeartsTerms: boolean;
   insuranceRequired: boolean;
+  requiresSeparateNda: boolean;
 }) {
   const onFile = [...new Set(rows
     .filter((row) => programHolderDocumentStatus(row) !== 'rejected')
@@ -1788,7 +1800,7 @@ function Documents({
       <ProgramHolderDocumentUpload isHvac={isHvac} insuranceRequired={insuranceRequired} onFile={onFile} />
       <SyllabusUploadStatus documents={rows} courseAssignments={courseAssignments} />
       <ProgramHolderDocumentUpload materialsOnly students={students} />
-      <ProgramHolderAcknowledgements requiresEnchantedHeartsTerms={requiresEnchantedHeartsTerms} />
+      <ProgramHolderAcknowledgements requiresEnchantedHeartsTerms={requiresEnchantedHeartsTerms} requiresSeparateNda={requiresSeparateNda} />
       <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
         <h2 className="text-xl font-black">Document register</h2>
         <div className="mt-4 space-y-3">

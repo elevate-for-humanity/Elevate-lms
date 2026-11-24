@@ -5,10 +5,14 @@ import { hydrateProcessEnv } from '@/lib/secrets';
 import { sendEmail } from '@/lib/email/sendgrid';
 import { programHolderWorkOneEmail } from '@/lib/email/templates/program-holder-workone';
 import { WORKONE_INDY_BOOKING_URL } from '@/lib/workone/booking';
+import { programHolderReferralsReady } from '@/lib/program-holder/referral-readiness';
 import { hasActiveProgramEnrollment } from '@/lib/program-holder/enrollment-identity';
 export async function POST(){
  const ctx=await requireProgramHolder();
  if(ctx.mode!=='holder') return NextResponse.json({error:'Program Holder session required.'},{status:403});
+ if (!(await programHolderReferralsReady(ctx.db, ctx.holderId))) {
+   return NextResponse.json({ error: 'Complete the current CNA agreements before contacting referrals.' }, { status: 409 });
+ }
  if(!ctx.programIds.length) return NextResponse.json({total:0,sent:0,failed:0,noteFailures:0,skippedAlreadyEnrolled:0});
  await hydrateProcessEnv();
  const key=process.env.SENDGRID_API_KEY;

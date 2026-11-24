@@ -47,8 +47,15 @@ The Admin AI compatibility draft endpoint may generate a reviewable blueprint th
 
 ## Runtime boundaries
 
-- `/api/devstudio/*` contains operational Admin AI/Studio runtime APIs.
-- `/api/admin/dev-studio/*` contains capability-specific Admin health and configuration APIs.
+- `/api/admin/dev-studio/*` is the canonical namespace for all Dev Studio
+  APIs (operational runtime, capability health, and configuration). There
+  are 86 routes there at HEAD.
+- `/api/devstudio/*` does NOT exist at HEAD. An earlier version of this
+  document claimed it held the operational runtime APIs; that is wrong.
+  `scripts/dev-studio-integration-gate.sh` enforces the absence of legacy
+  `/api/devstudio` aliases, and docs that still list them (notably
+  `.agents/AGENTS.md`, corrected 2026-11-23) are stale. Do not reintroduce
+  the legacy namespace.
 - `/api/admin/ai-assistant/*` contains live Admin operations conversation and staged-action approval APIs.
 - The architecture gate rejects duplicate relative implementations across runtime namespaces.
 - `lib/devstudio/*` owns shared Studio runtime behavior; domain-specific systems retain their canonical domain services.

@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import { notFound, redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Building2, Mail, Phone, ShieldCheck, Users, BookOpen, ArrowLeft } from 'lucide-react';
+import { ACHIEVE_HOLDER_ID } from '@/lib/program-holder/achieve-holder';
 import { requireRole } from '@/lib/auth/require-role';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { BUSINESS_REGISTRATION_GUIDANCE, programHolderDocumentStatus, programHolderRequirementStatus } from '@/lib/program-holder/document-requirements';
@@ -179,6 +180,11 @@ export default async function ProgramHolderDetailPage({
           <div className="rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm font-bold text-rose-800">
             {messages.error}
           </div>
+        )}
+        {id === ACHIEVE_HOLDER_ID && canDecide && (
+          <Link href={`/program-holders/${id}/cna-agreements`} className="inline-block rounded-lg border bg-white px-4 py-2 font-bold text-blue-800">
+            Publish Achieve CNA agreements
+          </Link>
         )}
         {messages.success && (
           <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm font-bold text-emerald-800">

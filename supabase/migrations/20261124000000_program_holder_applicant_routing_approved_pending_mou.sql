@@ -30,6 +30,8 @@ declare
   v_holder public.program_holders%rowtype;
   v_ids uuid[];
   v_written integer;
+  -- ECMAScript trim whitespace and line terminators, including pasted NBSP.
+  v_whitespace constant text := U&'\0009\000A\000B\000C\000D\0020\00A0\1680\2000\2001\2002\2003\2004\2005\2006\2007\2008\2009\200A\2028\2029\202F\205F\3000\FEFF';
 begin
   if p_rows is null or jsonb_typeof(p_rows) <> 'array'
     or jsonb_array_length(p_rows) > 500
@@ -75,7 +77,7 @@ begin
       application_status, label, created_at, updated_at
     )
     select p_holder_id, a.id, a.user_id, a.user_id, p_program_id,
-      r.applicant_name, nullif(lower(btrim(a.email)), ''), a.phone, 'applied',
+      r.applicant_name, nullif(lower(btrim(a.email, v_whitespace)), ''), a.phone, 'applied',
       a.status, 'Elevate-assigned referral', coalesce(a.created_at, now()), now()
     from jsonb_to_recordset(p_rows) as r(
       application_id uuid, applicant_name text, applicant_email text, applicant_phone text
@@ -89,9 +91,9 @@ begin
           (a.program_slug = p.slug or a.program_interest in (p.slug, p.title)
             or (p.slug = 'cdl-training' and a.program_interest ilike '%cdl%')))
       )
-      and r.applicant_name is not distinct from coalesce(nullif(btrim(a.full_name), ''),
-        nullif(btrim(a.name), ''), nullif(btrim(concat_ws(' ', a.first_name, a.last_name)), ''))
-      and r.applicant_email is not distinct from nullif(lower(btrim(a.email)), '')
+      and r.applicant_name is not distinct from coalesce(nullif(btrim(a.full_name, v_whitespace), ''),
+        nullif(btrim(a.name, v_whitespace), ''), nullif(btrim(concat_ws(' ', nullif(a.first_name, ''), nullif(a.last_name, '')), v_whitespace), ''))
+      and r.applicant_email is not distinct from nullif(lower(btrim(a.email, v_whitespace)), '')
       and r.applicant_phone is not distinct from a.phone
       and not exists (
         select 1 from public.program_enrollments e
@@ -105,11 +107,11 @@ begin
           and (
             prior.application_id = a.id
             or prior.user_id = a.user_id
-            or (nullif(lower(btrim(r.applicant_email)), '') is not null
-              and lower(btrim(prior.applicant_email)) = lower(btrim(r.applicant_email)))
+            or (nullif(lower(btrim(r.applicant_email, v_whitespace)), '') is not null
+              and lower(btrim(prior.applicant_email, v_whitespace)) = lower(btrim(r.applicant_email, v_whitespace)))
             or (nullif(btrim(r.applicant_name), '') is not null and prior.applicant_name <> 'Applicant'
-              and regexp_replace(lower(btrim(prior.applicant_name)), '[[:space:]]+', ' ', 'g')
-                = regexp_replace(lower(btrim(r.applicant_name)), '[[:space:]]+', ' ', 'g')
+              and regexp_replace(lower(translate(btrim(prior.applicant_name, v_whitespace), v_whitespace, repeat(' ', length(v_whitespace)))), ' +', ' ', 'g')
+                = regexp_replace(lower(translate(btrim(r.applicant_name, v_whitespace), v_whitespace, repeat(' ', length(v_whitespace)))), ' +', ' ', 'g')
               and regexp_replace(coalesce(prior.applicant_phone, ''), '[^0-9]', '', 'g')
                 = regexp_replace(coalesce(r.applicant_phone, ''), '[^0-9]', '', 'g'))
           )

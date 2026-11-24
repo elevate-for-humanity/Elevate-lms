@@ -130,6 +130,7 @@ export async function runBarberPostPayment(
           enrollmentId = existing.id;
           steps['create_enrollment'] = 'skipped'; // already exists
         } else {
+          const now = new Date().toISOString();
           const { data: newEnrollment, error: enrollErr } = await db
             .from('program_enrollments')
             .insert({
@@ -141,14 +142,26 @@ export async function runBarberPostPayment(
               email: studentEmail,
               full_name: studentName,
               phone: app.phone ?? null,
-              // Payment received — auto-enroll immediately (no admin gate for paid students)
+              // Payment received — auto-enroll immediately (no admin gate for paid students).
+              // The approved-paid admission check
+              // (lib/learner/approved-paid-admission.mjs) requires
+              // payment_status + the access fields below: without them a
+              // paid student signs in and is bounced to
+              // /lms/access-pending — experienced as "cannot log in".
+              // Mirrors activatePaidApplication in
+              // lib/enrollment/paid-application.ts.
               status: 'active', // AUTO-ENROLLED: Payment received immediately triggers enrollment (no admin gate)
               enrollment_state: 'enrolled',
+              payment_status: 'paid',
               funding_source: 'self_pay',
               amount_paid_cents: amountPaidCents,
               stripe_checkout_session_id: stripeSessionId,
               stripe_payment_intent_id: stripePaymentIntentId ?? null,
-              enrolled_at: new Date().toISOString(),
+              access_status: 'active',
+              access_granted_at: now,
+              self_pay_application_verified_at: now,
+              payment_reference: stripeSessionId,
+              enrolled_at: now,
             })
             .select('id')
             .maybeSingle();

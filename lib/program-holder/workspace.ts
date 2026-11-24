@@ -1,3 +1,4 @@
+import { programHolderReferralsReady } from './referral-readiness';
 import type { LearningMaterial } from '@/components/lms/AssignedLearningMaterials';
 import { loadHolderOnlineStudy } from './online-study';
 import { loadHolderExitReports } from './exit-reports';
@@ -156,14 +157,7 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
   const holderName = `${holderRes.data?.organization_name || ''} ${holderRes.data?.name || ''}`;
   const requiresEnchantedHeartsTerms = /enchanted hearts/i.test(holderName);
   const signedTypes = new Set(acknowledgements.map((item: any) => item.document_type));
-  let referralsReady = true;
-  if (holderId === 'acc9f5ab-8804-432e-9b12-aac1a6c86426') {
-    const { data, error } = await db.rpc('achieve_cna_referral_ready_v1', {
-      p_features: holderRes.data?.features ?? null,
-      p_mou_signed: holderRes.data?.mou_signed ?? false,
-    });
-    referralsReady = !error && data === true;
-  }
+  const referralsReady = await programHolderReferralsReady(db, holderId, holderRes.data ?? null);
   const contactProjection = studentContactProjection(
     requiresEnchantedHeartsTerms,
     signedTypes.has('non_compete'),

@@ -6,6 +6,11 @@ on:
     branches: [main]
     paths: ['.github/workflows/verify-owned-cpu-access.yml']
   workflow_dispatch:
+    inputs:
+      connect:
+        description: 'Run the connect job after verify succeeds (re-activates Admin + consumer endpoint aliases). Set to false for a read-only live re-proof that changes nothing.'
+        type: boolean
+        default: true
 permissions:
   contents: read
   actions: write
@@ -60,7 +65,7 @@ jobs:
         run: node scripts/gcp/probe-owned-cpu-admin.mjs
   connect:
     needs: verify
-    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && needs.verify.result == 'success'
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && needs.verify.result == 'success' && inputs.connect
     concurrency:
       group: google-runtime-us-central1
       cancel-in-progress: false

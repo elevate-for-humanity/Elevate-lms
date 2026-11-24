@@ -156,6 +156,14 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
   const holderName = `${holderRes.data?.organization_name || ''} ${holderRes.data?.name || ''}`;
   const requiresEnchantedHeartsTerms = /enchanted hearts/i.test(holderName);
   const signedTypes = new Set(acknowledgements.map((item: any) => item.document_type));
+  let referralsReady = true;
+  if (holderId === 'acc9f5ab-8804-432e-9b12-aac1a6c86426') {
+    const { data, error } = await db.rpc('achieve_cna_referral_ready_v1', {
+      p_features: holderRes.data?.features ?? null,
+      p_mou_signed: holderRes.data?.mou_signed ?? false,
+    });
+    referralsReady = !error && data === true;
+  }
   const contactProjection = studentContactProjection(
     requiresEnchantedHeartsTerms,
     signedTypes.has('non_compete'),
@@ -165,7 +173,7 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
   const applicantContactColumns = contactProjection.applicant;
   const applicantNotesColumns = contactProjection.notes;
   const programWideStudentAccess = holderRes.data?.features?.program_wide_student_access === true;
-  const recruitingEnabled = hasRecruitingAssignment(holderRes.data?.features);
+  const recruitingEnabled = referralsReady && hasRecruitingAssignment(holderRes.data?.features);
   const allApplicantAccess = holderRes.data?.features?.all_applicant_access === true;
   const regionalAssignment =
     holderRes.data?.features?.regional_assignment &&
@@ -239,7 +247,7 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
           .in('status', ['active', 'enrolled', 'in_progress', 'funded'])
           .order('training_start_date', { ascending: true, nullsFirst: false })
       : Promise.resolve({ data: [] }),
-    programIds.length
+    programIds.length && referralsReady
       ? db
           .from('program_holder_students')
           .select(

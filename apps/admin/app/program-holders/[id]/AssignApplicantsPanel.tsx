@@ -16,6 +16,9 @@ type Preview = {
   skipped_counts: Record<string, number>;
   assigned_total_for_holder: number;
   message?: string;
+  recruiting_enabled: boolean;
+  duplicate_application_ids: string[];
+  token: string | null;
 };
 
 export function AssignApplicantsPanel({
@@ -37,7 +40,7 @@ export function AssignApplicantsPanel({
   const [message, setMessage] = useState('');
   const [preview, setPreview] = useState<Preview | null>(null);
 
-  async function call(dryRun: boolean) {
+  async function call(dryRun: boolean, enableRecruiting = false) {
     setBusy(true);
     setMessage('');
     try {
@@ -46,7 +49,11 @@ export function AssignApplicantsPanel({
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ program_slug: programSlug, limit, dry_run: dryRun }),
+          body: JSON.stringify({
+            program_slug: programSlug, limit, dry_run: dryRun,
+            preview_token: dryRun ? undefined : preview?.token,
+            enable_recruiting: enableRecruiting,
+          }),
         },
       );
       if (!response.headers.get('content-type')?.includes('application/json')) {
@@ -54,17 +61,21 @@ export function AssignApplicantsPanel({
       }
       const result = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(result.error || 'The assignment could not be completed.');
-      setPreview({
+      setPreview(dryRun ? {
         selected: result.selected ?? [],
         skipped_counts: result.skipped_counts ?? {},
         assigned_total_for_holder: result.assigned_total_for_holder ?? assignedCount,
         message: result.message,
-      });
+        recruiting_enabled: result.recruiting_enabled === true,
+        duplicate_application_ids: result.duplicate_application_ids ?? [],
+        token: result.preview_token ?? null,
+      } : null);
       setMessage(
         result.message ||
           (dryRun ? 'Preview ready — nothing was assigned.' : 'Applicants assigned.'),
       );
     } catch (error) {
+      if (!dryRun) setPreview(null);
       setMessage(error instanceof Error ? error.message : 'The request could not be completed.');
     } finally {
       setBusy(false);
@@ -102,7 +113,8 @@ export function AssignApplicantsPanel({
           Program
           <select
             value={programSlug}
-            onChange={(event) => setProgramSlug(event.target.value)}
+            disabled={busy}
+            onChange={(event) => { setPreview(null); setProgramSlug(event.target.value); }}
             className="mt-2 block rounded-xl border border-slate-300 px-3 py-2 text-sm font-semibold"
           >
             {programs.map((program) => (
@@ -119,7 +131,8 @@ export function AssignApplicantsPanel({
             min={1}
             max={500}
             value={limit}
-            onChange={(event) => setLimit(Number(event.target.value) || 50)}
+            disabled={busy}
+            onChange={(event) => { setPreview(null); setLimit(Number(event.target.value) || 50); }}
             className="mt-2 block w-24 rounded-xl border border-slate-300 px-3 py-2 text-sm font-semibold"
           />
         </label>
@@ -133,12 +146,18 @@ export function AssignApplicantsPanel({
         </button>
         <button
           type="button"
-          disabled={busy || !programSlug || !preview?.selected.length}
+          disabled={busy || !programSlug || !preview?.token || !preview.selected.length}
           onClick={() => call(false)}
           className="rounded-xl bg-indigo-700 px-4 py-2.5 text-sm font-black text-white hover:bg-indigo-800 disabled:opacity-50"
         >
           {busy ? 'Working…' : 'Assign the previewed batch'}
         </button>
+        {preview && !preview.recruiting_enabled && preview.assigned_total_for_holder > 0 && (
+          <button type="button" disabled={busy} onClick={() => call(false, true)}
+            className="rounded-xl border border-slate-300 px-4 py-2.5 text-sm font-bold">
+            Enable recruiting for existing referrals
+          </button>
+        )}
       </div>
 
       {message && (
@@ -152,7 +171,7 @@ export function AssignApplicantsPanel({
           <p className="text-sm font-bold text-slate-800">
             {preview.selected.length} applicant{preview.selected.length === 1 ? '' : 's'} selected
             {skippedTotal > 0 ? ` · ${skippedTotal} skipped` : ''} ·{' '}
-            {preview.assigned_total_for_holder} total assigned to this holder after this batch.
+            {preview.assigned_total_for_holder} currently assigned to this holder.
           </p>
           {skippedTotal > 0 && (
             <p className="mt-1 text-xs text-slate-500">
@@ -163,6 +182,12 @@ export function AssignApplicantsPanel({
               {preview.skipped_counts.duplicate ?? 0} · past the batch limit:{' '}
               {preview.skipped_counts.beyond_limit ?? 0}
             </p>
+          )}
+          {preview.duplicate_application_ids.length > 0 && (
+            <details className="mt-2 text-xs">
+              <summary>Skipped duplicate application IDs</summary>
+              <ul>{preview.duplicate_application_ids.map((id) => <li key={id}>{id}</li>)}</ul>
+            </details>
           )}
           {preview.selected.length > 0 && (
             <div className="mt-3 max-h-80 overflow-auto rounded-xl border border-slate-200">
@@ -178,7 +203,7 @@ export function AssignApplicantsPanel({
                 <tbody className="divide-y divide-slate-100">
                   {preview.selected.map((row) => (
                     <tr key={row.application_id}>
-                      <td className="px-4 py-2 font-bold">{row.name}</td>
+                      <td className="px-4 py-2 font-bold">{row.name}<span className="block text-xs font-normal">{row.application_id}</span></td>
                       <td className="px-4 py-2">{row.email || '—'}</td>
                       <td className="px-4 py-2">
                         {row.applied_at ? new Date(row.applied_at).toLocaleDateString() : '—'}

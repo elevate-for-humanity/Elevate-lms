@@ -167,3 +167,25 @@ it('derives a display name from first/last name when no full name exists', () =>
     'name:reese ewing',
   );
 });
+
+it('keeps unnamed eligible applications with distinct stable identities', () => {
+  const first = app({ id: 'first', user_id: 'first-user', full_name: null, phone: null, email: null });
+  const second = app({ id: 'second', user_id: 'second-user', full_name: null, phone: null, email: null });
+  expect(applicantDisplayName(first)).toBe('Applicant');
+  expect(applicantIdentityKeys(first)).toEqual(['user:first-user']);
+  const { selected, skipped } = selectReferralBatch([first, second], { limit: 2 });
+  expect(selected.map(({ id }) => id)).toEqual(['first', 'second']);
+  expect(skipped.duplicate).toEqual([]);
+  expect(buildHolderStudentRow('holder', 'program', first).applicant_name).toBeNull();
+});
+
+it('recognizes a referral from an earlier batch by its stored name and phone', () => {
+  const original = app({ id: 'old', full_name: 'Test Person', email: 'old@example.com' });
+  const reapplication = app({ id: 'new', full_name: ' Test  Person ', email: 'new@example.com' });
+  const { selected, skipped } = selectReferralBatch([reapplication], {
+    limit: 2,
+    alreadyAssignedKeys: new Set(applicantIdentityKeys(original)),
+  });
+  expect(selected).toEqual([]);
+  expect(skipped.duplicate).toEqual([reapplication]);
+});

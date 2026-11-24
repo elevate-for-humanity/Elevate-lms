@@ -3,9 +3,11 @@ import { apiRequireAdmin } from '@/lib/admin/guards';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { safeError, safeDbError, safeOk } from '@/lib/api/safe-error';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { createReferralPreview, verifyReferralPreview } from '@/lib/program-holder/referral-preview';
 import { applicationProgramFilter } from '@/lib/admin/application-filters';
 import {
   applicantDisplayName,
+  applicantIdentityKeys,
   buildHolderStudentRow,
   isAssignableHolderStatus,
   selectReferralBatch,
@@ -25,6 +27,8 @@ interface AssignBody {
   limit?: number;
   /** True = preview only, write nothing. */
   dry_run?: boolean;
+  preview_token?: string;
+  enable_recruiting?: boolean;
 }
 
 function isUuid(value: string): boolean {
@@ -109,13 +113,30 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     return safeError('limit must be between 1 and 500', 400);
   }
   const dryRun = body.dry_run === true;
+  const enableRecruiting = body.enable_recruiting === true;
+  const previewToken = typeof body.preview_token === 'string' ? body.preview_token : '';
+  if (!dryRun && !enableRecruiting && !previewToken) {
+    return safeError('Preview the batch before assigning applicants.', 409);
+  }
+  if (enableRecruiting && !dryRun) {
+    const { error } = await db.rpc('apply_reviewed_holder_referrals_v1', {
+      p_holder_id: holderId, p_program_id: program.id, p_rows: [],
+      p_actor_id: auth.id, p_enable_existing: true,
+    });
+    if (error?.code === '23514') return safeError('Recruiting requires eligible referrals and completed release conditions.', 409);
+    if (error) return safeDbError(error, 'Recruiting access could not be enabled');
+    return safeOk({ recruiting_enabled: true, message: 'Recruiting access enabled for existing referrals.' });
+  }
 
   // --- Candidates: applications for this program (all statuses; the pure
   // selector classifies each one so the preview can show why rows skipped). ---
-  const programFilter = `program_id.eq.${program.id},${applicationProgramFilter(program)}`;
+  const programFilter = `program_id.eq.${program.id},and(program_id.is.null,or(${applicationProgramFilter(program)}))`;
   let candidates: ApplicantRow[] = [];
-  if (body.application_ids?.length) {
-    const ids = [...new Set(body.application_ids.filter((value) => isUuid(value)))];
+  if (body.application_ids !== undefined) {
+    if (!Array.isArray(body.application_ids) || body.application_ids.length > 500) {
+      return safeError('Supply up to 500 application IDs.', 400);
+    }
+    const ids = [...new Set(body.application_ids.filter((value) => typeof value === 'string' && isUuid(value)))];
     if (!ids.length) return safeError('No valid application ids supplied', 400);
     const { data, error } = await db
       .from('applications')
@@ -131,10 +152,11 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     }
     const wrongProgram = [...found.values()].filter(
       (row: any) =>
-        row.program_id !== program.id &&
-        row.program_slug !== program.slug &&
-        row.program_interest !== program.slug &&
-        row.program_interest !== program.title,
+        row.program_id ? row.program_id !== program.id :
+          row.program_slug !== program.slug &&
+          row.program_interest !== program.slug &&
+          row.program_interest !== program.title &&
+          !(program.slug === 'cdl-training' && /cdl/i.test(row.program_interest ?? '')),
     );
     if (wrongProgram.length) {
       return safeError(
@@ -165,31 +187,39 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   }
 
   // --- Already assigned (any holder, still live) + already enrolled. ---
-  const candidateIds = candidates.map((row) => row.id);
   const assignedIds = new Set<string>();
   const assignedKeys = new Set<string>();
-  if (candidateIds.length) {
-    const { data: existing, error: existingErr } = await db
+  const pageSize = 500;
+  for (let offset = 0; candidates.length; offset += pageSize) {
+    const { data: existing, error } = await db
       .from('program_holder_students')
-      .select('application_id, applicant_email, user_id, status')
+      .select('id,application_id,applicant_name,applicant_email,applicant_phone,user_id,status')
       .eq('program_id', program.id)
-      .in('application_id', candidateIds);
-    if (existingErr) return safeDbError(existingErr, 'Existing assignment lookup failed');
+      .order('id')
+      .range(offset, offset + pageSize - 1);
+    if (error) return safeDbError(error, 'Existing assignment lookup failed');
     for (const row of existing ?? []) {
-      if (String(row.status ?? '').toLowerCase() === 'routing_replaced') continue;
+      if (['routing_replaced', 'inactive', 'removed'].includes(String(row.status ?? '').toLowerCase())) continue;
       if (row.application_id) assignedIds.add(row.application_id);
-      if (row.applicant_email) assignedKeys.add(`email:${String(row.applicant_email).trim().toLowerCase()}`);
-      if (row.user_id) assignedKeys.add(`user:${row.user_id}`);
+      for (const key of applicantIdentityKeys({
+        id: row.application_id ?? row.id,
+        name: row.applicant_name === 'Applicant' ? null : row.applicant_name,
+        email: row.applicant_email,
+        phone: row.applicant_phone,
+        user_id: row.user_id,
+      })) assignedKeys.add(key);
     }
+    if (!existing || existing.length < pageSize) break;
   }
-  const candidateUserIds = [...new Set(candidates.map((row) => row.user_id).filter(Boolean))];
+  const candidateUserIds = [...new Set(candidates.flatMap((row) => row.user_id ? [row.user_id] : []))];
   const enrolledUserIds = new Set<string>();
-  if (candidateUserIds.length) {
+  for (let offset = 0; offset < candidateUserIds.length; offset += pageSize) {
     const { data: enrollments, error: enrollErr } = await db
       .from('program_enrollments')
       .select('user_id')
       .eq('program_id', program.id)
-      .in('user_id', candidateUserIds as string[])
+      .in('user_id', candidateUserIds.slice(offset, offset + pageSize))
+      .is('revoked_at', null)
       .in('status', ['active', 'enrolled', 'in_progress', 'completed', 'funded']);
     if (enrollErr) return safeDbError(enrollErr, 'Enrollment lookup failed');
     for (const row of enrollments ?? []) enrolledUserIds.add(String(row.user_id));
@@ -211,11 +241,13 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     beyond_limit: skipped.beyondLimit.length,
   };
 
-  const { count: assignedTotal } = await db
+  const { count: assignedTotal, error: countError } = await db
     .from('program_holder_students')
     .select('id', { count: 'exact', head: true })
     .eq('program_holder_id', holderId)
     .in('status', [...READABLE_ASSIGNMENT_STATUSES]);
+
+  if (countError) return safeDbError(countError, 'Existing referral count failed');
 
   const preview = {
     holder_id: holderId,
@@ -232,51 +264,31 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       application_status: row.status ?? null,
     })),
     skipped_counts: skippedCounts,
+    duplicate_application_ids: skipped.duplicate.map((row) => row.id),
     assigned_total_for_holder: assignedTotal ?? 0,
     recruiting_enabled: holder.features?.recruiting_enabled === true,
   };
 
-  if (dryRun || !selected.length) {
-    return safeOk({ ...preview, assigned: [], message: dryRun ? 'Dry run — nothing was assigned.' : 'Nothing to assign.' });
+  const batch = {
+    actorId: auth.id, holderId, programId: program.id, limit,
+    applicationIds: selected.map((row) => row.id),
+  };
+  if (dryRun) {
+    return safeOk({
+      ...preview, assigned: [], message: 'Preview ready. No referrals were assigned.',
+      preview_token: selected.length ? createReferralPreview(batch) : null,
+    });
   }
-
-  // --- Apply: write the holder projections the portal reads. ---
+  if (!selected.length || !verifyReferralPreview(previewToken, batch)) {
+    return safeError('The preview expired or the eligible batch changed. Run a fresh preview before assigning.', 409);
+  }
   const rows = selected.map((row) => buildHolderStudentRow(holderId, program.id, row));
-  const { error: insertErr } = await db
-    .from('program_holder_students')
-    .upsert(rows, { onConflict: 'program_holder_id,application_id' });
-  if (insertErr) return safeDbError(insertErr, 'Failed to assign applicants');
-
-  // The holder portal only lists assigned applicants when the holder has a
-  // recruiting assignment. First assignment turns that on for this holder.
-  let recruitingEnabled = holder.features?.recruiting_enabled === true;
-  if (!recruitingEnabled) {
-    const { error: featureErr } = await db
-      .from('program_holders')
-      .update({
-        features: { ...(holder.features ?? {}), recruiting_enabled: true },
-        updated_at: new Date().toISOString(),
-      })
-      .eq('id', holderId);
-    if (featureErr) return safeDbError(featureErr, 'Assignment saved but recruiting access could not be enabled');
-    recruitingEnabled = true;
-  }
-
-  await db.from('admin_audit_events').insert({
-    action: 'program_holder.assign_applicants',
-    actor_user_id: auth.id,
-    target_type: 'program_holder',
-    target_id: holderId,
-    metadata: {
-      program_slug: program.slug,
-      program_id: program.id,
-      limit,
-      dry_run: false,
-      assigned_count: selected.length,
-      assigned_application_ids: selected.map((row) => row.id),
-      skipped_counts: skippedCounts,
-    },
+  const { error } = await db.rpc('apply_reviewed_holder_referrals_v1', {
+    p_holder_id: holderId, p_program_id: program.id, p_rows: rows,
+    p_actor_id: auth.id, p_enable_existing: false,
   });
+  if (error?.code === '23514') return safeError('Referral eligibility or release conditions changed. Review the holder and preview again.', 409);
+  if (error) return safeDbError(error, 'Failed to assign applicants');
 
   return safeOk({
     ...preview,
@@ -284,7 +296,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     assigned: preview.selected,
     // Total after this batch, not before it.
     assigned_total_for_holder: (assignedTotal ?? 0) + selected.length,
-    recruiting_enabled: recruitingEnabled,
+    recruiting_enabled: true,
     message: `${selected.length} applicant${selected.length === 1 ? '' : 's'} assigned to ${preview.holder_name}.`,
   });
 }

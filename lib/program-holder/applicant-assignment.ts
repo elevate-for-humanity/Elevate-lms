@@ -58,10 +58,14 @@ export function isAssignableHolderStatus(status: string | null | undefined): boo
   );
 }
 
-export function applicantDisplayName(app: ApplicantRow): string {
+function storedApplicantName(app: ApplicantRow): string {
   const full = [app.full_name, app.name].find((value) => value && value.trim());
   if (full) return full.trim();
-  return [app.first_name, app.last_name].filter(Boolean).join(' ').trim() || 'Applicant';
+  return [app.first_name, app.last_name].filter(Boolean).join(' ').trim();
+}
+
+export function applicantDisplayName(app: ApplicantRow): string {
+  return storedApplicantName(app) || 'Applicant';
 }
 
 function normalizeEmail(email: string | null | undefined): string {
@@ -86,7 +90,7 @@ export function applicantIdentityKeys(app: ApplicantRow): string[] {
   const keys: string[] = [];
   const email = normalizeEmail(app.email);
   const userId = String(app.user_id ?? '').trim();
-  const name = normalizeName(applicantDisplayName(app));
+  const name = normalizeName(storedApplicantName(app));
   const phone = String(app.phone ?? '').replace(/[^0-9]/g, '');
   if (userId) keys.push(`user:${userId}`);
   if (email) keys.push(`email:${email}`);
@@ -199,7 +203,7 @@ export function buildHolderStudentRow(
     student_id: app.user_id ?? null,
     user_id: app.user_id ?? null,
     program_id: programId,
-    applicant_name: applicantDisplayName(app),
+    applicant_name: storedApplicantName(app) || null,
     applicant_email: normalizeEmail(app.email) || null,
     applicant_phone: app.phone ?? null,
     status: 'applied',

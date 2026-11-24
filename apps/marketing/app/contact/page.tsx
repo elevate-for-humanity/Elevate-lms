@@ -28,17 +28,20 @@ export default async function ContactPage({ searchParams }: ContactPageProps) {
   const submitted = params.submitted === '1';
   const submitError = typeof params.error === 'string' ? params.error : '';
   const requestedItem = product || course;
+  const courseBuilderMessage = Object.hasOwn(COURSE_BUILDER_REQUESTS, product)
+    ? COURSE_BUILDER_REQUESTS[product as keyof typeof COURSE_BUILDER_REQUESTS]
+    : null;
   const apprenticeship = typeof params.apprenticeship === 'string' ? params.apprenticeship : '';
   const isApprenticeshipInquiry = apprenticeship === 'general' || Object.hasOwn(PROGRAM_LABELS, apprenticeship);
   const region = HOST_SHOP_REGIONS.find((entry) => entry.slug === params.region);
   const community = typeof params.community === 'string' ? params.community.trim().slice(0, 80) : '';
   const location = [community, region?.city].filter(Boolean).join(', ');
-  const defaultSubject = isApprenticeshipInquiry ? 'apprenticeship' : course ? 'enrollment' : requestedItem ? 'other' : '';
-  const defaultMessage = isApprenticeshipInquiry
+  const defaultSubject = courseBuilderMessage ? 'course-builder' : isApprenticeshipInquiry ? 'apprenticeship' : course ? 'enrollment' : requestedItem ? 'other' : '';
+  const defaultMessage = courseBuilderMessage ?? (isApprenticeshipInquiry
     ? `I would like information about ${PROGRAM_LABELS[apprenticeship] ?? 'apprenticeship opportunities'}${location ? ` near ${location}` : ' in Indiana'}.`
     : requestedItem
       ? `I would like current availability, delivery details, access terms, and final pricing for ${titleFromSlug(requestedItem)}.`
-      : '';
+      : '');
 
   return (
     <main id="main-content" className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">

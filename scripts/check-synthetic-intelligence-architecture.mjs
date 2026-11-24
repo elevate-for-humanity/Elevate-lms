@@ -69,7 +69,21 @@ requireText('lib/ai/tools/registry.ts', 'audit', 'tool audit policy');
 requireText('lib/ai/tools/registry.ts', "name: 'openhands.execute'", 'governed OpenHands execution tool');
 requireText('lib/ai/tools/registry.ts', "name: 'openhands.status'", 'governed OpenHands status tool');
 requireText('lib/ai/tools/registry.ts', 'CONFIRM OPENHANDS EXECUTION', 'OpenHands human approval boundary');
-requireText('lib/ai/tools/planner.ts', "name: /\\bopenhands\\b/.test(lower) ? 'openhands.execute' : 'studio.engineering.execute'", 'conditional authorized engineering routing');
+requireText(
+  'lib/ai/tools/planner.ts',
+  'function routeEngineeringExecution(',
+  'conditional authorized engineering routing helper',
+);
+requireText(
+  'lib/ai/tools/planner.ts',
+  'isOpenHandsOptedIn()',
+  'explicit OpenHands opt-in guard',
+);
+requireText(
+  'lib/ai/tools/planner.ts',
+  "name: routeEngineeringExecution(lower)",
+  'governed engineering routing use',
+);
 requireText('lib/ai/tools/planner.ts', "name: 'openhands.status'", 'OpenHands status routing');
 requireText('lib/ai/tools/planner.ts', "name: 'courses.generate'", 'Course Builder remains outside OpenHands');
 requireText('lib/ai/tools/executor.ts', "status: 'accepted'", 'asynchronous governed tool status');

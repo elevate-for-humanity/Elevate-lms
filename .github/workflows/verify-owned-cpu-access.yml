@@ -33,9 +33,9 @@ jobs:
     env:
       CPU_MODEL_URL: https://elevate-owned-cpu-llm-aabnh2y32a-ue.a.run.app
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with: {persist-credentials: false}
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with: {node-version: '22'}
       - name: Verify identity proof, endpoint activation and bounded acceptance contracts
         run: node --test scripts/gcp/probe-owned-cpu-admin.test.mjs scripts/gcp/activate-owned-cpu-model.test.mjs scripts/gcp/accept-owned-cpu-model.test.mjs
@@ -74,9 +74,9 @@ jobs:
     timeout-minutes: 20
     environment: production
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with: {persist-credentials: false}
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with: {node-version: '22'}
       - uses: google-github-actions/auth@v3
         id: invocation

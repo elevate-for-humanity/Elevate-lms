@@ -25,6 +25,26 @@ describe('apprentice automatic-payment contract', () => {
     expect(scheduler).toContain('POST "$ADMIN_URL/api/cron/reconcile-apprentice-payments"');
   });
 
+  it('runs reconcile before the fallback in the Monday job so a collected week never gets a second invoice', () => {
+    expect(
+      scheduler.indexOf('POST "$ADMIN_URL/api/cron/reconcile-apprentice-payments"'),
+    ).toBeLessThan(
+      scheduler.indexOf('POST "$ADMIN_URL/api/cron/generate-apprentice-invoices"'),
+    );
+  });
+
+  it('makes the fallback consult the duplicate detector and PayPal before creating an invoice', () => {
+    expect(invoiceFallback).toContain('findInvoiceForScheduleWeek');
+    expect(invoiceFallback).toContain('hasCompletedPayPalPaymentForWeek');
+    expect(invoiceFallback).toContain("skipped: 'duplicate-invoice'");
+    expect(invoiceFallback).toContain("skipped: 'paypal-payment-found'");
+  });
+
+  it('makes reconcile apply payments to the week’s existing invoice instead of creating a second one', () => {
+    expect(reconciliation).toContain('appliedToExisting');
+    expect(reconciliation).toContain('duplicatesSkipped');
+  });
+
   it('falls back to an emailed QuickBooks invoice while PayPal activation is pending', () => {
     expect(invoiceFallback).toContain(".eq('status', 'paused')");
     expect(invoiceFallback).toContain('createManualInvoice');

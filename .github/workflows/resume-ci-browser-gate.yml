@@ -1,0 +1,35 @@
+name: Resume completed browser CI gate
+
+on:
+  workflow_run:
+    workflows: [CI, E2E desktop-chrome]
+    types: [completed]
+
+concurrency:
+  group: browser-ci-receipt-${{ github.event.workflow_run.head_repository.full_name }}-${{ github.event.workflow_run.head_branch }}-${{ github.event.workflow_run.head_sha }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  pull-requests: read
+  actions: write
+
+jobs:
+  resume:
+    if: github.event.workflow_run.event == 'pull_request'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      # Privileged workflow_run: execute trusted main only. Never download PR
+      # artifacts, restore PR caches, or check out the PR's executable code.
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Reconcile exact-head browser completion
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: node scripts/ci/resume-browser-gate.mjs

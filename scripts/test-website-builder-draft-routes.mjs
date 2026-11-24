@@ -17,19 +17,27 @@ const diagnostics=[];
 const commitWebsiteDraft=compile(await read('lib/apps/website-builder-draft-commit.ts'),{randomUUID,logger:{error:(...args)=>diagnostics.push(args)}},'commitWebsiteDraft');
 const sources={generate:await read('apps/marketing/app/api/apps/website-builder/ai-generate/route.ts'),import:await read('apps/marketing/app/api/apps/website-builder/sites/route.ts')};
 const config={template:{id:'executive'},branding:{logoText:'Example'},seo:{title:'Example',description:'A customer studio.'},homepage:{},footer:{},meta:{parisInterviewCompleted:true},pages:[{id:'home',slug:'/',title:'Home',sections:[{id:'hero',type:'hero',content:{title:'Example',backdropImage:'/approved-studio.svg',image:'/owner.webp'},settings:{backdropPosition:'right',backdropOpacity:20}}]}]};
-function fixture(mode,{user={id:'owner',email:'owner@example.test'},access={allowed:true,plan:'starter'},sites=[],readError=null,rpcError=null,generated=config,realNormalization=false}={}){
+function fixture(mode,{user={id:'owner',email:'owner@example.test'},access={allowed:true,plan:'starter'},sites=[],readError=null,rpcError=null,generated=config,realNormalization=false,creditAllowed=true}={}){
  const calls=[];
+ let modelCalls=0;
  const db={from(table){assert.equal(table,'user_websites');return {select(){return this},eq(){return this},order(){return Promise.resolve({data:sites,error:readError})}}},auth:{getUser:async()=>({data:{user}})}};
  const admin={...db,rpc:async(name,args)=>{calls.push({name,args});return {error:rpcError,data:rpcError?null:{website:{id:'saved'},creditsCharged:60,creditsRemaining:100}}}};
  const deps={createClient:async()=>db,requireAdminClient:async()=>admin,commitWebsiteDraft,
   getWebsiteBuilderAccess:async()=>access,buildDefaultSiteConfig:()=>config,ensureComposableSiteConfig:realNormalization?composition.ensureComposableSiteConfig:x=>x,sanitizePages:realNormalization?composition.sanitizePages:x=>x,
   buildLicensedAssetProjectPolicy:()=>({}),NextResponse:{json:(body,options={})=>({body,status:options.status||200})},
-  applyRateLimit:async()=>null,hydrateProcessEnv:async()=>{},runAITask:async()=>({content:JSON.stringify(generated)}),
-  validateHeroBackdropFields,validateFooterContactFields,validateFooterPresentationFields,suppliedFooterSocialLinks,suppliedFooterLogo,suppliedWebsiteContact,validateSiteConfig:realNormalization?realValidateSiteConfig:()=>({valid:true}),consumeWebsiteBuilderCredits:async(_db,_user,operation,options)=>{assert.equal(operation,'initial_site_generation');assert.equal(options.deferDebitUntilCommit,true);return {allowed:true,charged:0,isTrial:true}},
+  applyRateLimit:async()=>null,hydrateProcessEnv:async()=>{},runAITask:async()=>{modelCalls+=1;return {content:JSON.stringify(generated)}},
+  validateHeroBackdropFields,validateFooterContactFields,validateFooterPresentationFields,suppliedFooterSocialLinks,suppliedFooterLogo,suppliedWebsiteContact,validateSiteConfig:realNormalization?realValidateSiteConfig:()=>({valid:true}),consumeWebsiteBuilderCredits:async(_db,_user,operation,options)=>{assert.equal(operation,'initial_site_generation');assert.equal(options.deferDebitUntilCommit,true);return {allowed:creditAllowed,charged:0,isTrial:true}},
   missingRequiredWebsiteAnswers:()=>[],readWebsiteDesign:realNormalization?realDesign.readWebsiteDesign:x=>x,interviewWebsiteDesign:realNormalization?realDesign.interviewWebsiteDesign:x=>x,applyWebsiteDesign:realNormalization?realDesign.applyWebsiteDesign:x=>x,websiteCatalog:realNormalization?realDesign.websiteCatalog:()=>[],withApiAudit:(_path,fn)=>fn,logger:{error(){},warn(){}}};
- return {calls,post:compile(sources[mode],deps,'POST')};
+ return {calls,get modelCalls(){return modelCalls},post:compile(sources[mode],deps,'POST')};
 }
 const request=(body={})=>({json:async()=>({businessName:'Example',brief:'A sufficiently detailed business description for generation.',...body})});
+test('insufficient draft credits stop model work and website writes', async () => {
+ const fixtureWithEmptyWallet = fixture('generate', { creditAllowed: false });
+ const response = await fixtureWithEmptyWallet.post(request());
+ assert.equal(response.status, 402);
+ assert.equal(fixtureWithEmptyWallet.modelCalls, 0);
+ assert.equal(fixtureWithEmptyWallet.calls.length, 0);
+});
 for(const mode of ['generate','import']){
  test(`${mode} denies signed-out and denied subscription before writes`,async()=>{
   for(const options of [{user:null},{access:{allowed:false}}]){const f=fixture(mode,options);const r=await f.post(request());assert.ok([401,403].includes(r.status));assert.equal(f.calls.length,0)}

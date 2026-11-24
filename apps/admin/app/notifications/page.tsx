@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { requireAdmin } from '@/lib/auth';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
-import { Bell, ChevronRight, CheckCircle, XCircle, Clock } from 'lucide-react';
+import { type LucideIcon, Bell, ChevronRight, CheckCircle, XCircle, Clock } from 'lucide-react';
 import NotificationBroadcastForm from './NotificationBroadcastForm';
 
 export const dynamic = 'force-dynamic';
@@ -16,7 +16,7 @@ const STATUS_STYLES: Record<string, string> = {
   failed: 'bg-red-100 text-red-800',
   pending: 'bg-amber-100 text-amber-800',
 };
-const STATUS_ICON: Record<string, React.ElementType> = {
+const STATUS_ICON: Record<string, LucideIcon> = {
   sent: CheckCircle,
   failed: XCircle,
   pending: Clock,

@@ -31,9 +31,10 @@ export default function RefundPolicyPage() {
           <div className="prose prose-lg max-w-none">
             <h2 className="text-2xl md:text-3xl font-bold text-black mb-6">Training Programs</h2>
             <p className="text-black mb-6">
-              Our training programs are Funded and funded by government grants (WIOA, WRG, and other
-              workforce development programs). Since there is no tuition cost to students, refunds
-              do not apply to our training programs.
+              Training may be paid for through approved workforce funding, by the student, or by
+              another payer. If you did not pay tuition, there is no student tuition payment to
+              refund. If you paid tuition or fees, review the written terms for your program and
+              contact Admissions with your enrollment or payment reference.
             </p>
 
             <h3 className="text-lg md:text-base sm:text-lg font-bold text-black mb-4 mt-8">
@@ -147,7 +148,7 @@ export default function RefundPolicyPage() {
               </p>
               <p className="text-black mb-2">
                 Phone:{' '}
-                <a href="/support" className="text-brand-blue-600 hover:underline">
+                <a href={`tel:+1${PLATFORM_DEFAULTS.mainPhone.replace(/\D/g, '')}`} className="text-brand-blue-600 hover:underline">
                   {PLATFORM_DEFAULTS.mainPhone}
                 </a>
               </p>

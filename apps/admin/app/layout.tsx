@@ -10,6 +10,7 @@ import { DashboardReadingSupport } from '@/components/accessibility/DashboardRea
  * expose canned public actions inside a privileged workspace.
  */
 import type { Metadata } from 'next';
+import { headers } from 'next/headers';
 import { Suspense } from 'react';
 import './globals.css';
 import '../../../styles/contrast-guardrails.css';
@@ -72,6 +73,7 @@ export const viewport = {
 };
 
 export default async function AdminGroupLayout({ children }: { children: React.ReactNode }) {
+  const staffInbox = (await headers()).get('x-elevate-staff-inbox') === '1';
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
@@ -87,7 +89,7 @@ export default async function AdminGroupLayout({ children }: { children: React.R
         <I18nProvider>
           <Suspense fallback={<main className="min-h-dvh min-w-0">{children}</main>}>
             <DashboardReadingSupport>
-              <AdminApplicationChrome navSections={DEFAULT_NAV}><CloudBudgetNotice />{children}<Suspense fallback={null}><AutomaticPhone admin /></Suspense></AdminApplicationChrome>
+              <AdminApplicationChrome navSections={DEFAULT_NAV} staffInbox={staffInbox}><CloudBudgetNotice />{children}<Suspense fallback={null}><AutomaticPhone admin /></Suspense></AdminApplicationChrome>
             </DashboardReadingSupport>
           </Suspense>
         </I18nProvider>

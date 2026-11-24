@@ -51,7 +51,7 @@ export async function GET(request: NextRequest){
  const tasks=new Map<string,any>();
  if(taskIds.length){
   const receipt=await db.from('ai_tasks')
-   .select('id,user_id,tenant_id,tool_name,requires_approval,approval_status,tool_output')
+   .select('id,user_id,tenant_id,tool_name,status,requires_approval,approval_status,approval_reason,correlation_id,tool_output')
    .eq('user_id',auth.id).eq('tool_name','openhands.execute').is('tenant_id',null).in('id',taskIds);
   if(receipt.error)return NextResponse.json({error:'Repair approval evidence is temporarily unavailable.'},{status:503});
   for(const task of receipt.data??[])tasks.set(task.id,task);

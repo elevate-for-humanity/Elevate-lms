@@ -1,8 +1,24 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-const state = vi.hoisted(() => ({ existing: false, phone: '3175550100', inserts: 0, paid: true, provision: vi.fn() }));
+const state = vi.hoisted(() => ({
+  existing: false,
+  phone: '3175550100',
+  inserts: [] as Record<string, unknown>[],
+  paid: true,
+  accessUrl: 'https://app.elevateforhumanity.org/lms/dashboard',
+  provision: vi.fn(),
+}));
 vi.mock('@/lib/enrollment/paid-application', () => ({
-  verifyPaidApplication: async () => state.paid ? { user: { id: 'learner' } } : null,
-  activatePaidApplication: async () => 'https://app.elevateforhumanity.org/learner/dashboard',
+  verifyPaidApplication: async () => state.paid ? {
+    user: { id: 'learner' },
+    invoice: {
+      id: 'paid-hvac-invoice', status: 'paid', provider: 'quickbooks', total_cents: 350000,
+      paid_at: '2026-11-21T14:00:00.000Z', customer_email: 'test@example.test',
+      fulfillment_type: 'program_enrollment',
+      fulfillment_payload: { program_id: 'hvac-program', program_slug: 'hvac-technician' },
+    },
+    enrollment: { id: 'verified-enrollment', status: 'pending', payment_reference: 'paid-hvac-invoice' },
+  } : null,
+  activatePaidApplication: async () => state.accessUrl,
 }));
 vi.mock('@/lib/api/withRateLimit', () => ({ applyRateLimit: async () => null }));
 vi.mock('@/lib/rate-limit', () => ({ getRedisClient: () => null }));
@@ -27,15 +43,29 @@ vi.mock('@/lib/supabase/admin', () => ({
         eq: () => query,
         ilike: () => query,
         update: () => query,
+        or: () => query,
         neq: () => query,
         gte: () => query,
         not: () => query,
         order: () => query,
         limit: () => query,
-        insert() {
+        insert(payload: Record<string, unknown>) {
           inserted = true;
-          if (table === 'applications') state.inserts++;
+          if (table === 'applications') state.inserts.push(payload);
           return query;
+        },
+        then(resolve: (value: unknown) => unknown) {
+          const data = table === 'applications' && state.existing && selection.includes('reference_number')
+            ? [{
+              id: 'saved-application',
+              reference_number: 'EFH-SAVED',
+              status: 'submitted',
+              program_id: 'hvac-program',
+              program_interest: 'HVAC Technician',
+              normalized_phone: state.phone,
+            }]
+            : [];
+          return Promise.resolve({ data, error: null }).then(resolve);
         },
         async maybeSingle() {
           // Retry tests must satisfy the same catalog/payment boundary as a
@@ -94,7 +124,8 @@ const submit = () =>
 beforeEach(() => {
   state.existing = false; state.paid = true;
   state.phone = '3175550100';
-  state.inserts = 0;
+  state.inserts = [];
+  state.accessUrl = 'https://app.elevateforhumanity.org/lms/dashboard';
   state.provision.mockReset();
 });
 describe('saved application recovery', () => {
@@ -107,8 +138,9 @@ describe('saved application recovery', () => {
       existing: true,
       id: 'saved-application',
       referenceNumber: 'EFH-SAVED',
+      applicationStatus: 'enrolled',
     });
-    expect(state.inserts).toBe(0);
+    expect(state.inserts).toHaveLength(0);
     expect(state.provision).not.toHaveBeenCalled();
   });
   it('does not disclose an existing application or create a duplicate without owned verified payment', async () => {
@@ -116,14 +148,13 @@ describe('saved application recovery', () => {
     const response = await submit();
     expect(response.status).toBe(402);
     expect(await response.json()).not.toHaveProperty('id');
-    expect(state.inserts).toBe(0);
+    expect(state.inserts).toHaveLength(0);
   });
-  it('confirms the saved application even when account provisioning throws', async () => {
-    state.provision.mockRejectedValue(new Error('Auth service temporarily unavailable'));
+  it('activates the saved paid application without provisioning a second account', async () => {
     const response = await submit();
     expect(response.status).toBe(200);
-    expect(await response.json()).toMatchObject({ ok: true, id: 'saved-application' });
-    expect(state.inserts).toBe(1);
-    expect(state.provision).toHaveBeenCalledOnce();
+    expect(await response.json()).toMatchObject({ ok: true, id: 'saved-application', applicationStatus: 'enrolled' });
+    expect(state.inserts).toHaveLength(1);
+    expect(state.provision).not.toHaveBeenCalled();
   });
 });

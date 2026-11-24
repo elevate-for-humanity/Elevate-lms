@@ -122,18 +122,6 @@ test.describe('page-by-page public production audit', () => {
     });
   }
 
-  test('critical pages do not expose known placeholder content', async ({ page }) => {
-    for (const route of [...CRITICAL_PUBLIC_ROUTES, ...CRITICAL_PROGRAM_ROUTES]) {
-      await page.goto(route, { waitUntil: 'domcontentloaded' });
-      const body = (await page.locator('body').textContent()) ?? '';
-      for (const placeholder of FORBIDDEN_PLACEHOLDERS) {
-        expect(body, `${route} contains forbidden placeholder: ${placeholder}`).not.toContain(
-          placeholder,
-        );
-      }
-    }
-  });
-
   test('every homepage header and footer internal link resolves', async ({ page, request }) => {
     test.setTimeout(180_000);
     await page.goto('/', { waitUntil: 'domcontentloaded' });

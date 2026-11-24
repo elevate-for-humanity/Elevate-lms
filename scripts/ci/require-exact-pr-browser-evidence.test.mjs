@@ -138,3 +138,11 @@ test('truncated or unverifiable jobs total count cannot certify browser acceptan
     timeoutMs: 1000, pollMs: 1,
   }), /E2E_JOB_INVENTORY_INCOMPLETE/);
 });
+
+test('the default gate checks once and never occupies a runner waiting for browser capacity', async () => {
+  const { request } = mockApi(pr(), { ...run, status: 'queued', conclusion: null });
+  let sleeps = 0;
+  await assert.rejects(verifyExactPrBrowserEvidence({ repository, event: event(), token: 'test-token', request,
+    sleep: async () => { sleeps++; } }), /E2E_EXACT_HEAD_PENDING/);
+  assert.equal(sleeps, 0);
+});

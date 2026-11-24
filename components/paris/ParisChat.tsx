@@ -19,6 +19,7 @@ import {
   VolumeX,
 } from 'lucide-react';
 import { useNaturalVoice } from '@/components/voice/useNaturalVoice';
+import ParisAvatar from './ParisAvatar';
 import { usePathname, useRouter } from 'next/navigation';
 import { resolvePortalNavigation } from '@/lib/paris/portal-navigation';
 import type { PortalSupportIssue } from '@/lib/paris/portal-support';
@@ -534,8 +535,8 @@ export default function ParisChat({
       {showHeader && (
         <div className="shrink-0 bg-slate-950 px-6 py-4 text-white">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-white/10">
-              <GraduationCap className="h-6 w-6" aria-hidden="true" />
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full border border-white/20">
+              <ParisAvatar size={40} className="h-10 w-10" fallbackIconClassName="h-6 w-6" />
             </div>
             <div>
               <h2 className="text-lg font-bold">
@@ -574,7 +575,7 @@ export default function ParisChat({
               {message.role === 'user' ? (
                 <User className="h-4 w-4" aria-hidden="true" />
               ) : (
-                <Bot className="h-4 w-4" aria-hidden="true" />
+                <ParisAvatar size={32} className="h-8 w-8" fallbackIconClassName="h-4 w-4" />
               )}
             </div>
             <div
@@ -617,8 +618,8 @@ export default function ParisChat({
 
         {isLoading && (
           <div className="flex gap-3">
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-950 text-white">
-              <Bot className="h-4 w-4" aria-hidden="true" />
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full bg-slate-950 text-white">
+              <ParisAvatar size={32} className="h-8 w-8" fallbackIconClassName="h-4 w-4" />
             </div>
             <div className="rounded-2xl rounded-tl-sm border border-slate-200 bg-white px-4 py-3 shadow-sm">
               <div className="flex items-center gap-2 text-slate-700">

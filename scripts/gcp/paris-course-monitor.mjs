@@ -85,7 +85,11 @@ export async function monitorCourseQueue({request=fetch,env=process.env,now=new 
     !job.lease_owner && (!job.lease_expires_at || Date.parse(job.lease_expires_at)<=now.getTime());
   const readinessCandidates=rows.filter(job=>
     (job.status==='queued' && job.payload?.autopilot && job.available_at != null) ||
-    savedPauseRecovered(job));
+    savedPauseRecovered(job) ||
+    // Failed stages may retry only after the canonical predecessor, active
+    // pool and live-lease predicate passes. A due timestamp is insufficient.
+    (job.status==='failed' && job.payload?.autopilot &&
+      inspectCourseAutopilot(job,job.ultimate_course_builds,now.getTime()).action==='requeue'));
   const readyRoleIds=new Set();
   for(let i=0;i<readinessCandidates.length;i+=1000){
     const batch=readinessCandidates.slice(i,i+1000).map(job=>job.id);
@@ -114,6 +118,12 @@ export async function monitorCourseQueue({request=fetch,env=process.env,now=new 
        observation.state==='awaiting_assignment' && !readyRoleIds.has(job.id))
       observation={state:'prerequisite_wait',action:'observe',
         reason:'Canonical prerequisite, active pool or worker-lease readiness is not satisfied'};
+    // Never spend another failed-stage attempt while its predecessor or pool
+    // remains unavailable. Keep the failed record and original attempt history.
+    if(job.status==='failed' && job.payload?.autopilot &&
+       observation.action==='requeue' && !readyRoleIds.has(job.id))
+      observation={state:'prerequisite_wait',action:'observe',
+        reason:'Canonical predecessor, active pool or worker-lease readiness is not satisfied; failed attempt retained'};
     if(['awaiting_assignment','recovering'].includes(observation.state) && dispatchState?.status==='capacity_wait')
       observation={state:'capacity_wait',action:'wait_for_capacity',reason:dispatchState.reason || 'Google regional capacity is unavailable; saved work is preserved'};
     if(['awaiting_assignment','recovering'].includes(observation.state) && dispatchState?.status==='dispatch_failed')

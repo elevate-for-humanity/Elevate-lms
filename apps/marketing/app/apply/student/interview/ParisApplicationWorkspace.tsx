@@ -202,8 +202,12 @@ export default function ParisApplicationWorkspace({
         const resume = await fetch('/api/paris/application-interview', { cache: 'no-store' });
         if (resume.ok) {
           const data = (await resume.json()) as InterviewResponse;
-          if (alive && data.ok) setSession(data);
-          return;
+          if (data.ok) {
+            if (alive) setSession(data);
+            return;
+          }
+          // No resumable session (first visit): fall through and start a new
+          // interview instead of returning with no session.
         }
         const data = await callInterview({ action: 'start', locale: 'en' });
         if (alive) setSession(data);

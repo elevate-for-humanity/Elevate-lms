@@ -15,6 +15,14 @@ import {
 import { verifyOpenHandsGitHubOutcome, type OpenHandsGitHubEvidence } from './github-verifier';
 import { loadOpenHandsReconciliationQueue } from './reconciliation-queue';
 import { mayAutoRetryOpenHandsTask } from './retry-authorization';
+// NOTE: dispatchOpenHandsTask is source-sliced by
+// tests/worker/openhands-idempotent-handoff.test.mjs with only
+// requireAdminClient / findExistingTask / startOpenHandsTask injected.
+// Imported helpers are therefore invoked through typeof guards (safe on an
+// undeclared name in the sliced scope; always present in production).
+// The reuse path returns before the probe, so that test is unaffected.
+import { probeAndRecordOpenHandsReadiness } from '../paris-openhands-readiness';
+import { resolveOpenHandsCorrelationId } from './correlation';
 
 export type OpenHandsDispatchInput = {
   actorId: string;
@@ -141,11 +149,32 @@ export async function dispatchOpenHandsTask(
   if (!Number.isSafeInteger(maxAttempts) || maxAttempts < 1 || maxAttempts > 3) {
     throw new Error('OPENHANDS_ATTEMPT_LIMIT_INVALID');
   }
+  // Every dispatch carries a correlation id (PR3, #2524): the unique claim in
+  // ai_tasks (migration 20261110123000_openhands_unique_correlation.sql)
+  // only fires when one exists. A missing id is generated, never sent null.
+  const correlationId =
+    typeof resolveOpenHandsCorrelationId === 'function'
+      ? resolveOpenHandsCorrelationId(input.correlationId)
+      : input.correlationId?.trim() || globalThis.crypto.randomUUID();
   const db = await requireAdminClient();
-  const existing = await findExistingTask(input.correlationId);
+  const existing = await findExistingTask(correlationId);
   // Never issue a second Cloud conversation for a previously recorded
   // correlation. Ambiguous startup must be investigated, not blindly replayed.
-  if (existing) return reuseCorrelatedOpenHandsTask(existing, input);
+  if (existing) return reuseCorrelatedOpenHandsTask(existing, { ...input, correlationId });
+  // Live readiness gate (PR3, #2524): do not start a Cloud conversation on a
+  // key that has never been verified live. The probe is one bounded read and
+  // records test_status/last_tested on platform_secrets.OPENHANDS_API_KEY.
+  // The approval / start-receipt gates in #2775/#2789 are unchanged.
+  if (typeof probeAndRecordOpenHandsReadiness !== 'function') {
+    throw new Error('OPENHANDS_READINESS_PROBE_UNAVAILABLE: the OpenHands readiness probe is not linked; dispatch is refused rather than starting an unverified Cloud conversation.');
+  }
+  const readiness = await probeAndRecordOpenHandsReadiness();
+  if (!readiness.verified) {
+    throw new Error(
+      `OPENHANDS_READINESS_NOT_VERIFIED: OpenHands probe status ${readiness.status}. ` +
+        `Test the OPENHANDS_API_KEY secret (Admin > Secrets) and confirm the key is live before dispatch.`,
+    );
+  }
   let taskId: string | undefined;
 
   if (!taskId) {
@@ -182,8 +211,8 @@ export async function dispatchOpenHandsTask(
         agent_id: agentId,
         agent_type: 'LIZZY',
         intent: 'engineering',
-        trace_id: input.correlationId ?? null,
-        correlation_id: input.correlationId ?? null,
+        trace_id: correlationId,
+        correlation_id: correlationId,
         tool_name: 'openhands.execute',
         tool_input: { task: input.task, repository: input.repository ?? null, branch: input.branch ?? null },
         attempts: 1,
@@ -194,12 +223,12 @@ export async function dispatchOpenHandsTask(
       })
       .select('id')
       .single();
-    if (error?.code === '23505' && input.correlationId) {
+    if (error?.code === '23505') {
       // Another dispatcher won the unique correlation claim. Never start a second
       // provider conversation; the winning request may still be starting.
-      const winner = await findExistingTask(input.correlationId);
+      const winner = await findExistingTask(correlationId);
       if (!winner) throw new Error('OPENHANDS_CORRELATION_CLAIM_UNCONFIRMED');
-      return reuseCorrelatedOpenHandsTask(winner, input);
+      return reuseCorrelatedOpenHandsTask(winner, { ...input, correlationId });
     }
     if (error || !created?.id)
       throw new Error(error?.message ?? 'Unable to create canonical OpenHands task');
@@ -225,7 +254,7 @@ export async function dispatchOpenHandsTask(
     message: input.task,
     repository: input.repository,
     branch: input.branch,
-    traceId: input.correlationId,
+    traceId: correlationId,
     taskId,
     tags: ['engineering'],
   });

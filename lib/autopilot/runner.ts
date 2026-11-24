@@ -6,7 +6,7 @@ export async function runAutopilot(name: string, payload: any = {}) {
 }
 export async function runAutopilots(
   metadata: Record<string, any>,
-  repo = 'elevateforhumanity/fix2',
+  repo = 'elevate-for-humanity/Elevate-lms',
 ) {
   try {
     // Scan repository
@@ -35,7 +35,7 @@ export async function runAutopilots(
     };
   }
 }
-export async function runFullAnalysis(repo = 'elevateforhumanity/fix2') {
+export async function runFullAnalysis(repo = 'elevate-for-humanity/Elevate-lms') {
   try {
     const { files, analysis } = await analyzeRepository(repo);
     return {

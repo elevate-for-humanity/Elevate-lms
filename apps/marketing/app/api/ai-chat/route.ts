@@ -9,16 +9,21 @@ import { PARIS_SYSTEM_IDENTITY } from '@/lib/ai/paris-identity';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { aiChat, isAIAvailable } from '@/lib/ai/ai-service';
+import { findSiteFacts, formatProgramIndex, formatSiteFacts } from '@/lib/ai/paris-site-facts';
 import { hydrateProcessEnv } from '@/lib/secrets';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import { VERIFIED_WORKFORCE_FUNDED_PROGRAMS } from '@/lib/programs/funding-registry';
 
 export const runtime = 'nodejs';
-export const maxDuration = 60;
+export const maxDuration = 180;
 export const dynamic = 'force-dynamic';
 
-// Leave time for gateway cleanup and the guided response before the route expires.
-const INFERENCE_TIMEOUT_MS = 45_000;
+// Warm-model budget: a warm 7B CPU reply of up to 700 tokens can take over a
+// minute to generate, so the route must not abort at 45s. Cold starts are not
+// the route's job — one model instance stays warm (see
+// scripts/gcp/deploy-owned-cpu-model.mjs) — but the route still leaves time
+// for gateway cleanup and the guided response before it expires.
+const INFERENCE_TIMEOUT_MS = 120_000;
 
 type ParisSurface = 'public' | 'learner' | 'store';
 
@@ -169,6 +174,24 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'No message provided' }, { status: 400 });
     }
 
+    // Retrieve verified facts from the site's own program catalog for this
+    // question. The owned model cannot browse, so facts reach it here.
+    // Retrieval never blocks the reply: a failure just means no site facts.
+    let siteFacts = '';
+    try {
+      const recentUserText = [...messages]
+        .reverse()
+        .filter((message) => message.role === 'user')
+        .slice(0, 2)
+        .reverse()
+        .map((message) => message.content)
+        .join('\n');
+      const matched = findSiteFacts(recentUserText);
+      siteFacts = matched.length > 0 ? formatSiteFacts(matched) : formatProgramIndex();
+    } catch {
+      siteFacts = '';
+    }
+
     // Marketing must hydrate the same canonical runtime connection as Admin
     // before deciding that the shared owned model is unavailable.
     await hydrateProcessEnv();
@@ -179,8 +202,16 @@ export async function POST(req: NextRequest) {
     }
 
     try {
+      const systemContent =
+        PARIS_SYSTEM_IDENTITY +
+        '\n\n' +
+        systemPrompt(context) +
+        (siteFacts
+          ? '\n\nSITE FACTS — retrieved from Elevate\u2019s own program catalog for this question. Use these exact facts; do not invent prices, durations, credentials, or funding beyond what is written here:\n' +
+            siteFacts
+          : '');
       const result = await aiChat({
-        messages: [{ role: 'system', content: PARIS_SYSTEM_IDENTITY + '\n\n' + systemPrompt(context) }, ...messages],
+        messages: [{ role: 'system', content: systemContent }, ...messages],
         temperature: context.surface === 'store' ? 0.45 : 0.25,
         maxTokens: 700,
         signal,

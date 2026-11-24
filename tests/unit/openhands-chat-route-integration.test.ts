@@ -37,6 +37,8 @@ function post(body: Record<string, unknown>) {
 describe('OpenHands authenticated conversation endpoint (real route, mocked external boundary)', () => {
   beforeEach(() => {
     vi.resetAllMocks();
+    // These tests exercise the opted-in OpenHands path.
+    vi.stubEnv('PARIS_REPAIR_ENGINE', 'openhands');
     state.rate.mockResolvedValue(null);
     state.auth.mockResolvedValue({ userId: 'original-owner', effectiveRoles: ['engineer'], error: null });
     state.allowed.mockReturnValue(true);

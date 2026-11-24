@@ -2,6 +2,7 @@ import 'server-only';
 
 import {getRuntimeReadiness} from '@/lib/health/service-health';
 import {getHydratedOpenHandsConfig} from './openhands/client';
+import {openHandsProbeTestStatus} from './openhands/probe-status';
 
 const REPOSITORY = 'elevate-for-humanity/Elevate-lms';
 const CLOUD_ORIGIN = 'https://app.all-hands.dev';
@@ -63,4 +64,36 @@ export async function probeOpenHandsReadiness() {
   } catch {
     return {...result, verified: false, status: 'provider_request_failed'};
   }
+}
+
+/**
+ * Record a probe outcome on platform_secrets.OPENHANDS_API_KEY (PR3, #2524).
+ * Only test_status/last_tested are written — the encrypted value is never
+ * read or touched. A recording failure never masks the probe outcome.
+ * The admin client is imported lazily so the read-only probe path (and its
+ * existing tests) never loads the database client.
+ */
+export async function recordOpenHandsProbeResult(result: {
+  verified: boolean;
+  status: string;
+}): Promise<{ recorded: boolean; testStatus: 'ok' | 'error' }> {
+  const testStatus = openHandsProbeTestStatus(result);
+  try {
+    const { requireAdminClient } = await import('@/lib/supabase/admin');
+    const db = await requireAdminClient();
+    const { error } = await db
+      .from('platform_secrets')
+      .update({ test_status: testStatus, last_tested: new Date().toISOString() })
+      .eq('key', 'OPENHANDS_API_KEY');
+    return { recorded: !error, testStatus };
+  } catch {
+    return { recorded: false, testStatus };
+  }
+}
+
+/** Probe the live OpenHands key, then record the outcome for #2524. */
+export async function probeAndRecordOpenHandsReadiness() {
+  const probe = await probeOpenHandsReadiness();
+  const { recorded, testStatus } = await recordOpenHandsProbeResult(probe);
+  return { ...probe, probeRecorded: recorded, probeTestStatus: testStatus };
 }

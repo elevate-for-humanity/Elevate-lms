@@ -1,17 +1,17 @@
-# Dockerfile.northflank-lms
+# Dockerfile.google-lms
 # Builds and serves the LMS application (apps/lms/)
 # Serves app.elevateforhumanity.org
 #
-# Northflank Configuration:
+# Google Cloud Configuration:
 #   - Build type: Dockerfile
-#   - Dockerfile path: /Dockerfile.northflank-lms
+#   - Dockerfile path: /Dockerfile.google-lms
 #   - Build context: /
 #   - Public port: 3000
 #
 # Production contract:
 #   - dependency graph must match pnpm-lock.yaml exactly
 #   - the packaged standalone runtime must actually boot and serve /api/ping
-#   - build identity comes from Northflank's injected NF_GIT_SHA
+#   - build identity comes from the NF_GIT_SHA build argument supplied by Google builds
 ARG NF_GIT_SHA
 ARG BUILD_TIMESTAMP=unknown
 ARG BUILD_ID
@@ -97,7 +97,7 @@ RUN echo "Validating NF_GIT_SHA=${NF_GIT_SHA}" && \
     test -n "${NF_GIT_SHA}" && \
     echo "${NF_GIT_SHA}" | grep -qE '^[a-f0-9]{7,40}$' && \
     echo "${NF_GIT_SHA}" | grep -qv '^0*$' && \
-    echo "Northflank SHA validated: ${NF_GIT_SHA}"
+    echo "Build SHA validated: ${NF_GIT_SHA}"
 
 ENV NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_SITE_URL
 ENV NEXT_PUBLIC_APP_URL=$NEXT_PUBLIC_APP_URL

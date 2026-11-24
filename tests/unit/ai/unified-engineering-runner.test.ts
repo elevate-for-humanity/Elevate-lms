@@ -61,8 +61,9 @@ describe('unified engineering runner planning', () => {
     expect(executor).toContain(
       "@/apps/admin/app/api/admin/dev-studio/engineering/route",
     );
-    expect(planner).toContain(
-      "/\\bopenhands\\b/.test(lower) ? 'openhands.execute' : 'studio.engineering.execute'",
-    );
+    // Naming OpenHands in a command does not opt in: the planner routes to
+    // OpenHands only when the explicit opt-in is set, else the owned engine.
+    expect(planner).toContain('routeEngineeringExecution(lower)');
+    expect(planner).toContain('isOpenHandsOptedIn()');
   });
 });

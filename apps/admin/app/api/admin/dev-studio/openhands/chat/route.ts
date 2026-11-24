@@ -9,6 +9,7 @@ import {
 import { dispatchOpenHandsTask, refreshOpenHandsTask } from '@/lib/devstudio/openhands/runtime';
 import { findOwnedOpenHandsTask } from '@/lib/devstudio/openhands/task-access';
 import { publicOpenHandsLifecycle } from '@/lib/devstudio/openhands/public-lifecycle';
+import { isOpenHandsOptedIn } from '@/lib/devstudio/openhands-opt-in';
 
 function canAccessDevTools(effectiveRoles: readonly string[]): boolean {
   return normalizeRoles([...effectiveRoles]).some(role =>
@@ -24,6 +25,15 @@ export async function POST(request: NextRequest) {
   if (auth.error) return auth.error;
   if (!canAccessDevTools(auth.effectiveRoles)) {
     return NextResponse.json({ error: 'Admin dev-tool access required' }, { status: 403 });
+  }
+
+  // OpenHands is opt-in-only (PARIS_REPAIR_ENGINE=openhands). New dispatches
+  // and continuations fail closed without the opt-in; use the owned engine.
+  if (!isOpenHandsOptedIn()) {
+    return NextResponse.json(
+      { error: 'OpenHands is opt-in only; set PARIS_REPAIR_ENGINE=openhands to enable it' },
+      { status: 503 },
+    );
   }
 
   try {

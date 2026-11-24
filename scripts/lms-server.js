@@ -1,6 +1,6 @@
 /**
  * scripts/lms-server.js — Graceful shutdown wrapper for Next.js standalone server.
- * Used by Dockerfile.northflank-lms instead of the default server.js.
+ * Used by Dockerfile.google-lms instead of the default server.js.
  */
 'use strict';
 

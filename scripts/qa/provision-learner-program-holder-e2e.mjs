@@ -13,9 +13,20 @@ if (!supabaseUrl || !serviceRoleKey) {
   throw new Error('NEXT_PUBLIC_SUPABASE_URL/SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are required');
 }
 
+// The isolated QA project is the default. The release-acceptance workflow
+// runs these fixtures against production with disposable, per-run identities
+// (owner-approved 2026-11-24: throwaway users on the live site, removed by
+// the workflow cleanup step). Production is allowed only with the explicit
+// opt-in flag, and only for the production host — any other host is rejected.
+const allowProductionDisposables =
+  process.env.QA_E2E_ALLOW_PRODUCTION_DISPOSABLES === '1';
 const qaHostname = new URL(supabaseUrl).hostname;
 if (qaHostname !== 'isdgjcdabhxxozarmxta.supabase.co') {
-  throw new Error('This fixture may run only against the isolated QA project');
+  if (!(allowProductionDisposables && qaHostname === 'cuxzzpsyufcewtmicszk.supabase.co')) {
+    throw new Error(
+      'This fixture may run only against the isolated QA project, or against production with QA_E2E_ALLOW_PRODUCTION_DISPOSABLES=1',
+    );
+  }
 }
 
 const db = createClient(supabaseUrl, serviceRoleKey, { auth: { autoRefreshToken: false, persistSession: false } });
@@ -51,7 +62,7 @@ async function provision() {
   const approvalAdmin = approvalAdmins?.[0];
   if (!approvalAdmin?.id)
     throw new Error('No authorized isolated-QA approval administrator is available');
-  let state = { runId, marker, learner: null, programHolder: null, qaProgramId: null, holderId: null, holderProgramId: null, hvacEnrollmentId: null };
+  let state = { runId, marker, learner: null, programHolder: null, qaProgramId: null, holderId: null, holderProgramId: null, hvacEnrollmentId: null, holderStudent: null, holderEnrollmentId: null };
   try {
     const learner = await createQaUser('learner', 'student', '[QA E2E] Learner', anchor.tenant_id); state.learner = learner;
     // A disposable learner has real enrolled-course access for the live HVAC
@@ -79,6 +90,27 @@ async function provision() {
     const holder = await must(db.from('program_holders').insert({ user_id: programHolder.id, organization_name: '[QA E2E] Isolated Program Holder', name: '[QA E2E] Program Holder', contact_name: '[QA E2E] Program Holder', contact_email: programHolder.email, status: 'approved', approved_at: new Date().toISOString(), mou_signed: true, mou_signed_at: new Date().toISOString(), mou_status: 'signed', is_using_internal_lms: true, payout_status: 'not_started', primary_program_id: qaProgram.id, teaches_multiple: false, features: { qa_e2e: true, qa_run_id: runId, isolated: true } }).select('id').single(), 'create isolated QA program holder'); state.holderId = holder.id;
     await must(db.from('profiles').update({ program_holder_id: holder.id }).eq('id', programHolder.id), 'link QA profile to program holder');
     const holderProgram = await must(db.from('program_holder_programs').insert({ program_holder_id: holder.id, program_id: qaProgram.id, program_slug: qaProgram.slug, role_in_program: 'owner', is_primary: true, status: 'active' }).select('id').single(), 'associate isolated QA program'); state.holderProgramId = holderProgram.id;
+    await writePrivateQaState(statePath, state);
+    // One enrolled student under the QA holder, so the holder portal's
+    // roster and student progress report form have a real row to work with.
+    // Without it the report form's submit button is disabled (no students)
+    // and the roster is always empty. The enrollment is scoped to the holder
+    // (program_holder_id) because the report API verifies ownership against
+    // the holder before inserting a report.
+    const holderStudent = await createQaUser('holder-student', 'student', '[QA E2E] Holder Student', anchor.tenant_id); state.holderStudent = holderStudent;
+    const holderEnrollment = await must(db.from('program_enrollments').insert({
+      user_id: holderStudent.id, student_id: holderStudent.id, email: holderStudent.email,
+      full_name: '[QA E2E] Holder Student', program_id: qaProgram.id, program_slug: qaProgram.slug,
+      program_holder_id: holder.id,
+      status: 'active', enrollment_state: 'active',
+      payment_status: 'paid', approved_at: new Date().toISOString(),
+      approved_by: approvalAdmin.id,
+      funding_source: 'qa-e2e', funding_status: 'unfunded_self_continuing',
+      funding_verified: false, amount_paid_cents: 0,
+      source: 'qa-e2e', tenant_id: anchor.tenant_id,
+      training_start_date: new Date().toISOString().slice(0, 10),
+    }).select('id').single(), 'enroll isolated QA student under program holder');
+    state.holderEnrollmentId = holderEnrollment.id;
     await writePrivateQaState(statePath, state);
     if (process.env.GITHUB_ENV) {
       await writeFile(process.env.GITHUB_ENV, [
@@ -124,10 +156,16 @@ async function cleanup() {
       .eq('student_id', state.learner.id);
     if (courseError) throw new Error('QA course enrollment cleanup failed: ' + courseError.message);
   }
+  if (state.holderEnrollmentId && state.holderStudent?.id) {
+    const { data, error } = await db.from('program_enrollments').delete()
+      .eq('id', state.holderEnrollmentId).eq('user_id', state.holderStudent.id).select('id');
+    if (error || data?.length !== 1)
+      throw new Error('QA holder-student enrollment cleanup was not independently confirmed: ' + (error?.message || 'row count mismatch'));
+  }
   if (state.holderProgramId) await db.from('program_holder_programs').delete().eq('id', state.holderProgramId);
   if (state.holderId) await db.from('program_holders').delete().eq('id', state.holderId);
   if (state.qaProgramId) await db.from('programs').delete().eq('id', state.qaProgramId);
-  for (const userId of [state.learner?.id, state.programHolder?.id].filter(Boolean)) {
+  for (const userId of [state.learner?.id, state.programHolder?.id, state.holderStudent?.id].filter(Boolean)) {
     await db.from('profiles').delete().eq('id', userId);
     const { error } = await db.auth.admin.deleteUser(userId, true);
     if (error && !/not found/i.test(error.message)) console.error(`soft-delete auth user ${userId}: ${error.message}`);

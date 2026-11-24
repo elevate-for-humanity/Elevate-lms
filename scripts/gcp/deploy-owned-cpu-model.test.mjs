@@ -2,9 +2,9 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {privateCpuDeploymentArguments,reviewPrivateModelPolicy,preflightPrivateCpuRelease} from './deploy-owned-cpu-model.mjs';
 const admin='elevate-admin-runtime@elegant-racer-299721.iam.gserviceaccount.com';
-test('CPU release is immutable, bounded, scale-to-zero and never enables public access or GPUs',()=>{
+test('CPU release is immutable, bounded, keeps one warm instance and never enables public access or GPUs',()=>{
  const args=privateCpuDeploymentArguments('sha256:'+'a'.repeat(64));
- for(const pair of [['--region','us-east1'],['--cpu','4'],['--memory','8Gi'],['--concurrency','1'],['--max-instances','2'],['--min-instances','0']])assert.equal(args[args.indexOf(pair[0])+1],pair[1]);
+ for(const pair of [['--region','us-east1'],['--cpu','4'],['--memory','8Gi'],['--concurrency','1'],['--max-instances','2'],['--min','1'],['--min-instances','1']])assert.equal(args[args.indexOf(pair[0])+1],pair[1]);
  assert.ok(!args.some(arg=>/allow-unauthenticated|invoker-iam|--gpu|allUsers/.test(arg)));
  assert.ok(args.includes('--cpu-boost'));
  assert.ok(!args.includes('--no-cpu-boost'));

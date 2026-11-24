@@ -66,3 +66,85 @@ describe('resolveCartAddParam — clone licenses', () => {
     });
   });
 });
+
+// The managed platform licenses and community add-ons had the same class
+// of breakage: their slugs live in the canonical catalog
+// (lib/data/store-products) but the resolver never consulted it, so
+// /store/cart?add=<slug> returned null and the cart showed "That product
+// could not be added." The school license detail page was doubly broken —
+// its "Purchase Now" linked to /store/checkout?license=school, a param
+// the cart page never reads. These must resolve at the advertised prices
+// (which the 20261123 price-correction migrations also set in the DB).
+describe('resolveCartAddParam — platform licenses and community add-ons', () => {
+  it('resolves school-license at the advertised $15,000 one-time price', () => {
+    expect(resolveCartAddParam('school-license')).toMatchObject({
+      slug: 'school-license',
+      name: 'School / Training Provider License',
+      price: 15000,
+      category: 'license',
+      digital: true,
+      inStock: true,
+    });
+  });
+
+  it('resolves efh-core-platform at the advertised $4,999 price', () => {
+    expect(resolveCartAddParam('efh-core-platform')).toMatchObject({
+      slug: 'efh-core-platform',
+      name: 'EFH Core Workforce Platform',
+      price: 4999,
+      category: 'license',
+      digital: true,
+      inStock: true,
+    });
+  });
+
+  it('resolves enterprise-license at the advertised $50,000 price', () => {
+    expect(resolveCartAddParam('enterprise-license')).toMatchObject({
+      slug: 'enterprise-license',
+      name: 'Enterprise Workforce Solution',
+      price: 50000,
+      category: 'license',
+      digital: true,
+      inStock: true,
+    });
+  });
+
+  it('resolves monthly-subscription at the advertised $499/month price', () => {
+    expect(resolveCartAddParam('monthly-subscription')).toMatchObject({
+      slug: 'monthly-subscription',
+      name: 'Monthly Subscription',
+      price: 499,
+      category: 'license',
+      digital: true,
+      inStock: true,
+    });
+  });
+
+  it('resolves community add-ons at the advertised prices', () => {
+    expect(resolveCartAddParam('community-hub')).toMatchObject({
+      slug: 'community-hub',
+      price: 2499,
+      category: 'license',
+    });
+    expect(resolveCartAddParam('community-basic')).toMatchObject({
+      slug: 'community-basic',
+      price: 99,
+      category: 'license',
+    });
+    expect(resolveCartAddParam('community-pro')).toMatchObject({
+      slug: 'community-pro',
+      price: 199,
+      category: 'license',
+    });
+    expect(resolveCartAddParam('community-enterprise')).toMatchObject({
+      slug: 'community-enterprise',
+      price: 299,
+      category: 'license',
+    });
+  });
+
+  it('does not resolve grant add-ons, which have no DB row or purchase path', () => {
+    expect(resolveCartAddParam('grant-contract-automation-suite')).toBeNull();
+    expect(resolveCartAddParam('agency-template-autofill')).toBeNull();
+  });
+});

@@ -36,7 +36,7 @@ export default function SchoolLicensePage() {
             <Link href="/contact?subject=School%20License" className="bg-white text-slate-900 px-6 py-3 rounded-lg font-bold hover:bg-slate-100">
               Book Walkthrough
             </Link>
-            <Link href="/store/checkout?license=school" className="bg-orange-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-orange-700">
+            <Link href="/store/licenses/checkout/school-license" className="bg-orange-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-orange-700">
               Purchase Now
             </Link>
           </div>
@@ -350,7 +350,7 @@ export default function SchoolLicensePage() {
               Book Walkthrough
             </Link>
             <Link 
-              href="/store/checkout?license=school"
+              href="/store/licenses/checkout/school-license"
               className="bg-orange-700 text-white px-8 py-4 rounded-lg font-bold text-lg hover:bg-orange-800 border-2 border-orange-500"
             >
               Get Started — $15,000

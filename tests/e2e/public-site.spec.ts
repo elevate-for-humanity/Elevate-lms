@@ -274,7 +274,12 @@ test.describe('responsive navigation acceptance', () => {
     await expect(menuButton).toBeVisible();
     await menuButton.click();
 
-    const mobileNav = page.getByRole('navigation', { name: /mobile navigation/i });
+    // The mobile drawer nav is deliberately named "Site navigation" — the same
+    // name the public navigation audit (tests/e2e/helpers/public-navigation-audit.ts)
+    // and the other responsive specs assert. There is no navigation named
+    // "Mobile navigation" anywhere in the app; the old name here failed on
+    // every attempt in run 45266295624.
+    const mobileNav = page.getByRole('navigation', { name: 'Site navigation', exact: true });
     await expect(mobileNav).toBeVisible();
   });
 });

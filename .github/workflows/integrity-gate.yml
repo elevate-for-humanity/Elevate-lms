@@ -164,7 +164,9 @@ jobs:
 
       - name: Analytics integrity check
         if: ${{ always() }}
-        run: pnpm run integrity:analytics
+        run: |
+          node --test scripts/check-analytics-integrity.test.mjs
+          pnpm run integrity:analytics
 
       - name: Self-service policy check
         if: ${{ always() }}

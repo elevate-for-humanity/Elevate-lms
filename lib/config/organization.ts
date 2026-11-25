@@ -22,13 +22,24 @@ export const organization = {
     addressCountry: 'US',
   },
 
+  geo: {
+    latitude: 39.768761,
+    longitude: -86.155515,
+  },
+
   // Testing is scheduled by program/provider; use the public testing page for current location details.
   testingAddress: '120 E Market St, Suite 930, Indianapolis, IN 46204',
 
   hours: {
     weekdays: 'Monday–Friday, 9:00 a.m.–5:00 p.m. ET',
     saturday: 'By appointment',
+    openingHours: {
+      dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+      opens: '09:00',
+      closes: '17:00',
+    },
   },
+  timeZone: 'America/Indiana/Indianapolis',
   appointmentOnly: true,
   calendly: 'https://calendly.com/elevate4humanityedu',
 

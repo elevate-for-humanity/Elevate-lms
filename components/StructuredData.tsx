@@ -32,7 +32,7 @@ export default function StructuredData() {
     description:
       'Career training, registered apprenticeship, workforce-development, testing, and employer-connected education services based in Indianapolis, Indiana.',
     telephone,
-    email: PLATFORM_DEFAULTS.supportEmail,
+    email: organization.email,
     address: {
       '@type': 'PostalAddress',
       ...organization.postalAddress,
@@ -45,7 +45,7 @@ export default function StructuredData() {
       '@type': 'ContactPoint',
       contactType: 'Admissions and Support',
       telephone,
-      email: PLATFORM_DEFAULTS.supportEmail,
+      email: organization.email,
       availableLanguage: ['English'],
     },
     sameAs: [

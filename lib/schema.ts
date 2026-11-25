@@ -4,6 +4,7 @@
  */
 
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { organization } from '@/lib/config/organization';
 import {
   Organization,
   WithContext,
@@ -27,17 +28,13 @@ export const organizationSchema: WithContext<Organization> = {
     'Career training, registered apprenticeship support, credential preparation, and program-specific workforce funding pathways in Indiana.',
   address: {
     '@type': 'PostalAddress',
-    streetAddress: '120 East Market Street, Suite 930',
-    addressLocality: 'Indianapolis',
-    addressRegion: 'IN',
-    postalCode: '46204',
-    addressCountry: 'US',
+    ...organization.postalAddress,
   },
   contactPoint: {
     '@type': 'ContactPoint',
-    telephone: `+1-${PLATFORM_DEFAULTS.mainPhone}`,
+    telephone: '+14632401404',
     contactType: 'Admissions',
-    email: `support@${PLATFORM_DEFAULTS.canonicalDomain}`,
+    email: organization.email,
   },
   sameAs: [
     'https://www.facebook.com/61578240192934/',
@@ -54,14 +51,10 @@ export const educationalOrganizationSchema: WithContext<EducationalOrganization>
   url: baseUrl,
   logo: `${baseUrl}/images/Elevate_for_Humanity_logo_81bf0fab.jpg`,
   description: 'Workforce development and career training programs',
-  telephone: `+1-${PLATFORM_DEFAULTS.mainPhone}`,
+  telephone: '+14632401404',
   address: {
     '@type': 'PostalAddress',
-    streetAddress: '120 East Market Street, Suite 930',
-    addressLocality: 'Indianapolis',
-    addressRegion: 'IN',
-    postalCode: '46204',
-    addressCountry: 'US',
+    ...organization.postalAddress,
   },
 };
 

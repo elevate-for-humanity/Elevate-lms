@@ -4,14 +4,14 @@ vi.mock('@/lib/programs/host-shops', () => ({
   getApprovedShops: async () => [
     {
       id: 'mesmerized', publicSlug: 'mesmerized-by-beauty-cosmetology-academy-8420fefa',
-      name: 'Mesmerized by Beauty Cosmetology Academy', address: '120 East Market Street, Suite 930',
+      name: 'Mesmerized by Beauty Cosmetology Academy', address: '120 East Market Street, Suite 560',
       city: 'Indianapolis', state: 'IN', zip: '', phone: '',
       programs: ['nail-technician-apprenticeship', 'esthetician-apprenticeship'],
       mediaGallery: [{ url: '/images/partners/mesmerized-by-beauty/downtown-nail-program.webp', alt: 'Mesmerized nail program' }],
     },
     {
       id: 'prestige', publicSlug: 'prestige-elevation-barber-and-beauty-institute',
-      name: 'Prestige Elevation Barber and Beauty Institute LLC', address: '120 East Market Street, Suite 930',
+      name: 'Prestige Elevation Barber and Beauty Institute LLC', address: '120 East Market Street, Suite 560',
       city: 'Indianapolis', state: 'IN', zip: '', phone: '',
       programs: ['barber-apprenticeship', 'cosmetology-apprenticeship'],
     },

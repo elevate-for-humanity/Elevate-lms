@@ -1,4 +1,5 @@
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { organization } from '@/lib/config/organization';
 import { url } from '@/lib/utils/url-factory';
 // Structured Data (JSON-LD) for SEO
 
@@ -13,17 +14,13 @@ export const organizationSchema = {
     'Career and technical education provider connecting learners with training, registered apprenticeships, testing and credential pathways, workforce funding navigation, employers, and supportive services.',
   address: {
     '@type': 'PostalAddress',
-    streetAddress: '120 East Market Street, Suite 930',
-    addressLocality: 'Indianapolis',
-    addressRegion: 'IN',
-    postalCode: '46204',
-    addressCountry: 'US',
+    ...organization.postalAddress,
   },
   contactPoint: {
     '@type': 'ContactPoint',
     telephone: '+1-463-240-1404',
     contactType: 'Admissions',
-    email: 'support@elevateforhumanity.org',
+    email: organization.email,
   },
   sameAs: [
     'https://www.facebook.com/61578240192934/',

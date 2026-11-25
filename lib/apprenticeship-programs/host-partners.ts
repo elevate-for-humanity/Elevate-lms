@@ -290,7 +290,7 @@ export const FEATURED_BEAUTY_HOST_PARTNERS: FeaturedHostPartner[] = [
     city: 'Indianapolis',
     state: 'IN',
     zip: '',
-    address: '120 East Market Street, Suite 930',
+    address: '120 East Market Street, Suite 560',
     programs: ['esthetician-apprenticeship', 'nail-technician-apprenticeship'],
     primaryProgram: 'esthetician-apprenticeship',
     note: 'Published downtown Indianapolis Host Shop profile for esthetics and nail apprenticeship pathways.',

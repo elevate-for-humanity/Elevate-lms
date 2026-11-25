@@ -167,7 +167,7 @@ export default async function LocationsPage() {
                     {/* Hours come from the central site config — keep in sync
                         with lib/config/site.ts, lib/config/organization.ts,
                         and the Google Business Profile. */}
-                    <p>Monday - Friday: {siteConfig.hours.weekdays}</p>
+                    <p>{siteConfig.hours.weekdays}</p>
                     <p>Saturday: {siteConfig.hours.saturday}</p>
                     <p>Sunday: {siteConfig.hours.sunday}</p>
                   </div>

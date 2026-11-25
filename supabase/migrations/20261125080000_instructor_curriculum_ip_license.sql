@@ -151,6 +151,15 @@ BEGIN
  IF TG_OP='UPDATE' AND NEW.signature_receipt IS DISTINCT FROM OLD.signature_receipt THEN
    RAISE EXCEPTION 'Instructor signature receipts are immutable';
  END IF;
+ IF TG_OP='INSERT'
+   AND nullif(btrim(coalesce(NEW.signature_receipt->>'renewalLicenseId','')), '') IS NOT NULL
+   AND NOT EXISTS (
+     SELECT 1 FROM public.instructor_curriculum_licenses prior
+     WHERE prior.user_id=NEW.user_id AND prior.agreement_type=NEW.agreement_type
+       AND prior.agreement_version=NEW.agreement_version AND prior.status='revoked'
+   ) THEN
+   RAISE EXCEPTION 'A first license cannot reference a revoked license';
+ END IF;
  IF TG_OP='INSERT' AND EXISTS (
    SELECT 1 FROM public.instructor_curriculum_licenses prior
    WHERE prior.user_id=NEW.user_id AND prior.agreement_type=NEW.agreement_type

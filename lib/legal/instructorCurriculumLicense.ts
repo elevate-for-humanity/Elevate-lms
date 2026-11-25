@@ -255,6 +255,8 @@ export async function issueInstructorCurriculumLicense(
       Date.parse(receipt.signedAt) <= Date.parse(existing.data.revoked_at))
   )
     throw new Error('Signature receipt must postdate revocation');
+  if (!existing.data && receipt.renewalLicenseId?.trim())
+    throw new Error('A first license cannot reference a revoked license');
   // Bind the submission to the revocation displayed by the signing form.
   // Replaying an old request must not become fresh merely because the server
   // timestamps its processing after revocation.

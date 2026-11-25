@@ -213,6 +213,21 @@ describe('instructor curriculum license status', () => {
 });
 
 describe('issueInstructorCurriculumLicense', () => {
+  it('rejects a signer-supplied renewal target on first issuance', async () => {
+    seedAuthorized();
+    m.tables.instructor_curriculum_licenses = [];
+    await expect(issueInstructorCurriculumLicense(database(), {
+      userId, agreementVersion: '1.0', agreementHash: hash, scopeCourseIds: [courseId], programIds: [],
+      signatureReceipt: {
+        acceptanceId: 'acc-1', signedAt: '2026-11-25T12:00:00Z',
+        renewalLicenseId: 'attacker-selected-license', signerName: 'QA',
+        signerEmail: 'qa@example.com', method: 'typed', signature: 'QA',
+        ipAddress: '127.0.0.1', userAgent: 'test',
+      },
+    })).rejects.toThrow('first license cannot reference');
+    expect(m.inserts).toEqual([]);
+  });
+
   it('refuses renewal without fresh signature evidence', async () => {
     seedAuthorized();
     m.tables.instructor_curriculum_licenses[0].status = 'revoked';

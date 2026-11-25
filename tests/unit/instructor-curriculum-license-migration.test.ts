@@ -41,7 +41,7 @@ async function fixture(seedVersion = false, seedHash = agreementHash) {
     CREATE FUNCTION auth.uid() RETURNS uuid LANGUAGE sql AS $$ SELECT nullif(current_setting('test.user_id',true),'')::uuid $$;
     CREATE TABLE public.profiles(id uuid PRIMARY KEY, role text, is_active boolean, suspended boolean);
     CREATE TABLE public.instructor_assignments(instructor_id uuid, course_id uuid, active boolean, cohort_id uuid);
-    CREATE TABLE public.program_enrollments(user_id uuid,student_id uuid,cohort_id uuid,revoked_at timestamptz,status text);
+    CREATE TABLE public.program_enrollments(user_id uuid,student_id uuid,cohort_id uuid,revoked_at timestamptz,status text,program_id uuid);
     CREATE TABLE public.interaction_progress(learner_id uuid,course_id uuid,interaction_type text,interaction_id text);
     ALTER TABLE public.interaction_progress ENABLE ROW LEVEL SECURITY;
     GRANT SELECT ON public.interaction_progress TO authenticated;
@@ -64,6 +64,22 @@ async function fixture(seedVersion = false, seedHash = agreementHash) {
       UNIQUE(agreement_type, version)
     );
     INSERT INTO auth.users VALUES('${userId}');
+    CREATE FUNCTION rpc_private.assigned_educator_course_read(p_course uuid)
+    RETURNS boolean LANGUAGE sql STABLE SECURITY INVOKER SET search_path = '' AS $$
+      SELECT false
+    $$;
+    CREATE FUNCTION rpc_private.workbook_program_access(p_program uuid)
+    RETURNS boolean LANGUAGE sql STABLE SECURITY DEFINER SET search_path = '' AS $$
+      SELECT auth.uid() IS NOT NULL AND (
+        EXISTS (SELECT 1 FROM public.program_enrollments e
+          WHERE coalesce(e.user_id,e.student_id)=(SELECT auth.uid())
+            AND e.program_id=p_program AND e.revoked_at IS NULL
+            AND e.status IN ('active','enrolled','in_progress','confirmed','completed'))
+        OR EXISTS (SELECT 1 FROM public.courses c
+          WHERE c.program_id=p_program AND c.is_active AND c.status='published'
+            AND rpc_private.assigned_educator_course_read(c.id))
+      )
+    $$;
   `);
   if (seedVersion) {
     await db.query(
@@ -192,6 +208,29 @@ describe('instructor curriculum IP license migration', () => {
     expect(active).toEqual([{ license_reference: 'ELV-INST-ABCDEF02' }]);
   });
 
+  it('rejects a signer-supplied renewal target when no revoked license exists', async () => {
+    const db = await fixture();
+    await db.exec(migration);
+    const receipt = JSON.stringify({
+      renewalLicenseId: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
+      acceptanceId: 'receipt',
+      signedAt: '2026-11-25T12:00:00Z',
+      signerName: 'QA',
+      signerEmail: 'qa@example.com',
+      method: 'typed',
+      signature: 'QA',
+      ipAddress: '127.0.0.1',
+      userAgent: 'test',
+    });
+    await expect(db.query(
+      `INSERT INTO instructor_curriculum_licenses
+        (user_id,agreement_version,agreement_hash,license_reference,signature_receipt)
+       VALUES ($1,'1.0',$2,'FIRST',$3::jsonb)`,
+      [userId, agreementHash, receipt],
+    )).rejects.toThrow('first license cannot reference');
+    expect((await db.query('SELECT id FROM instructor_curriculum_licenses')).rows).toEqual([]);
+  });
+
   it('is idempotent: re-running does not duplicate the version row', async () => {
     const db = await fixture();
     await db.exec(migration);
@@ -208,8 +247,10 @@ describe('instructor curriculum IP license migration', () => {
     const db = await fixture();
     await db.exec(migration);
     const courseId = 'd48c61c4-8880-4d9d-9ab5-fab4dd51b201';
+    const programId = 'dddddddd-dddd-4ddd-8ddd-dddddddddddd';
     await db.exec(`INSERT INTO profiles VALUES ('${userId}','instructor',true,false);
       INSERT INTO instructor_assignments VALUES ('${userId}','${courseId}',true,NULL);
+      INSERT INTO courses VALUES ('${courseId}','${programId}',true,'published');
       SELECT set_config('test.user_id','${userId}',false);`);
     const allowed = async () =>
       (
@@ -218,6 +259,9 @@ describe('instructor curriculum IP license migration', () => {
         )
       ).rows[0].allowed;
     expect(await allowed()).toBe(false);
+    expect((await db.query<{allowed:boolean}>(
+      `SELECT rpc_private.workbook_program_access('${programId}') AS allowed`,
+    )).rows[0].allowed).toBe(false);
     await db.query(
       `INSERT INTO license_agreement_acceptances
       (user_id,agreement_type,document_version,signature_typed)
@@ -241,10 +285,14 @@ describe('instructor curriculum IP license migration', () => {
       [userId, agreementHash, receipt],
     );
     expect(await allowed()).toBe(true);
+    expect((await db.query<{allowed:boolean}>(
+      `SELECT rpc_private.workbook_program_access('${programId}') AS allowed`,
+    )).rows[0].allowed).toBe(true);
     const cohort = 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb';
     const student = 'cccccccc-cccc-4ccc-8ccc-cccccccccccc';
     await db.exec(`UPDATE instructor_assignments SET cohort_id='${cohort}';
-      INSERT INTO program_enrollments VALUES ('${student}',NULL,'${cohort}',NULL,'active');`);
+      INSERT INTO program_enrollments(user_id,student_id,cohort_id,revoked_at,status)
+      VALUES ('${student}',NULL,'${cohort}',NULL,'active');`);
     expect(
       (
         await db.query<{ allowed: boolean }>(
@@ -273,6 +321,15 @@ describe('instructor curriculum IP license migration', () => {
       `UPDATE instructor_curriculum_licenses SET status='revoked',revoked_at='2026-11-25T11:00:00Z'`,
     );
     expect(await allowed()).toBe(false);
+    expect((await db.query<{allowed:boolean}>(
+      `SELECT rpc_private.workbook_program_access('${programId}') AS allowed`,
+    )).rows[0].allowed).toBe(false);
+    await db.exec(`INSERT INTO program_enrollments
+      (user_id,student_id,cohort_id,revoked_at,status,program_id)
+      VALUES ('${userId}',NULL,NULL,NULL,'active','${programId}')`);
+    expect((await db.query<{allowed:boolean}>(
+      `SELECT rpc_private.workbook_program_access('${programId}') AS allowed`,
+    )).rows[0].allowed).toBe(true);
     await expect(
       db.query(
         `INSERT INTO instructor_curriculum_licenses

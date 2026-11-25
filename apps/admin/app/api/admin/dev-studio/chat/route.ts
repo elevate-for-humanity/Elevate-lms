@@ -1,7 +1,6 @@
-import { isOwnedStudioProviderRequest } from '@/lib/devstudio/owned-provider-policy';
+import { isOwnedStudioProviderRequest, OWNED_STUDIO_PROVIDER } from '@/lib/devstudio/owned-provider-policy';
 import { studioTextStreamResponse } from '@/lib/devstudio/studio-text-stream';
 import { prohibitsToolUse } from '@/lib/ai/command-intent';
-import { recordParisObservation } from '@/lib/ai/runtime/supervision';
 import { executeStudioCommand } from '@/lib/studio/runtime-command';
 import { DevStudioUltimateCourseControl } from '@/lib/devstudio/ultimate-course-control';
 /**
@@ -14,26 +13,15 @@ import { DevStudioUltimateCourseControl } from '@/lib/devstudio/ultimate-course-
 
 import { logger } from '@/lib/logger';
 import { normalizeError } from '@/lib/errors/normalize-error';
-import { after, NextRequest, NextResponse } from 'next/server';
-import { createAdminChatClient } from '@/lib/ai/admin-chat-client';
+import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { apiRequireDevStudio } from '@/lib/devstudio/api-auth';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { hydrateProcessEnv } from '@/lib/secrets';
-import { isGroqConfigured, getGroqClient } from '@/lib/groq-client';
-import { isGeminiConfigured } from '@/lib/gemini-client';
-import { getOpenAIClient, isOpenAIConfigured } from '@/lib/ai/openai-client';
-import { getAnthropicClient, isAnthropicConfigured } from '@/lib/ai/anthropic-client';
-import { aiChat, aiChatStream, getActiveProviderName } from '@/lib/ai/ai-service';
-import { isXAIConfigured } from '@/lib/ai/xai-config';
+import { aiChatStream } from '@/lib/ai/ai-service';
 import { probeOwnedModel } from '@/lib/ai/providers/owned-model-health.mjs';
-import {
-  executePaidInference,
-  paidArtifactFingerprint,
-  reservePaidInference,
-} from '@/lib/ai/paid-inference-gateway';
 import { getRAGContext } from '@/lib/platform/rag';
 import { getAiCharterContext } from '@/lib/devstudio/platform-control-plane';
 import { createMasterStudioRun } from '@/lib/studio/master-runtime';
@@ -50,7 +38,6 @@ import path from 'path';
 
 type ToolCallRecord = { tool: string; args: Record<string, unknown>; result: string };
 type ChatMessage = { role: 'user' | 'assistant' | 'system'; content: string };
-type ChatProvider = 'auto' | 'xai' | 'groq' | 'openai' | 'gemini' | 'anthropic';
 type StudioAgent = 'ADMIN_AI';
 
 const PUBLIC_ORIGIN = 'https://www.elevateforhumanity.org';
@@ -166,26 +153,6 @@ async function recordUnifiedCapabilityUse(
         .eq('slug', row.slug),
     ),
   );
-}
-
-const PROVIDER_MODELS: Record<Exclude<ChatProvider, 'auto'>, readonly [string, ...string[]]> = {
-  xai: ['grok-4.6'],
-  groq: ['llama-3.3-70b-versatile', 'llama-3.1-8b-instant'],
-  openai: ['gpt-6-luna', 'gpt-4.1-mini', 'gpt-4o-mini'],
-  gemini: ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash'],
-  anthropic: ['claude-sonnet-4-5', 'claude-3-5-haiku-latest'],
-};
-
-function normalizeProvider(value: unknown): ChatProvider {
-  return ['auto', 'xai', 'groq', 'openai', 'gemini', 'anthropic'].includes(String(value))
-    ? (String(value) as ChatProvider)
-    : 'auto';
-}
-
-function modelFor(provider: Exclude<ChatProvider, 'auto'>, requested: unknown) {
-  const models = PROVIDER_MODELS[provider];
-  const candidate = typeof requested === 'string' ? requested : '';
-  return models.includes(candidate) ? candidate : models[0];
 }
 
 function toChatMessages(messages: ChatMessage[]) {
@@ -847,84 +814,6 @@ function formatAutomaticEvidence(records: ToolCallRecord[]): string {
     .join('\n\n');
 }
 
-function enforceEvidenceBoundary(
-  message: string,
-  query: string,
-  records: ToolCallRecord[],
-): string {
-  if (!isOperationalDiagnosticRequest(query)) return message;
-
-  const browserRecord = records.find((record) => record.tool === 'scan_live_page');
-  if (browserRecord) {
-    try {
-      const result = JSON.parse(browserRecord.result) as {
-        target?: string;
-        results?: Array<{ audit?: { url?: string } }>;
-      };
-      const target = result.target ? new URL(result.target) : null;
-      const finalUrls = (result.results ?? [])
-        .map((entry) => entry.audit?.url)
-        .filter((url): url is string => Boolean(url));
-      const authenticationBlocked =
-        target?.hostname === 'admin.elevateforhumanity.org' &&
-        finalUrls.some((url) => {
-          try {
-            const finalUrl = new URL(url);
-            return (
-              finalUrl.hostname === 'admin.elevateforhumanity.org' && finalUrl.pathname === '/login'
-            );
-          } catch {
-            return false;
-          }
-        });
-
-      if (authenticationBlocked) {
-        return `Problem:\nThe isolated Studio Browser could not verify the protected admin page because it was redirected to the admin login screen. This is an authentication boundary, not evidence that the dashboard is broken.\n\nEvidence used:\n- scan_live_page targeted ${result.target}\n- Final browser URL redirected to ${finalUrls.find((url) => url.includes('/login'))}\n\nLikely causes:\n- The isolated browser does not share the administrator's authenticated session.\n- Protected admin routes correctly require an authenticated admin session.\n\nAffected files/routes/tables:\n- /api/admin/dev-studio/browser/session\n- /api/admin/dev-studio/chat\n- Protected route requested: ${target.pathname}\n\nConfidence:\nHigh confidence that authentication blocked this audit. No conclusion is made about the protected page's functionality.\n\nNext debug step:\nRun the audit with an explicitly authenticated Studio Browser session, or use authenticated admin tools and route-level diagnostics. Do not report the dashboard as failed from this redirect.`;
-      }
-    } catch {
-      // The existing invalid-evidence handling below provides the deterministic fallback.
-    }
-  }
-
-  const requestsBrowserEvidence =
-    /\b(?:live|homepage|home page|browser|console|network|mobile|accessibility|layout|broken control)\b/i.test(
-      query,
-    );
-  if (requestsBrowserEvidence) {
-    let browserFailure = '';
-    if (browserRecord) {
-      try {
-        const result = JSON.parse(browserRecord.result) as {
-          status?: string;
-          verified?: boolean;
-          error?: string;
-        };
-        if (result.status === 'failed' || result.verified === false) {
-          browserFailure = result.error || 'The live browser audit failed without an error detail.';
-        }
-      } catch {
-        browserFailure = 'The live browser audit returned invalid evidence.';
-      }
-    } else {
-      browserFailure = 'No live browser tool was executed for this answer.';
-    }
-
-    if (browserFailure) {
-      return `Problem:\nThe requested live browser verification did not complete.\n\nEvidence used:\n- scan_live_page: failed — ${browserFailure}\n- Any registry or source inspection is architecture evidence only; it does not prove live browser behavior.\n\nLikely causes:\n- The isolated Studio Browser runtime is unavailable, unconfigured, or unreachable from Admin.\n\nAffected files/routes/tables:\n- /api/admin/dev-studio/browser/session\n- /api/admin/dev-studio/chat\n- services/studio-browser/server.mjs\n- STUDIO_BROWSER_URL and STUDIO_BROWSER_SECRET runtime configuration\n\nConfidence:\nHigh confidence that live verification failed; no conclusion is made about homepage quality.\n\nNext debug step:\nRestore Studio Browser health, then rerun this exact request. Do not mark the page clean until scan_live_page returns measured desktop and mobile evidence.`;
-    }
-  }
-
-  const hasEvidenceStatus =
-    /Evidence used:/i.test(message) || /No live tool was executed/i.test(message);
-  if (hasEvidenceStatus) return message;
-
-  const evidenceLine = records.length
-    ? `Evidence used: ${records.map((record) => record.tool).join(', ')}.`
-    : 'Evidence used: No live tool was executed for this answer.';
-
-  return `Problem:\n${query}\n\n${evidenceLine}\n\n${message}`;
-}
-
 function buildTemplate(args: Record<string, unknown>): string {
   const pageType = String(args.page_type || 'landing');
   const pageTitle = String(args.page_title || 'New Page');
@@ -1421,7 +1310,7 @@ async function _POST(req: NextRequest) {
     await hydrateProcessEnv();
 
     const body = await req.json();
-    const { fileContext, documentsContext, provider: rawProvider, model: rawModel } = body;
+    const { fileContext, documentsContext, provider: rawProvider } = body;
     const agent = normalizeAgent(body.agent);
 
     let messages: ChatMessage[] = [];
@@ -1452,10 +1341,17 @@ async function _POST(req: NextRequest) {
     if (!isOwnedStudioProviderRequest(rawProvider)) {
       return NextResponse.json({ error: 'Dev Studio uses the Elevate-owned engine only.', code: 'OWNED_PROVIDER_REQUIRED' }, { status: 403 });
     }
-    const providerPreference = normalizeProvider(rawProvider);
-    // PARIS auto mode uses Elevate-owned inference only. Never silently
-    // select an external metered provider or activate a GPU here.
-    const effectiveProvider: ChatProvider | 'elevate' = providerPreference === 'auto' ? 'elevate' : providerPreference;
+    const owned = await ownedModelReachable();
+    if (!owned.verified) {
+      return NextResponse.json(
+        {
+          error: 'The Elevate-owned AI engine is temporarily unavailable.',
+          code: 'OWNED_MODEL_UNAVAILABLE',
+        },
+        { status: 503 },
+      );
+    }
+
     const lastUserMessage =
       messages.findLast((m: { role: string }) => m.role === 'user')?.content ?? '';
     const masterDb = await requireAdminClient();
@@ -1481,16 +1377,16 @@ async function _POST(req: NextRequest) {
       : null;
 
     const [ragContext, automaticEvidence] = await Promise.all([
-      toolsAllowed ? getRAGContext(lastUserMessage, { providerPolicy: effectiveProvider === 'elevate' ? 'owned-only' : 'configured-provider' }) : Promise.resolve(''),
+      toolsAllowed ? getRAGContext(lastUserMessage, { providerPolicy: 'owned-only' }) : Promise.resolve(''),
       toolsAllowed ? collectAutomaticEvidence(lastUserMessage) : Promise.resolve([]),
     ]);
     const toolCalls: ToolCallRecord[] = [...automaticEvidence];
 
     const systemPrompt = buildAdminAiSystemPrompt({
       agent,
-      contextProfile: effectiveProvider === 'elevate'
-        ? (!toolsAllowed && !fileContext && !documentsContext && !isOperationalDiagnosticRequest(lastUserMessage) ? 'conversation' : 'owned-cpu')
-        : 'full',
+      contextProfile: !toolsAllowed && !fileContext && !documentsContext && !isOperationalDiagnosticRequest(lastUserMessage)
+        ? 'conversation'
+        : 'owned-cpu',
       institutionalContext: getAiCharterContext(),
       ragContext,
       fileContext,
@@ -1500,551 +1396,43 @@ async function _POST(req: NextRequest) {
       toolInventory: toolsAllowed ? TOOLS.map((tool) => tool.function.name) : [],
     });
 
-    let assistantMessage: string | null = null;
-    let provider = 'none';
-    let model = 'none';
-    const canonicalProvider = getActiveProviderName();
-
-    // An owned-model outage is a visible failure, never permission to send
-    // private Studio context to another inference provider.
-    if (effectiveProvider === 'elevate') {
-      const owned = await ownedModelReachable();
-      if (!owned.verified) {
-        return NextResponse.json({ error: 'The Elevate-owned AI engine is temporarily unavailable. No external provider was called.', code: 'OWNED_MODEL_UNAVAILABLE' }, { status: 503 });
-      }
-    }
-
-    // True model streaming for the default Admin conversation. The response is
-    // returned immediately; OpenAI deltas are forwarded as they arrive instead
-    // of waiting for a completed answer and replaying it word-by-word.
-    if (effectiveProvider === 'openai' && isOpenAIConfigured()) {
-      const selectedModel = modelFor('openai', rawModel);
-      const apiKey = process.env.OPENAI_API_KEY;
-      if (!apiKey) {
-        return NextResponse.json({ error: 'OPENAI_API_KEY not configured' }, { status: 503 });
-      }
-      const openai = createAdminChatClient(apiKey);
-      const encoder = new TextEncoder();
-      const stream = new ReadableStream({
-        async start(controller) {
-          let complete = '';
-          const streamedToolCalls: Record<number, { id: string; name: string; args: string }> = {};
-          const emit = (payload: Record<string, unknown>) =>
-            controller.enqueue(encoder.encode(`data: ${JSON.stringify(payload)}\n\n`));
-          try {
-            const first = await openai.chat.completions.create({
-              model: selectedModel,
-              messages: [{ role: 'system', content: systemPrompt }, ...toChatMessages(messages)],
-              tools: toolsAllowed ? TOOLS : undefined,
-              tool_choice: toolsAllowed ? 'auto' : undefined,
-              temperature: 0.4,
-              max_tokens: 4096,
-              stream: true,
-            });
-            for await (const chunk of first) {
-              const delta = chunk.choices[0]?.delta;
-              if (delta?.content) {
-                complete += delta.content;
-                emit({ token: delta.content });
-              }
-              for (const tc of delta?.tool_calls ?? []) {
-                const index = tc.index ?? 0;
-                const row = streamedToolCalls[index] ?? { id: '', name: '', args: '' };
-                if (tc.id) row.id = tc.id;
-                if (tc.function?.name) row.name += tc.function.name;
-                if (tc.function?.arguments) row.args += tc.function.arguments;
-                streamedToolCalls[index] = row;
-              }
-            }
-
-            const calls = Object.values(streamedToolCalls).filter((call) => call.name);
-            if (toolsAllowed && calls.length) {
-              const toolResults = [];
-              const assistantToolCalls = [];
-              for (const call of calls) {
-                let args: Record<string, unknown> = {};
-                try { args = JSON.parse(call.args || '{}'); } catch { /* malformed args become empty */ }
-                const result = await execTool(call.name, { ...args, studio_run_id: masterExecution?.studioRunId }, auth.userId);
-                toolCalls.push({ tool: call.name, args, result });
-                const id = call.id || `call_${crypto.randomUUID()}`;
-                assistantToolCalls.push({
-                  id,
-                  type: 'function' as const,
-                  function: { name: call.name, arguments: JSON.stringify(args) },
-                });
-                toolResults.push({ role: 'tool' as const, tool_call_id: id, content: result });
-                emit({ tool: call.name, toolStatus: 'completed' });
-              }
-
-              const second = await openai.chat.completions.create({
-                model: selectedModel,
-                messages: [
-                  { role: 'system', content: systemPrompt },
-                  ...toChatMessages(messages),
-                  { role: 'assistant', content: complete || null, tool_calls: assistantToolCalls },
-                  ...toolResults,
-                ],
-                temperature: 0.4,
-                max_tokens: 4096,
-                stream: true,
-              });
-              for await (const chunk of second) {
-                const token = chunk.choices[0]?.delta?.content;
-                if (token) {
-                  complete += token;
-                  emit({ token });
-                }
-              }
-            }
-
-            const capabilitiesUsed = unifiedCapabilities(lastUserMessage, toolCalls);
-            emit({
-              done: true,
-              provider: 'openai',
-              model: selectedModel,
-              providerPreference: effectiveProvider,
-              availableProviders: {
-                xai: isXAIConfigured(),
-                groq: isGroqConfigured(),
-                openai: isOpenAIConfigured(),
-                anthropic: isAnthropicConfigured(),
-                gemini: isGeminiConfigured(),
-              },
-              toolCalls,
-              capabilitiesUsed,
-              studioRun: masterExecution,
-            });
-            after(async () => {
-              try {
-                const db = await requireAdminClient();
-                await db.from('devstudio_chat_log').insert({
-                  user_id: auth.userId,
-                  user_message: lastUserMessage,
-                  assistant_response: complete,
-                  file_context: fileContext || null,
-                  provider: 'openai',
-                  model: selectedModel,
-                });
-                await recordUnifiedCapabilityUse(db, capabilitiesUsed, 'openai', selectedModel, toolCalls);
-              } catch (err: unknown) {
-                logger.warn('[devstudio/chat] streamed DB log failed', normalizeError(err));
-              }
-            });
-          } catch (error) {
-            logger.error('[devstudio/chat] OpenAI stream failed', error);
-            await recordParisObservation({kind:'inference',operation:'studio.openai.stream',status:'failed',durationMs:0,actorId:auth.userId,error});
-            emit({ error: normalizeError(error).message ?? String(error), done: true });
-          } finally {
-            controller.close();
-          }
-        },
-      });
-      return new Response(stream, {
-        headers: {
-          'Content-Type': 'text/event-stream',
-          'Cache-Control': 'no-cache, no-transform',
-          'X-Accel-Buffering': 'no',
-          Connection: 'keep-alive',
-        },
-      });
-    }
-
-    if (effectiveProvider === 'elevate') {
-      const owned = await ownedModelReachable();
-      if (owned.verified) {
-        return studioTextStreamResponse({
-          signal: req.signal,
-          tokens: (signal) => aiChatStream({
-            providerPolicy: 'owned-only',
-            messages: [{ role: 'system', content: systemPrompt }, ...toChatMessages(messages)],
-            temperature: 0.4,
-            maxTokens: 2048,
-            signal,
-          }),
-          complete: async (content) => {
-            const capabilitiesUsed = unifiedCapabilities(lastUserMessage, toolCalls);
-            try {
-              const { error: logError } = await masterDb.from('devstudio_chat_log').insert({
-                user_id: auth.userId,
-                user_message: lastUserMessage,
-                assistant_response: content,
-                file_context: fileContext || null,
-                provider: 'elevate',
-                model: 'elevate-local',
-              });
-              if (logError) logger.warn('[devstudio/chat] owned response log failed', { reason: logError.message });
-              await recordUnifiedCapabilityUse(masterDb, capabilitiesUsed, 'elevate', 'elevate-local', toolCalls);
-            } catch (error) {
-              logger.warn('[devstudio/chat] owned response audit failed', normalizeError(error));
-            }
-            return {
-              provider: 'elevate',
-              model: 'elevate-local',
-              providerPreference,
-              availableProviders: {
-                xai: isXAIConfigured(),
-                groq: isGroqConfigured(),
-                openai: isOpenAIConfigured(),
-                anthropic: isAnthropicConfigured(),
-                gemini: isGeminiConfigured(),
-              },
-              toolCalls,
-              capabilitiesUsed,
-              studioRun: masterExecution,
-            };
-          },
-          onError: (error) => logger.warn('[devstudio/chat] owned stream failed', normalizeError(error)),
-          errorMessage: 'Paris could not complete this response. No outside AI provider was used.',
-        });
-      }
-      // Auto mode preferred the owned model, but it is not reachable. Degrade to
-      // a governed external provider instead of refusing to answer; owned-only
-      // streaming policy is preserved for callers that explicitly set ELEVATE_LLM_*.
-      logger.warn('[devstudio/chat] owned model unreachable; using governed provider fallback', {
-        status: owned.status,
-        configured: owned.configured,
-      });
-    }
-
-    const providerOrder = [effectiveProvider];
-
-    for (const nextProvider of providerOrder) {
-      if (assistantMessage) break;
-
-      if (nextProvider === 'groq' && isGroqConfigured()) {
+    return studioTextStreamResponse({
+      signal: req.signal,
+      tokens: (signal) => aiChatStream({
+        providerPolicy: 'owned-only',
+        messages: [{ role: 'system', content: systemPrompt }, ...toChatMessages(messages)],
+        temperature: 0.4,
+        maxTokens: 2048,
+        signal,
+      }),
+      complete: async (content) => {
+        const capabilitiesUsed = unifiedCapabilities(lastUserMessage, toolCalls);
         try {
-          const selectedModel = modelFor('groq', rawModel);
-          const groq = getGroqClient();
-          const initial = await groq.chat.completions.create({
-            model: selectedModel,
-            messages: [{ role: 'system', content: systemPrompt }, ...messages],
-            tools: toolsAllowed ? TOOLS : undefined,
-            tool_choice: toolsAllowed ? 'auto' : undefined,
-            temperature: 0.4,
-            max_tokens: 4096,
+          const { error: logError } = await masterDb.from('devstudio_chat_log').insert({
+            user_id: auth.userId,
+            user_message: lastUserMessage,
+            assistant_response: content,
+            file_context: fileContext || null,
+            provider: 'elevate',
+            model: 'elevate-local',
           });
-
-          const choice = initial.choices[0];
-          if (!choice) throw new Error('Groq returned no completion choice');
-          const toolCallRequests = (choice?.message?.tool_calls ?? []).filter(
-            (toolCall) => toolCall.type === 'function',
-          );
-
-          if (toolsAllowed && toolCallRequests.length > 0) {
-            const execResults = await Promise.all(
-              toolCallRequests.map(async (tc) => {
-                const args = JSON.parse(tc.function.arguments || '{}') as Record<string, unknown>;
-                const result = await execTool(tc.function.name, { ...args, studio_run_id: masterExecution?.studioRunId }, auth.userId);
-                toolCalls.push({ tool: tc.function.name, args, result });
-                return {
-                  role: 'tool' as const,
-                  tool_call_id: tc.id,
-                  content: result,
-                };
-              }),
-            );
-
-            const second = await groq.chat.completions.create({
-              model: selectedModel,
-              messages: [
-                { role: 'system', content: systemPrompt },
-                ...messages,
-                {
-                  role: 'assistant',
-                  content: choice.message.content ?? '',
-                  tool_calls: toolCallRequests,
-                },
-                ...execResults,
-              ],
-              temperature: 0.4,
-              max_tokens: 4096,
-            });
-            assistantMessage = second.choices[0]?.message?.content ?? null;
-          } else {
-            assistantMessage = choice?.message?.content ?? null;
-          }
-
-          provider = 'groq';
-          model = selectedModel;
-        } catch (err: unknown) {
-          logger.warn('[devstudio/chat] Groq failed', normalizeError(err));
+          if (logError) logger.warn('[devstudio/chat] owned response log failed', { reason: logError.message });
+          await recordUnifiedCapabilityUse(masterDb, capabilitiesUsed, 'elevate', 'elevate-local', toolCalls);
+        } catch (error) {
+          logger.warn('[devstudio/chat] owned response audit failed', normalizeError(error));
         }
-      }
-
-      if (nextProvider === 'openai' && isOpenAIConfigured()) {
-        try {
-          const selectedModel = modelFor('openai', rawModel);
-          const apiKey = process.env.OPENAI_API_KEY;
-          if (!apiKey) throw new Error('OPENAI_API_KEY not configured');
-          const openai = createAdminChatClient(apiKey);
-          const initial = await openai.chat.completions.create({
-            model: selectedModel,
-            messages: [{ role: 'system', content: systemPrompt }, ...toChatMessages(messages)],
-            tools: toolsAllowed ? TOOLS : undefined,
-            tool_choice: toolsAllowed ? 'auto' : undefined,
-            temperature: 0.4,
-            max_tokens: 4096,
-          });
-          const choice = initial.choices[0];
-          if (!choice) throw new Error('OpenAI returned no completion choice');
-          const toolCallRequests = (choice?.message?.tool_calls ?? []).filter(
-            (toolCall) => toolCall.type === 'function',
-          );
-          if (toolsAllowed && toolCallRequests.length > 0) {
-            const execResults = await Promise.all(
-              toolCallRequests.map(async (tc) => {
-                const args = JSON.parse(tc.function.arguments || '{}') as Record<string, unknown>;
-                const result = await execTool(tc.function.name, args, auth.userId);
-                toolCalls.push({ tool: tc.function.name, args, result });
-                return { role: 'tool' as const, tool_call_id: tc.id, content: result };
-              }),
-            );
-            const second = await openai.chat.completions.create({
-              model: selectedModel,
-              messages: [
-                { role: 'system', content: systemPrompt },
-                ...toChatMessages(messages),
-                {
-                  role: 'assistant',
-                  content: choice.message.content ?? '',
-                  tool_calls: toolCallRequests,
-                },
-                ...execResults,
-              ],
-              temperature: 0.4,
-              max_tokens: 4096,
-            });
-            assistantMessage = second.choices[0]?.message?.content ?? null;
-          } else {
-            assistantMessage = choice?.message?.content ?? null;
-          }
-          provider = 'openai';
-          model = selectedModel;
-        } catch (err: unknown) {
-          logger.warn('[devstudio/chat] OpenAI failed', normalizeError(err));
-        }
-      }
-
-      if (nextProvider === 'anthropic' && isAnthropicConfigured()) {
-        try {
-          const selectedModel = modelFor('anthropic', rawModel);
-          const anthropic = getAnthropicClient();
-          const anthropicTools = TOOLS.map((t) => ({
-            name: t.function.name,
-            description: t.function.description,
-            input_schema: t.function.parameters,
-          }));
-          const initial = await anthropic.messages.create({
-            model: selectedModel,
-            max_tokens: 4096,
-            system: systemPrompt,
-            messages: toChatMessages(messages),
-            tools: toolsAllowed ? anthropicTools : undefined,
-          });
-          const toolUseBlocks = initial.content.filter((b) => b.type === 'tool_use');
-          if (toolsAllowed && toolUseBlocks.length > 0) {
-            const toolResults = await Promise.all(
-              toolUseBlocks.map(async (b) => {
-                if (b.type !== 'tool_use') return null;
-                const result = await execTool(
-                  b.name,
-                  b.input as Record<string, unknown>,
-                  auth.userId,
-                );
-                toolCalls.push({ tool: b.name, args: b.input as Record<string, unknown>, result });
-                return { type: 'tool_result' as const, tool_use_id: b.id, content: result };
-              }),
-            );
-            const second = await anthropic.messages.create({
-              model: selectedModel,
-              max_tokens: 4096,
-              system: systemPrompt,
-              messages: [
-                ...toChatMessages(messages),
-                { role: 'assistant', content: initial.content },
-                { role: 'user', content: toolResults.filter(Boolean) as never[] },
-              ],
-            });
-            assistantMessage = second.content.find((block) => block.type === 'text')?.text ?? null;
-          } else {
-            assistantMessage = initial.content.find((block) => block.type === 'text')?.text ?? null;
-          }
-          provider = 'anthropic';
-          model = selectedModel;
-        } catch (err: unknown) {
-          logger.warn('[devstudio/chat] Anthropic failed', normalizeError(err));
-        }
-      }
-
-      if (nextProvider === 'gemini' && isGeminiConfigured()) {
-        try {
-          const selectedModel = modelFor('gemini', rawModel);
-          const result = await aiChat({
-            provider: 'gemini',
-            model: selectedModel,
-            messages: [{ role: 'system', content: systemPrompt }, ...toChatMessages(messages)],
-            temperature: 0.4,
-            maxTokens: 4096,
-          });
-          assistantMessage = result.content ?? null;
-          provider = result.provider ?? 'gemini';
-          model = selectedModel;
-        } catch (err: unknown) {
-          logger.warn('[devstudio/chat] Gemini failed', normalizeError(err));
-        }
-      }
-    }
-
-    // The owned Elevate stream returns above; only external providers reach this fallback.
-    if (!assistantMessage && effectiveProvider !== 'openai') {
-      try {
-        const db = await requireAdminClient();
-        const requestNonce = req.headers.get('x-request-id')?.trim() || crypto.randomUUID();
-        const projectedCostMicros = Math.max(
-          0,
-          Number(process.env.STUDIO_CHAT_PROJECTED_COST_MICROS ?? '100000'),
-        );
-        const artifactFingerprint = paidArtifactFingerprint({
-          operation: 'studio-chat',
-          actorId: auth.userId,
-          provider: canonicalProvider,
-          model: typeof rawModel === 'string' ? rawModel : null,
-          message: lastUserMessage,
-          requestNonce,
-        });
-        const paidExecution = await executePaidInference({
-          db,
-          authorize: () =>
-            reservePaidInference(db, {
-              scopeKey: 'studio-chat',
-              actorId: auth.userId,
-              artifactFingerprint,
-              idempotencyKey: `studio-chat:${requestNonce}`,
-              provider: canonicalProvider,
-              model:
-                typeof rawModel === 'string' && rawModel.trim()
-                  ? rawModel.trim()
-                  : process.env.CLOUDFLARE_AI_MODEL || 'canonical',
-              operation: 'studio-chat',
-              projectedCostMicros,
-            }),
-          dispatch: () =>
-            aiChat({
-              messages: [{ role: 'system', content: systemPrompt }, ...messages],
-              temperature: 0.4,
-              maxTokens: 2048,
-              // Auto mode lets the canonical resolver pick the first reachable
-              // provider; explicit selections stay pinned to their provider.
-              provider: effectiveProvider === 'elevate' ? undefined : effectiveProvider,
-            }),
-        });
-        if (paidExecution.decision === 'approved' && paidExecution.value) {
-          assistantMessage = paidExecution.value.content ?? null;
-          provider = paidExecution.value.provider ?? canonicalProvider;
-          model = paidExecution.value.model;
-        } else {
-          logger.warn('[devstudio/chat] governed inference was not dispatched', {
-            decision: paidExecution.decision,
-            requestId: paidExecution.requestId,
-          });
-        }
-      } catch (err: unknown) {
-        logger.warn('[devstudio/chat] aiChat fallback failed', normalizeError(err));
-      }
-    }
-
-    if (!assistantMessage) {
-      logger.error('[devstudio/chat] no provider available', undefined, {
-        hasGroq: isGroqConfigured(),
-        hasXAI: isXAIConfigured(),
-        hasGemini: isGeminiConfigured(),
-        hasOpenAI: isOpenAIConfigured(),
-        hasAnthropic: isAnthropicConfigured(),
-      });
-      return NextResponse.json(
-        {
-          error:
-            effectiveProvider === 'openai' && !isOpenAIConfigured()
-              ? 'OpenAI is not configured for Admin Studio. Connect OPENAI_API_KEY in Admin → Integrations.'
-              : canonicalProvider === 'none'
-                ? 'No explicitly selected AI provider is available.'
-                : `LIZZY could not reach the selected ${effectiveProvider} provider. Check that provider connection in Admin → Integrations.`,
-          debug: {
-            hasGroq: isGroqConfigured(),
-            hasXAI: isXAIConfigured(),
-            hasOpenAI: isOpenAIConfigured(),
-            hasAnthropic: isAnthropicConfigured(),
-            hasGemini: isGeminiConfigured(),
-            requestedProvider: effectiveProvider,
-          },
-        },
-        { status: 503 },
-      );
-    }
-
-    assistantMessage = enforceEvidenceBoundary(assistantMessage, lastUserMessage, toolCalls);
-    const capabilitiesUsed = unifiedCapabilities(lastUserMessage, toolCalls);
-
-    (async () => {
-      try {
-        const supabase = await createClient();
-        const db = await requireAdminClient();
-        const {
-          data: { user },
-        } = await supabase.auth.getUser();
-        const { error: logError } = await db.from('devstudio_chat_log').insert({
-          user_id: user?.id || null,
-          user_message: messages[messages.length - 1]?.content || '',
-          assistant_response: assistantMessage,
-          file_context: fileContext || null,
-          provider,
-          model,
-        });
-        if (logError)
-          logger.warn('[devstudio/chat] DB log insert failed', { reason: logError.message });
-        await recordUnifiedCapabilityUse(db, capabilitiesUsed, provider, model, toolCalls);
-      } catch (err: unknown) {
-        logger.warn('[devstudio/chat] DB log failed', normalizeError(err));
-      }
-    })();
-
-    const encoder = new TextEncoder();
-    const stream = new ReadableStream({
-      start(controller) {
-        const words = (assistantMessage ?? '').split(/(?<= )/);
-        for (const word of words) {
-          controller.enqueue(encoder.encode(`data: ${JSON.stringify({ token: word })}\n\n`));
-        }
-        controller.enqueue(
-          encoder.encode(
-            `data: ${JSON.stringify({
-              done: true,
-              provider,
-              model,
-              providerPreference,
-              availableProviders: {
-                xai: isXAIConfigured(),
-                groq: isGroqConfigured(),
-                openai: isOpenAIConfigured(),
-                anthropic: isAnthropicConfigured(),
-                gemini: isGeminiConfigured(),
-              },
-              toolCalls,
-              capabilitiesUsed,
-              studioRun: masterExecution,
-            })}\n\n`,
-          ),
-        );
-        controller.close();
+        return {
+          provider: 'elevate',
+          model: 'elevate-local',
+          providerPreference: OWNED_STUDIO_PROVIDER,
+          availableProviders: { [OWNED_STUDIO_PROVIDER]: true },
+          toolCalls,
+          capabilitiesUsed,
+          studioRun: masterExecution,
+        };
       },
-    });
-
-    return new Response(stream, {
-      headers: {
-        'Content-Type': 'text/event-stream',
-        'Cache-Control': 'no-cache',
-        'X-Accel-Buffering': 'no',
-      },
+      onError: (error) => logger.warn('[devstudio/chat] owned stream failed', normalizeError(error)),
+      errorMessage: 'Paris could not complete this response. No outside AI provider was used.',
     });
   } catch (error) {
     logger.error('[devstudio/chat] error', error);

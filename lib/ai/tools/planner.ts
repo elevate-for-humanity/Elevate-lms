@@ -2,15 +2,11 @@ import 'server-only';
 
 import { getAITool } from './registry';
 import { isReadOnlyRequest, isRepositoryRevisionInspection } from '../command-intent';
-import { isOpenHandsOptedIn } from '@/lib/devstudio/openhands-opt-in';
-
-// OpenHands is opt-in-only: naming it in a command does not opt in. Without
-// PARIS_REPAIR_ENGINE=openhands, engineering execution routes to the owned
-// internal engine (studio.engineering.execute).
-function routeEngineeringExecution(lower: string): 'openhands.execute' | 'studio.engineering.execute' {
-  return /\bopenhands\b/.test(lower) && isOpenHandsOptedIn()
-    ? 'openhands.execute'
-    : 'studio.engineering.execute';
+// OpenHands has been removed: engineering execution always routes to the
+// owned internal engine (studio.engineering.execute). Naming OpenHands in
+// a command cannot select it — there is no OpenHands execution path.
+function routeEngineeringExecution(_lower: string): 'studio.engineering.execute' {
+  return 'studio.engineering.execute';
 }
 
 export type PlannedAITool = {

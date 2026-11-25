@@ -26,7 +26,8 @@ import { GET as taskGet } from '../../apps/admin/app/api/admin/dev-studio/tasks/
 
 beforeEach(() => {
   vi.resetAllMocks();
-  // These tests exercise the opted-in OpenHands path.
+  // The legacy opt-in env value is inert after the OpenHands removal; it is
+  // stubbed here to prove the routes no longer consult it.
   vi.stubEnv('PARIS_REPAIR_ENGINE', 'openhands');
   mocks.limit.mockResolvedValue(null);
   mocks.auth.mockResolvedValue({ userId: 'owner', effectiveRoles: ['admin'] });
@@ -78,24 +79,24 @@ for (const [name, get] of [['agent', agentGet], ['chat', chatGet]] as const) {
 }
 
 for (const [name, post, field] of [['agent', agentPost, 'task'], ['chat', chatPost, 'message']] as const) {
-  it(`${name} start errors never echo upstream response contents`, async () => {
-    mocks.dispatch.mockRejectedValue(new Error('DO_NOT_PUBLISH_PROVIDER_ERROR'));
+  it(`${name} start is permanently removed and never reaches the provider`, async () => {
     const response = await post(new NextRequest('https://admin.example.test/agent', {
       method: 'POST', headers: { 'content-type': 'application/json', 'idempotency-key': 'isolated-test' },
       body: JSON.stringify({ [field]: 'Isolated test' }),
     }));
-    expect(response.status).toBe(502);
-    expect(await response.text()).not.toContain('DO_NOT_PUBLISH');
+    expect(response.status).toBe(410);
+    expect(await response.text()).toContain('OPENHANDS_REMOVED');
+    expect(mocks.dispatch).not.toHaveBeenCalled();
   });
 
-  it(`${name} start fails closed without the OpenHands opt-in`, async () => {
+  it(`${name} start stays removed without the legacy opt-in value`, async () => {
     vi.stubEnv('PARIS_REPAIR_ENGINE', '');
     const response = await post(new NextRequest('https://admin.example.test/agent', {
       method: 'POST', headers: { 'content-type': 'application/json', 'idempotency-key': 'isolated-test' },
       body: JSON.stringify({ [field]: 'Isolated test' }),
     }));
-    expect(response.status).toBe(503);
-    expect(await response.text()).toContain('opt-in only');
+    expect(response.status).toBe(410);
+    expect(await response.text()).toContain('has been removed');
     expect(mocks.dispatch).not.toHaveBeenCalled();
   });
 }

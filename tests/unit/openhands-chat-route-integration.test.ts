@@ -34,11 +34,9 @@ function post(body: Record<string, unknown>) {
   }) as never);
 }
 
-describe('OpenHands authenticated conversation endpoint (real route, mocked external boundary)', () => {
+describe('OpenHands chat endpoint after the OpenHands removal (real route, mocked external boundary)', () => {
   beforeEach(() => {
     vi.resetAllMocks();
-    // These tests exercise the opted-in OpenHands path.
-    vi.stubEnv('PARIS_REPAIR_ENGINE', 'openhands');
     state.rate.mockResolvedValue(null);
     state.auth.mockResolvedValue({ userId: 'original-owner', effectiveRoles: ['engineer'], error: null });
     state.allowed.mockReturnValue(true);
@@ -56,22 +54,20 @@ describe('OpenHands authenticated conversation endpoint (real route, mocked exte
     state.refresh.mockResolvedValue({ status: 'running', conversationId: 'existing-conversation' });
   });
 
-  it('continues the exact owned conversation, never dispatching another agent', async () => {
+  it('refuses to continue an owned conversation: POST is permanently removed', async () => {
     const response = await post({ taskId: 'original-task', conversationId: 'existing-conversation', message: 'Follow up' });
-    expect(response.status).toBe(200);
-    expect(await response.json()).toMatchObject({ taskId: 'original-task', conversationId: 'existing-conversation' });
-    expect(state.owned).toHaveBeenCalledWith({
-      actorId: 'original-owner', taskId: 'original-task', conversationId: 'existing-conversation',
-    });
-    expect(state.send).toHaveBeenCalledTimes(1);
-    expect(state.send).toHaveBeenCalledWith('existing-conversation', 'Follow up');
+    expect(response.status).toBe(410);
+    expect(await response.json()).toMatchObject({ code: 'OPENHANDS_REMOVED' });
+    expect(state.owned).not.toHaveBeenCalled();
+    expect(state.send).not.toHaveBeenCalled();
     expect(state.dispatch).not.toHaveBeenCalled();
   });
 
-  it('blocks cross-owner/nonexistent conversations before contacting provider', async () => {
+  it('refuses cross-owner/nonexistent conversations without contacting the provider', async () => {
     state.owned.mockResolvedValue(null);
     const response = await post({ taskId: 'different-owner-task', conversationId: 'stolen-id', message: 'No' });
-    expect(response.status).toBe(404);
+    expect(response.status).toBe(410);
+    expect(state.owned).not.toHaveBeenCalled();
     expect(state.send).not.toHaveBeenCalled();
     expect(state.dispatch).not.toHaveBeenCalled();
   });
@@ -81,7 +77,7 @@ describe('OpenHands authenticated conversation endpoint (real route, mocked exte
     { requiresApproval: false, approvalStatus: 'pending' },
     { requiresApproval: true, approvalStatus: null },
     { requiresApproval: false, approvalStatus: null },
-  ])('blocks running-but-unapproved task before Cloud message: %j', async (approval) => {
+  ])('refuses running-but-unapproved tasks: %j', async (approval) => {
     state.owned.mockResolvedValue({
       taskId: 'original-task', status: 'running', conversationId: 'existing-conversation',
       ...approval,
@@ -89,12 +85,12 @@ describe('OpenHands authenticated conversation endpoint (real route, mocked exte
     const response = await post({
       taskId: 'original-task', conversationId: 'existing-conversation', message: 'Continue',
     });
-    expect(response.status).toBe(409);
+    expect(response.status).toBe(410);
     expect(state.send).not.toHaveBeenCalled();
     expect(state.dispatch).not.toHaveBeenCalled();
   });
 
-  it('allows exact owned continuation after recorded approval', async () => {
+  it('refuses continuation even after a recorded approval — removal is unconditional', async () => {
     state.owned.mockResolvedValue({
       taskId: 'original-task', status: 'running', conversationId: 'existing-conversation',
       requiresApproval: true, approvalStatus: 'approved',
@@ -102,30 +98,32 @@ describe('OpenHands authenticated conversation endpoint (real route, mocked exte
     const response = await post({
       taskId: 'original-task', conversationId: 'existing-conversation', message: 'Approved follow-up',
     });
-    expect(response.status).toBe(200);
-    expect(state.send).toHaveBeenCalledWith('existing-conversation', 'Approved follow-up');
+    expect(response.status).toBe(410);
+    expect(state.send).not.toHaveBeenCalled();
     expect(state.dispatch).not.toHaveBeenCalled();
   });
 
-  it('does not resume approval-gated or terminal tasks', async () => {
+  it('refuses approval-gated or terminal tasks', async () => {
     state.owned.mockResolvedValue({ taskId: 'original-task', status: 'awaiting_approval' });
     const response = await post({ taskId: 'original-task', conversationId: 'existing-conversation', message: 'No' });
-    expect(response.status).toBe(409);
+    expect(response.status).toBe(410);
     expect(state.send).not.toHaveBeenCalled();
-  });
-
-  it('requires exact conversation identifier when the task ID is supplied', async () => {
-    const response = await post({ taskId: 'original-task', message: 'No' });
-    expect(response.status).toBe(400);
     expect(state.dispatch).not.toHaveBeenCalled();
   });
 
-  it('rejects unauthorized roles before querying tasks or provider', async () => {
+  it('refuses a task ID without a conversation identifier', async () => {
+    const response = await post({ taskId: 'original-task', message: 'No' });
+    expect(response.status).toBe(410);
+    expect(state.dispatch).not.toHaveBeenCalled();
+  });
+
+  it('rejects unauthorized roles before the removal response', async () => {
     state.allowed.mockReturnValue(false);
     const response = await post({ taskId: 'original-task', conversationId: 'existing-conversation', message: 'No' });
     expect(response.status).toBe(403);
     expect(state.owned).not.toHaveBeenCalled();
     expect(state.send).not.toHaveBeenCalled();
+    expect(state.dispatch).not.toHaveBeenCalled();
   });
 
   it('reconciles status for an owned task without creating a new agent', async () => {
@@ -141,16 +139,14 @@ describe('OpenHands authenticated conversation endpoint (real route, mocked exte
     expect(state.send).not.toHaveBeenCalled();
   });
 
-  it('passes caller idempotency to the existing tracked dispatcher for a new approved task', async () => {
+  it('never dispatches a new task, even with a caller idempotency key', async () => {
     const response = await POST(new Request('https://admin.example.test/api/admin/dev-studio/openhands/chat', {
       method: 'POST', headers: { 'Content-Type': 'application/json', 'Idempotency-Key': 'same-approved-work' },
       body: JSON.stringify({ message: 'Check the existing approved engineering request' }),
     }) as never);
-    expect(response.status).toBe(202);
-    expect(state.dispatch).toHaveBeenCalledTimes(1);
-    expect(state.dispatch).toHaveBeenCalledWith(expect.objectContaining({
-      actorId: 'original-owner', correlationId: 'same-approved-work',
-    }));
+    expect(response.status).toBe(410);
+    expect(await response.json()).toMatchObject({ code: 'OPENHANDS_REMOVED' });
+    expect(state.dispatch).not.toHaveBeenCalled();
     expect(state.send).not.toHaveBeenCalled();
   });
 

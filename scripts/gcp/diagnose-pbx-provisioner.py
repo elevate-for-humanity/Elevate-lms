@@ -6,7 +6,7 @@ import re
 import subprocess
 import time
 
-CODES = frozenset('asterisk_command_failed asterisk_endpoint_unverified asterisk_aor_unverified asterisk_dialplan_unverified asterisk_revocation_unverified asterisk_reload_failed asterisk_configuration_rejected asterisk_rollback_failed provisioner_quarantined provisioner_unavailable ownership_unavailable device_authorization_unavailable phone_system_configuration_invalid invalid_stored_record invalid_generation invalid_stored_state unknown'.split())
+CODES = frozenset('asterisk_command_failed asterisk_endpoint_unverified asterisk_aor_unverified asterisk_dialplan_unverified asterisk_revocation_unverified asterisk_reload_failed asterisk_configuration_rejected asterisk_rollback_failed provisioner_quarantined provisioner_unavailable ownership_unavailable device_authorization_unavailable phone_system_configuration_invalid invalid_stored_record invalid_generation invalid_stored_state duplicate_extension unknown'.split())
 STAGES = {'ownership/runtime reconciliation failed': 'reconciliation', 'expired-credential revocation stage': 'revocation'}
 ROOT = Path('/opt/elevate-pbx/repo/infra/pbx/asterisk/elevate-webrtc')
 JOURNAL_WINDOW_HOURS = 24

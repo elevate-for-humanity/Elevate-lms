@@ -183,7 +183,10 @@ export function ParisFloatingButton({
                   portalRole={portalRole}
                   personName={personName}
                   portalIssue={portalIssue}
-                  voiceEnabled
+                  // The public site bubble is text-only by product decision
+                  // (2026-11-25): visitors read PARIS replies, nothing is
+                  // spoken aloud. Learner and portal bubbles keep voice.
+                  voiceEnabled={surface !== 'public'}
                 />
               </Suspense>
             </div>
@@ -263,3 +266,4 @@ export function ParisFloatingButton({
 }
 
 export default ParisFloatingButton;
+

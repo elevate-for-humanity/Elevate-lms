@@ -147,7 +147,6 @@ export default function ParisApplicationWorkspace({
   const [speechEnabled, setSpeechEnabled] = useState(false);
   const [transferEvidence, setTransferEvidence] = useState<File | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
-  const initialSessionRequest = useRef<Promise<InterviewResponse> | null>(null);
   const initializedProgram = useRef(false);
   const spokenMessageId = useRef('');
   const parisVoice = useNaturalVoice();
@@ -203,13 +202,19 @@ export default function ParisApplicationWorkspace({
 
   useEffect(() => {
     let alive = true;
-    // Start already resumes an authorized existing interview. Reuse this
-    // request across Strict Mode's effect replay instead of creating twice.
-    const pending = initialSessionRequest.current ?? requestInterview({ action: 'start', locale: 'en' });
-    initialSessionRequest.current = pending;
     (async () => {
       try {
-        const data = await pending;
+        const resume = await fetch('/api/paris/application-interview', { cache: 'no-store' });
+        if (resume.ok) {
+          const data = (await resume.json()) as InterviewResponse;
+          if (data.ok) {
+            if (alive) setSession(data);
+            return;
+          }
+          // No resumable session (first visit): fall through and start a new
+          // interview instead of returning with no session.
+        }
+        const data = await callInterview({ action: 'start', locale: 'en' });
         if (alive) setSession(data);
       } catch (err) {
         if (alive) setError(err instanceof Error ? err.message : 'Unable to start the application interview.');

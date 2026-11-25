@@ -8,7 +8,7 @@ import ParisSupervisionPanel from '@/components/admin/ParisSupervisionPanel';
 
 import { ResizableWorkspace } from '@/components/studio/ResizableWorkspace';
 import { FormEvent, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
-import { Award, BookOpen, Bot, Loader2, RefreshCw, Rocket, ShieldCheck } from 'lucide-react';
+import { Award, BookOpen, Bot, Clapperboard, Loader2, RefreshCw, Rocket, ShieldCheck } from 'lucide-react';
 import UltimateStageInspector from '@/components/admin/course-builder/UltimateStageInspector';
 import CredentialRegistryPanel from '@/components/admin/course-builder/CredentialRegistryPanel';
 import type { SyllabusPlan } from '@/lib/ultimate-course-builder/authoring/syllabus-plan';
@@ -944,6 +944,8 @@ export function UltimateBuildPanel({
   const [syllabusName, setSyllabusName] = useState('');
   const [syllabusBusy, setSyllabusBusy] = useState(false);
   const [syllabusConfirmed, setSyllabusConfirmed] = useState(false);
+  const [compileBusy, setCompileBusy] = useState(false);
+  const [compileMessage, setCompileMessage] = useState('');
   const jobs: NonNullable<UltimateBuildRow['ultimate_build_jobs']> = orderCourseJobs(
     latest?.ultimate_build_jobs ?? [],
   );
@@ -1252,6 +1254,32 @@ export function UltimateBuildPanel({
       setError(reason instanceof Error ? reason.message : 'Ultimate release failed');
     } finally {
       setBusy(false);
+    }
+  }
+
+  async function compileAuthoredCourse() {
+    setCompileBusy(true);
+    setCompileMessage('');
+    try {
+      const response = await fetch('/api/admin/course-builder', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'compile-authored', courseId: course.id }),
+      });
+      const payload = await readJson(response);
+      if (!response.ok || !payload?.ok) {
+        throw new Error(payload?.error || 'Authored course compile failed');
+      }
+      setCompileMessage(
+        `Compiled ${payload.compiledLessons} of ${payload.lessonCount} lessons and queued ${payload.videosQueued} lesson videos. ` +
+          'Videos render automatically in the media queue; each lesson can publish once its video passes review.',
+      );
+    } catch (reason) {
+      setCompileMessage(
+        reason instanceof Error ? reason.message : 'Authored course compile failed',
+      );
+    } finally {
+      setCompileBusy(false);
     }
   }
 
@@ -1628,6 +1656,36 @@ export function UltimateBuildPanel({
         </button>
         <p className="text-sm text-slate-300">{latest?.status==='built' ? 'Ready for the release checks.' : latest?.status==='published' ? 'This course is live.' : 'Publication becomes available after build acceptance.'}</p>
       </div>
+      <div className="mt-5 rounded-xl border border-violet-800 bg-slate-950 p-4 text-white">
+        <p className="text-xs font-black uppercase tracking-[0.18em] text-violet-300">
+          Lesson videos — any course
+        </p>
+        <h3 className="mt-2 font-bold">Compile lessons &amp; queue videos</h3>
+        <p className="mt-2 max-w-4xl text-sm leading-6 text-slate-300">
+          Runs the canonical authored-course compile on the lessons saved for this course:
+          each lesson is compiled, its narration is locked, and a video job is queued.
+          This works for every course in the catalog — no course list gates it. Videos
+          render automatically in the media queue, and each lesson can publish once its
+          video passes review. Use it to finish courses whose lessons were written here
+          but never compiled, including lessons flagged “No video yet.”
+        </p>
+        <button
+          type="button"
+          onClick={() => void compileAuthoredCourse()}
+          disabled={compileBusy}
+          className="mt-3 inline-flex items-center gap-2 rounded-lg bg-violet-500 px-4 py-2 font-black text-slate-950 hover:bg-violet-400 disabled:opacity-50"
+        >
+          {compileBusy ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <Clapperboard className="h-4 w-4" />
+          )}
+          {compileBusy ? 'Compiling lessons…' : 'Compile lessons & queue videos'}
+        </button>
+        {compileMessage ? (
+          <p className="mt-3 rounded-lg bg-white/10 p-3 text-sm text-violet-100">{compileMessage}</p>
+        ) : null}
+      </div>
       <details
         aria-label="Syllabus instructional source"
         className="mt-5 rounded-xl border border-cyan-800 bg-slate-950 p-4 text-white"
@@ -1728,8 +1786,9 @@ export function UltimateBuildPanel({
         )}
       </div>
       <p className="mt-4 text-xs text-slate-300">
-        Course Factory generation, blueprint execution, and standalone media queues are not
-        available from this surface.
+        Authored lessons saved in this builder can be compiled and queued for video from
+        this panel for any course — no operations workflow is required. Full blueprint
+        regeneration remains an operations workflow.
       </p>
     </section>
   );

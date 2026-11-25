@@ -3,7 +3,6 @@ import 'server-only';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { decomposePlan, type Plan } from '@/lib/platform/planner';
 import { ensureCanonicalStudioRun, appendStudioRunEvent } from '@/lib/devstudio/studio-run';
-import { isOpenHandsOptedIn } from '@/lib/devstudio/openhands-opt-in';
 
 export type MasterStudioSpecialist = 'ELLIE' | 'PARIS' | 'LIZZY' | 'ZORA' | 'OPENHANDS' | 'ROUTER';
 
@@ -16,12 +15,12 @@ const SPECIALIST_RULES: Array<{ specialist: MasterStudioSpecialist; pattern: Reg
 ];
 
 export function selectMasterStudioSpecialist(command: string): MasterStudioSpecialist {
-  // The OPENHANDS specialist label is a plan label only — no executor maps it
-  // to OpenHands — but it must not claim OpenHands for generic code work
-  // unless OpenHands is opted in. Without the opt-in, code work falls
-  // through to ROUTER (the owned engine), not to OpenHands.
+  // The OPENHANDS specialist label is retained for historical plan records
+  // only — no executor maps it to OpenHands, and OpenHands has been
+  // removed. Code work always falls through to ROUTER (the owned engine),
+  // never to OpenHands.
   const matched = SPECIALIST_RULES.find((rule) => rule.pattern.test(command))?.specialist ?? 'ROUTER';
-  if (matched === 'OPENHANDS' && !isOpenHandsOptedIn()) return 'ROUTER';
+  if (matched === 'OPENHANDS') return 'ROUTER';
   return matched;
 }
 

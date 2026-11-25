@@ -17,6 +17,7 @@ import { resolveCourseEnrollment } from '@/lib/enrollment/resolve-course-enrollm
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import { hasRequiredLessonWorkbook } from '@/lib/lms/lesson-workbook';
 import { hasRequiredManufacturingSimulation } from '@/lib/lms/manufacturing-simulation-progress';
+import { checkRequiredLessonWork } from '@/lib/lms/lesson-requirements';
 
 export const runtime = 'nodejs';
 export const maxDuration = 60;
@@ -111,6 +112,27 @@ async function _POST(request: NextRequest, { params }: { params: Promise<{ lesso
           error:
             'Complete and save the virtual workplace practice beneath this lesson, including every critical decision, then try again.',
           code: 'LESSON_SIMULATION_REQUIRED',
+        },
+        { status: 403 },
+      );
+    }
+
+    // No-skip: required assignments authored in the Course Builder (rows in
+    // the assignments table for this lesson) must be submitted first. The
+    // check fails OPEN on any data problem — the learner is never blocked
+    // by unreadable required-work data; the block is routed to PARIS
+    // instead (see lib/lms/lesson-requirements.ts).
+    const requiredWork = await checkRequiredLessonWork(db, {
+      userId: user.id,
+      lessonId,
+      courseId: lesson.course_id,
+    });
+    if (!requiredWork.allowed) {
+      return NextResponse.json(
+        {
+          error: `Complete the required assignment(s) for this lesson before marking it complete: ${requiredWork.missing.map((assignment) => assignment.title).join(', ')}`,
+          code: 'REQUIRED_WORK_INCOMPLETE',
+          missingAssignments: requiredWork.missing,
         },
         { status: 403 },
       );

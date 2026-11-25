@@ -42,6 +42,13 @@ jobs:
       fail-fast: false
       matrix:
         service: [marketing, lms, admin]
+        include:
+          - service: marketing
+            dockerfile: Dockerfile.marketing
+          - service: lms
+            dockerfile: Dockerfile.google-lms
+          - service: admin
+            dockerfile: Dockerfile.admin
     env:
       NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
       NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}

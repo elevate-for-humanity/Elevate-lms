@@ -14,6 +14,7 @@ import {
 import { sanitizePublicFundingText } from '@/lib/programs/public-funding-copy';
 import { isRAPIDSProgram } from '@/lib/compliance/rapids-config';
 import { BUSINESS_ADMIN } from './business-administration';
+import { AI_ENGINEERING } from './ai-engineering';
 import { CAD_DRAFTING } from './cad-drafting';
 import { CONSTRUCTION_TRADES } from './construction-trades-certification';
 import { CPR_FIRST_AID } from './cpr-first-aid';
@@ -85,6 +86,7 @@ const STATIC_PROGRAMS: ProgramSchema[] = [
   SOFTWARE_DEV,
   WEB_DEVELOPMENT,
   COMMERCIAL_CLEANING,
+  AI_ENGINEERING,
 ];
 
 export const STATIC_PROGRAM_MAP: ReadonlyMap<string, ProgramSchema> = new Map(
@@ -260,3 +262,4 @@ export function getStaticProgram(slug: string): ProgramSchema | undefined {
     verified?.aliases?.map((alias) => STATIC_PROGRAM_MAP.get(alias)).find(Boolean);
   return program ? normalizePublicProgram(program) : undefined;
 }
+

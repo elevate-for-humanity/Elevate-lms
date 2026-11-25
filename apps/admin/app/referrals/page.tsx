@@ -16,6 +16,7 @@ import { AdminCard, AdminEmptyState, AdminFilterBar } from '@/components/admin/A
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import ReferralConfirmButton from './ReferralConfirmButton';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { WORKONE_ACCESS_START_ISO } from '@/lib/workone/access-scope';
 
 export const metadata: Metadata = {
   title: `Agency Referrals | Admin | ${PLATFORM_DEFAULTS.orgName}`,
@@ -58,7 +59,9 @@ export default async function ReferralsPage({
   const { data: counts } = await db
     .from('workforce_referrals')
     .select('status')
-    .eq('archived', false);
+    .eq('archived', false)
+    // WorkOne scope: NEW applicants only — never the pre-access backlog.
+    .gte('created_at', WORKONE_ACCESS_START_ISO);
 
   const summary = {
     total:               counts?.length ?? 0,
@@ -71,6 +74,7 @@ export default async function ReferralsPage({
   let query = db
     .from('referral_pipeline_summary')
     .select('*')
+    .gte('created_at', WORKONE_ACCESS_START_ISO)
     .order('referral_date', { ascending: false })
     .limit(100);
 

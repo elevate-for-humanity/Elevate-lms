@@ -16,13 +16,34 @@ export async function activateProgramInstallments(
   if (payment.paidCents >= payment.tuitionCents) return;
   const schedules = await db
     .from('billing_schedules')
-    .select('id,cadence,updated_at,fulfillment_payload')
+    .select('id,cadence,updated_at,fulfillment_payload,collection_mode,provider_status,provider_subscription_id,fulfillment_type')
     .eq('customer_external_key', `user:${payment.userId}`)
     .eq('canonical_product_key', `program-installments-${payment.programId}`)
     .eq('provider', 'quickbooks')
     .eq('status', 'paused');
   if (schedules.error) throw new Error('The payment schedule could not be loaded.');
   for (const row of schedules.data || []) {
+    if (row.collection_mode === 'automatic') {
+      // The database refuses to activate an automatic schedule whose
+      // collection provider is not fully active
+      // (enforce_automatic_billing_activation: paypal + subscription +
+      // provider_status 'active', plus an approved recurring-tuition
+      // migration authorization for tuition schedules). Attempting the
+      // update anyway throws AFTER the enrollment was already activated,
+      // stranding a paid student mid-flow — leave such schedules paused
+      // until the student authorizes a collection method.
+      if (!row.provider_subscription_id || row.provider_status !== 'active') continue;
+      if (row.fulfillment_type === 'tuition_payment') {
+        const authorization = await db
+          .from('billing_migration_authorizations')
+          .select('id')
+          .eq('billing_schedule_id', row.id)
+          .eq('status', 'approved')
+          .eq('authorization_scope', 'recurring_tuition')
+          .maybeSingle();
+        if (authorization.error || !authorization.data) continue;
+      }
+    }
     const terms = row.fulfillment_payload || {};
     if (
       terms.initial_invoice_id &&
@@ -45,3 +66,4 @@ export async function activateProgramInstallments(
     if (activated.error) throw new Error('The payment schedule could not be activated.');
   }
 }
+

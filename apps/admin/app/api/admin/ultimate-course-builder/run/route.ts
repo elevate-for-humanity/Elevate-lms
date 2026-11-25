@@ -1,4 +1,5 @@
 import { recordCourseDispatch } from '@/lib/ultimate-course-builder/worker/dispatch-evidence';
+import { inspectOrphanedPool } from '@/lib/ultimate-course-builder/worker/paris-monitor.mjs';
 import { NextRequest, NextResponse } from 'next/server';
 import { apiRequireAdmin } from '@/lib/admin/guards';
 import { requireAdminClient } from '@/lib/supabase/admin';
@@ -150,6 +151,57 @@ export async function POST(req: NextRequest) {
           { status: 409 },
         );
       job = recovery.data;
+    }
+    // A pool that still says 'active' blocks the coordinator claim in SQL and
+    // hides the job from the dispatcher, so a launch would be accepted and
+    // then wait for a heartbeat that can never arrive. When that pool is
+    // orphaned (failed stages, no live worker for hours), say so plainly and
+    // route the root cause to PARIS instead of reporting a launch.
+    const { data: pool } = await db
+      .from('ultimate_autopilot_pools')
+      .select('id,state,created_at,updated_at')
+      .eq('build_id', build.id)
+      .maybeSingle();
+    if (pool?.state === 'active') {
+      const { data: buildJobs } = await db
+        .from('ultimate_build_jobs')
+        .select('id,job_type,status,heartbeat_at,updated_at,lease_expires_at,payload')
+        .eq('build_id', build.id)
+        .limit(500);
+      const orphan = inspectOrphanedPool(pool, buildJobs ?? []);
+      if (orphan) {
+        await recordCourseDispatch(db, job.id, { dispatched: false, launchMode: 'pool-orphaned' }, auth.id);
+        try {
+          const { enqueueParisRepair } = await import('@/lib/ai/runtime/code-repair');
+          await enqueueParisRepair({
+            actorId: auth.id,
+            sourceJobId: job.id,
+            goal:
+              `Course Builder worker cannot start for build ${build.id}: its autopilot pool ${pool.id} is orphaned. ` +
+              `${orphan.reason} Failed stage jobs: ${orphan.failedJobIds.join(', ')}. ` +
+              'Repair the failed stages (or their producer code) so the pool can advance and the coordinator can claim. ' +
+              'Preserve lesson IDs, approved content, licenses, quality gates and unrelated jobs.',
+          });
+        } catch {
+          // The refusal below still names the root cause; a failed repair
+          // enqueue must not turn an honest answer into a 500.
+        }
+        return NextResponse.json(
+          {
+            ok: true,
+            queued: true,
+            dispatched: false,
+            launchBlocked: 'POOL_ORPHANED',
+            buildId: build.id,
+            jobId: job.id,
+            message:
+              'The build is safely queued, but no worker can start yet: ' +
+              orphan.reason +
+              ' A PARIS repair has been requested for the failed stages.',
+          },
+          { status: 202 },
+        );
+      }
     }
     const dispatch = await requestCourseWorker();
     const dispatchEvidenceSaved = await recordCourseDispatch(db, job.id, dispatch, auth.id);

@@ -190,6 +190,16 @@ async function cleanup() {
       .eq('subject_type', 'program_enrollment').eq('subject_id', enrollmentId).limit(1), label + ' enrollment platform event');
   };
   if (state.learner?.id) {
+    // Remove only this run's disposable HVAC simulation evidence; real learner
+    // history and other interaction categories remain outside this cleanup.
+    await deleteDerived(db.from('interaction_progress').delete()
+      .eq('learner_id', state.learner.id).eq('course_id', QA_HVAC_COURSE_ID)
+      .eq('interaction_type', 'simulation').like('interaction_id', 'hvac-sim:%'),
+    'delete disposable HVAC simulation progress');
+    await assertDerivedGone(db.from('interaction_progress').select('id')
+      .eq('learner_id', state.learner.id).eq('course_id', QA_HVAC_COURSE_ID)
+      .eq('interaction_type', 'simulation').like('interaction_id', 'hvac-sim:%').limit(1),
+    'disposable HVAC simulation progress');
     // Playback stores QA events, never formal credits. Remove only this run's
     // disposable learner rows before its profile and login are removed.
     for (const table of [

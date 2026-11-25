@@ -69,6 +69,14 @@ if (process.env.QA_CROSS_SHOP_ACCEPTANCE === '1') {
   SPECS.lms.push('host-shop-cross-shop-production.spec.ts');
 }
 
+// The isolated QA database currently contains only the HVAC orientation
+// fixture. Full-course acceptance requires the actual 17 lessons, four quizzes
+// and authenticated progress schema, plus the disposable learner lifecycle.
+// The trusted LMS deployment acceptance step opts in and requires an exact SHA.
+if (process.env.QA_HVAC_SIMULATION_ACCEPTANCE === '1') {
+  SPECS.lms.push('hvac-course-simulation.spec.ts');
+}
+
 // Production acceptance specs with hard-coded production origins. They run only
 // when a workflow explicitly targets a deployed environment.
 const LIVE_ONLY_SPECS = ['public-runtime-acceptance.spec.ts'];

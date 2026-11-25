@@ -3,13 +3,17 @@ import { notFound, redirect } from 'next/navigation';
 import { resolveCourseEnrollment } from '@/lib/enrollment/resolve-course-enrollment';
 import { getCurrentUser } from '@/lib/auth';
 import { requireAdminClient } from '@/lib/supabase/admin';
+import { createClient } from '@/lib/supabase/server';
 import CanonicalHvacCourseHome from './CanonicalHvacCourseHome';
 import { findPublishedHvacCourseId } from '@/lib/courses/resolvers';
 import { loadCourseActivity } from '@/lib/learner/course-activity';
+import { getHvacSimulationDefinition } from '@/lib/lms/hvac-course-simulations';
+import { HVAC_COURSE_ID } from '@/lib/lms/hvac-workbook-contract';
 
 export const metadata: Metadata = {
   title: 'HVAC Technician Course',
-  description: 'HVAC technician training with EPA Section 608 preparation, safety, diagnostics, and hands-on learning.',
+  description:
+    'HVAC technician training with EPA Section 608 preparation, safety, diagnostics, and hands-on learning.',
 };
 
 export const dynamic = 'force-dynamic';
@@ -20,13 +24,15 @@ export default async function HvacCoursePage() {
 
   const db = await requireAdminClient();
   const activeCourseId = await findPublishedHvacCourseId();
-  const { data: course, error: courseError } = activeCourseId ? await db
-    .from('courses')
-    .select('id, title, description, slug, is_active')
-    .eq('id', activeCourseId)
-    .eq('is_active', true)
-    .eq('status', 'published')
-    .maybeSingle() : { data: null, error: null };
+  const { data: course, error: courseError } = activeCourseId
+    ? await db
+        .from('courses')
+        .select('id, title, description, slug, is_active')
+        .eq('id', activeCourseId)
+        .eq('is_active', true)
+        .eq('status', 'published')
+        .maybeSingle()
+    : { data: null, error: null };
 
   if (courseError) {
     throw new Error(`HVAC_COURSE_LOOKUP_FAILED:${courseError.message}`);
@@ -61,23 +67,50 @@ export default async function HvacCoursePage() {
     if (!directEnrollment) notFound();
   }
 
-  const [{ data: modules, error: modulesError }, { data: lessons, error: lessonsError }] = await Promise.all([
-    db
-      .from('course_modules')
-      .select('id, title, description, order_index')
-      .eq('course_id', course.id)
-      .eq('is_published', true)
-      .order('order_index', { ascending: true }),
-    db
-      .from('course_lessons')
-      .select('id, module_id, title, lesson_type, duration_minutes, order_index, is_published')
-      .eq('course_id', course.id)
-      .eq('is_published', true)
-      .order('order_index', { ascending: true }),
-  ]);
+  const [{ data: modules, error: modulesError }, { data: lessons, error: lessonsError }] =
+    await Promise.all([
+      db
+        .from('course_modules')
+        .select('id, title, description, order_index')
+        .eq('course_id', course.id)
+        .eq('is_published', true)
+        .order('order_index', { ascending: true }),
+      db
+        .from('course_lessons')
+        .select('id, module_id, title, lesson_type, duration_minutes, order_index, is_published')
+        .eq('course_id', course.id)
+        .eq('is_published', true)
+        .order('order_index', { ascending: true }),
+    ]);
 
   if (modulesError) throw new Error(`HVAC_MODULES_FAILED:${modulesError.message}`);
   if (lessonsError) throw new Error(`HVAC_LESSONS_FAILED:${lessonsError.message}`);
+
+  const simulationDb = course.id === HVAC_COURSE_ID ? await createClient() : null;
+  const { data: simulationProgress, error: simulationProgressError } = simulationDb
+    ? await simulationDb
+        .from('interaction_progress')
+        .select('lesson_id,interaction_id,completed,attempts')
+        .eq('learner_id', user.id)
+        .eq('course_id', course.id)
+        .eq('interaction_type', 'simulation')
+        .like('interaction_id', 'hvac-sim:%')
+    : { data: [], error: null };
+  if (simulationProgressError) throw new Error('HVAC_SIMULATION_PROGRESS_UNAVAILABLE');
+
+  const simulationForLesson = (lessonId: string) => {
+    const definition = course.id === HVAC_COURSE_ID ? getHvacSimulationDefinition(lessonId) : null;
+    if (!definition) return undefined;
+    const saved = simulationProgress?.find(
+      (row) => row.lesson_id === lessonId && row.interaction_id === definition.id,
+    );
+    return {
+      id: definition.id,
+      title: definition.title,
+      mastered: saved?.completed === true,
+      started: Number(saved?.attempts ?? 0) > 0,
+    };
+  };
 
   const moduleModels = (modules ?? []).map((module) => ({
     id: String(module.id),
@@ -92,6 +125,7 @@ export default async function HvacCoursePage() {
         lessonType: String(lesson.lesson_type ?? 'lesson'),
         durationMinutes: lesson.duration_minutes == null ? null : Number(lesson.duration_minutes),
         orderIndex: Number(lesson.order_index ?? 0),
+        simulation: simulationForLesson(String(lesson.id)),
       }))
       .sort((a, b) => a.orderIndex - b.orderIndex),
   }));
@@ -105,10 +139,10 @@ export default async function HvacCoursePage() {
     .eq('course_id', course.id);
 
   if (progressError) throw new Error('HVAC_PROGRESS_UNAVAILABLE');
-  const publishedIds = new Set((lessons ?? []).map(lesson => String(lesson.id)));
+  const publishedIds = new Set((lessons ?? []).map((lesson) => String(lesson.id)));
   const savedActivity = await loadCourseActivity(db, user.id, course.id, [...publishedIds]);
   if (progress) {
-    const publishedProgress = progress.filter(row => publishedIds.has(String(row.lesson_id)));
+    const publishedProgress = progress.filter((row) => publishedIds.has(String(row.lesson_id)));
     completedLessonIds = publishedProgress
       .filter((row) => row.completed === true && row.lesson_id)
       .map((row) => String(row.lesson_id));

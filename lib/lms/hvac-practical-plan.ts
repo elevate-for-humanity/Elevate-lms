@@ -7,6 +7,30 @@
  */
 export const HVAC_PRACTICAL_COURSE_ID = 'd48c61c4-8880-4d9d-9ab5-fab4dd51b201' as const;
 
+/** Exact transcription of the supplied instructor sheet; these are planned,
+ * not earned, hours. The printed total disagrees with its individual rows. */
+export const HVAC_PRACTICAL_SOURCE_ALLOCATION = [
+  { topic: 'interplay_online', label: 'Interplay online', hours: 8 },
+  { topic: 'split_system', label: 'Residential split-system', hours: 5 },
+  { topic: 'gas_furnace', label: 'Gas furnace', hours: 5 },
+  { topic: 'pressure_test', label: 'Pressure test', hours: 3 },
+  { topic: 'vacuum', label: 'Vacuum', hours: 3 },
+  { topic: 'digital_manifold', label: 'Digital manifold gauges', hours: 3 },
+  { topic: 'recovery_cylinders', label: 'Recovery cylinders', hours: 2 },
+  { topic: 'multimeter', label: 'Multimeters', hours: 2 },
+  { topic: 'clamp_meter', label: 'Clamp meters', hours: 4 },
+  { topic: 'leak_detector', label: 'Leak detectors', hours: 2 },
+  { topic: 'pump_down', label: 'Pump down', hours: 1 },
+  { topic: 'brazing', label: 'Braze', hours: 5 },
+] as const;
+export const HVAC_PRACTICAL_SOURCE_PRINTED_HOURS = 48;
+export const HVAC_PRACTICAL_SOURCE_LISTED_HOURS = HVAC_PRACTICAL_SOURCE_ALLOCATION.reduce(
+  (total, item) => total + item.hours,
+  0,
+);
+export const HVAC_PRACTICAL_SOURCE_UNALLOCATED_HOURS =
+  HVAC_PRACTICAL_SOURCE_PRINTED_HOURS - HVAC_PRACTICAL_SOURCE_LISTED_HOURS;
+
 export type HvacPracticalMode = 'virtual_simulation' | 'instructor_led';
 export type HvacPracticalTopic =
   | 'safety'
@@ -34,8 +58,10 @@ export type HvacPracticalModule = {
 };
 
 /**
- * Allocation is PROPOSED: the instructor's photographed syllabus specifies
- * a 48-hour total but does not assign individual topic hours.
+ * Allocation is PROPOSED and is independent of the source transcription above.
+ * The photographed rows total 43 hours (including 8 online), although its
+ * printed total is 48. The missing 5 hours require instructor clarification;
+ * this proposed allocation must not be represented as his confirmed schedule.
  * No migration, enrollment, progress, or certification mutation occurs here.
  */
 export const HVAC_PRACTICAL_MODULES: readonly HvacPracticalModule[] = [
@@ -44,7 +70,8 @@ export const HVAC_PRACTICAL_MODULES: readonly HvacPracticalModule[] = [
     title: 'Safety, equipment identification and isolation decisions',
     proposedHours: 4,
     topics: ['safety'],
-    simulationActivity: 'Identify hazards, choose protective measures and stop unsafe simulated actions',
+    simulationActivity:
+      'Identify hazards, choose protective measures and stop unsafe simulated actions',
     instructorActivity: 'Demonstrate workshop safety and assess hazard identification',
     competency: 'Choose safe procedures before beginning diagnostics',
     requiresPhysicalVerification: true,
@@ -74,7 +101,8 @@ export const HVAC_PRACTICAL_MODULES: readonly HvacPracticalModule[] = [
     title: 'Electrical measurements and diagnostics',
     proposedHours: 6,
     topics: ['multimeter', 'clamp_meter'],
-    simulationActivity: 'Choose meter modes, simulated probe points and diagnose faults from readings',
+    simulationActivity:
+      'Choose meter modes, simulated probe points and diagnose faults from readings',
     instructorActivity: 'Observe safe tool setup, meter selection and measurements',
     competency: 'Interpret voltage, current and resistance readings',
     requiresPhysicalVerification: true,
@@ -94,7 +122,8 @@ export const HVAC_PRACTICAL_MODULES: readonly HvacPracticalModule[] = [
     title: 'Pressure-test reasoning and leak detection',
     proposedHours: 5,
     topics: ['pressure_test', 'leak_detector'],
-    simulationActivity: 'Interpret virtual test trends, identify suspected leaks and choose safe responses',
+    simulationActivity:
+      'Interpret virtual test trends, identify suspected leaks and choose safe responses',
     instructorActivity: 'Observe approved pressure-test and detection procedures on equipment',
     competency: 'Distinguish leak evidence from unrelated system faults',
     requiresPhysicalVerification: true,
@@ -104,7 +133,8 @@ export const HVAC_PRACTICAL_MODULES: readonly HvacPracticalModule[] = [
     title: 'Evacuation and vacuum interpretation',
     proposedHours: 4,
     topics: ['vacuum'],
-    simulationActivity: 'Read virtual micron trends and distinguish moisture, leaks and stable evacuation',
+    simulationActivity:
+      'Read virtual micron trends and distinguish moisture, leaks and stable evacuation',
     instructorActivity: 'Demonstrate equipment-specific evacuation and verification',
     competency: 'Interpret evacuation results without using simulated numbers as field targets',
     requiresPhysicalVerification: true,
@@ -124,7 +154,8 @@ export const HVAC_PRACTICAL_MODULES: readonly HvacPracticalModule[] = [
     title: 'Brazing and line-set preparation',
     proposedHours: 4,
     topics: ['brazing'],
-    simulationActivity: 'Sequence preparation, fire prevention and simulated joint-inspection decisions',
+    simulationActivity:
+      'Sequence preparation, fire prevention and simulated joint-inspection decisions',
     instructorActivity: 'Observe actual joint preparation, brazing and quality inspection',
     competency: 'Recognize preparation, safety and workmanship requirements',
     requiresPhysicalVerification: true,
@@ -142,7 +173,8 @@ export const HVAC_PRACTICAL_MODULES: readonly HvacPracticalModule[] = [
 ] as const;
 
 export const HVAC_PRACTICAL_PROPOSED_HOURS = HVAC_PRACTICAL_MODULES.reduce(
-  (sum, module) => sum + module.proposedHours, 0
+  (sum, module) => sum + module.proposedHours,
+  0,
 );
 
 /**
@@ -158,5 +190,5 @@ export const HVAC_PRACTICAL_HOUR_POLICY = {
 } as const;
 
 export function practicalModulesForTopic(topic: HvacPracticalTopic) {
-  return HVAC_PRACTICAL_MODULES.filter(module => module.topics.includes(topic));
+  return HVAC_PRACTICAL_MODULES.filter((module) => module.topics.includes(topic));
 }

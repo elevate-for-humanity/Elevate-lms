@@ -4,6 +4,9 @@ import { notFound, redirect } from 'next/navigation';
 import { ArrowLeft, BookOpen, CheckCircle2, Clock3, Video } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
 import InteractiveLessonExperience from '@/components/lms/InteractiveLessonExperience';
+import HvacCourseSimulation from '@/components/lms/HvacCourseSimulation';
+import { getHvacSimulationDefinition } from '@/lib/lms/hvac-course-simulations';
+import { HVAC_COURSE_ID } from '@/lib/lms/hvac-workbook-contract';
 import AITeachingPlayer, { type TeachingSlide } from '@/components/lms/AITeachingPlayer';
 import { getInstructorForCourse } from '@/lib/ai-instructors';
 import LessonProgressClient from './LessonProgressClient';
@@ -14,7 +17,10 @@ import InteractiveVideoPlayer, { type Checkpoint } from '@/components/lms/Intera
 import { resolveCoursePreview } from '@/lib/admin/course-preview';
 import { assertLessonAccess } from '@/lib/lms/access-control';
 import { requireAdminClient } from '@/lib/supabase/admin';
-import { canonicalBeautyApprenticeshipSlug, loadBeautyPaymentGate } from '@/lib/apprenticeship/beauty-payment-gate.mjs';
+import {
+  canonicalBeautyApprenticeshipSlug,
+  loadBeautyPaymentGate,
+} from '@/lib/apprenticeship/beauty-payment-gate.mjs';
 import { managedLessonPlaybackUrl } from '@/lib/storage/lesson-playback';
 import { measuredLessonCues } from '@/lib/video/measured-lesson-assets';
 import { TheoryWindowNotice } from '@/components/apprenticeship/TheoryWindowNotice';
@@ -253,6 +259,8 @@ export default async function LessonPage({
   if (!preview.active) lessonQuery = lessonQuery.eq('is_published', true);
   const { data: lesson } = await lessonQuery.maybeSingle();
   if (!lesson) notFound();
+  const hasHvacSimulation =
+    course.id === HVAC_COURSE_ID && !!getHvacSimulationDefinition(lesson.id);
 
   const [{ data: orderedLessons }, { data: moduleRow }, { data: lessonVisual }] = await Promise.all(
     [
@@ -416,18 +424,34 @@ export default async function LessonPage({
           ) : null}
           {course.id === BOOKKEEPING_COURSE_ID ? (
             <p className="rounded-xl border border-teal-300 bg-teal-50 p-4 leading-relaxed">
-              Start your theory timeclock when prompted. Use 1. Lesson video to watch, then
-              2. Reading &amp; workbook to read, write, save, and complete the lesson assessment.
-              You can switch views without losing your writing.
+              Start your theory timeclock when prompted. Use 1. Lesson video to watch, then 2.
+              Reading &amp; workbook to read, write, save, and complete the lesson assessment. You
+              can switch views without losing your writing.
             </p>
           ) : null}
           <LearningWorkspace
-            initialView={handsOnClockOnly || course.id === BOOKKEEPING_COURSE_ID ? 'preview' : 'split'}
-            instructionLabel={course.id === BOOKKEEPING_COURSE_ID ? '2. Reading & workbook' : 'Workbook & lesson activities'}
-            previewLabel={course.id === BOOKKEEPING_COURSE_ID ? '1. Lesson video' : 'Theory lesson & video'}
+            initialView={
+              handsOnClockOnly || course.id === BOOKKEEPING_COURSE_ID ? 'preview' : 'split'
+            }
+            instructionLabel={
+              course.id === BOOKKEEPING_COURSE_ID
+                ? '2. Reading & workbook'
+                : 'Workbook & lesson activities'
+            }
+            previewLabel={
+              course.id === BOOKKEEPING_COURSE_ID ? '1. Lesson video' : 'Theory lesson & video'
+            }
             instructions={
               <>
                 <LessonPicker courseId={course.id} lessonId={lesson.id} lessons={lessonList} />
+                {hasHvacSimulation && !preview.active ? (
+                  <a
+                    href="#hvac-simulation"
+                    className="mt-3 inline-flex min-h-11 items-center rounded-xl bg-cyan-800 px-5 py-3 text-base font-bold text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-800"
+                  >
+                    Open this lesson’s interactive simulation
+                  </a>
+                ) : null}
                 {handsOnClockOnly ? (
                   <p className="mt-3 rounded-xl bg-amber-50 p-4 font-bold text-amber-950">
                     Use the timeclock only for supervised hands-on training. Online theory and
@@ -458,7 +482,10 @@ export default async function LessonPage({
                   </section>
                 ) : null}
                 {lessonHtml ? (
-                  <section id="lesson-reading" className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                  <section
+                    id="lesson-reading"
+                    className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
+                  >
                     <h2 className="text-xl font-bold text-slate-950">Lesson reading</h2>
                     <p className="mt-1 text-sm text-slate-600">
                       Read the instructions here, then complete the activities below.
@@ -477,6 +504,9 @@ export default async function LessonPage({
                     lesson complete.
                   </section>
                 )}
+                {hasHvacSimulation && !preview.active ? (
+                  <HvacCourseSimulation key={lesson.id} courseId={course.id} lessonId={lesson.id} />
+                ) : null}
                 {lessonWorkbook && <LessonWorkbook {...lessonWorkbook} />}
                 <WorkbookLessonInstruction resources={lesson.resources} />
                 {keyTerms.length ? (

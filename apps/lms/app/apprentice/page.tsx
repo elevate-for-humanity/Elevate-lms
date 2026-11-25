@@ -30,6 +30,9 @@ import { courseOverviewPath } from '@/lib/lms/routes';
 import { getProgramHeroImage } from '@/lib/images/programImages';
 import { resolveApprenticeshipRuntimeContext } from '@/lib/apprenticeship/runtime-context';
 import { loadRegisteredApprenticeshipProgress } from '@/lib/apprenticeship/progress-service';
+import { loadPracticalServiceSummary } from '@/lib/apprenticeship/practical-dashboard';
+import PracticalServicesCard from '@/components/apprenticeship/PracticalServicesCard';
+import TuitionRefundPolicyNotice from '@/components/apprenticeship/TuitionRefundPolicyNotice';
 import { resolveApplicableWage } from '@/lib/apprenticeship/registered-program-contract';
 import { resolvePortalPreviewSubject } from '@/lib/admin/portal-preview';
 import { getBeautyApprenticeshipConfig } from '@/lib/apprenticeship/beauty-program-config';
@@ -622,6 +625,7 @@ export default async function ApprenticePortalPage({
         </details>
         <MandatoryBillingSetup requirement={billingRequirement} readOnly={subject.previewing} />
         {requiredPolicyPanel}
+        <TuitionRefundPolicyNotice />
         <section className="grid gap-4 sm:grid-cols-3">
           <Metric
             label={beautyProgram?.hostLabel || 'Host Shop'}
@@ -673,6 +677,10 @@ export default async function ApprenticePortalPage({
   }
 
   const progress = await loadRegisteredApprenticeshipProgress(db, runtime);
+  const practicalSummary = await loadPracticalServiceSummary(db, {
+    enrollmentIds: [runtime.enrollment.id].filter(Boolean),
+    programSlug,
+  });
   const wage = resolveApplicableWage(runtime.contract, progress.competencies.completed);
   const nextWageMilestone =
     runtime.contract.standard.wageMilestones.find(
@@ -782,6 +790,8 @@ export default async function ApprenticePortalPage({
           </div>
         </div>
       </section>
+
+      <TuitionRefundPolicyNotice />
 
       <section
         className={`rounded-2xl border p-5 ${placementReady ? 'border-cyan-200 bg-cyan-50 text-cyan-950' : 'border-slate-200 bg-slate-50 text-slate-950'}`}
@@ -923,6 +933,24 @@ export default async function ApprenticePortalPage({
           }
         />
       </section>
+
+      <PracticalServicesCard
+        heading="Practical services"
+        totalsLine={
+          practicalSummary.unavailable
+            ? 'Practical service progress is temporarily unavailable.'
+            : practicalSummary.hasTargets
+              ? `${practicalSummary.recordedCount} of ${practicalSummary.requiredCount} required hands-on practices verified by your Host Shop`
+              : practicalSummary.totalVerified > 0
+                ? `${practicalSummary.totalVerified} verified ${practicalSummary.totalVerified === 1 ? 'service' : 'services'} recorded by your Host Shop`
+                : 'No verified services recorded yet'
+        }
+        percent={practicalSummary.hasTargets ? practicalSummary.percent : null}
+        recentEntries={practicalSummary.recentEntries}
+        note="Services are recorded and verified by your Host Shop owner after observing the complete safe workflow. You can view your progress here — you cannot check off your own services. These practice counts do not award Appendix A competencies, workplace hours, or RTI credit."
+        primaryLink={{ href: '/apprentice/practical-progress', label: 'View my practical progress' }}
+        unavailable={practicalSummary.unavailable}
+      />
 
       {priorLearning ? (
         <PriorLearningPanel priorLearning={priorLearning} nativePercent={digitalCoursePercent} />

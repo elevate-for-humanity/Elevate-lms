@@ -315,6 +315,14 @@ export const getHostShopBoard = cache(async function getHostShopBoard(userId: st
     string,
     { completed: number; required: number | null; progressModel: TradeTarget['progressModel'] }
   > = {};
+  const practicalByStudent: Record<string, number> = {};
+  let practicalServicesTotal = 0;
+  let practicalRecentEntries: {
+    id: string;
+    service_name: string;
+    performed_on: string;
+    subject_type: string;
+  }[] = [];
   let pendingHoursCount = 0;
   if (studentIds.length) {
     const { data: hourRows, error: hourError } = await db
@@ -402,6 +410,39 @@ export const getHostShopBoard = cache(async function getHostShopBoard(userId: st
         };
       }
     }
+    // Mentor-verified practical services (cuts, colors, shaves, facials, …)
+    // recorded by the Host Shop owner. Counts only verified, non-voided
+    // entries so the dashboard never presents an unconfirmed service as done.
+    // Filtering happens in code so the query uses only the universally
+    // mocked chainable methods (select/in).
+    const { data: practicalRows, error: practicalError } = enrollmentIds.length
+      ? await db
+          .from('host_shop_practical_service_entries')
+          .select('id,enrollment_id,student_id,service_name,performed_on,subject_type,verified_at,voided_at')
+          .in('enrollment_id', enrollmentIds)
+      : { data: [], error: null };
+    if (practicalError) unavailableData.push('practical services');
+    const verifiedPracticalRows = (practicalError ? [] : practicalRows || []).filter(
+      (row: any) => row.verified_at && !row.voided_at,
+    );
+    for (const row of verifiedPracticalRows) {
+      const studentId = row.student_id as string;
+      if (!studentId || !placementByStudent.has(studentId)) continue;
+      practicalByStudent[studentId] = (practicalByStudent[studentId] || 0) + 1;
+      practicalServicesTotal += 1;
+    }
+    practicalRecentEntries = verifiedPracticalRows
+      .slice()
+      .sort((a: any, b: any) =>
+        String(b.performed_on || '').localeCompare(String(a.performed_on || '')),
+      )
+      .slice(0, 5)
+      .map((row: any) => ({
+        id: String(row.id),
+        service_name: String(row.service_name || ''),
+        performed_on: String(row.performed_on || ''),
+        subject_type: String(row.subject_type || ''),
+      }));
   }
 
   const programType = resolveHostShopProgram(partner);
@@ -517,7 +558,10 @@ export const getHostShopBoard = cache(async function getHostShopBoard(userId: st
         progressModel: apprentice.tradeInfo.progressModel,
       },
       competency: competencyProgress[apprentice.student_id] || null,
+      practical: { verified: practicalByStudent[apprentice.student_id] || 0 },
     })),
     pendingHoursCount,
+    practicalServicesTotal,
+    practicalRecentEntries,
   };
 });

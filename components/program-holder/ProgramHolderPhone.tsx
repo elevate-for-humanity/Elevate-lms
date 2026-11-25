@@ -1,4 +1,5 @@
 'use client';
+// Branch refreshed to pick up main (a11d77d8): CI Preflight test fixes for the worker-start dispatcher/resume changes.
 // Branch refreshed to pick up main (2c73e61c): fresh CI after E2E shard 3/4 environment failure on the 71e31a22 base.
 
 import { DashboardVideoCalls } from '@/components/communications/DashboardVideoCalls';

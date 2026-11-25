@@ -22,6 +22,7 @@ import {
   queueCourseMedia,
   normalizeGeneratedCourseForGovernance,
 } from '@/lib/course-builder/orchestrator';
+import { upgradePersistedAuthoredCourse } from '@/lib/course-factory/persisted-authored-upgrade';
 import {
   saveCourseModule,
   saveCourseLesson,
@@ -96,6 +97,7 @@ type CourseBuilderAction =
   | 'publish'
   | 'publish-persisted'
   | 'repair'
+  | 'compile-authored'
   | 'generate-missing'
   | 'start-existing';
 
@@ -349,6 +351,55 @@ export async function POST(req: NextRequest) {
     }
   }
 
+  if (action === 'compile-authored') {
+    // Self-serve authored-course compile: the same canonical compile the
+    // upgrade-authored-course operations workflow runs (compile each
+    // persisted lesson, lock its narration contract, create its video job),
+    // available for ANY course straight from the Course Builder. Identity
+    // comes from the course record itself — there is no slug allowlist.
+    const courseId = typeof body.courseId === 'string' ? body.courseId.trim() : '';
+    if (!courseId) {
+      return NextResponse.json({ ok: false, error: 'courseId is required' }, { status: 400 });
+    }
+    const lessonIds = Array.isArray(body.lessonIds)
+      ? body.lessonIds.filter(
+          (id: unknown): id is string => typeof id === 'string' && id.trim().length > 0,
+        )
+      : undefined;
+    try {
+      const db = await requireAdminClient();
+      await assertCourseBuilderGenerationEnabled(db, courseId);
+      const result = await upgradePersistedAuthoredCourse(
+        courseId,
+        db,
+        lessonIds?.length ? { lessonIds } : undefined,
+      );
+      return NextResponse.json({
+        ok: true,
+        courseId: result.courseId,
+        courseSlug: result.courseSlug,
+        lessonCount: result.lessonCount,
+        compiledLessons: result.repairedLessonCount,
+        // The upgrade creates or refreshes exactly one canonical video job
+        // per compiled lesson; the queue worker renders them automatically.
+        videosQueued: result.repairedLessonCount,
+      });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : '';
+      if (/not found|no persisted lessons|module is missing|missing lesson/i.test(message)) {
+        return NextResponse.json({ ok: false, error: message }, { status: 422 });
+      }
+      if (/PAUSED/.test(message)) {
+        return NextResponse.json({ ok: false, error: message }, { status: 409 });
+      }
+      logger.error('[course-builder] Authored compile failed', error);
+      return NextResponse.json(
+        { ok: false, error: 'Authored course compile failed' },
+        { status: 500 },
+      );
+    }
+  }
+
   if (action === 'save-program-config') {
     try {
       return NextResponse.json({
@@ -530,7 +581,10 @@ export async function POST(req: NextRequest) {
 
   if (action === 'publish') {
     try {
-      const result = await publishGovernedCourse((body.template ?? body) as any);
+      const result = await publishGovernedCourse((body.template ?? body) as any, undefined, {
+        actorId: auth.id,
+        publishOverride: body.publishOverride ?? null,
+      });
       return NextResponse.json(result, { status: result.ok ? 202 : 422 });
     } catch (error) {
       logger.error('[course-builder] Governed publication failed', error);

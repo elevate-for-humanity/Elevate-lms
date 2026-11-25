@@ -18,6 +18,8 @@ import {
 } from 'lucide-react';
 import TextToSpeech from '@/components/TextToSpeech';
 import CommercialLessonExperience from '@/components/lms/CommercialLessonExperience';
+import ManifoldGaugeSimulator from '@/components/lms/ManifoldGaugeSimulator';
+import { MANIFOLD_GAUGE_SIMULATOR_KEY } from '@/lib/lms/manifold-gauge-simulation';
 
 type Interaction = {
   id: string;
@@ -185,6 +187,18 @@ export default function InteractiveLessonExperience({
           return <HotspotActivity key={interaction.id} interaction={interaction} />;
         if (interaction.type === 'drag-drop' || interaction.type === 'matching')
           return <MatchingActivity key={interaction.id} interaction={interaction} />;
+        if (
+          interaction.type === 'simulation' &&
+          interaction.data?.simulator === MANIFOLD_GAUGE_SIMULATOR_KEY
+        )
+          return (
+            <ManifoldGaugeSimulator
+              key={interaction.id}
+              interaction={interaction}
+              courseId={courseId}
+              lessonId={lessonId}
+            />
+          );
         if (interaction.type === 'practical' || interaction.type === 'simulation')
           return (
             <PracticalActivity

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {inspectCourseAutopilot} from '../../lib/ultimate-course-builder/worker/paris-monitor.mjs';
+import {inspectCourseAutopilot,inspectOrphanedPool} from '../../lib/ultimate-course-builder/worker/paris-monitor.mjs';
 import {monitorCourseQueue,latestRoleJobs} from './paris-course-monitor.mjs';
 const now=new Date('2026-10-14T18:00:00Z');
 test('source revision failures require reconciliation even when a PARIS repair receipt exists',()=>{
@@ -505,4 +505,103 @@ test('failed autopilot stage requeues once canonical readiness is positively ver
  assert.equal(changes.attempts,undefined,'preserve attempt history');
  assert.equal(changes.execution_generation,3);
  assert.equal(result[0].action,'requeue');
+});
+
+test('a failed internal repair with no recorded receipt requests one instead of parking',()=>{
+ const observation=inspectCourseAutopilot(job({status:'failed',attempts:2,
+  last_error:'ULTIMATE_INTERNAL_REPAIR_REQUIRED:lesson-a:FINDINGS=[{"step":"visual_assignment"}]'}),{},+now);
+ assert.equal(observation.state,'repair_unrequested');
+ assert.equal(observation.action,'request_repair');
+ // Durable external blockers keep their own remedy and never auto-request.
+ for(const last_error of [
+  'ULTIMATE_INTERNAL_REPAIR_REQUIRED:lesson-a:FINDINGS=[{"code":"MEDIA_LICENSE_REQUIRED"}]',
+  'ULTIMATE_INTERNAL_REPAIR_REQUIRED:lesson-a:FINDINGS=[{"code":"COURSE_OBJECT_STORAGE_UPLOAD_FAILED"}]',
+  'ULTIMATE_INTERNAL_REPAIR_REQUIRED:lesson-a:OWNER_SOURCE_GAP',
+ ]) {
+  const blocked=inspectCourseAutopilot(job({status:'failed',attempts:2,last_error}),{},+now);
+  assert.equal(blocked.action,'none',last_error);
+ }
+});
+
+test('a deleted repair receipt is re-requested; a live one still parks as repair_requested',()=>{
+ const base=job({status:'failed',attempts:2,monitor:{enabled:true,repairId:'gone',recoveries:3},
+  last_error:'ULTIMATE_AUTOPILOT_STAGE_NOT_COMPLETE:synchronization'});
+ const missing=inspectCourseAutopilot({...base,repairReceiptMissing:true},{},+now);
+ assert.equal(missing.state,'repair_receipt_missing');
+ assert.equal(missing.action,'request_repair');
+ const live=inspectCourseAutopilot(base,{},+now);
+ assert.equal(live.state,'repair_requested');
+ assert.equal(live.action,'observe');
+ // A resumable failure still wins over a missing receipt.
+ const resumable=inspectCourseAutopilot(job({status:'failed',attempts:1,
+  monitor:{enabled:true,repairId:'gone',recoveries:0},repairReceiptMissing:true,
+  last_error:'ULTIMATE_AUTOPILOT_STAGE_NOT_COMPLETE:synchronization'}),{},+now);
+ assert.equal(resumable.action,'requeue');
+});
+
+test('orphaned pools are detected only when active, failed and long without a worker',()=>{
+ const pool={id:'pool',build_id:'build',state:'active',created_at:'2026-10-01T00:00:00Z',updated_at:'2026-10-01T00:00:00Z'};
+ const failed={id:'lesson-job',status:'failed',payload:{autopilot:{role:'media'}},heartbeat_at:'2026-10-02T00:00:00Z',updated_at:'2026-10-02T00:00:00Z'};
+ const orphan=inspectOrphanedPool(pool,[failed],+now);
+ assert.equal(orphan.state,'pool_orphaned');
+ assert.deepEqual(orphan.failedJobIds,['lesson-job']);
+ assert.match(orphan.reason,/cannot claim while this pool says active/);
+ // Fresh activity, a live lease, no failures, or a finished pool are not orphans.
+ assert.equal(inspectOrphanedPool(pool,[{...failed,heartbeat_at:'2026-10-14T17:59:00Z'}],+now),null);
+ assert.equal(inspectOrphanedPool(pool,[{...failed,status:'running',lease_expires_at:'2026-10-14T19:00:00Z'}],+now),null);
+ assert.equal(inspectOrphanedPool(pool,[{...failed,status:'completed'}],+now),null);
+ assert.equal(inspectOrphanedPool({...pool,state:'completed'},[failed],+now),null);
+});
+
+test('monitor re-requests a repair whose receipt was deleted and records the new receipt',async()=>{
+ const row=job({status:'failed',attempts:2,build_id:'build-1',
+  payload:{autopilot:{role:'media'}},monitor:{enabled:true,repairId:'deleted-repair',recoveries:3},
+  last_error:'ULTIMATE_AUTOPILOT_STAGE_NOT_COMPLETE:synchronization',
+  ultimate_course_builds:{status:'running',ownerPaused:false}});
+ const patches=[],posts=[];
+ const result=await monitorCourseQueue({env:monitorEnv,now,request:async(url,options={})=>{
+  const value=String(url);
+  if(options.method==='PATCH'){patches.push(JSON.parse(options.body));return {ok:true,json:async()=>[{id:'job'}]};}
+  if(options.method==='POST'&&value.includes('paris_code_repairs')){posts.push(JSON.parse(options.body));return {ok:true,json:async()=>[]};}
+  if(value.includes('paris_code_repairs')&&value.includes('fingerprint=eq.'))return {ok:true,json:async()=>[{id:'new-repair',status:'queued'}]};
+  if(value.includes('paris_code_repairs'))return {ok:true,json:async()=>[]};
+  if(value.includes('paris_autopilot_policy'))return {ok:true,json:async()=>[{enabled:true,actor_id:'paris-actor'}]};
+  if(value.includes('ultimate_autopilot_pools'))return {ok:true,json:async()=>[]};
+  if(value.includes('/rpc/'))return {ok:true,json:async()=>[]};
+  return {ok:true,json:async()=>[row]};
+ }});
+ assert.equal(posts.length,1);
+ assert.equal(posts[0].fingerprint,'course:job:quality');
+ assert.equal(posts[0].source_job_id,'job');
+ const monitorWrite=patches.find(body=>body.monitor?.repairId==='new-repair');
+ assert.ok(monitorWrite,'the new receipt must be persisted on the job monitor');
+ assert.equal(monitorWrite.monitor.state,'repair_receipt_missing');
+ assert.equal(result.find(o=>o.jobId==='job')?.state,'repair_receipt_missing');
+});
+
+test('monitor names an orphaned pool on the coordinator job instead of awaiting assignment',async()=>{
+ const coordinator={id:'coord',build_id:'build-1',job_type:'course_build',status:'queued',attempts:0,max_attempts:5,
+  execution_generation:1,monitor:{enabled:true},heartbeat_at:null,updated_at:'2026-10-02T00:00:00Z',
+  ultimate_course_builds:{status:'running',ownerPaused:false}};
+ const lesson={id:'lesson-job',build_id:'build-1',job_type:'lesson_autopilot:lesson-a:media',status:'failed',attempts:2,max_attempts:5,
+  execution_generation:40,monitor:{enabled:true,repairId:'live-repair'},heartbeat_at:'2026-10-02T00:00:00Z',updated_at:'2026-10-02T00:00:00Z',
+  payload:{autopilot:{role:'media'}},last_error:'ULTIMATE_INTERNAL_REPAIR_REQUIRED:lesson-a:FINDINGS=[]',
+  ultimate_course_builds:{status:'running',ownerPaused:false}};
+ const pool={id:'pool-1',build_id:'build-1',state:'active',created_at:'2026-10-01T00:00:00Z',updated_at:'2026-10-01T00:00:00Z'};
+ const patches=new Map();
+ const result=await monitorCourseQueue({env:monitorEnv,now,request:async(url,options={})=>{
+  const value=String(url);
+  if(options.method==='PATCH'){
+   const id=new URL(value).searchParams.get('id').slice(3);
+   patches.set(id,JSON.parse(options.body));return {ok:true,json:async()=>[{id}]};
+  }
+  if(value.includes('paris_code_repairs'))return {ok:true,json:async()=>[{id:'live-repair'}]};
+  if(value.includes('ultimate_autopilot_pools'))return {ok:true,json:async()=>[pool]};
+  if(value.includes('/rpc/'))return {ok:true,json:async()=>[]};
+  return {ok:true,json:async()=>[coordinator,lesson]};
+ }});
+ const coordObservation=result.find(o=>o.jobId==='coord');
+ assert.equal(coordObservation.state,'pool_orphaned');
+ assert.equal(patches.get('coord').monitor.state,'pool_orphaned');
+ assert.deepEqual(patches.get('coord').monitor.failedJobIds,['lesson-job']);
 });

@@ -75,3 +75,17 @@ registerSimulation({
   description:
     'Retail case scenarios (Cases A/B/C): read the facts, make the decision, and check the numbers.',
 });
+
+// Manifold gauge + refrigerant charging lab for the EPA 608 course
+// (components/lms/ManifoldGaugeSimulator.tsx, scenario + server-side scorer
+// in lib/lms/manifold-gauge-simulation.ts). Attempts are scored through the
+// learner interactions API and recorded in interaction_progress; venting
+// refrigerant hard-fails the attempt under Clean Air Act §608.
+registerSimulation({
+  id: 'hvac-manifold-gauge-charging',
+  title: 'Manifold Gauge & Refrigerant Charging Simulator',
+  trade: 'hvac',
+  component: 'HvacManifoldGaugeSimulator',
+  description:
+    'Hands-on manifold gauge lab: connect the gauges, calculate superheat and subcooling from the PT chart, and charge an undercharged R-410A TXV system to its subcooling target — recover, never vent.',
+});

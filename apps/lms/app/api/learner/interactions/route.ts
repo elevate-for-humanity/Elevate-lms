@@ -17,6 +17,10 @@ import {
   buildLessonLearningObjects,
   type LearningObject,
 } from '@/lib/course-factory/learning-objects';
+import {
+  scoreManifoldGaugeAttempt,
+  type ManifoldGaugeSimulationConfig,
+} from '@/lib/lms/manifold-gauge-simulation';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -40,7 +44,7 @@ const AttemptSchema = z.object({
   courseId: z.string().uuid(),
   lessonId: z.string().uuid(),
   interactionId: z.string().min(1).max(240),
-  interactionType: z.enum(['knowledge-check', 'scenario', 'case-study']),
+  interactionType: z.enum(['knowledge-check', 'scenario', 'case-study', 'simulation']),
   responses: z.array(z.number().int().nonnegative()).min(1).max(50),
 });
 
@@ -196,7 +200,9 @@ export async function POST(request: NextRequest) {
           : `${lesson.slug}-kc`
         : interactionType === 'case-study'
           ? `${lesson.slug}-case`
-          : `${lesson.slug}-scenario`;
+          : interactionType === 'simulation'
+            ? `${lesson.slug}-simulation`
+            : `${lesson.slug}-scenario`;
     if (interactionId !== expectedId) {
       return privateJson(
         { error: 'Interaction does not belong to this lesson' },
@@ -334,6 +340,19 @@ function scoreAttempt(
   weakObjectives: string[];
   feedback: Record<string, unknown>;
 } | null {
+  if (type === 'simulation') {
+    // Hands-on simulation modules (e.g. the manifold gauge charging lab)
+    // carry their authored scenario under experience.simulation and score
+    // with their own server-side scorer at the lesson's mastery threshold.
+    const config = experience.simulation as ManifoldGaugeSimulationConfig | undefined;
+    if (!config) return null;
+    return scoreManifoldGaugeAttempt(
+      config,
+      responses,
+      resolveLessonMasteryPolicy(experience).threshold,
+    );
+  }
+
   if (type === 'knowledge-check') {
     const questions = Array.isArray(experience.knowledgeChecks) ? experience.knowledgeChecks : [];
     if (!questions.length || responses.length !== questions.length) return null;

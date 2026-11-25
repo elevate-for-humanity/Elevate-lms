@@ -35,15 +35,28 @@ export async function storeSmsEvent(
       .select('id')
       .eq('phone_system_id', number.phone_system_id)
       .maybeSingle();
-    const { data: admin } = workspace
-      ? await db
-          .from('communication_extensions')
-          .select('profile_id')
-          .eq('workspace_id', workspace.id)
-          .eq('extension', '0')
-          .eq('enabled', true)
-          .maybeSingle()
-      : { data: null };
+    // The fallback thread owner is the operator: whichever extension row the
+    // phone system designates as its admin extension
+    // (phone_systems.admin_extension), never a literal extension '0'.
+    const { data: system } = await db
+      .from('phone_systems')
+      .select('admin_extension')
+      .eq('id', number.phone_system_id)
+      .maybeSingle();
+    const adminExtension =
+      typeof system?.admin_extension === 'string' && system.admin_extension.trim()
+        ? system.admin_extension.trim()
+        : null;
+    const { data: admin } =
+      workspace && adminExtension
+        ? await db
+            .from('communication_extensions')
+            .select('profile_id')
+            .eq('workspace_id', workspace.id)
+            .eq('extension', adminExtension)
+            .eq('enabled', true)
+            .maybeSingle()
+        : { data: null };
     const owner = prior?.owner_profile_id || admin?.profile_id || null;
     const { error } = await db
       .from('communication_sms_messages')

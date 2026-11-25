@@ -95,9 +95,9 @@ jobs:
         run: node scripts/qa/provision-remaining-portal-e2e.mjs provision
       - name: Provision disposable Learner and Program Holder QA identities
         run: node scripts/qa/provision-learner-program-holder-e2e.mjs provision
-    - name: Provision disposable Apprenticeship QA identities
-    if: ${{ matrix.shard == 4 }}
-    run: node scripts/qa/provision-apprenticeship-e2e.mjs provision
+      - name: Provision disposable Apprenticeship QA identities
+        if: ${{ matrix.shard == 4 }}
+        run: node scripts/qa/provision-apprenticeship-e2e.mjs provision
       - name: Verify preinstalled Playwright browsers
         run: node scripts/verify-playwright-runtime.mjs chromium
       - name: Verify published marketing artwork through Next image loader
@@ -110,7 +110,7 @@ jobs:
       - name: Authenticated Host Shop desktop, tablet and mobile geometry
         if: ${{ matrix.shard == 1 && env.E2E_HOST_SHOP_EMAIL != '' && env.E2E_HOST_SHOP_PASSWORD != '' }}
         run: >-
-                  pnpm exec playwright test tests/e2e/portal-responsive-design.spec.ts
+          pnpm exec playwright test tests/e2e/portal-responsive-design.spec.ts
           --grep "critical Host Shop surfaces fit the active device viewport"
           --project=desktop-chrome --project=tablet-chrome
           --project=android-chrome --project=iphone-webkit
@@ -160,9 +160,9 @@ jobs:
       - name: Clean up disposable Employer, Instructor, Staff, Case Manager and Admin QA identities
         if: always()
         run: node scripts/qa/provision-remaining-portal-e2e.mjs cleanup
-    - name: Clean up disposable Apprenticeship QA identities
-    if: ${{ always() && matrix.shard == 4 }}
-    run: node scripts/qa/provision-apprenticeship-e2e.mjs cleanup
+      - name: Clean up disposable Apprenticeship QA identities
+        if: ${{ always() && matrix.shard == 4 }}
+        run: node scripts/qa/provision-apprenticeship-e2e.mjs cleanup
       - name: Upload Playwright report
         if: always()
         uses: actions/upload-artifact@v7

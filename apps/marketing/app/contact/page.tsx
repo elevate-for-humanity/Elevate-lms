@@ -227,13 +227,13 @@ export default async function ContactPage({ searchParams }: ContactPageProps) {
                     <div><p className="text-sm text-slate-500">Technical Support — Login and Website Help</p><p className="font-semibold">{siteConfig.technicalSupport.display}</p></div>
                   </a>
 
-                  <a href="mailto:info@elevateforhumanity.org" className="flex items-center gap-3 text-slate-700 hover:text-brand-orange-600 transition-colors">
+                  <a href="mailto:support@elevateforhumanity.org" className="flex items-center gap-3 text-slate-700 hover:text-brand-orange-600 transition-colors">
                     <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center">
                       <Mail className="w-5 h-5 text-brand-blue-700" />
                     </div>
                     <div>
                       <p className="text-sm text-slate-500">Email</p>
-                      <p className="font-semibold">info@elevateforhumanity.org</p>
+                      <p className="font-semibold">support@elevateforhumanity.org</p>
                     </div>
                   </a>
                   

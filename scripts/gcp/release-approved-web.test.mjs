@@ -1,4 +1,5 @@
 import test from 'node:test';
+// Branch refreshed to pick up main (a11d77d8): CI Preflight test fixes for the worker-start dispatcher/resume changes.
 // Branch refreshed to pick up main (e8b0e402): fresh CI after E2E shard 3/4 environment failure on the fcad399b base.
 import assert from 'node:assert/strict';
 import { releaseApprovedWeb, releaseCurrentWorkflow, resolveReleaseCredential, dispatchCompletedMainCI } from './release-approved-web.mjs';

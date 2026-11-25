@@ -5,7 +5,7 @@ export const QMA: ProgramSchema = {
   title: 'Qualified Medication Aide (QMA)',
   subtitle: 'Indiana QMA training pathway in 4 weeks. Administer medications under nurse supervision in residential care settings. Public workforce funding is not represented unless a verified program record is published. Self-pay: $1,200.',
   sector: 'healthcare', category: 'Healthcare', programType: 'workforce',
-  heroImage: '/images/pages/pharmacy-tech.webp',
+  heroImage: '/images/program-media-20261016/qma.webp',
   heroImageAlt: 'Qualified Medication Aide preparing medications for supervised administration',
   videoSrc: '/videos/cna-hero.mp4',
   deliveryMode: 'hybrid', deliveredBy: 'Elevate', durationWeeks: 4, hoursPerWeekMin: 30, hoursPerWeekMax: 40,

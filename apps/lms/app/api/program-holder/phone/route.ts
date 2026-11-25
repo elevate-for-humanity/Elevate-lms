@@ -297,6 +297,14 @@ export async function PATCH(request: Request) {
               error: statusError
                 ? 'Registration evidence could not be saved.'
                 : 'The SIP registration is not currently reachable.',
+              // When the provisioner no longer holds this device at all
+              // (its lease expired and the record was removed), no
+              // heartbeat can ever succeed again. Say so distinctly so
+              // the client stops heartbeating a dead device and does a
+              // full re-provision/connect cycle instead.
+              ...(!statusError && evidence.provisioned === false
+                ? { code: 'device_not_provisioned' }
+                : {}),
             },
             { status: statusError ? 500 : 409 },
           );

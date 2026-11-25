@@ -1,3 +1,4 @@
+// Branch refreshed to pick up main (71e31a22): /apply/student E2E fix + Dockerfile.google-lms.
 // GitHub workflow conclusion alone does not prove a service reached production.
 // Validation-only jobs can succeed while all deployment stages were skipped.
 const requiredReleaseJobs = Object.freeze({

@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+// Branch refreshed to pick up main (a11d77d8): CI Preflight test fixes for the worker-start dispatcher/resume changes.
 // Branch refreshed to pick up main (e8b0e402): fresh CI after E2E shard 3/4 environment failure on the fcad399b base.
 import Link from 'next/link';
 import { ArrowRight, Check, Code, Shield } from 'lucide-react';

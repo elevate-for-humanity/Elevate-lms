@@ -1,5 +1,5 @@
 import { appOrigin, peerOrigin } from './helpers/app-origins';
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type APIRequestContext, type Page } from '@playwright/test';
 
 const BASE = appOrigin('lms');
 const APPRENTICE_EMAIL = process.env.E2E_APPRENTICE_EMAIL || process.env.TEST_STUDENT_EMAIL || '';
@@ -40,12 +40,51 @@ async function login(page: Page, email: string, password: string, base = BASE) {
   ]);
 }
 
-async function expectPortalRoute(page: Page, path: string, expectedText?: RegExp) {
+// A failure that can be produced by a `next dev` restart mid-navigation:
+// the document load aborts (ERR_ABORTED/ECONNRESET/503). Mirrors the
+// restart handling in tests/e2e/public-site.spec.ts (assertNoRuntimeFailure).
+const RESTART_TRANSIENT_MESSAGE =
+  /503|empty body|did not return a response|ERR_ABORTED|ECONNRESET|ChunkLoadError|no healthy upstream|returned 5\d\d/i;
+const SERVER_READY_TIMEOUT_MS = 120_000;
+const SERVER_READY_POLL_MS = 2_000;
+
+async function waitForServerReady(request: APIRequestContext): Promise<boolean> {
+  const deadline = Date.now() + SERVER_READY_TIMEOUT_MS;
+  while (Date.now() < deadline) {
+    try {
+      const response = await request.get('/', { maxRedirects: 5, timeout: 5_000 });
+      if (response.status() < 400) return true;
+    } catch {
+      // Server is down or still restarting; keep polling until the deadline.
+    }
+    await new Promise((resolve) => setTimeout(resolve, SERVER_READY_POLL_MS));
+  }
+  return false;
+}
+
+async function expectPortalRouteOnce(page: Page, path: string, expectedText?: RegExp) {
   const response = await page.goto(`${BASE}${path}`, { waitUntil: 'domcontentloaded' });
   expect(response?.status() ?? 200, `${path} returned a server error`).toBeLessThan(500);
   expect(page.url(), `${path} redirected to unauthorized`).not.toContain('/unauthorized');
   expect(page.url(), `${path} unexpectedly returned to login`).not.toMatch(/\/login(?:\?|$)/);
   if (expectedText) await expect(page.locator('body')).toContainText(expectedText);
+}
+
+async function expectPortalRoute(page: Page, path: string, expectedText?: RegExp) {
+  try {
+    await expectPortalRouteOnce(page, path, expectedText);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    if (!RESTART_TRANSIENT_MESSAGE.test(message)) throw error;
+    // The LMS dev server restarted under the navigation (Next exits 77 past
+    // its heap threshold and drops in-flight requests). Wait until the server
+    // answers again, then navigate once more; a failure on the second pass
+    // is a real failure, not a restart. Run 45623494305 failed here with
+    // net::ERR_ABORTED at /apprentice/hours.
+    const ready = await waitForServerReady(page.request);
+    if (!ready) throw error;
+    await expectPortalRouteOnce(page, path, expectedText);
+  }
 }
 
 async function expectBrowserDeniedFromPortal(page: Page, path: string) {

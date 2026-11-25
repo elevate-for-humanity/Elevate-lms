@@ -7,13 +7,23 @@ test('probe reads both projection and filtered queue without launching or claimi
  const result=await probeCourseDispatchQueue({env,request:async(url,options)=>{
   calls.push(new URL(url));
   assert.equal(options.method,undefined);
-  assert.match(url.searchParams.get('select'),/owner_paused:profile->>ownerPaused/);
+  const select=url.searchParams.get('select');
+  if(!select.includes('owner_paused:profile->>ownerPaused')){
+   // The dispatcher's pool-blocked diagnostic projects pools instead of the
+   // owner-pause projection; serve its real row shape. The probe's sample
+   // shape check rejects it and the dispatcher swallows that diagnostic
+   // failure by design, so this is the last call the probe makes.
+   assert.match(select,/active_pools:ultimate_autopilot_pools/);
+   return {ok:true,json:async()=>[{id:'job',build_id:'build',build:{active_pools:{id:'pool',state:'active',created_at:'2026-01-01T00:00:00.000Z'}}}]};
+  }
   return {ok:true,json:async()=>[{id:'job',build:{owner_paused:url.searchParams.has('build.profile->>ownerPaused')?'false':'true',active_pools:null}}]};
  }});
- assert.equal(calls.length,2);
+ assert.equal(calls.length,3);
  assert.equal(calls[0].searchParams.has('or'),false);
  assert.equal(calls[0].searchParams.has('build.profile->>ownerPaused'),false);
  assert.equal(calls[1].searchParams.get('build.profile->>ownerPaused'),'eq.false');
+ assert.equal(calls[2].searchParams.get('limit'),'1');
+ assert.equal(calls[2].searchParams.get('status'),'in.(queued,running)');
  assert.equal(result.readOnly,true);assert.equal(result.eligibleRows,1);
 });
 test('probe rejects invalid parent shapes and cannot accept empty sample evidence',async()=>{
@@ -37,7 +47,7 @@ test('probe retries bounded transient timeouts and still validates both projecti
   if(requests===1)throw Object.assign(new Error('network timeout'),{name:'TimeoutError'});
   return {ok:true,json:async()=>[{build:{owner_paused:requests===2?'true':'false',active_pools:null}}]};
  }});
- assert.equal(requests,3);assert.deepEqual(waits,[500]);
+ assert.equal(requests,5);assert.deepEqual(waits,[500]);
  assert.equal(result.projectionVerified,true);assert.equal(result.pausedFilterVerified,true);
 });
 test('probe never turns persistent timeouts into a passing gate',async()=>{

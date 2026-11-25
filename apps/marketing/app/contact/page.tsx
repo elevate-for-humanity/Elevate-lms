@@ -1,4 +1,4 @@
-import { isEmtInquiryOnly } from '@/lib/programs/emt-inquiry-only';
+import { EMT_PROGRAM_SLUG, isEmtInquiryOnly } from '@/lib/programs/emt-inquiry-only';
 import HeroPicture from '@/components/marketing/HeroPicture';
 import { siteConfig } from '@/lib/config/site';
 import { Metadata } from 'next';
@@ -75,7 +75,8 @@ export default async function ContactPage({ searchParams }: ContactPageProps) {
                 )}
                 
                 <ContactRequestForm>
-                  {courseBuilderMessage && <input type="hidden" name="interest" value={product} />}
+                  {emtInquiry && <input type="hidden" name="program" value={EMT_PROGRAM_SLUG} />}
+                  {!emtInquiry && courseBuilderMessage && <input type="hidden" name="interest" value={product} />}
                   {/* Name */}
                   <div>
                     <label htmlFor="name" className="block text-sm font-semibold text-slate-700 mb-2">

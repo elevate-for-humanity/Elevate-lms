@@ -16,13 +16,15 @@ export default function PublicCatalogCard({
   const apprenticeship = !inquiryOnly && variant === 'apprenticeship';
   const funded = !inquiryOnly && program.funding_tier === 'workforce-funded';
   const image = getProgramCardImage(program.slug);
+  const title = inquiryOnly ? 'Emergency Medical Technician (EMT)' : program.title;
+  const category = inquiryOnly ? 'Healthcare training' : program.category;
   return (
     <article className="group flex h-full min-w-0 flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-lg">
       <div className="relative aspect-[4/3] shrink-0 overflow-hidden bg-slate-100">
         <ProgramCardImage
           src={image}
-          alt={`${program.title} training program`}
-          category={inquiryOnly ? 'Healthcare training' : program.category}
+          alt={`${title} training program`}
+          category={category}
         />
         <div className="absolute left-3 top-3 flex flex-wrap gap-2">
           {inquiryOnly ? (
@@ -50,10 +52,10 @@ export default function PublicCatalogCard({
       </div>
       <div className="flex flex-1 flex-col p-5 sm:p-6">
         <p className="mb-2 text-xs font-extrabold uppercase tracking-wider text-slate-500">
-          {program.category}
+          {category}
         </p>
         <h3 className="line-clamp-2 min-h-[3.5rem] break-words text-xl font-extrabold leading-tight text-slate-950">
-          {program.title}
+          {title}
         </h3>
         {inquiryOnly ? (
           <p className="mt-3 text-base text-slate-700">Ask about future EMT training. Enrollment is not open.</p>

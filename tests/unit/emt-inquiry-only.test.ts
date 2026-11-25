@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
-import { EMT_INQUIRY_HREF, isEmtInquiryOnly } from '../../lib/programs/emt-inquiry-only';
+import { EMT_INQUIRY_HREF, isEmtInquiryOnly, isEmtInterviewSelection } from '../../lib/programs/emt-inquiry-only';
 
 const read = (path: string) => readFileSync(path, 'utf8');
 
@@ -30,6 +30,50 @@ describe('temporary EMT inquiry-only policy', () => {
     'apps/marketing/app/apply/student/interview/page.tsx',
   ])('redirects saved EMT application routes through %s', (path) => {
     expect(read(path)).toMatch(/if \(isEmtInquiryOnly.*redirect\(EMT_INQUIRY_HREF\)/);
+  });
+
+  it.each(['EMT', 'EMT training.', 'Emergency Medical Technician (EMT)', 'emt-apprenticeship'])(
+    'recognizes EMT when selected or typed as %s', (value) => {
+      expect(isEmtInterviewSelection(value)).toBe(true);
+    },
+  );
+
+  it.each(['paramedic', 'EMT or CNA', 'hvac-technician', undefined])(
+    'does not divert a different or ambiguous interview answer: %s', (value) => {
+      expect(isEmtInterviewSelection(value)).toBe(false);
+    },
+  );
+
+  it('routes interview choices, typed and resumed answers, and the exact API link to inquiries', () => {
+    const page = read('apps/marketing/app/apply/student/interview/page.tsx');
+    const workspace = read('apps/marketing/app/apply/student/interview/ParisApplicationWorkspace.tsx');
+    expect(page).toContain('!isEmtInquiryOnly(program.slug)');
+    expect(page).toContain('href={EMT_INQUIRY_HREF}');
+    expect(workspace).toContain("session?.nextQuestion?.field === 'program' && isEmtInterviewSelection(value)");
+    expect(workspace).toContain('isEmtInterviewSelection(pending.value)');
+    expect(workspace).toContain('data.inquiryUrl === EMT_INQUIRY_HREF');
+  });
+
+  it('keeps historical standard-form EMT drafts out of application and payment', () => {
+    const form = read('apps/marketing/app/apply/student/StudentApplicationForm.tsx');
+    expect(form).toContain('isEmtInquiryOnly(resumed.program)');
+    expect(form).toContain('isEmtInquiryOnly(form.program)');
+    expect(form).toContain('data.inquiryUrl === EMT_INQUIRY_HREF');
+  });
+
+  it('posts structured EMT interest independently of editable message text', () => {
+    const page = read('apps/marketing/app/contact/page.tsx');
+    const route = read('apps/marketing/app/api/contact/route.ts');
+    expect(page).toContain('name="program" value={EMT_PROGRAM_SLUG}');
+    expect(route).toContain('program_interest: data.program || data.interest || null');
+  });
+
+  it('shows inquiry cards outside the searchable enrollment groups', () => {
+    const page = read('apps/marketing/app/programs/page.tsx');
+    expect(page).toContain('const apprenticeships = enrollmentPrograms.filter(isApprenticeship)');
+    expect(page).toContain('const careerTraining = enrollmentPrograms.filter');
+    expect(page).toContain('inquiryOnly.map((program) => <PublicCatalogCard');
+    expect(page).not.toContain('<ProgramsExplorer programs={inquiryOnly}');
   });
 
   it('blocks the active payment and application writes server-side', () => {

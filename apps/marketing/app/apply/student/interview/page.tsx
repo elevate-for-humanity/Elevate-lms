@@ -35,7 +35,7 @@ async function loadApplicationPrograms() {
     if (error) throw error;
     if (data?.length) {
       return data
-        .filter((program) => Boolean(program.slug && program.title))
+        .filter((program) => Boolean(program.slug && program.title) && !isEmtInquiryOnly(program.slug))
         .map((program) => ({ slug: program.slug as string, title: program.title as string }));
     }
   } catch (error) {
@@ -47,7 +47,8 @@ async function loadApplicationPrograms() {
 
   // Recovery fallback only. Canonical application submission still resolves the
   // selected slug against public.programs before accepting the application.
-  return ALL_PROGRAMS.map((program) => ({ slug: program.slug, title: program.title }));
+  return ALL_PROGRAMS.filter((program) => !isEmtInquiryOnly(program.slug))
+    .map((program) => ({ slug: program.slug, title: program.title }));
 }
 
 export default async function ParisStudentApplicationPage({
@@ -135,6 +136,9 @@ export default async function ParisStudentApplicationPage({
             <p className="mt-2"><strong>2. Full Enrollment Application:</strong> pay the required deposit or tuition, complete the full application, and submit to activate your enrollment and dashboard. Required onboarding and placement still apply before training starts.</p>
             {initialProgram && <Link href={`/enroll/${encodeURIComponent(initialProgram)}`} className="mt-4 inline-block rounded-xl bg-blue-700 px-5 py-3 font-bold text-white">Start Full Enrollment Application</Link>}
           </div>}
+          <p className="mb-5 text-sm text-slate-700">
+            Interested in EMT? <Link href={EMT_INQUIRY_HREF} className="font-bold text-blue-800 underline">Ask about future EMT training</Link> instead of starting an application.
+          </p>
           <ParisApplicationWorkspace
             programs={programs}
             initialProgram={initialProgram}

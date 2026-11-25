@@ -1,4 +1,5 @@
 'use client';
+// Branch refreshed to pick up main (2c73e61c): fresh CI after E2E shard 3/4 environment failure on the 71e31a22 base.
 
 import { DashboardVideoCalls } from '@/components/communications/DashboardVideoCalls';
 import { AudioOutputControl } from '@/components/communications/AudioOutputControl';

@@ -26,6 +26,7 @@ import { scopePhoneProfileQuery, phoneNumberProfileChoices } from '@/lib/phone/p
 import { PHONE_MANAGER_ROLES } from '@/lib/phone/access';
 import { hydrateProcessEnv } from '@/lib/secrets';
 import { probePhoneReadiness } from '@/lib/phone/readiness-probe';
+import { DEFAULT_SMS_AUTO_REPLY_MESSAGE } from '@/lib/phone/sms-auto-reply';
 import { derivePhoneDevicePresence } from '@/lib/phone/availability';
 import { summarizePhoneReadiness } from '@/lib/phone/readiness';
 import {
@@ -194,6 +195,8 @@ export default async function PhonePage() {
       'Identify yourself as PARIS with Elevate for Humanity. Answer ordinary caller questions first using verified Elevate website and platform knowledge. Use the live enabled extension directory when the caller asks for a person or department or needs a human. Name the staff member and extension before offering the transfer. Never identify an individual staff member as the administrator unless their live role says so. Never guess unverified program, funding, enrollment, licensing, payment, or compliance information; offer a human transfer when uncertain.',
     aiAllowInterruptions: system?.ai_allow_interruptions ?? true,
     aiHumanHandoffEnabled: system?.ai_human_handoff_enabled ?? true,
+    smsAutoReplyEnabled: system?.sms_auto_reply_enabled ?? false,
+    smsAutoReplyMessage: system?.sms_auto_reply_message ?? DEFAULT_SMS_AUTO_REPLY_MESSAGE,
   };
 
   const cards = [

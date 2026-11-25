@@ -1,17 +1,26 @@
-export async function storeSmsEvent(db: any, event: any) {
+/**
+ * Stores one provider messaging event. For an inbound text it returns the
+ * owning phone system and profile so callers (the Twilio webhook) can run
+ * follow-ups such as the SMS auto-reply against the stored message; other
+ * event kinds return null.
+ */
+export async function storeSmsEvent(
+  db: any,
+  event: any,
+): Promise<{ phoneSystemId: string; ownerProfileId: string | null } | null> {
   const payload = event.data.payload,
     kind = event.data.event_type;
   if (kind === 'message.received') {
     const to = payload.to?.[0]?.phone_number,
       from = payload.from?.phone_number;
-    if (!to || !from || !payload.id) return;
+    if (!to || !from || !payload.id) return null;
     const { data: number } = await db
       .from('phone_numbers')
       .select('phone_system_id')
       .eq('e164', to)
       .eq('status', 'active')
       .maybeSingle();
-    if (!number) return;
+    if (!number) return null;
     const { data: prior } = await db
       .from('communication_sms_messages')
       .select('owner_profile_id')
@@ -70,6 +79,7 @@ export async function storeSmsEvent(db: any, event: any) {
           },
           { onConflict: 'idempotency_key', ignoreDuplicates: true },
         );
+    return { phoneSystemId: number.phone_system_id, ownerProfileId: owner };
   } else if (['message.sent', 'message.finalized'].includes(kind)) {
     const status =
       payload.to?.[0]?.status || (kind === 'message.sent' ? 'sent' : 'delivery_unconfirmed');
@@ -82,4 +92,5 @@ export async function storeSmsEvent(db: any, event: any) {
       .eq('provider_message_id', payload.id);
     if (error) throw Error('SMS receipt storage failed');
   }
+  return null;
 }

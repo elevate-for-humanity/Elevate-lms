@@ -1,6 +1,6 @@
 'use client';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { groupSmsThreads, smsThreadPreview, type SmsMessageLike } from '@/lib/phone/sms-threads';
+import { groupSmsThreads, isSmsAutoReply, smsThreadPreview, type SmsMessageLike } from '@/lib/phone/sms-threads';
 
 export function TextWorkspace() {
   const [data, setData] = useState<any>(null),
@@ -177,7 +177,8 @@ export function TextWorkspace() {
                     className="mt-2 block font-bold text-blue-800 underline">Open picture or attachment {index + 1}</a>
                 ))}
                 <p className="mt-2 text-xs text-slate-600">
-                  {m.direction === 'inbound' ? 'Received' : 'Sent'} · {m.status} · {new Date(m.created_at).toLocaleString()}
+                  {m.direction === 'inbound' ? 'Received' : 'Sent'} · {m.status}
+                  {isSmsAutoReply(m) ? ' · Auto-reply' : ''} · {new Date(m.created_at).toLocaleString()}
                 </p>
                 {m.error_message && <p className="mt-2 text-sm text-red-800">{m.error_message}</p>}
               </article>

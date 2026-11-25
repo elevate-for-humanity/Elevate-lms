@@ -26,6 +26,7 @@ import { scopePhoneProfileQuery, phoneNumberProfileChoices } from '@/lib/phone/p
 import { PHONE_MANAGER_ROLES } from '@/lib/phone/access';
 import { hydrateProcessEnv } from '@/lib/secrets';
 import { probePhoneReadiness } from '@/lib/phone/readiness-probe';
+import { derivePhoneDevicePresence } from '@/lib/phone/availability';
 import { summarizePhoneReadiness } from '@/lib/phone/readiness';
 import {
   CapabilityGuide,
@@ -124,9 +125,9 @@ export default async function PhonePage() {
           .order('extension'),
         db
           .from('phone_webrtc_devices')
-          .select('id', { count: 'exact', head: true })
+          .select('registration_state, connection_state, last_seen_at')
           .eq('status', 'active')
-          .gte('last_seen_at', new Date(Date.now() - 120_000).toISOString()),
+          .limit(500),
       ])
     : ([
         { data: [] },
@@ -138,7 +139,7 @@ export default async function PhonePage() {
         { data: [] },
         { data: [] },
         { data: [] },
-        { count: 0 },
+        { data: [] },
       ] as any);
 
   // Retired carrier inventory must not appear as a current dashboard number.
@@ -154,6 +155,12 @@ export default async function PhonePage() {
     (profile: any) => !String(profile.email || '').endsWith('@qa.invalid'),
   );
   const extensions = extensionsResult.data ?? [];
+  // Stored device state is never trusted on its own: a handset that vanished
+  // without disconnecting leaves 'registered' rows behind. Presence is
+  // derived from last_seen_at freshness.
+  const liveDeviceCount = (devicesResult.data ?? []).filter(
+    (device: any) => derivePhoneDevicePresence(device).live,
+  ).length;
   const directoryEntries = extensions.filter((entry: any) => entry.enabled);
   const settings: PhoneSettings = {
     greeting:
@@ -232,7 +239,7 @@ export default async function PhonePage() {
     },
     {
       label: 'Connect one PWA phone',
-      complete: (devicesResult.count ?? 0) > 0,
+      complete: liveDeviceCount > 0,
     },
     {
       label: 'Call history recorded',

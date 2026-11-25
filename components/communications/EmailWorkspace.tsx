@@ -129,6 +129,7 @@ export function EmailWorkspace({
   initialRecipient,
   initialSubject = '',
   communicationLinks,
+  guideHref,
 }: {
   apiPath?: string;
   initialMailboxId?: string;
@@ -136,6 +137,7 @@ export function EmailWorkspace({
   roleLabel?: string;
   initialRecipient?: string;
   initialSubject?: string;
+  guideHref?: string;
   communicationLinks?: { phone: string; chat: string; calendar: string } | null;
 }) {
   const [data, setData] = useState<WorkspaceData | null>(null);
@@ -505,6 +507,11 @@ export function EmailWorkspace({
 
   return (
     <div className="space-y-4">
+      {guideHref && (
+        <a href={guideHref} className="inline-block text-sm font-semibold text-blue-800 underline">
+          How to use Interoffice Email
+        </a>
+      )}
       {data.isAdmin && (
         <button
           type="button"

@@ -7,7 +7,6 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import { apiRequireRoles } from '@/lib/admin/guards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
-import { resolveProfileAccessUpdate } from '@/lib/admin/profile-access';
 
 export const runtime = 'nodejs';
 
@@ -38,12 +37,9 @@ async function _POST(request: NextRequest) {
     }
 
     const db = await requireAdminClient();
-    // profiles.status alone does not block LMS access — no LMS guard reads
-    // it. Suspending must also set suspended/is_active, the columns the
-    // guards in lib/auth actually check (see lib/admin/profile-access.ts).
     const { error } = await db
       .from('profiles')
-      .update({ ...resolveProfileAccessUpdate(status), updated_at: new Date().toISOString() })
+      .update({ status, updated_at: new Date().toISOString() })
       .eq('id', userId);
 
     if (error) {

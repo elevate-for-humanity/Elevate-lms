@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
+import { siteUrls } from '@/lib/utils/site-urls';
 
 export const dynamic = 'force-dynamic';
 
@@ -29,12 +30,25 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   );
 }
 
-export default async function InterofficeEmailHelpPage() {
+const inboxByMailbox = new Map([
+  ['host-shop', '/host-shop/email'],
+  ['program-holder', '/program-holder/email'],
+  ['admin', `${siteUrls.admin}/phone/email`],
+]);
+
+export default async function InterofficeEmailHelpPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ mailbox?: string }>;
+}) {
+  const { mailbox } = await searchParams;
+  const inbox = typeof mailbox === 'string' ? inboxByMailbox.get(mailbox) : undefined;
+  const guidePath = inbox ? `/communications/email/help?mailbox=${mailbox}` : '/communications/email/help';
   const db = await createClient();
   const {
     data: { user },
   } = await db.auth.getUser();
-  if (!user) redirect('/login?redirect=%2Fcommunications%2Femail%2Fhelp');
+  if (!user) redirect(`/login?redirect=${encodeURIComponent(guidePath)}`);
 
   return (
     <main className="mx-auto max-w-3xl space-y-4 p-4 sm:p-6">
@@ -46,15 +60,14 @@ export default async function InterofficeEmailHelpPage() {
       </h1>
       <p className="text-[15px] leading-7 text-slate-700">
         Interoffice Email is Elevate&apos;s own built-in email system, inside the Elevate app. It
-        is <strong>not Gmail</strong> — you do not need a separate email app or a Google account
-        to use it. Every active staff member, learner, and apprentice gets a personal Elevate
+        runs in your Elevate account, alongside the rest of your portal. Every active staff member, learner, and apprentice gets a personal Elevate
         mailbox automatically. Approved program holders and host shops get an organization mailbox
         automatically. A message you send to another Elevate person lands in their Interoffice
         Email inbox. A message to an outside address is also delivered as a regular email.
       </p>
       <p>
         <Link
-          href="/communications/email"
+          href={inbox ?? '/communications/email'}
           className="inline-flex min-h-11 items-center rounded-xl bg-blue-700 px-5 text-sm font-black text-white"
         >
           Back to Email
@@ -66,7 +79,7 @@ export default async function InterofficeEmailHelpPage() {
           <Step n={1}>Sign in to the Elevate app at app.elevateforhumanity.org with your Elevate account.</Step>
           <Step n={2}>
             In the menu, tap <strong>Interoffice Email</strong> (students and apprentices) or{' '}
-            <strong>Email</strong> (host shops and program holders).
+            <strong>Email</strong> (host shops, program holders, and staff).
           </Step>
           <Step n={3}>Your inbox opens. Your own email address shows at the top of the page.</Step>
         </ol>

@@ -50,20 +50,14 @@ export default async function InterofficeEmail({
       role={shellRole}
     >
       <main className="space-y-3 p-4">
-        <details className="rounded-xl border border-slate-200 bg-white p-4 text-sm text-slate-700">
-          <summary className="cursor-pointer font-bold">How to use Interoffice Email</summary>
-          <p className="mt-2">
-            Open a message and choose Reply. To start a conversation, choose Compose and select a
-            contact from the directory.
-          </p>
-          <p className="mt-2">
-            <a href="/communications/email/help" className="font-bold text-blue-800 underline">
-              Read the step-by-step guide: sending, replying, attachments, folders, and fixing
-              common problems
-            </a>
-          </p>
-        </details>
+        {['student', 'learner', 'apprentice'].includes(shellRole) && (
+          <details className="rounded-xl border border-slate-200 bg-white p-4 text-sm text-slate-700">
+            <summary className="cursor-pointer font-bold">How to use your Inbox</summary>
+            <p className="mt-2">Open a message and choose Reply. To start a conversation, choose Compose and select your assigned instructor or Elevate support from the contact list.</p>
+          </details>
+        )}
         <EmailWorkspace
+          guideHref="/communications/email/help"
           initialThreadId={typeof params.threadId === 'string' ? params.threadId : undefined}
           roleLabel="account holder"
           initialMailboxId={typeof params.mailboxId === 'string' && /^[0-9a-f-]{36}$/i.test(params.mailboxId) ? params.mailboxId : undefined}

@@ -22,20 +22,22 @@ export const organizationSchema: WithContext<Organization> = {
   '@type': 'Organization',
   name: PLATFORM_DEFAULTS.orgName,
   url: baseUrl,
-  logo: `${baseUrl}/images/logo.png`,
+  logo: `${baseUrl}/images/Elevate_for_Humanity_logo_81bf0fab.jpg`,
   description:
     'Career training, registered apprenticeship support, credential preparation, and program-specific workforce funding pathways in Indiana.',
   address: {
     '@type': 'PostalAddress',
+    streetAddress: '120 East Market Street, Suite 930',
     addressLocality: 'Indianapolis',
     addressRegion: 'IN',
+    postalCode: '46204',
     addressCountry: 'US',
   },
   contactPoint: {
     '@type': 'ContactPoint',
     telephone: `+1-${PLATFORM_DEFAULTS.mainPhone}`,
     contactType: 'Admissions',
-    email: `info@${PLATFORM_DEFAULTS.canonicalDomain}`,
+    email: `support@${PLATFORM_DEFAULTS.canonicalDomain}`,
   },
   sameAs: [
     'https://www.facebook.com/61578240192934/',
@@ -50,11 +52,15 @@ export const educationalOrganizationSchema: WithContext<EducationalOrganization>
   '@type': 'EducationalOrganization',
   name: PLATFORM_DEFAULTS.orgName,
   url: baseUrl,
+  logo: `${baseUrl}/images/Elevate_for_Humanity_logo_81bf0fab.jpg`,
   description: 'Workforce development and career training programs',
+  telephone: `+1-${PLATFORM_DEFAULTS.mainPhone}`,
   address: {
     '@type': 'PostalAddress',
+    streetAddress: '120 East Market Street, Suite 930',
     addressLocality: 'Indianapolis',
     addressRegion: 'IN',
+    postalCode: '46204',
     addressCountry: 'US',
   },
 };
@@ -125,7 +131,7 @@ export function generateArticleSchema(article: {
       name: PLATFORM_DEFAULTS.orgName,
       logo: {
         '@type': 'ImageObject',
-        url: `${baseUrl}/images/logo.png`,
+        url: `${baseUrl}/images/Elevate_for_Humanity_logo_81bf0fab.jpg`,
       },
     },
     datePublished: article.datePublished,

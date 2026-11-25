@@ -3,10 +3,10 @@ export const siteConfig = {
   name: 'Elevate for Humanity',
   url: 'https://www.elevateforhumanity.org',
   description: 'Career training, workforce pathways, and community-centered education programs.',
-  phone: '' + PLATFORM_DEFAULTS.supportPhone + '',
+  phone: '' + PLATFORM_DEFAULTS.mainPhone + '',
   email: 'elevate4humanityedu@gmail.com',
-  address: 'Indianapolis, IN',
-  hours: 'Mon–Fri 8am–6pm, Sat 9am–1pm EST',
+  address: '120 E Market St, Suite 930, Indianapolis, IN 46204',
+  hours: 'Mon–Fri 9am–5pm, Sat by appointment EST',
   nav: [
     { label: 'Programs', href: '/programs' },
     { label: 'Career Training', href: '/career-training' },

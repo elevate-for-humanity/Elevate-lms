@@ -12,7 +12,7 @@ vi.mock('@/lib/supabase/admin', () => ({
         }],
         host_shop_applications: [{
           id: 'mesmerized-app', shop_name: 'Mesmerized by Beauty Cosmetology Academy',
-          address: '120 E Market Street, Suite 560, Indianapolis, IN 46204',
+          address: '120 E Market Street, Suite 930, Indianapolis, IN 46204',
           intake: { programs: ['esthetician-apprenticeship', 'nail-technician-apprenticeship'] },
         }],
         public_host_shops: [{

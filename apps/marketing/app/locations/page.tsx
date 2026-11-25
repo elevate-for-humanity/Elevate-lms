@@ -8,6 +8,7 @@ import { MapPin, Phone, Mail, Clock, Navigation } from 'lucide-react';
 import HeroVideo from '@/components/marketing/HeroVideo';
 import heroBanners from '@/content/heroBanners';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { siteConfig } from '@/lib/config/site';
 
 export const metadata: Metadata = {
   title: 'Locations | Elevate for Humanity',
@@ -163,9 +164,12 @@ export default async function LocationsPage() {
                     Hours of Operation
                   </h4>
                   <div className="space-y-2 text-slate-700">
-                    <p>Monday - Friday: 8:00 AM - 6:00 PM</p>
-                    <p>Saturday: 9:00 AM - 1:00 PM</p>
-                    <p>Sunday: Closed</p>
+                    {/* Hours come from the central site config — keep in sync
+                        with lib/config/site.ts, lib/config/organization.ts,
+                        and the Google Business Profile. */}
+                    <p>Monday - Friday: {siteConfig.hours.weekdays}</p>
+                    <p>Saturday: {siteConfig.hours.saturday}</p>
+                    <p>Sunday: {siteConfig.hours.sunday}</p>
                   </div>
                 </div>
               </div>

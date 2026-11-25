@@ -36,7 +36,10 @@ import { ScrollNarrator } from '@/components/home/ScrollNarrator';
 import { MediaPlaybackCoordinator } from '@/components/media/MediaPlaybackCoordinator';
 
 const siteUrl = 'https://www.elevateforhumanity.org';
-const logoUrl = `${siteUrl}/images/logo.png`;
+// Complete official logo (emblem + "Elevate for Humanity" wordmark). Do NOT
+// use /images/logo.png here — that file is the emblem only and is clipped
+// at the bottom.
+const logoUrl = `${siteUrl}/images/Elevate_for_Humanity_logo_81bf0fab.jpg`;
 const shareImageUrl = `${siteUrl}/images/partners/salon-saloon/team-sign.webp`;
 
 export const metadata: Metadata = {
@@ -108,6 +111,18 @@ const organizationJsonLd = {
     postalCode: '46204',
     addressCountry: 'US',
   },
+  geo: {
+    '@type': 'GeoCoordinates',
+    latitude: 39.768761,
+    longitude: -86.155515,
+  },
+  openingHours: ['Mo-Fr 09:00-17:00'],
+  sameAs: [
+    'https://www.facebook.com/61578240192934/',
+    'https://linkedin.com/company/elevate-for-humanity',
+    'https://instagram.com/elevateforhumanity',
+    'https://www.youtube.com/@elevateforhumanity',
+  ],
   description:
     'Career and technical education provider connecting learners with training, registered apprenticeships, testing and credential pathways, workforce funding navigation, employers, and supportive services.',
   knowsAbout: [

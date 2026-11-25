@@ -6,7 +6,9 @@ import { organization } from '@/lib/config/organization';
 
 export default function StructuredData() {
   const barber = PROGRAMS['barber-apprenticeship'];
-  const telephoneDigits = PLATFORM_DEFAULTS.supportPhone.replace(/\D/g, '');
+  // Organization telephone is the main business line. (The legacy support
+  // line must never be published as the organization's number.)
+  const telephoneDigits = PLATFORM_DEFAULTS.mainPhone.replace(/\D/g, '');
   const telephone =
     telephoneDigits.length === 11 && telephoneDigits.startsWith('1')
       ? `+${telephoneDigits}`

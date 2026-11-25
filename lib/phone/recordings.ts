@@ -85,7 +85,7 @@ function audioResponse(
   }
   if (parsed) {
     const body = audio.subarray(parsed.start, parsed.end + 1);
-    return new Response(body, {
+    return new Response(copyResponseBytes(body), {
       status: 206,
       headers: {
         ...headers,
@@ -94,9 +94,20 @@ function audioResponse(
       },
     });
   }
-  return new Response(audio, {
+  return new Response(copyResponseBytes(audio), {
     headers: { ...headers, 'Content-Length': String(audio.length) },
   });
+}
+
+/**
+ * Response accepts ArrayBuffer-backed bodies. A Uint8Array may be typed over
+ * SharedArrayBuffer in current TypeScript libraries, so copy the requested
+ * bytes into an owned ArrayBuffer before constructing the response.
+ */
+function copyResponseBytes(bytes: Uint8Array): ArrayBuffer {
+  const copy = new Uint8Array(bytes.byteLength);
+  copy.set(bytes);
+  return copy.buffer;
 }
 
 /** Call only after verifying the requesting user owns the associated inbox row. */

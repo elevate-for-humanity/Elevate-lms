@@ -25,6 +25,9 @@
 //   the old script recorded those as failures and gave up.
 // - /videos/*.mp4 references found on the pages are range-checked too, so
 //   a missing hero video fails the run loudly instead of silently.
+// - Removed '/get-started' from the default page set (2026-11-25): no such
+//   route exists in apps/marketing (404 live, no redirect) and no live page
+//   links to it; '/apply' is the real entry point and is already in the set.
 //
 // TODO (needs workflow scope): add this as a post-deploy step in the
 // Marketing release workflow so warming is automatic, not manual.
@@ -47,7 +50,6 @@ const DEFAULT_PAGES = [
   '/lms',
   '/employers',
   '/training-providers',
-  '/get-started',
   '/contact',
   '/student-portal',
 ].map((p) => ORIGIN + p);

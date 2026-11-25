@@ -83,7 +83,7 @@
     {
       "source": "app/tax-software/professional/page.tsx",
       "target": "apps/marketing/app/tax-software/professional/page.tsx",
-      "sha256": "1dcbf5837f8e3aeda679c57fe8b7d4c26f1505001d2dacfeac422f007e5cf01f",
+      "sha256": "ea825a41f9f6eea28c6a4ce90a6088f67e75605e96bea4b40a5d3ba5d2cee4c9",
       "sourceSha256": "882dca6f8f981f5d77a9b0d5636181526abeff05eb0adeb009991d0fb158c9d5",
       "localRevisionReason": "Owner-authorized withdrawal of the defective Bookkeeping offering: remove its tax-training promotion and enrollment links; retain Business Administration and the immutable upstream source digest."
     },

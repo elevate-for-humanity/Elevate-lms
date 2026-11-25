@@ -67,6 +67,9 @@ test('monitor proves Contents write before reviving a branch-creation failure',(
  // no proven write authority, no revival.
  assert.match(section,/const branchFailure=isGithubAppBranchFailure\(repair\);/);
  assert.match(section,/diagnostic\?\.repository\?\.permissions\?\.contentsWrite===true/);
+ // Installation tokens report no repository flags; issuance proved contents:write.
+ assert.match(section,/diagnostic\?\.repository\?\.permissions\?\.contentsWrite===null/);
+ assert.doesNotMatch(section,/contentsWrite===false/);
  assert.match(section,/if\(branchFailure\?githubAppWriteHealth:githubAppRecoveryHealth\)\{/);
  assert.ok(section.indexOf('if(branchFailure?githubAppWriteHealth:githubAppRecoveryHealth)')<
   section.indexOf("status:'queued'"));

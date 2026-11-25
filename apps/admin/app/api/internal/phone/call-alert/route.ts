@@ -63,7 +63,7 @@ export async function POST(request: Request) {
     }
     const body = await readBody(request);
     const callerName =
-      typeof body.callerName === 'string' ? body.callerName.replace(/[\u0000-\u001f\u007f]/g, ' ').trim() : '';
+      typeof body.callerName === 'string' ? Array.from(body.callerName, (c) => (c.charCodeAt(0) < 32 || c.charCodeAt(0) === 127 ? ' ' : c)).join('').trim() : '';
     if (
       !UUID.test(body.id || '') ||
       !/^(0|[1-9][0-9]{2})$/.test(body.extension || '') ||

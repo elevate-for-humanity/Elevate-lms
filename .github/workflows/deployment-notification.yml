@@ -1,7 +1,7 @@
 name: Deployment Notifications
 concurrency:
-group: ${{ github.workflow }}-${{ github.ref }}
-cancel-in-progress: true
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.deployment.id || github.run_id }}
+  cancel-in-progress: false
 
 on:
   workflow_dispatch:
@@ -21,9 +21,6 @@ jobs:
       - uses: actions/checkout@v4
       - name: Check deployment state
         id: check
-        concurrency:
-        group: ${{ github.workflow }}-${{ github.ref }}-${{ github.event.deployment.id }}
-        cancel-in-progress: false
         run: |
           node --input-type=module <<'NODE'
           import { readFileSync, appendFileSync } from 'node:fs';

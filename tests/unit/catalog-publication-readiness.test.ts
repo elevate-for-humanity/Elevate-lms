@@ -26,7 +26,7 @@ beforeAll(async () => {
     create table program_tracks (program_id uuid references programs, available boolean, title text);
     create table program_modules (program_id uuid references programs, is_published boolean, title text,
       id uuid primary key default gen_random_uuid());
-    create table program_lessons (module_id uuid references program_modules);
+    create table program_lessons (module_id uuid references program_modules, is_published boolean);
     create table program_credentials (program_id uuid references programs);
     create table program_outcomes (program_id uuid references programs);
     create table program_versions (org_id uuid, program_id uuid, version integer, snapshot jsonb,
@@ -67,7 +67,8 @@ it('rejects missing assessments and atomically accepts a complete linked course 
     update programs set hero_image_url='/images/example.webp' where id='${programId}';
     insert into program_ctas values ('${programId}','Apply','/apply?program=example');
     insert into program_tracks values ('${programId}',true,'Self-pay');
-    insert into program_modules (program_id,is_published,title) values ('${programId}',true,'First module');
+    insert into program_modules (program_id,is_published,title) values ('${programId}',false,'First module');
+    insert into program_lessons select id,false from program_modules;
   `);
   await expect(db.query('select publish_catalog_program($1,$1)', [programId]))
     .rejects.toThrow('Approve the program');
@@ -76,6 +77,7 @@ it('rejects missing assessments and atomically accepts a complete linked course 
     .rejects.toThrow('finish publishing the linked LMS course');
   expect((await db.query('select version from program_versions')).rows).toEqual([]);
   expect((await db.query('select url from program_media')).rows).toEqual([]);
+  expect((await db.query('select is_published from program_lessons')).rows).toEqual([{ is_published: false }]);
   await expect(db.exec(`update programs set published=true where id='${programId}'`))
     .rejects.toThrow('Supply program hero media');
 
@@ -99,6 +101,7 @@ it('rejects missing assessments and atomically accepts a complete linked course 
   expect((await db.query('select status from courses')).rows).toEqual([{ status: 'published' }]);
   expect((await db.query('select version from program_versions')).rows).toEqual([{ version: 1 }]);
   expect((await db.query('select url from program_media')).rows).toEqual([{ url: '/images/example.webp' }]);
+  expect((await db.query('select is_published from program_lessons')).rows).toEqual([{ is_published: true }]);
   expect((await db.query("select has_function_privilege('authenticated','publish_catalog_program(uuid,uuid)','execute') as allowed")).rows)
     .toEqual([{ allowed: false }]);
 });

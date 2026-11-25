@@ -194,6 +194,16 @@ begin
     'program_tracks', (select coalesce(jsonb_agg(to_jsonb(t)), '[]'::jsonb) from public.program_tracks t where t.program_id = program.id)
   );
 
+  -- These rows are the catalog outline, separate from the linked LMS lessons.
+  -- Their visibility advances only if the complete publication commits.
+  if program.has_lms_course is true or program.delivery_model = 'internal_lms' then
+    update public.program_modules set is_published = true where program_id = program.id;
+    update public.program_lessons l set is_published = true
+      where exists (
+        select 1 from public.program_modules m where m.id = l.module_id and m.program_id = program.id
+      );
+  end if;
+
   update public.programs set version = next_version, published = true, is_active = true,
     status = 'published', review_status = 'published', published_at = saved_at,
     published_by = p_actor_id, updated_at = saved_at

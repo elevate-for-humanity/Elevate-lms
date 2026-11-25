@@ -1,4 +1,5 @@
 // Branch refreshed to pick up main (71e31a22): /apply/student E2E fix + Dockerfile.google-lms.
+// Branch refreshed to pick up main (dbe7a427): fresh CI after E2E shard 3/4 environment failure on the 433802fb base.
 // Branch refreshed to pick up main (a5daf49d): Course Builder merge; fresh CI after E2E shard 3/4 environment failure.
 import { spawnSync } from 'node:child_process';
 

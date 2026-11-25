@@ -1,3 +1,4 @@
+import { EMT_INQUIRY_HREF, isEmtInquiryOnly } from '@/lib/programs/emt-inquiry-only';
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { verifyPaidApplication } from '@/lib/enrollment/paid-application';
@@ -62,6 +63,7 @@ export default async function ParisStudentApplicationPage({
 }) {
   const params = await searchParams;
   const initialProgram = resolveSlug(params?.program || '') || '';
+  if (isEmtInquiryOnly(params?.program) || isEmtInquiryOnly(initialProgram)) redirect(EMT_INQUIRY_HREF);
   const applicationIntent = params?.intent === 'enrollment' ? 'enrollment' : 'inquiry';
   const paymentSessionId = params?.billing_invoice_id || '';
   if (applicationIntent === 'enrollment' &&

@@ -1,3 +1,4 @@
+import { EMT_INQUIRY_HREF, EMT_INQUIRY_MESSAGE, isEmtInquiryOnly } from '@/lib/programs/emt-inquiry-only';
 import { getInitialProgramInvoiceCents } from '@/lib/programs/deposit-policy';
 import { programInstallmentTerms, installmentSchedule, firstWeeklyInvoiceDate } from '@/lib/programs/installment-terms';
 import { InvoiceTermsConflict } from '@/lib/billing/revise-unpaid-program-invoice';
@@ -116,6 +117,9 @@ export async function POST(request: NextRequest) {
     }
     if (!program) {
       return NextResponse.json({ error: 'Program not found' }, { status: 404 });
+    }
+    if (isEmtInquiryOnly(program.slug)) {
+      return NextResponse.json({ error: EMT_INQUIRY_MESSAGE, inquiryUrl: EMT_INQUIRY_HREF }, { status: 409 });
     }
     const payment_plan = body.payment_plan ?? (/apprentice/i.test(program.slug) ? 'installments' : 'full');
     if (body.down_payment_cents !== undefined &&

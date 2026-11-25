@@ -1,4 +1,5 @@
 'use client';
+import { EMT_INQUIRY_HREF, isEmtInquiryOnly } from '@/lib/programs/emt-inquiry-only';
 import Link from 'next/link';
 import { ArrowRight, Award, Clock, DollarSign, ShieldCheck, Star } from 'lucide-react';
 import type { ProgramsPageRow } from '@/lib/programs/public-programs-page';
@@ -11,8 +12,9 @@ export default function PublicCatalogCard({
   program: ProgramsPageRow;
   variant?: 'training' | 'apprenticeship';
 }) {
-  const apprenticeship = variant === 'apprenticeship';
-  const funded = program.funding_tier === 'workforce-funded';
+  const inquiryOnly = isEmtInquiryOnly(program.slug);
+  const apprenticeship = !inquiryOnly && variant === 'apprenticeship';
+  const funded = !inquiryOnly && program.funding_tier === 'workforce-funded';
   const image = getProgramCardImage(program.slug);
   return (
     <article className="group flex h-full min-w-0 flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-lg">
@@ -20,10 +22,12 @@ export default function PublicCatalogCard({
         <ProgramCardImage
           src={image}
           alt={`${program.title} training program`}
-          category={program.category}
+          category={inquiryOnly ? 'Healthcare training' : program.category}
         />
         <div className="absolute left-3 top-3 flex flex-wrap gap-2">
-          {apprenticeship ? (
+          {inquiryOnly ? (
+            <span className="rounded-full bg-slate-950 px-3 py-1.5 text-sm font-bold text-white">Inquiry only</span>
+          ) : apprenticeship ? (
             <span className="inline-flex items-center gap-1 rounded-full bg-brand-blue-800 px-3 py-1.5 text-sm font-extrabold text-white shadow">
               <ShieldCheck className="h-4 w-4" /> Earn while you learn
             </span>
@@ -51,19 +55,21 @@ export default function PublicCatalogCard({
         <h3 className="line-clamp-2 min-h-[3.5rem] break-words text-xl font-extrabold leading-tight text-slate-950">
           {program.title}
         </h3>
-        {program.description ? (
+        {inquiryOnly ? (
+          <p className="mt-3 text-base text-slate-700">Ask about future EMT training. Enrollment is not open.</p>
+        ) : program.description ? (
           <p className="mt-3 line-clamp-3 text-base leading-relaxed text-slate-600">
             {program.description}
           </p>
         ) : null}
         <div className="mt-4 flex flex-wrap gap-x-4 gap-y-2 text-sm font-semibold text-slate-600">
-          {program.duration ? (
+          {!inquiryOnly && program.duration ? (
             <span className="inline-flex items-center gap-1.5">
               <Clock className="h-4 w-4" />
               {program.duration}
             </span>
           ) : null}
-          {program.credential ? (
+          {!inquiryOnly && program.credential ? (
             <span className="inline-flex items-center gap-1.5">
               <Award className="h-4 w-4" />
               {program.credential}
@@ -78,10 +84,10 @@ export default function PublicCatalogCard({
             View Program <ArrowRight className="h-4 w-4" />
           </Link>
           <Link
-            href={program.applicationHref ?? `/apply?program=${program.slug}`}
+            href={inquiryOnly ? EMT_INQUIRY_HREF : (program.applicationHref ?? `/apply?program=${program.slug}`)}
             className={`inline-flex flex-1 items-center justify-center rounded-xl px-4 py-3 text-base font-bold ${funded ? 'bg-brand-red-600 text-white hover:bg-brand-red-700' : 'border border-slate-300 text-slate-900 hover:bg-slate-50'}`}
           >
-            {apprenticeship
+            {inquiryOnly ? 'Ask About EMT Training' : apprenticeship
               ? 'Apply for Apprenticeship'
               : funded
                 ? 'Start Application'

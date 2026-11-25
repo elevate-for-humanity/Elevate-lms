@@ -1,3 +1,4 @@
+import { isEmtInquiryOnly } from '@/lib/programs/emt-inquiry-only';
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import { ArrowRight, BriefcaseBusiness } from 'lucide-react';
@@ -21,9 +22,11 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function ProgramsPage() {
   const { programs } = await getPublicProgramsPageData();
   const isApprenticeship = (program: (typeof programs)[number]) =>
-    program.category.toLowerCase().includes('apprenticeship') ||
-    program.slug.includes('apprenticeship') ||
-    program.title.toLowerCase().includes('apprenticeship');
+    !isEmtInquiryOnly(program.slug) && (
+      program.category.toLowerCase().includes('apprenticeship') ||
+      program.slug.includes('apprenticeship') ||
+      program.title.toLowerCase().includes('apprenticeship')
+    );
   const apprenticeships = programs.filter(isApprenticeship);
   const careerTraining = programs.filter((program) => !isApprenticeship(program));
   const funded = careerTraining.filter((program) => program.funding_tier === 'workforce-funded');

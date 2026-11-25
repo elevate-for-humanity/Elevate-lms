@@ -1,3 +1,4 @@
+import { isEmtInquiryOnly } from '@/lib/programs/emt-inquiry-only';
 import HeroPicture from '@/components/marketing/HeroPicture';
 import { siteConfig } from '@/lib/config/site';
 import { Metadata } from 'next';
@@ -30,7 +31,10 @@ export default async function ContactPage({ searchParams }: ContactPageProps) {
     ? COURSE_BUILDER_REQUESTS[product as keyof typeof COURSE_BUILDER_REQUESTS]
     : null;
   const defaultSubject = courseBuilderMessage ? 'course-builder' : course ? 'enrollment' : requestedItem ? 'other' : '';
-  const defaultMessage = courseBuilderMessage ?? (requestedItem
+  const emtInquiry = isEmtInquiryOnly(params.program);
+  const defaultMessage = emtInquiry
+    ? 'I would like an update on future EMT training, the training provider and certification requirements.'
+    : courseBuilderMessage ?? (requestedItem
     ? `I would like current availability, delivery details, access terms, and final pricing for ${titleFromSlug(requestedItem)}.`
     : '');
 

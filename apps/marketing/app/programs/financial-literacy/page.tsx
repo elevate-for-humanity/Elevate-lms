@@ -7,6 +7,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { ProgramStructuredData } from '@/components/seo/CourseStructuredData';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import { TEAM } from '@/data/team';
+import { getProgramHeroImage } from '@/lib/images/programImages';
 
 const PROGRAM = {
   slug: 'financial-literacy',
@@ -68,7 +69,7 @@ export default function FinancialLiteracyPage() {
 
       <section className="relative overflow-hidden bg-slate-950 px-4 py-16 text-white sm:py-20">
         <Image
-          src="/images/business/office-admin.webp"
+          src={getProgramHeroImage(PROGRAM.slug)}
           alt="Financial literacy and business skills training"
           fill
           priority

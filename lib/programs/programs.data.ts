@@ -582,7 +582,7 @@ export const PROGRAMS: Program[] = [
     shortDescription:
       'Hybrid program for heating, cooling, and refrigeration basics with industry-recognized training.',
     cardImage: '/images/hvac-hero.webp',
-    heroImage: '/images/programs/hvac/training-20261029/gauges.webp',
+    heroImage: '/images/hvac-hero.webp',
     duration: '12-16 weeks',
     cost: 'Funding may cover full cost',
     format: 'In-person',

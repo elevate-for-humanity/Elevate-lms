@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { getApprovedShops, PROGRAM_SLUGS } from './host-shops';
+import { getApprovedShops, getApprovedShopByPublicSlug, PROGRAM_SLUGS } from './host-shops';
 
 const { rows } = vi.hoisted(() => ({ rows: {} as Record<string, Record<string, unknown>[]> }));
 vi.mock('@/lib/supabase/admin', () => ({
@@ -70,5 +70,31 @@ describe('public Host Shop partner-backed approvals', () => {
   it('does not duplicate an already visible shop', async () => {
     rows.host_shop_applications = [{ id: 'application-1', status: 'approved', shop_name: profile.display_name, address: '', intake: { programs: partner.programs } }];
     expect(await getApprovedShops()).toHaveLength(1);
+  });
+
+  it('unions canonical approvals without changing the primary trade or losing either profile URL', async () => {
+    rows.host_shops = [{ id: 'active1234', name: profile.display_name, is_approved: true, shop_status: 'active', specializations: ['cosmetology-apprenticeship'] }];
+    const all = await getApprovedShops();
+    expect(all).toHaveLength(1);
+    expect(all[0]).toEqual(expect.objectContaining({
+      id: 'active1234',
+      publicSlug: partner.public_slug,
+      primaryProgram: PROGRAM_SLUGS.cosmetology,
+      programs: [PROGRAM_SLUGS.cosmetology, PROGRAM_SLUGS.esthetician, PROGRAM_SLUGS.nail],
+    }));
+    expect(await getApprovedShops('barber')).toEqual([]);
+    expect(await getApprovedShops('esthetician')).toHaveLength(1);
+    expect(await getApprovedShops('nail')).toHaveLength(1);
+    expect((await getApprovedShopByPublicSlug(partner.public_slug))?.id).toBe('active1234');
+    expect((await getApprovedShopByPublicSlug('catalog-salon-llc-active12'))?.id).toBe('active1234');
+  });
+
+  it('does not add partner trades without public directory opt-in', async () => {
+    rows.host_shops = [{ id: 'active1234', name: profile.display_name, is_approved: true, shop_status: 'active', specializations: ['cosmetology-apprenticeship'] }];
+    rows.host_shop_partnerships = [{ ...listing, directory_listing: false }];
+    const all = await getApprovedShops();
+    expect(all).toHaveLength(1);
+    expect(all[0].programs).toEqual([PROGRAM_SLUGS.cosmetology]);
+    expect(await getApprovedShops('esthetician')).toEqual([]);
   });
 });

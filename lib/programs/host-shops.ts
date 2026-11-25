@@ -24,6 +24,7 @@ export type HostShop = {
   primaryProgram?: string;
   badge: string;
   publicSlug?: string;
+  publicSlugAliases?: string[];
   description?: string;
   website?: string;
   googleMapsUrl?: string;
@@ -253,9 +254,6 @@ export async function getApprovedShops(program?: ProgramKey): Promise<HostShop[]
       row.id === partner.id && row.public_slug === partner.public_slug && row.public_profile_published_at,
     );
     if (!profile?.display_name || !businessKey(profile.display_name)) continue;
-    if ([...alreadyListed, ...partnerBacked].some(shop =>
-      shop.publicSlug === profile.public_slug || businessKey(shop.name) === businessKey(profile.display_name),
-    )) continue;
     const programs = [...new Set((Array.isArray(partner.programs) ? partner.programs : [])
       .map(normalizeHostShopProgram).filter((value): value is string => value !== null))];
     if (!programs.length) continue;
@@ -279,6 +277,28 @@ export async function getApprovedShops(program?: ProgramKey): Promise<HostShop[]
       videoUrl: profile.video_url ?? undefined,
       mediaGallery: parseMedia(profile.media_gallery),
     };
+    if (!isPubliclyListedHostShop(shop) || archivedNames.has(businessKey(shop.name))) continue;
+    // Match the published identity first. Only use the existing directory's
+    // business-name fallback when it resolves to one unambiguous record.
+    const candidates = [...alreadyListed, ...partnerBacked];
+    const slugMatches = candidates.filter(existing => existing.publicSlug === shop.publicSlug);
+    const nameMatches = candidates.filter(existing => businessKey(existing.name) === businessKey(shop.name));
+    const matches = slugMatches.length ? slugMatches : nameMatches;
+    if (matches.length > 1) continue;
+    const duplicate = matches[0];
+    if (duplicate) {
+      // Union the independently authorized occupations. Preserve the operational
+      // ID, primary trade and contact data, and keep the previous URL resolving.
+      const previousSlug = duplicate.publicSlug;
+      duplicate.programs = [...new Set([...duplicate.programs, ...shop.programs])];
+      duplicate.primaryProgram ??= duplicate.programs[0];
+      duplicate.publicSlug = shop.publicSlug;
+      duplicate.publicSlugAliases = [...new Set([
+        ...(duplicate.publicSlugAliases ?? []),
+        ...(previousSlug && previousSlug !== shop.publicSlug ? [previousSlug] : []),
+      ])].filter(slug => slug !== duplicate.publicSlug);
+      continue;
+    }
     partnerBacked.push({
       ...shop,
       description: profile.description || approvedDescription(shop),
@@ -302,7 +322,7 @@ export async function getApprovedShops(program?: ProgramKey): Promise<HostShop[]
 export async function getApprovedShopByPublicSlug(publicSlug: string): Promise<HostShop | null> {
   const shops = await getApprovedShops();
   const featured = getFeaturedHostPartnerBySlug(publicSlug);
-  return shops.find((shop) => shop.publicSlug === publicSlug ||
+  return shops.find((shop) => shop.publicSlug === publicSlug || shop.publicSlugAliases?.includes(publicSlug) ||
     (featured && (getFeaturedHostPartnerBySlug(shop.publicSlug ?? '')?.slug === featured.slug ||
       businessKey(shop.name) === businessKey(featured.name) ||
       (featured.dba && businessKey(shop.name) === businessKey(featured.dba))))) ?? null;

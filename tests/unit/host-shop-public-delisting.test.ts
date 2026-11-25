@@ -30,10 +30,11 @@ vi.mock('@/lib/supabase/admin', () => ({
           services: ['barber-apprenticeship'], specializations: ['cosmetology-apprenticeship'],
         }],
         partners: [],
+        host_shop_partnerships: [],
       };
       const value = { data: source[table] ?? [], error: null };
       const query = {
-        select: () => query, eq: () => query, or: () => query, order: () => query,
+        select: () => query, eq: () => query, or: () => query, not: () => query, order: () => query,
         then: (ok: (value: typeof value) => unknown, fail?: (reason: unknown) => unknown) =>
           Promise.resolve(value).then(ok, fail),
       };

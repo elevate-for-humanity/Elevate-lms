@@ -414,7 +414,7 @@ export async function assignPhoneNumber(formData: FormData): Promise<void> {
   const profileId = String(formData.get('profileId') ?? '').trim() || null;
   const extension = String(formData.get('extension') ?? '').trim() || null;
   if (extension && !validPhoneExtension(extension)) {
-    throw new Error('Use 0 for the operator or a 2 to 6 digit extension.');
+    throw new Error('Use 0 for the operator or a 3-digit extension.');
   }
   const { data: number, error: numberError } = await db.from('phone_numbers')
     .select('assigned_profile_id').eq('id', phoneNumberId).eq('phone_system_id', id).single();
@@ -448,7 +448,7 @@ export async function saveProgramHolderExtension(formData: FormData): Promise<vo
   const extension = String(formData.get('extension') ?? '').trim();
   const department = String(formData.get('department') ?? '').trim() || null;
   if (!profileId || !validPhoneExtension(extension)) {
-    throw new Error('Select a staff member or Program Holder and enter 0 for the operator or a 2 to 6 digit extension.');
+    throw new Error('Select a staff member or Program Holder and enter 0 for the operator or a 3-digit extension.');
   }
   const { error } = await db.rpc('save_phone_extension', {
     p_workspace_id: workspace.id,
@@ -488,3 +488,4 @@ export async function destinationActionResult(_state:PhoneActionState,formData:F
 export async function createMeetingResult(_state:PhoneActionState,formData:FormData):Promise<PhoneActionState>{
  try{await createMeeting(formData);return {ok:true,message:'Meeting saved. Copy or share its link from the meeting list below.'};}catch(error){return failure(error,'The meeting could not be created.');}
 }
+

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
-import { EMT_INQUIRY_HREF, isEmtInquiryOnly, isEmtInterviewSelection } from '../../lib/programs/emt-inquiry-only';
+import { EMT_INQUIRY_HREF, getContactFormReturnPath, isEmtInquiryOnly, isEmtInterviewSelection } from '../../lib/programs/emt-inquiry-only';
 
 const read = (path: string) => readFileSync(path, 'utf8');
 
@@ -51,6 +51,7 @@ describe('temporary EMT inquiry-only policy', () => {
     expect(page).toContain('href={EMT_INQUIRY_HREF}');
     expect(workspace).toContain("session?.nextQuestion?.field === 'program' && isEmtInterviewSelection(value)");
     expect(workspace).toContain('isEmtInterviewSelection(pending.value)');
+    expect(workspace).toContain("onClick={() => void chooseAction('change')}");
     expect(workspace).toContain('data.inquiryUrl === EMT_INQUIRY_HREF');
   });
 
@@ -66,6 +67,21 @@ describe('temporary EMT inquiry-only policy', () => {
     const route = read('apps/marketing/app/api/contact/route.ts');
     expect(page).toContain('name="program" value={EMT_PROGRAM_SLUG}');
     expect(route).toContain('program_interest: data.program || data.interest || null');
+  });
+
+  it.each(['invalid', 'error', 'submitted'] as const)('preserves program attribution through native form %s returns', (status) => {
+    const attemptedPost = new URLSearchParams({ program: 'emt-apprenticeship', name: 'J' });
+    const redirected = new URL(getContactFormReturnPath(status, attemptedPost.get('program')), 'https://example.test');
+    expect(redirected.pathname).toBe('/contact');
+    expect(redirected.hash).toBe('#contact-form');
+    expect(redirected.searchParams.get('program')).toBe('emt-apprenticeship');
+    expect(redirected.searchParams.get(status === 'submitted' ? 'submitted' : 'error')).toBe(status === 'submitted' ? '1' : status);
+    const secondPost = new URLSearchParams({ program: redirected.searchParams.get('program') || '', name: 'Jo', message: 'Please call me with an update.' });
+    expect(secondPost.get('program')).toBe('emt-apprenticeship');
+    expect(getContactFormReturnPath('invalid', 'other')).toBe('/contact?error=invalid');
+    const route = read('apps/marketing/app/api/contact/route.ts');
+    expect(route).toContain('if (isNativeForm) submittedProgram = body?.program');
+    expect(route).toContain('getContactFormReturnPath(status, submittedProgram)');
   });
 
   it('shows inquiry cards outside the searchable enrollment groups', () => {

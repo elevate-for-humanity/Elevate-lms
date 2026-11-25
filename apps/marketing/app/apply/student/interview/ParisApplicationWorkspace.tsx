@@ -455,8 +455,8 @@ export default function ParisApplicationWorkspace({
   }
 
   const pending = session.state.pendingConfirmation;
-  if (isEmtInterviewSelection(session.state.answers.program) ||
-      (pending?.field === 'program' && isEmtInterviewSelection(pending.value))) {
+  const pendingEmt = pending?.field === 'program' && isEmtInterviewSelection(pending.value);
+  if (isEmtInterviewSelection(session.state.answers.program) || pendingEmt) {
     return (
       <section className="space-y-3 rounded-2xl border border-slate-200 bg-white p-6">
         <h2 className="text-xl font-bold">
@@ -466,6 +466,17 @@ export default function ParisApplicationWorkspace({
         <Link className="block font-bold text-blue-800 underline" href={EMT_INQUIRY_HREF}>
           {locale === 'es' ? 'Preguntar sobre capacitación EMT' : 'Ask about EMT training'}
         </Link>
+        {pendingEmt && (
+          <button
+            type="button"
+            className="block text-left font-bold text-blue-800 underline"
+            disabled={sending}
+            onClick={() => void chooseAction('change')}
+          >
+            {locale === 'es' ? 'Cambiar el programa en esta entrevista' : 'Change the program in this interview'}
+          </button>
+        )}
+        {error && <p role="alert" className="text-sm text-red-800">{error}</p>}
         <Link className="block text-blue-800 underline" href="/apply/student/form">
           {locale === 'es' ? 'Elegir otro programa en el formulario estándar' : 'Choose a different program in the standard form'}
         </Link>

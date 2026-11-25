@@ -15,3 +15,11 @@ export function isEmtInquiryOnly(value: unknown): boolean {
   const slug = value.trim().toLowerCase();
   return slug === EMT_PROGRAM_SLUG || slug === 'emt';
 }
+
+/** Preserve only the canonical EMT context in a native contact form redirect. */
+export function getContactFormReturnPath(status: 'submitted' | 'invalid' | 'error', program: unknown): string {
+  const result = status === 'submitted' ? 'submitted=1' : `error=${status}`;
+  return isEmtInquiryOnly(program)
+    ? `/contact?program=${EMT_PROGRAM_SLUG}&${result}#contact-form`
+    : `/contact?${result}`;
+}

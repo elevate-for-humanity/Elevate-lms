@@ -28,6 +28,10 @@ export const organizationJsonLd = {
   image: ORGANIZATION_LOGO_URL,
   telephone,
   email: organization.email,
+  address: {
+    '@type': 'PostalAddress',
+    ...organization.postalAddress,
+  },
   location: {
     '@type': 'Place',
     '@id': `${MARKETING_SITE_URL}/#indianapolis-office`,

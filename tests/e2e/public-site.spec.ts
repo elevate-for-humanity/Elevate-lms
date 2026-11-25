@@ -1,3 +1,4 @@
+import path from 'node:path';
 import { expect, test, type APIRequestContext, type Page } from '@playwright/test';
 
 const CRITICAL_PUBLIC_ROUTES = [
@@ -174,9 +175,21 @@ async function collectInternalLinks(page: Page, selector: string): Promise<strin
   return [...new Set(hrefs.filter(isInternalHref))].sort();
 }
 
+// Section narration synthesizes speech through Google Cloud, which is not
+// provisioned for CI dev servers. Serve a committed recording so the audit
+// measures page runtime health rather than speech-provider availability.
+const NARRATION_FIXTURE = path.resolve(
+  process.cwd(),
+  'public/audio/program-introductions/barber-apprenticeship.mp3',
+);
+
 async function assertNoRuntimeFailure(page: Page, route: string) {
   const pageErrors: string[] = [];
   const consoleErrors: string[] = [];
+
+  await page.route('**/api/voice/natural', (request) =>
+    request.fulfill({ path: NARRATION_FIXTURE, contentType: 'audio/mpeg' }),
+  );
 
   page.on('pageerror', (error) => pageErrors.push(error.message));
   page.on('console', (message) => {

@@ -20,6 +20,8 @@ import TextToSpeech from '@/components/TextToSpeech';
 import CommercialLessonExperience from '@/components/lms/CommercialLessonExperience';
 import ManifoldGaugeSimulator from '@/components/lms/ManifoldGaugeSimulator';
 import { MANIFOLD_GAUGE_SIMULATOR_KEY } from '@/lib/lms/manifold-gauge-simulation';
+import ForkliftSimulator from '@/components/lms/ForkliftSimulator';
+import { FORKLIFT_SIMULATOR_KEY } from '@/lib/lms/forklift-simulation';
 
 type Interaction = {
   id: string;
@@ -193,6 +195,18 @@ export default function InteractiveLessonExperience({
         )
           return (
             <ManifoldGaugeSimulator
+              key={interaction.id}
+              interaction={interaction}
+              courseId={courseId}
+              lessonId={lessonId}
+            />
+          );
+        if (
+          interaction.type === 'simulation' &&
+          interaction.data?.simulator === FORKLIFT_SIMULATOR_KEY
+        )
+          return (
+            <ForkliftSimulator
               key={interaction.id}
               interaction={interaction}
               courseId={courseId}

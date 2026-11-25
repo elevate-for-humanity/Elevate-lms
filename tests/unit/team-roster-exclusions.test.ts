@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import fs from 'node:fs';
+import { PGlite } from '@electric-sql/pglite';
 import { TEAM } from '@/data/team';
 import { teamProfileHref } from '@/lib/navigation/team-profile';
 import { resolveTeamProfileMember } from '@/lib/team-roster';
@@ -57,8 +58,45 @@ describe('staff team roster exclusions', () => {
 
   it('does not label a stock image as Naomi Jordan', () => {
     expect(TEAM.find((member) => member.name === 'Naomi Jordan')?.headshotSrc).toBeUndefined();
-    expect(migration).not.toContain('/images/naomi-jordan.jpg');
     expect(migration).toContain("WHERE lower(btrim(name)) = lower('Naomi Jordan')");
+    expect(migration).toContain("images/naomi-jordan\\.jpg$");
+    expect(migration).toContain('ELSE headshot_url');
+    expect(migration).toContain('ELSE image_url');
+    expect(migration).not.toContain("WHEN seed.name = 'Naomi Jordan' THEN NULL");
+  });
+
+  it('removes only Naomi Jordan’s stock field and preserves her saved portrait', async () => {
+    const database = new PGlite();
+    await database.exec(`
+      CREATE TABLE public.team_members (
+        name text,
+        headshot_url text,
+        image_url text,
+        updated_at timestamptz
+      );
+      INSERT INTO public.team_members (name, headshot_url, image_url)
+      VALUES (
+        'Naomi Jordan',
+        'https://cdn.example.test/images/naomi-jordan.jpg?version=old',
+        'https://media.example.test/staff/naomi-real.webp'
+      );
+    `);
+    const cleanup = migration.match(
+      /UPDATE public\.team_members\nSET headshot_url =[\s\S]+?\n  \);(?=\n\n-- Update existing people)/,
+    )?.[0];
+    expect(cleanup).toBeTruthy();
+    await database.exec(cleanup!);
+    const result = await database.query<{
+      headshot_url: string | null;
+      image_url: string | null;
+    }>('SELECT headshot_url, image_url FROM public.team_members');
+    expect(result.rows).toEqual([
+      {
+        headshot_url: null,
+        image_url: 'https://media.example.test/staff/naomi-real.webp',
+      },
+    ]);
+    await database.close();
   });
 
   it('reconciles existing roster identities without an unsupported name-only upsert', () => {

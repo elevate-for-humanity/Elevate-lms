@@ -263,14 +263,24 @@ WHERE lower(btrim(member.name)) = lower(btrim(matched.seed_name))
   AND member.id <> matched.member_id
   AND member.is_active = true;
 
--- The checked-in Naomi Jordan image is a generic Pexels portrait. Remove it
--- from existing rows as well as the static fallback rather than presenting a
--- stock subject as a real staff member.
+-- The checked-in Naomi Jordan image is a generic Pexels portrait. Remove only
+-- that known asset, including absolute CDN forms of the same path. Preserve a
+-- real portrait that an administrator may already have saved in either field.
 UPDATE public.team_members
-SET headshot_url = NULL,
-    image_url = NULL,
+SET headshot_url = CASE
+      WHEN lower(split_part(headshot_url, '?', 1)) ~ '(^|/)images/naomi-jordan\.jpg$' THEN NULL
+      ELSE headshot_url
+    END,
+    image_url = CASE
+      WHEN lower(split_part(image_url, '?', 1)) ~ '(^|/)images/naomi-jordan\.jpg$' THEN NULL
+      ELSE image_url
+    END,
     updated_at = now()
-WHERE lower(btrim(name)) = lower('Naomi Jordan');
+WHERE lower(btrim(name)) = lower('Naomi Jordan')
+  AND (
+    lower(split_part(headshot_url, '?', 1)) ~ '(^|/)images/naomi-jordan\.jpg$'
+    OR lower(split_part(image_url, '?', 1)) ~ '(^|/)images/naomi-jordan\.jpg$'
+  );
 
 -- Update existing people by their reconciled identity. A blank or absent seed
 -- email cannot erase an address saved through Team Members.
@@ -279,14 +289,8 @@ SET name = seed.name,
     title = seed.title,
     org_role = seed.org_role,
     bio = seed.bio,
-    headshot_url = CASE
-      WHEN seed.name = 'Naomi Jordan' THEN NULL
-      ELSE COALESCE(NULLIF(seed.headshot_url, ''), member.headshot_url)
-    END,
-    image_url = CASE
-      WHEN seed.name = 'Naomi Jordan' THEN NULL
-      ELSE COALESCE(NULLIF(seed.image_url, ''), member.image_url)
-    END,
+    headshot_url = COALESCE(NULLIF(seed.headshot_url, ''), member.headshot_url),
+    image_url = COALESCE(NULLIF(seed.image_url, ''), member.image_url),
     email = COALESCE(NULLIF(seed.email, ''), member.email),
     credentials = COALESCE(seed.credentials, member.credentials),
     display_order = seed.display_order,

@@ -8,6 +8,10 @@ import { businessHoursFromForm, normalizeUsPhone, validMenuDigit, validPhoneExte
 import { ensureLiveKitRoom, liveKitReadiness } from '@/lib/communications/livekit';
 import { scopePhoneProfileQuery } from '@/lib/phone/profile-scope';
 import { findPhoneWorkspace } from '@/lib/phone/workspace';
+import {
+  normalizeVoicemailGreetingMode,
+  validateVoicemailGreetingText,
+} from '@/lib/phone/voicemail-greeting';
 import { PHONE_MANAGER_ROLES } from '@/lib/phone/access';
 import {hydrateProcessEnv} from '@/lib/secrets';
 
@@ -262,6 +266,135 @@ export async function saveSmsAutoReplySettings(
     };
   } catch (error) {
     return failure(error, 'Unable to save text auto-reply settings.');
+  }
+}
+
+
+type VoicemailGreetingForm = { mode: 'text' | 'recording'; text: string; recordingPath: string };
+
+function voicemailGreetingFromForm(formData: FormData): VoicemailGreetingForm {
+  return {
+    mode: normalizeVoicemailGreetingMode(String(formData.get('voicemailGreetingMode') ?? 'text')),
+    text: String(formData.get('voicemailGreeting') ?? ''),
+    recordingPath: String(formData.get('voicemailGreetingRecordingPath') ?? '').trim(),
+  };
+}
+
+function voicemailGreetingSaveError(error: { message: string }): PhoneActionState {
+  // Until the voicemail_greeting_config migration is applied, the mode and
+  // recording-path columns do not exist; say so plainly instead of
+  // surfacing a schema error. (The per-extension text column already
+  // exists, but the slot is saved as one unit so the modes stay honest.)
+  if (/voicemail_greeting|column|schema cache/i.test(error.message))
+    return {
+      ok: false,
+      message:
+        'Voicemail greetings cannot be saved yet — the database update for this feature has not been applied. Nothing else was changed.',
+    };
+  return { ok: false, message: error.message };
+}
+
+function validateVoicemailGreetingForm(
+  greeting: VoicemailGreetingForm,
+): { ok: false; message: string } | { ok: true; text: string } {
+  const validated = validateVoicemailGreetingText(greeting.text);
+  if (!validated.ok) return validated;
+  if (greeting.mode === 'recording' && !greeting.recordingPath)
+    return {
+      ok: false,
+      message:
+        'Record your greeting first (or switch back to a typed greeting) — there is no recording to save yet.',
+    };
+  if (greeting.recordingPath && !greeting.recordingPath.endsWith('.webm') && !/\.(ogg|mp4|m4a|mp3|wav)$/i.test(greeting.recordingPath))
+    return { ok: false, message: 'That recording file is not a supported audio type.' };
+  return { ok: true, text: validated.text };
+}
+
+const VOICEMAIL_GREETING_SAVED_MESSAGE =
+  'Voicemail greeting saved. The phone system applies saved greetings when its greeting update runs; callers then hear the new greeting instead of the standard one.';
+
+/**
+ * The default voicemail greeting for the whole phone system — also what
+ * the operator (Admin) mailbox plays. Typed text is spoken by the phone
+ * system's voice; a recording is played as-is.
+ */
+export async function saveVoicemailGreetingSettings(
+  _state: PhoneActionState,
+  formData: FormData,
+): Promise<PhoneActionState> {
+  try {
+    const { db, id } = await requireSystemId();
+    const greeting = voicemailGreetingFromForm(formData);
+    const validated = validateVoicemailGreetingForm(greeting);
+    if (!validated.ok) return validated;
+    const { error } = await db
+      .from('phone_systems')
+      .update({
+        voicemail_greeting: greeting.mode === 'text' ? validated.text || null : null,
+        voicemail_greeting_mode: greeting.mode,
+        voicemail_greeting_recording_path:
+          greeting.mode === 'recording' ? greeting.recordingPath : null,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', id);
+    if (error) return voicemailGreetingSaveError(error);
+    revalidatePath('/phone');
+    return {
+      ok: true,
+      message:
+        greeting.mode === 'text' && !validated.text
+          ? 'Default voicemail greeting cleared. Callers hear the standard voicemail prompts until a greeting is set.'
+          : VOICEMAIL_GREETING_SAVED_MESSAGE,
+    };
+  } catch (error) {
+    return failure(error, 'Unable to save the voicemail greeting.');
+  }
+}
+
+/**
+ * One extension's own voicemail greeting, overriding the system default
+ * for that person's mailbox. Saving an empty typed greeting (or recording
+ * mode with no recording is rejected above) clears the override so the
+ * mailbox falls back to the system default.
+ */
+export async function saveExtensionVoicemailGreetingSettings(
+  _state: PhoneActionState,
+  formData: FormData,
+): Promise<PhoneActionState> {
+  try {
+    const { db, workspace } = await requireWorkspace();
+    const extensionId = String(formData.get('extensionId') ?? '');
+    if (!/^[0-9a-f-]{36}$/i.test(extensionId))
+      return { ok: false, message: 'Choose a valid extension.' };
+    const greeting = voicemailGreetingFromForm(formData);
+    const validated = validateVoicemailGreetingForm(greeting);
+    if (!validated.ok) return validated;
+    const { data: updated, error } = await db
+      .from('communication_extensions')
+      .update({
+        voicemail_greeting: greeting.mode === 'text' ? validated.text || null : null,
+        voicemail_greeting_mode: greeting.mode,
+        voicemail_greeting_recording_path:
+          greeting.mode === 'recording' ? greeting.recordingPath : null,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', extensionId)
+      .eq('workspace_id', workspace.id)
+      .select('id')
+      .maybeSingle();
+    if (error) return voicemailGreetingSaveError(error);
+    if (!updated)
+      return { ok: false, message: 'That extension does not belong to this phone system.' };
+    revalidatePath('/phone');
+    return {
+      ok: true,
+      message:
+        greeting.mode === 'text' && !validated.text
+          ? 'Extension greeting cleared. That mailbox now uses the default voicemail greeting.'
+          : VOICEMAIL_GREETING_SAVED_MESSAGE,
+    };
+  } catch (error) {
+    return failure(error, 'Unable to save the extension voicemail greeting.');
   }
 }
 

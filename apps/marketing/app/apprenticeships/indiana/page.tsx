@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+// Branch refreshed to pick up main (e8b0e402): fresh CI after E2E shard 3/4 environment failure on the 71e31a22 base.
 import Link from 'next/link';
 import Image from 'next/image';
 import { HOST_SHOP_REGIONS } from '@/lib/marketing/host-shop-regions';

@@ -110,8 +110,7 @@ jobs:
       - name: Authenticated Host Shop desktop, tablet and mobile geometry
         if: ${{ matrix.shard == 1 && env.E2E_HOST_SHOP_EMAIL != '' && env.E2E_HOST_SHOP_PASSWORD != '' }}
         run: >-
-        
-          pnpm exec playwright test tests/e2e/portal-responsive-design.spec.ts
+                  pnpm exec playwright test tests/e2e/portal-responsive-design.spec.ts
           --grep "critical Host Shop surfaces fit the active device viewport"
           --project=desktop-chrome --project=tablet-chrome
           --project=android-chrome --project=iphone-webkit

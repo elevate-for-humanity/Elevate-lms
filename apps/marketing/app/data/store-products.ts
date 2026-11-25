@@ -28,8 +28,8 @@ export const PLATFORM_APPS: PlatformApp[] = [
   {
     id: 'payments',
     key: 'payments',
-    name: 'Payment Processing',
-    description: 'Stripe integration for tuition, subscriptions, and product purchases.',
+    name: 'Payments & Billing',
+    description: 'QuickBooks invoice billing and verified payment tracking.',
     enabledByDefault: true,
     icon: '💳',
   },

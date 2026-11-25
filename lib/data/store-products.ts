@@ -68,7 +68,7 @@ export const PLATFORM_APPS: PlatformApp[] = [
     id: 'payments',
     key: 'payments',
     name: 'Payments & Billing',
-    description: 'Stripe integration, invoices, funding sources, and financial tracking.',
+    description: 'QuickBooks invoice billing, funding sources, and financial tracking.',
     enabledByDefault: true,
     icon: '💳',
   },
@@ -147,7 +147,7 @@ export const STORE_PRODUCTS: StoreProduct[] = [
     features: [
       'Unlimited students and courses',
       'SCORM and xAPI support',
-      'Stripe payment integration',
+      'QuickBooks invoicing and verified payment tracking',
       'Mobile-responsive design',
       'Progress tracking and certificates',
       'Email notifications',

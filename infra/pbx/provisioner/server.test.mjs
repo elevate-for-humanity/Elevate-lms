@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdir, mkdtemp, readFile, readlink, rm, symlink, writeFile } from 'node:fs/promises';
+import { chmod, mkdir, mkdtemp, readFile, readlink, rm, symlink, writeFile } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import { reportFailure, createProvisioner, endpointFor, parseContacts, renderConfiguration, validateIdentity } from './server.mjs';
@@ -241,4 +241,34 @@ test('timer expiry retains apply evidence and sanitizes arbitrary exceptions', a
   reportFailure('reconciliation', 'timer', malicious, line => lines.push(line));
   assert.match(lines[0], /^PBX failure v1 \d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z reconciliation timer unknown\n$/);
   assert.doesNotThrow(() => reportFailure('expiry', 'timer', malicious, () => { throw Error('sink failed'); }));
+});
+
+test('duplicate extension failures are journaled under their own code', () => {
+  const second = { ...record, profileId: '33333333-3333-4333-8333-333333333333', extensionId: '44444444-4444-4444-8444-444444444444' };
+  second.endpointId = endpointFor(second);
+  let caught;
+  try { renderConfiguration([record, second]); } catch (error) { caught = error; }
+  const lines = [];
+  reportFailure('provision', 'apply', caught, line => lines.push(line));
+  assert.match(lines[0], /provision apply duplicate_extension\n$/);
+});
+
+test('post-apply generation cleanup cannot fail a successful provision', async t => {
+  const f = await fixture(t);
+  // Directory listing starts failing while traversal still works. Generation
+  // cleanup runs only after the credential is applied and verified, so the
+  // provision must still succeed and return the credential.
+  await chmod(f.root, 0o311);
+  try {
+    const provision = await f.request();
+    assert.equal(provision.status, 200);
+    assert.match(provision.body.sipPassword, /^[A-Za-z0-9_-]{43}$/);
+  } finally {
+    await chmod(f.root, 0o755);
+  }
+});
+
+test('control-plane request timeout covers the verification settling budget', async t => {
+  const f = await fixture(t);
+  assert.equal(f.service.server.requestTimeout, 60000);
 });

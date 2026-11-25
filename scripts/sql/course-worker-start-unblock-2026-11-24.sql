@@ -120,8 +120,8 @@ set monitor = j.monitor || jsonb_build_object(
       'repairId', r.id,
       'repairRequestedAt', now()
     )
-from paris_code_repairs r
-join (values
+from paris_code_repairs r,
+  (values
     ('7faa312a-2d5b-47de-9677-54576fa51f0d'::uuid, 40),
     ('29e39bc2-2495-4ec2-9e08-37cec879e549'::uuid, 42),
     ('2e65c965-f54a-4a12-88d5-933aa6b60bb0'::uuid, 42),
@@ -133,8 +133,9 @@ join (values
     ('be635ebb-5ef2-4706-8551-60989be9e2d7'::uuid, 30),
     ('72cf7ad7-748e-4c5d-8875-da4c874afe99'::uuid, 75),
     ('b85bb0f4-6844-42dc-b0e0-7d904587583c'::uuid, 102)
-  ) as expected(id, gen) on expected.id = j.id
+  ) as expected(id, gen)
 where r.source_job_id = j.id
+  and expected.id = j.id
   and j.status = 'failed'
   and j.execution_generation = expected.gen;
 

@@ -29,7 +29,20 @@ WHERE name IN (
   'Operations Team'
 );
 
-INSERT INTO public.team_members
+CREATE TEMP TABLE staff_roster_seed (
+  name text PRIMARY KEY,
+  title text NOT NULL,
+  org_role text,
+  bio text,
+  headshot_url text,
+  image_url text,
+  email text,
+  credentials text[],
+  display_order integer NOT NULL,
+  is_active boolean NOT NULL
+) ON COMMIT DROP;
+
+INSERT INTO staff_roster_seed
   (name, title, org_role, bio, headshot_url, image_url, email, credentials, display_order, is_active)
 VALUES
   (
@@ -152,8 +165,8 @@ Her teaching emphasizes hands-on learning, digital literacy, problem-solving, co
     'Director of Healthcare Administration',
     'Healthcare Programs',
     $bio$Naomi Jordan is the owner of Rebuilds Mind and Body Studio LLC, located at 6331 N Keystone Ave, Indianapolis, IN 46220. She holds active Indiana credentials as a Certified Nursing Assistant (CNA), Home Health Aide (HHA), Phlebotomy Technician, and Qualified Medication Aide (QMA). As Director of Healthcare Administration at Elevate for Humanity, Naomi oversees all healthcare program administration, clinical coordination, healthcare partner relationships, and curriculum compliance for CNA, HHA, Phlebotomy, QMA, Medical Assistant, Pharmacy Technician, and Peer Recovery Specialist programs. She brings direct clinical experience to program design and ensures that Elevate’s healthcare graduates are fully prepared to pass state and national credentialing exams and enter the healthcare workforce.$bio$,
-    '/images/naomi-jordan.jpg',
-    '/images/naomi-jordan.jpg',
+    NULL,
+    NULL,
     NULL,
     ARRAY[
       'Certified Nursing Assistant (CNA) — Indiana',
@@ -200,14 +213,108 @@ Her teaching emphasizes hands-on learning, digital literacy, problem-solving, co
     12,
     true
   )
-ON CONFLICT (name) DO UPDATE SET
-  title = EXCLUDED.title,
-  org_role = EXCLUDED.org_role,
-  bio = EXCLUDED.bio,
-  headshot_url = EXCLUDED.headshot_url,
-  image_url = EXCLUDED.image_url,
-  email = EXCLUDED.email,
-  credentials = EXCLUDED.credentials,
-  display_order = EXCLUDED.display_order,
-  is_active = true,
-  updated_at = now();
+;
+
+-- A person's existing UUID is the durable identity. The database's supported
+-- uniqueness is (name, title), while historical rows may carry an older title.
+-- Select one keeper for each seed without relying on a nonexistent name-only
+-- constraint. Prefer the exact unique-key match, then a row with a saved email.
+CREATE TEMP TABLE staff_roster_match (
+  seed_name text PRIMARY KEY,
+  member_id uuid NOT NULL
+) ON COMMIT DROP;
+
+INSERT INTO staff_roster_match (seed_name, member_id)
+SELECT seed.name, existing.id
+FROM staff_roster_seed AS seed
+JOIN LATERAL (
+  SELECT member.id
+  FROM public.team_members AS member
+  WHERE lower(btrim(member.name)) = lower(btrim(seed.name))
+  ORDER BY
+    CASE WHEN member.name = seed.name AND member.title = seed.title THEN 0 ELSE 1 END,
+    CASE WHEN NULLIF(btrim(member.email), '') IS NULL THEN 1 ELSE 0 END,
+    member.created_at NULLS LAST,
+    member.id
+  LIMIT 1
+) AS existing ON true;
+
+-- If a historical duplicate carries the only saved email, transfer it to the
+-- keeper before hiding the duplicate. Never delete a staff record in a seed.
+WITH preserved_email AS (
+  SELECT
+    matched.member_id,
+    max(NULLIF(btrim(member.email), '')) AS email
+  FROM staff_roster_match AS matched
+  JOIN public.team_members AS member
+    ON lower(btrim(member.name)) = lower(btrim(matched.seed_name))
+  GROUP BY matched.member_id
+)
+UPDATE public.team_members AS keeper
+SET email = COALESCE(NULLIF(btrim(keeper.email), ''), preserved_email.email)
+FROM preserved_email
+WHERE keeper.id = preserved_email.member_id;
+
+UPDATE public.team_members AS member
+SET is_active = false,
+    updated_at = now()
+FROM staff_roster_match AS matched
+WHERE lower(btrim(member.name)) = lower(btrim(matched.seed_name))
+  AND member.id <> matched.member_id
+  AND member.is_active = true;
+
+-- The checked-in Naomi Jordan image is a generic Pexels portrait. Remove it
+-- from existing rows as well as the static fallback rather than presenting a
+-- stock subject as a real staff member.
+UPDATE public.team_members
+SET headshot_url = NULL,
+    image_url = NULL,
+    updated_at = now()
+WHERE lower(btrim(name)) = lower('Naomi Jordan');
+
+-- Update existing people by their reconciled identity. A blank or absent seed
+-- email cannot erase an address saved through Team Members.
+UPDATE public.team_members AS member
+SET name = seed.name,
+    title = seed.title,
+    org_role = seed.org_role,
+    bio = seed.bio,
+    headshot_url = CASE
+      WHEN seed.name = 'Naomi Jordan' THEN NULL
+      ELSE COALESCE(NULLIF(seed.headshot_url, ''), member.headshot_url)
+    END,
+    image_url = CASE
+      WHEN seed.name = 'Naomi Jordan' THEN NULL
+      ELSE COALESCE(NULLIF(seed.image_url, ''), member.image_url)
+    END,
+    email = COALESCE(NULLIF(seed.email, ''), member.email),
+    credentials = COALESCE(seed.credentials, member.credentials),
+    display_order = seed.display_order,
+    is_active = seed.is_active,
+    updated_at = now()
+FROM staff_roster_seed AS seed,
+     staff_roster_match AS matched
+WHERE matched.seed_name = seed.name
+  AND member.id = matched.member_id;
+
+-- Insert only genuinely missing staff. PostgreSQL migrations are serialized,
+-- so this anti-join remains atomic without inventing a name-only unique key.
+INSERT INTO public.team_members
+  (name, title, org_role, bio, headshot_url, image_url, email, credentials, display_order, is_active)
+SELECT
+  seed.name,
+  seed.title,
+  seed.org_role,
+  seed.bio,
+  seed.headshot_url,
+  seed.image_url,
+  NULLIF(seed.email, ''),
+  seed.credentials,
+  seed.display_order,
+  seed.is_active
+FROM staff_roster_seed AS seed
+WHERE NOT EXISTS (
+  SELECT 1
+  FROM staff_roster_match AS matched
+  WHERE matched.seed_name = seed.name
+);

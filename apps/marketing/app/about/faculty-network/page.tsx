@@ -39,7 +39,7 @@ const faculty: Card[] = [
     name: 'Jozanna George', role: 'Program holder and independent host-shop partner',
     area: 'Esthetics and nail technology',
     offerings: ['Esthetics supervision and coordination', 'Nail technology supervision and coordination', 'Supervised host-shop training'],
-    image: '/images/jozanna-george.jpg', imageAlt: 'Josanna George', portrait: true,
+    image: '/images/jozanna-george.jpg', imageAlt: 'Jozanna George', portrait: true,
     href: '/about/team/jozanna-george',
   },
 ];

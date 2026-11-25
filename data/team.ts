@@ -120,7 +120,6 @@ Her teaching emphasizes hands-on learning, digital literacy, problem-solving, co
     title: 'Director of Healthcare Administration',
     orgRole: 'Healthcare Programs',
     bio: 'Naomi Jordan is the owner of Rebuilds Mind and Body Studio LLC, located at 6331 N Keystone Ave, Indianapolis, IN 46220. She holds active Indiana credentials as a Certified Nursing Assistant (CNA), Home Health Aide (HHA), Phlebotomy Technician, and Qualified Medication Aide (QMA). As Director of Healthcare Administration at Elevate for Humanity, Naomi oversees all healthcare program administration, clinical coordination, healthcare partner relationships, and curriculum compliance for CNA, HHA, Phlebotomy, QMA, Medical Assistant, Pharmacy Technician, and Peer Recovery Specialist programs. She brings direct clinical experience to program design and ensures that Elevate\u2019s healthcare graduates are fully prepared to pass state and national credentialing exams and enter the healthcare workforce.',
-    headshotSrc: '/images/naomi-jordan.jpg',
     credentials: [
       'Certified Nursing Assistant (CNA) — Indiana',
       'Home Health Aide (HHA) — Indiana',

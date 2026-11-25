@@ -2,29 +2,22 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { teamProfileHref, teamPortrait, teamPortraitAlt } from '@/lib/navigation/team-profile';
 import { notFound } from 'next/navigation';
-import { getTeamMembers } from '@/lib/content';
+import { getTeamMembersResult } from '@/lib/content';
 import { buildMetadata } from '@/lib/cf-seo';
 import { siteConfig } from '@/content/cf-site';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import { TEAM } from '@/data/team';
+import { resolveTeamProfileMember } from '@/lib/team-roster';
 
 export const dynamic = 'force-dynamic';
 
-function teamMemberSlug(member: { name: string }): string {
-  return member.name
-    .normalize('NFKD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/(^-|-$)/g, '');
-}
-
 async function findTeamMember(slug: string) {
-  const databaseMembers = await getTeamMembers().catch(() => []);
-  return (
-    databaseMembers.find((member) =>
-      member.id === slug || teamMemberSlug(member) === slug || teamProfileHref(member).endsWith(`/${slug}`),
-    ) ?? TEAM.find((member) => member.id === slug || teamMemberSlug(member) === slug || teamProfileHref(member).endsWith(`/${slug}`))
+  const { members, error } = await getTeamMembersResult();
+  return resolveTeamProfileMember(
+    slug,
+    members,
+    TEAM,
+    error !== null,
   );
 }
 

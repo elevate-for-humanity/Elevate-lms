@@ -2,10 +2,10 @@ import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { createClient } from '@/lib/supabase/server';
 import { TEAM } from '@/data/team';
 import { teamProfileHref, teamPortrait, teamPortraitAlt } from '@/lib/navigation/team-profile';
 import { PublicEditorialHero } from '@/components/marketing/PublicEditorialHero';
+import { getTeamMembersResult } from '@/lib/content';
 
 // Load the active staff roster at request time; cookies() cannot run during prerendering.
 export const dynamic = 'force-dynamic';
@@ -20,30 +20,25 @@ export const metadata: Metadata = {
 export default async function TeamPage() {
   let members = TEAM;
 
-  try {
-    const supabase = await createClient();
-    const { data: dbStaff, error } = await supabase
-      .from('team_members')
-      .select('id, name, title, bio, image_url, email, credentials')
-      .eq('is_active', true)
-      .order('display_order');
+  const { members: dbStaff, error } = await getTeamMembersResult();
+  if (error) {
+    console.error('[team] Supabase query failed:', error);
+  } else {
+    members = dbStaff.map((member) => {
+      const staticMember = TEAM.find((candidate) => candidate.name === member.name);
 
-    if (error) {
-      console.error('[team] Supabase query failed:', error.message);
-    } else if (dbStaff && dbStaff.length > 0) {
-      members = dbStaff.map((p) => ({
-        id: p.id,
-        name: p.name ?? 'Team Member',
-        title: p.title ?? '',
-        bio: p.bio ?? '',
-        headshotSrc: teamPortrait(p) || TEAM.find(member => member.name === p.name)?.headshotSrc,
-        email: p.email ?? '',
-        credentials: (Array.isArray(p.credentials) ? p.credentials : undefined) ?? TEAM.find(member => member.name === p.name)?.credentials,
-      }));
-    }
-  } catch (err) {
-    console.error('[team] Failed to load team members:', err);
-    // Fall back to static data on any failure
+      return {
+        id: member.id,
+        name: member.name ?? 'Team Member',
+        title: member.title ?? '',
+        bio: member.bio ?? '',
+        headshotSrc: teamPortrait(member) || staticMember?.headshotSrc,
+        email: member.email ?? '',
+        credentials:
+          (Array.isArray(member.credentials) ? member.credentials : undefined) ??
+          staticMember?.credentials,
+      };
+    });
   }
 
   return (

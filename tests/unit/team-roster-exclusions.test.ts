@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import fs from 'node:fs';
 import { TEAM } from '@/data/team';
 import { teamProfileHref } from '@/lib/navigation/team-profile';
+import { resolveTeamProfileMember } from '@/lib/team-roster';
 
 /**
  * Elizabeth (Nov 25, 2026): Carl, Sharon, and Debbie must not appear on the
@@ -9,6 +10,11 @@ import { teamProfileHref } from '@/lib/navigation/team-profile';
  * re-seed cannot silently put them back.
  */
 describe('staff team roster exclusions', () => {
+  const migration = fs.readFileSync(
+    'supabase/migrations/20261125140000_fix_staff_team_page.sql',
+    'utf8',
+  );
+
   it('does not list Carl, Sharon, or Debbie anywhere on the team', () => {
     for (const member of TEAM) {
       expect(member.name).not.toMatch(/^(carl|sharon|debbie)\b/i);
@@ -39,5 +45,32 @@ describe('staff team roster exclusions', () => {
 
   it('has a unique profile route per member', () => {
     expect(new Set(TEAM.map(teamProfileHref)).size).toBe(TEAM.length);
+  });
+
+  it('does not substitute static content after a successful empty database lookup', () => {
+    expect(resolveTeamProfileMember('alberta-davis', [], TEAM, false)).toBeUndefined();
+  });
+
+  it('uses static content only when the database query failed', () => {
+    expect(resolveTeamProfileMember('alberta-davis', [], TEAM, true)?.name).toBe('Alberta Davis');
+  });
+
+  it('does not label a stock image as Naomi Jordan', () => {
+    expect(TEAM.find((member) => member.name === 'Naomi Jordan')?.headshotSrc).toBeUndefined();
+    expect(migration).not.toContain('/images/naomi-jordan.jpg');
+    expect(migration).toContain("WHERE lower(btrim(name)) = lower('Naomi Jordan')");
+  });
+
+  it('reconciles existing roster identities without an unsupported name-only upsert', () => {
+    expect(migration).not.toContain('ON CONFLICT (name)');
+    expect(migration).toContain('CREATE TEMP TABLE staff_roster_match');
+    expect(migration).toContain('member.name = seed.name AND member.title = seed.title');
+    expect(migration).toContain('member.id <> matched.member_id');
+    expect(migration).not.toContain('DELETE FROM public.team_members');
+    expect(migration).toContain('WHERE NOT EXISTS (');
+  });
+
+  it('preserves saved contact data when the verified roster has no email', () => {
+    expect(migration).toContain("email = COALESCE(NULLIF(seed.email, ''), member.email)");
   });
 });

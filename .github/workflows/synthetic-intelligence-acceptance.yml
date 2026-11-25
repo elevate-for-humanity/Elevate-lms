@@ -107,8 +107,6 @@ jobs:
               lib/devstudio/openhands/client.ts \
               lib/devstudio/openhands/runtime.ts \
               lib/devstudio/openhands/github-verifier.ts \
-              apps/admin/app/api/admin/dev-studio/openhands/chat/route.ts \
-              apps/admin/app/api/admin/dev-studio/openhands/agent/route.ts \
               lib/platform/planner.ts \
               lib/platform/orchestration/context-service.ts \
               lib/platform/orchestration/evaluator.ts \

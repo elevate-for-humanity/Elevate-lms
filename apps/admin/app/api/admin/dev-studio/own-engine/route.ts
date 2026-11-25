@@ -59,7 +59,7 @@ export async function GET(request: NextRequest) {
       loop: 'lib/devstudio/own-engine/agent-loop.ts',
       gate: 'PARIS approval (paris_autopilot_policy + paris_code_repairs)',
       hands: 'lib/devstudio/muse-loop.ts (draft PR only, never merges)',
-      openhands: 'opt-in only (PARIS_REPAIR_ENGINE=openhands); not required',
+      openhands: 'removed; the owned engine is the only repair engine',
     },
     capabilities: getCapabilityRegistry(),
   });

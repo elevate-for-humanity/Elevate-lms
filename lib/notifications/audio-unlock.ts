@@ -73,12 +73,28 @@ export function startRingtone(volume = 0.6): void {
   stopRingtone();
   const generation = ringGeneration;
   void unlockAudio().then((ok) => {
-    if (!ok || generation !== ringGeneration) return;
-    const ctx = audioContext();
+    if (generation !== ringGeneration) return;
+    let ctx: AudioContext | null = null;
+    try {
+      ctx = audioContext();
+    } catch {
+      ctx = null;
+    }
     if (!ctx) return;
-    beep(ctx, volume);
+    if (ok) beep(ctx, volume);
+    // A context that exists but is still suspended (the page has not had a
+    // user gesture yet) must not stay silent for the whole call: retry the
+    // resume on every ring so the tone starts as soon as a gesture unlocks
+    // audio mid-ring, instead of giving up after the first suspended check.
     ringTimer = setInterval(() => {
-      if (generation === ringGeneration) beep(ctx, volume);
+      if (generation !== ringGeneration) return;
+      void unlockAudio()
+        .then((unlocked) => {
+          if (!unlocked || generation !== ringGeneration) return;
+          const current = audioContext();
+          if (current) beep(current, volume);
+        })
+        .catch(() => undefined);
     }, 1500);
   }).catch(() => {
     if (generation === ringGeneration) stopRingtone();

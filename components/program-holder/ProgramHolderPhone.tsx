@@ -150,6 +150,11 @@ export function ProgramHolderPhone({
   const registeredRef = useRef(false);
   const ringModeRef = useRef<RingMode>('ring');
   const autoConnectAttemptedRef = useRef(false);
+  // Wake mode: this page was opened from a call-wake notification
+  // (lib/phone/call-wake.ts) because a call is ringing this extension NOW.
+  const wakeRef = useRef<{ callId: string; from: string } | null>(null);
+  const wakeAttemptsRef = useRef(0);
+  const [wakeMode, setWakeMode] = useState(false);
 
   useEffect(() => {
     if (data) ringModeRef.current = data.extension.ringMode;
@@ -177,6 +182,22 @@ export function ProgramHolderPhone({
       document.getElementById('incoming-call-alert-mode')?.scrollIntoView({ block: 'center' });
     }
   }, [loading, data?.extension.id]);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('wake') !== '1') return;
+    wakeRef.current = { callId: params.get('call') || '', from: params.get('from') || '' };
+    setWakeMode(true);
+    if (params.get('from')) setIncomingNumber(params.get('from') || '');
+  }, []);
+
+  // Bring the incoming-call card into view the moment a call actually rings,
+  // whichever way this page was opened.
+  useEffect(() => {
+    if (callState === 'ringing') {
+      document.getElementById('incoming-call-card')?.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    }
+  }, [callState]);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -416,6 +437,21 @@ export function ProgramHolderPhone({
     autoConnectAttemptedRef.current = true;
     void connect();
   }, [connect, connected, connecting, data]);
+
+  // Wake mode: a caller is ringing this extension right now, so connecting is
+  // not optional and a dropped attempt is retried while the wake is fresh.
+  // The first attempt waits a beat so the standard auto-connect above (which
+  // fires on the same data load for ring/vibrate modes) wins when it applies;
+  // wake mode additionally covers the modes auto-connect skips and retries
+  // after a drop, which auto-connect never does.
+  useEffect(() => {
+    if (!wakeMode || !data || data.readOnly || connected || connecting || callState !== 'idle') return;
+    if (wakeAttemptsRef.current >= 4) return;
+    const attempt = wakeAttemptsRef.current + 1;
+    wakeAttemptsRef.current = attempt;
+    const timer = setTimeout(() => void connect(), attempt === 1 ? 1200 : 2000 * attempt);
+    return () => clearTimeout(timer);
+  }, [wakeMode, data, connected, connecting, callState, connect]);
 
   async function saveSettings() {
     if (!data || data.readOnly) return;
@@ -923,8 +959,25 @@ export function ProgramHolderPhone({
         </div>
       </section>
 
+      {wakeMode && callState === 'idle' && (
+        <section className="mx-auto w-full max-w-md rounded-3xl border-2 border-amber-300 bg-amber-50 p-5 text-center shadow" aria-live="polite">
+          <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-amber-400/20">
+            <PhoneCall className="h-10 w-10 text-amber-600" />
+          </div>
+          <p className="mt-4 text-sm font-black uppercase tracking-widest text-amber-700">
+            Incoming call
+          </p>
+          <h2 className="mt-2 text-3xl font-black text-slate-950">{friendlyNumber(incomingNumber)}</h2>
+          <p className="mt-2 text-sm font-semibold text-slate-700">
+            {connected
+              ? 'Your phone is connected — the call will appear here the moment it reaches you.'
+              : 'Connecting your phone now… keep this screen open to answer.'}
+          </p>
+        </section>
+      )}
+
       {callState !== 'idle' && (
-        <section className="mx-auto w-full max-w-md rounded-3xl border-2 border-cyan-300 bg-slate-950 p-5 text-center text-white shadow-2xl">
+        <section id="incoming-call-card" className="mx-auto w-full max-w-md rounded-3xl border-2 border-cyan-300 bg-slate-950 p-5 text-center text-white shadow-2xl">
           <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-cyan-500/20">
             <PhoneCall className="h-10 w-10 text-cyan-300" />
           </div>

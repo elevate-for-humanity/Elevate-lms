@@ -35,6 +35,10 @@ describe('marketing organization structured data', () => {
   it('publishes office-only fields on a Place location node', () => {
     expect(organizationJsonLd).not.toHaveProperty('geo');
     expect(organizationJsonLd).not.toHaveProperty('openingHours');
+    expect(organizationJsonLd.address).toEqual({
+      '@type': 'PostalAddress',
+      ...organization.postalAddress,
+    });
     expect(organizationJsonLd.location).toMatchObject({
       '@type': 'Place',
       address: {

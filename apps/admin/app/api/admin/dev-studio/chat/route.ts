@@ -1,3 +1,4 @@
+import { isOwnedStudioProviderRequest } from '@/lib/devstudio/owned-provider-policy';
 import { studioTextStreamResponse } from '@/lib/devstudio/studio-text-stream';
 import { prohibitsToolUse } from '@/lib/ai/command-intent';
 import { recordParisObservation } from '@/lib/ai/runtime/supervision';
@@ -8,9 +9,7 @@ import { DevStudioUltimateCourseControl } from '@/lib/devstudio/ultimate-course-
  *
  * AI platform controller for Dev Studio. Admin-only.
  *
- * Provider chain:
- *   1. Groq   — llama-3.3-70b-versatile (tool/function calling)
- *   2. Gemini — gemini-1.5-flash         (fallback, no tool calling)
+ * Uses the Elevate-owned engine only; outages fail closed without vendor fallback.
  */
 
 import { logger } from '@/lib/logger';
@@ -30,15 +29,6 @@ import { getAnthropicClient, isAnthropicConfigured } from '@/lib/ai/anthropic-cl
 import { aiChat, aiChatStream, getActiveProviderName } from '@/lib/ai/ai-service';
 import { isXAIConfigured } from '@/lib/ai/xai-config';
 import { probeOwnedModel } from '@/lib/ai/providers/owned-model-health.mjs';
-import {
-  CloudflareProvider,
-  GroqProvider,
-  OpenAIProvider,
-  AnthropicProvider,
-  GeminiProvider,
-  XAIProvider,
-} from '@/lib/ai/providers';
-import type { AIProvider } from '@/lib/ai/types';
 import {
   executePaidInference,
   paidArtifactFingerprint,
@@ -208,10 +198,8 @@ function toChatMessages(messages: ChatMessage[]) {
 }
 
 /**
- * Cached ownership probe. Auto mode prefers the owned PARIS model; when it is
- * unreachable we fall back to a governed external provider instead of refusing
- * to answer. The result is cached briefly so a down endpoint cannot add a probe
- * round-trip to every message.
+ * Cached owned-engine readiness. An unavailable model returns a visible 503;
+ * no vendor substitution is permitted. Cache the bounded probe briefly.
  */
 let ownedProbeCache: { at: number; verified: boolean; status?: string; configured?: boolean } | null =
   null;
@@ -230,87 +218,6 @@ async function ownedModelReachable(ttlMs = 30_000) {
     configured: (result as { configured?: boolean }).configured,
   };
   return ownedProbeCache;
-}
-
-// Auto mode degrades to the first reachable external provider that works inside
-// the paid-inference authorization boundary. Ordering is Cloudflare-first (the
-// platform's own Workers AI), then the other configured providers. External
-// metered providers that require a paid context are still only reached through
-// executePaidInference, so this preserves the provider authorization boundary.
-const GOVERNED_PROVIDER_FACTORIES: ReadonlyArray<readonly [string, () => AIProvider]> = [
-  ['cloudflare', () => new CloudflareProvider()],
-  ['groq', () => new GroqProvider()],
-  ['openai', () => new OpenAIProvider()],
-  ['anthropic', () => new AnthropicProvider()],
-  ['gemini', () => new GeminiProvider()],
-  ['xai', () => new XAIProvider()],
-];
-
-/**
- * Run one governed, tool-capable external completion for auto mode. External
- * metered providers are only reached inside a paid-inference authorization, and
- * the request is fully audited. Returns null when no provider is authorized or
- * available so the caller can continue its own fallbacks.
- */
-async function governedExternalCompletion(input: {
-  messages: ChatMessage[];
-  systemPrompt: string;
-  toolsAllowed: boolean;
-  tools: unknown[];
-  userId: string;
-  req: NextRequest;
-  runId?: string;
-  toolCalls: ToolCallRecord[];
-}): Promise<{ content: string; provider: string; model: string } | null> {
-  const providers = GOVERNED_PROVIDER_FACTORIES.map(([name, create]) => ({ name, provider: create() }));
-  for (const { name, provider } of providers) {
-    try {
-      if (!provider.isAvailable()) continue;
-    } catch {
-      continue;
-    }
-    try {
-      const db = await requireAdminClient();
-      const requestNonce = input.req.headers.get('x-request-id')?.trim() || crypto.randomUUID();
-      const projectedCostMicros = Math.max(
-        0,
-        Number(process.env.STUDIO_CHAT_PROJECTED_COST_MICROS ?? '100000'),
-      );
-      const artifactFingerprint = paidArtifactFingerprint({
-        operation: 'studio-chat',
-        actorId: input.userId,
-        provider: name,
-        message: input.messages.at(-1)?.content ?? '',
-        requestNonce,
-      });
-      const completion = await executePaidInference({
-        db,
-        authorize: () =>
-          reservePaidInference(db, {
-            scopeKey: 'studio-chat',
-            actorId: input.userId,
-            artifactFingerprint,
-            idempotencyKey: `studio-chat:${name}:${requestNonce}`,
-            provider: name,
-            model: name,
-            operation: 'studio-chat',
-            projectedCostMicros,
-          }),
-        dispatch: () =>
-          provider.chat({
-            messages: [{ role: 'system', content: input.systemPrompt }, ...input.messages],
-            temperature: 0.4,
-            maxTokens: 2048,
-            provider: name,
-          }),
-      });
-      if (completion.decision !== 'approved' || !completion.value?.content) continue;
-      return { content: completion.value.content, provider: name, model: completion.value.model ?? name };
-    } catch (error) {
-      logger.warn(`[devstudio/chat] governed fallback provider "${name}" failed`, normalizeError(error));
-    }
-  }
-  return null;
 }
 
 const TOOLS: any[] = [
@@ -1542,6 +1449,9 @@ async function _POST(req: NextRequest) {
       return NextResponse.json({ error: 'messages array is required' }, { status: 400 });
     }
 
+    if (!isOwnedStudioProviderRequest(rawProvider)) {
+      return NextResponse.json({ error: 'Dev Studio uses the Elevate-owned engine only.', code: 'OWNED_PROVIDER_REQUIRED' }, { status: 403 });
+    }
     const providerPreference = normalizeProvider(rawProvider);
     // PARIS auto mode uses Elevate-owned inference only. Never silently
     // select an external metered provider or activate a GPU here.
@@ -1595,27 +1505,12 @@ async function _POST(req: NextRequest) {
     let model = 'none';
     const canonicalProvider = getActiveProviderName();
 
-    // Auto mode prefers the owned PARIS model. When it is unreachable, degrade
-    // to a governed external provider instead of leaving the operator with no
-    // answer. Explicit provider selections skip this and stay pinned below.
+    // An owned-model outage is a visible failure, never permission to send
+    // private Studio context to another inference provider.
     if (effectiveProvider === 'elevate') {
       const owned = await ownedModelReachable();
       if (!owned.verified) {
-        const governed = await governedExternalCompletion({
-          messages: toChatMessages(messages),
-          systemPrompt,
-          toolsAllowed,
-          tools: TOOLS,
-          userId: auth.userId,
-          req,
-          runId: masterExecution?.studioRunId,
-          toolCalls,
-        });
-        if (governed) {
-          assistantMessage = governed.content;
-          provider = governed.provider;
-          model = governed.model;
-        }
+        return NextResponse.json({ error: 'The Elevate-owned AI engine is temporarily unavailable. No external provider was called.', code: 'OWNED_MODEL_UNAVAILABLE' }, { status: 503 });
       }
     }
 

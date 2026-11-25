@@ -1,6 +1,6 @@
 import { gh, parseRepo } from '@/lib/github';
 
-export async function scanRepository(repo = 'elevateforhumanity/fix2', branch = 'main') {
+export async function scanRepository(repo = 'elevate-for-humanity/Elevate-lms', branch = 'main') {
   const { owner, name } = parseRepo(repo);
   const client = gh();
 
@@ -14,7 +14,7 @@ export async function scanRepository(repo = 'elevateforhumanity/fix2', branch = 
   return tree.data.tree.filter((i) => i.type === 'blob').map((i) => i.path!);
 }
 
-export async function analyzeRepository(repo = 'elevateforhumanity/fix2', branch = 'main') {
+export async function analyzeRepository(repo = 'elevate-for-humanity/Elevate-lms', branch = 'main') {
   const files = await scanRepository(repo, branch);
 
   const analysis = {

@@ -24,6 +24,49 @@ let cache: Record<string, string> | null = null;
 let cacheTimestamp = 0;
 let hydrated = false;
 const CACHE_TTL_MS = 5 * 60 * 1000;
+// A failed canonical read is cached as an outcome too. Before this, only a
+// successful read filled the cache, so on any instance where the canonical
+// store was unreachable EVERY request repaid the full serial read cost
+// (two table reads plus one RPC per runtime key, each allowed a 30s fetch
+// timeout and up to 3 attempts) before it could proceed. A failure now
+// suppresses synchronous re-reads for FAILURE_CACHE_TTL_MS; the partial
+// (legacy-only) result is served in the meantime and the next attempt
+// happens on the first request after the TTL, or in the background when an
+// interactive caller uses the bounded hydration variant.
+const FAILURE_CACHE_TTL_MS = Math.max(
+  1000,
+  Number.parseInt(process.env.SUPABASE_FAILURE_CACHE_TTL_MS || '30000', 10) || 30000,
+);
+// Synchronous budget for interactive paths (see hydrateProcessEnvBounded).
+// A cold or failing hydration must never hold a visitor-facing request
+// longer than this; hydration continues in the background and merges into
+// process.env when it lands.
+export const HYDRATION_SYNC_BUDGET_MS = Math.max(
+  0,
+  Number.parseInt(process.env.HYDRATION_SYNC_BUDGET_MS || '1500', 10) || 1500,
+);
+let failureCache: Record<string, string> | null = null;
+let failureTimestamp = 0;
+let lastLoadCompletedAt = 0;
+let lastLoadSucceeded = false;
+let inFlightLoad: Promise<Record<string, string>> | null = null;
+let inFlightHydration: Promise<void> | null = null;
+
+function successCacheFresh(): boolean {
+  return Boolean(cache && Date.now() - cacheTimestamp < CACHE_TTL_MS);
+}
+
+function failureCacheFresh(): boolean {
+  return Boolean(failureCache && Date.now() - failureTimestamp < FAILURE_CACHE_TTL_MS);
+}
+
+/** True when the last completed hydration attempt (success OR failure) is
+ * still inside its TTL, so no new synchronous read is owed. */
+function hydrationOutcomeFresh(): boolean {
+  if (!lastLoadCompletedAt) return false;
+  const ttl = lastLoadSucceeded ? CACHE_TTL_MS : FAILURE_CACHE_TTL_MS;
+  return Date.now() - lastLoadCompletedAt < ttl;
+}
 const SECRETS_FETCH_TIMEOUT_MS = Math.max(
   1000,
   Number.parseInt(process.env.SUPABASE_FETCH_TIMEOUT_MS || '30000', 10) || 30000,
@@ -100,33 +143,65 @@ function acceptSecret(target: Record<string, string>, key: unknown, value: unkno
   if (trimmed) target[key] = value;
 }
 
-async function loadSecrets(): Promise<Record<string, string>> {
+async function performLoadSecrets(): Promise<Record<string, string>> {
   if (usesGoogleRuntimeBindings()) return {};
-  if (cache && Date.now() - cacheTimestamp < CACHE_TTL_MS) return cache;
+  if (successCacheFresh()) return cache!;
 
   const client = getBootstrapClient();
-  if (!client) return {};
+  if (!client) {
+    // No bootstrap credentials: nothing can be read. Record the outcome so
+    // callers serve process.env instead of re-checking on every request.
+    failureCache = {};
+    failureTimestamp = Date.now();
+    lastLoadCompletedAt = failureTimestamp;
+    lastLoadSucceeded = false;
+    return {};
+  }
 
   const secrets: Record<string, string> = {};
   let canonicalReadSucceeded = false;
 
+  // The legacy and canonical list reads are independent: run them in
+  // parallel instead of serially (they used to cost up to
+  // 2 x SECRETS_READ_ATTEMPTS x SECRETS_FETCH_TIMEOUT_MS back to back).
+  // Precedence is still applied afterwards, in order: legacy first,
+  // canonical platform_secrets values overwrite it.
+  const [legacyOutcome, canonicalOutcome] = await Promise.all([
+    (async () => {
+      try {
+        return { result: await readRuntimeSecrets(client, 'app_secrets', 'key,value'), error: null as unknown };
+      } catch (error) {
+        return { result: null, error };
+      }
+    })(),
+    (async () => {
+      try {
+        return { result: await readRuntimeSecrets(client, 'platform_secrets', 'key,scope'), error: null as unknown };
+      } catch (error) {
+        return { result: null, error };
+      }
+    })(),
+  ]);
+
   // Legacy fallback first. Canonical platform_secrets values below overwrite it.
-  try {
-    const result = await readRuntimeSecrets(client, 'app_secrets', 'key,value');
-    if (!result.error) {
-      for (const row of result.data ?? []) acceptSecret(secrets, row.key, row.value);
-    } else if (result.error.code !== '42P01') {
-      logger.error('Failed to load legacy app_secrets', result.error);
+  if (legacyOutcome.error) {
+    logger.error('Failed to load legacy app_secrets', legacyOutcome.error instanceof Error ? legacyOutcome.error : undefined);
+  } else if (legacyOutcome.result) {
+    if (!legacyOutcome.result.error) {
+      for (const row of legacyOutcome.result.data ?? []) acceptSecret(secrets, row.key, row.value);
+    } else if (legacyOutcome.result.error.code !== '42P01') {
+      logger.error('Failed to load legacy app_secrets', legacyOutcome.result.error);
     }
-  } catch (error) {
-    logger.error('Failed to load legacy app_secrets', error instanceof Error ? error : undefined);
   }
 
   // Canonical source. Never hydrate value_enc directly: it is encrypted at rest.
   // Resolve each runtime key through the restricted database function so only
-  // decrypted values reach process.env.
-  try {
-    const result = await readRuntimeSecrets(client, 'platform_secrets', 'key,scope');
+  // decrypted values reach process.env. The per-key RPCs already run in
+  // parallel via Promise.all.
+  if (canonicalOutcome.error) {
+    logger.error('Failed to load platform_secrets', canonicalOutcome.error instanceof Error ? canonicalOutcome.error : undefined);
+  } else if (canonicalOutcome.result) {
+    const result = canonicalOutcome.result;
     if (!result.error) {
       let allDecryptionsSucceeded = true;
       const decryptedRows = await Promise.all(
@@ -144,29 +219,122 @@ async function loadSecrets(): Promise<Record<string, string>> {
     } else {
       logger.error('Failed to load platform_secrets', result.error);
     }
-  } catch (error) {
-    logger.error('Failed to load platform_secrets', error instanceof Error ? error : undefined);
   }
 
-  // Do not cache an empty result caused by a transient canonical-store failure.
+  const completedAt = Date.now();
+  lastLoadCompletedAt = completedAt;
   if (canonicalReadSucceeded) {
+    // Only a successful canonical read fills the success cache.
     cache = secrets;
-    cacheTimestamp = Date.now();
+    cacheTimestamp = completedAt;
+    failureCache = null;
+    failureTimestamp = 0;
+    lastLoadSucceeded = true;
+  } else {
+    // Cache the failure OUTCOME (with whatever partial values were read)
+    // for FAILURE_CACHE_TTL_MS so a transient canonical-store failure is
+    // not repaid synchronously by every request on this instance.
+    failureCache = secrets;
+    failureTimestamp = completedAt;
+    lastLoadSucceeded = false;
   }
   return secrets;
 }
 
-/** Merge canonical runtime secrets into process.env. */
-export async function hydrateProcessEnv(): Promise<void> {
-  for (const key of Object.keys(process.env)) if (isRetiredPhoneSecret(key)) delete process.env[key];
-  if (usesGoogleRuntimeBindings()) return;
-  if (hydrated && Date.now() - cacheTimestamp < CACHE_TTL_MS) return;
+/**
+ * Load runtime secrets with outcome caching and in-flight dedupe.
+ *
+ * - Success: cached for CACHE_TTL_MS (unchanged semantics).
+ * - Failure: the partial result is cached for FAILURE_CACHE_TTL_MS and
+ *   served to subsequent callers without new reads.
+ * - Concurrent callers share one in-flight load instead of each starting
+ *   their own serial read chain.
+ */
+async function loadSecrets(): Promise<Record<string, string>> {
+  if (usesGoogleRuntimeBindings()) return {};
+  if (successCacheFresh()) return cache!;
+  if (inFlightLoad) return inFlightLoad;
+  if (failureCacheFresh()) return failureCache!;
+  inFlightLoad = performLoadSecrets().finally(() => {
+    inFlightLoad = null;
+  });
+  return inFlightLoad;
+}
 
-  const secrets = await loadSecrets();
+function mergeSecretsIntoEnv(secrets: Record<string, string>): void {
   for (const [key, value] of Object.entries(secrets)) {
     if (!usesGoogleRuntimeBindings(key) && value.trim()) process.env[key] = value;
   }
-  hydrated = true;
+}
+
+/**
+ * The single shared hydration run. Concurrent callers share it; when it
+ * lands it merges into process.env exactly once. Never rejects: load
+ * failures are recorded as a cached failure outcome by loadSecrets and
+ * callers fall back to whatever process.env already holds.
+ */
+function ensureHydration(): Promise<void> {
+  for (const key of Object.keys(process.env)) if (isRetiredPhoneSecret(key)) delete process.env[key];
+  if (usesGoogleRuntimeBindings()) return Promise.resolve();
+  if (hydrated && hydrationOutcomeFresh()) return Promise.resolve();
+  if (inFlightHydration) return inFlightHydration;
+  inFlightHydration = (async () => {
+    try {
+      const secrets = await loadSecrets();
+      mergeSecretsIntoEnv(secrets);
+      hydrated = true;
+    } catch (error) {
+      // loadSecrets records failures itself; hydration must never take a
+      // request down with it. Serve the env that is already present.
+      logger.error('Failed to hydrate process env', error instanceof Error ? error : undefined);
+    }
+  })().finally(() => {
+    inFlightHydration = null;
+  });
+  return inFlightHydration;
+}
+
+/**
+ * Merge canonical runtime secrets into process.env — STRICT variant.
+ *
+ * Awaits the full hydration, however long the underlying reads take
+ * (bounded only by the per-read fetch timeout and retry policy). This is
+ * the guarantee non-interactive callers rely on: withRuntime and
+ * cronHandler validate required secrets immediately after this returns,
+ * and instrumentation hydrates once at boot. Keep those callers on this
+ * variant. Interactive, visitor-facing routes should use
+ * hydrateProcessEnvBounded instead.
+ */
+export async function hydrateProcessEnv(): Promise<void> {
+  await ensureHydration();
+}
+
+/**
+ * Bounded hydration for interactive paths (e.g. the PARIS chat route).
+ *
+ * Starts (or joins) hydration, then waits at most `budgetMs`. If hydration
+ * has not landed by then, the caller proceeds with whatever process.env
+ * already holds — the exact state the strict path ultimately fell back to
+ * after a failed read — while hydration continues in the background and
+ * merges into process.env when it completes, so the next request on this
+ * instance is warm. A failing canonical store therefore costs an
+ * interactive request at most the budget, once per failure TTL, instead
+ * of the full read chain on every request.
+ */
+export async function hydrateProcessEnvBounded(budgetMs: number = HYDRATION_SYNC_BUDGET_MS): Promise<void> {
+  const hydration = ensureHydration();
+  if (budgetMs <= 0) return;
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  try {
+    await Promise.race([
+      hydration,
+      new Promise<void>((resolve) => {
+        timer = setTimeout(resolve, budgetMs);
+      }),
+    ]);
+  } finally {
+    if (timer) clearTimeout(timer);
+  }
 }
 
 /** Get a single runtime secret, falling back to process.env. */
@@ -229,6 +397,10 @@ export function getCachedSecret(key: string): string | undefined {
 export async function refreshSecrets(): Promise<void> {
   cache = null;
   cacheTimestamp = 0;
+  failureCache = null;
+  failureTimestamp = 0;
+  lastLoadCompletedAt = 0;
+  lastLoadSucceeded = false;
   hydrated = false;
   await hydrateProcessEnv();
 }

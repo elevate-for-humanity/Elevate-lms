@@ -303,18 +303,24 @@ export async function PATCH(request: Request) {
         }
         verifiedAt = evidence.observedAt;
       } catch {
-        await ctx.db
+        // The provisioner could not be reached, so it produced no evidence
+        // about this device. The heartbeat itself proves the PWA is alive:
+        // record the sighting and preserve the last verified registration
+        // state instead of erasing it. Presence derivation ages a device
+        // out on its own if heartbeats actually stop arriving, and the
+        // next successful verification restores the confirmed state.
+        const seenAt = new Date().toISOString();
+        const { error: seenError } = await ctx.db
           .from('phone_webrtc_devices')
-          .update({
-            registration_state: 'unregistered',
-            connection_state: 'disconnected',
-            registration_verified_at: null,
-            updated_at: new Date().toISOString(),
-          })
+          .update({ last_seen_at: seenAt, updated_at: seenAt })
           .eq('id', registeredDevice.id);
         return NextResponse.json(
-          { error: 'Asterisk has not confirmed a reachable SIP registration.' },
-          { status: 409 },
+          {
+            error: seenError
+              ? 'Registration evidence could not be saved.'
+              : 'Asterisk registration could not be verified. Your check-in was recorded; please retry.',
+          },
+          { status: seenError ? 500 : 503 },
         );
       }
     }

@@ -11,7 +11,7 @@ function fixture({paused=true,status='blocked',conflict=false,running=false,deni
  const build={id:'572cca43-6bd6-4a91-b385-a8b576209c4e',status,profile,updated_at:'2026-10-25T20:00:00.123456+00:00'};
  const db={from(table){let write,filters=[];const q={
   select(){return q;},eq(k,v){filters.push([k,v]);return q;},in(k,v){filters.push([k,v]);return q;},
-  update(value){write=value;return q;},async single(){return {data:build};},
+  update(value){write=value;return q;},async single(){return {data:build};},async maybeSingle(){return {data:null};},
   then(resolve,reject){if(write)writes.push({table,write,filters});return Promise.resolve({data:conflict?[]:[{id:build.id}]}).then(resolve,reject);}
  };return q;}};
  const job={id:'job',status:running?'running':'queued',attempts,max_attempts:5,payload:{},

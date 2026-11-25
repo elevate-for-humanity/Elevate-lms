@@ -1,4 +1,5 @@
 'use client';
+// Branch refreshed to pick up main (a5daf49d): Course Builder merge; fresh CI after E2E shard 3/4 environment failure.
 
 /**
  * Canonical PWA install banner.

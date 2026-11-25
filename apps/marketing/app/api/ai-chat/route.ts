@@ -26,6 +26,11 @@ export const dynamic = 'force-dynamic';
 // for gateway cleanup and the guided response before it expires.
 const INFERENCE_TIMEOUT_MS = 120_000;
 
+// Interactive streaming clients show a spinner until the first token, so the
+// optional pre-stream web search gets a tighter budget on that path. It
+// still fails open: a timeout just means no web results in the prompt.
+const STREAM_WEB_SEARCH_TIMEOUT_MS = 2_000;
+
 type ParisSurface = 'public' | 'learner' | 'store';
 
 interface Message {
@@ -275,7 +280,12 @@ export async function POST(req: NextRequest) {
         (context.surface ?? 'public') === 'public' &&
         shouldWebSearch(recentUserText, matchedProgramCount)
       ) {
-        webResults = formatWebResults(await searchWebForParis(recentUserText));
+        webResults = formatWebResults(
+          await searchWebForParis(
+            recentUserText,
+            wantsStream ? { timeoutMs: STREAM_WEB_SEARCH_TIMEOUT_MS } : {},
+          ),
+        );
       }
     } catch {
       webResults = '';
@@ -328,3 +338,4 @@ export async function POST(req: NextRequest) {
     }, { status: 503, headers: { 'Cache-Control': 'no-store' } });
   }
 }
+

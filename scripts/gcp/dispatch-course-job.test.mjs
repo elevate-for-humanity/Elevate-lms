@@ -255,3 +255,24 @@ for(const generation of [4,undefined])test('a stale or missing generation cannot
  s.options.request=async url=>url.searchParams.has('id')?{ok:true,json:async()=>[{id:'queued',status:'completed',heartbeat_at:'2026-10-06T10:00:01Z',execution_generation:generation}]}:base(url);
  assert.equal((await dispatchQueuedCourseJob(s.options)).reason,'awaiting_worker_assignment');
 });
+
+test('an empty scan names coordinators hidden by an active pool instead of looking idle',async()=>{
+ const s=setup([],[]);
+ const base=s.options.request;
+ const events=[];
+ const originalInfo=console.info;
+ console.info=(...args)=>{events.push(args.join(' '));};
+ try {
+  s.options.request=async url=>{
+   if(url.searchParams.get('build.active_pools')==='not.is.null')
+    return {ok:true,json:async()=>[{id:'coord-1',build_id:'build-1',build:{active_pools:[{id:'pool-1',state:'active',created_at:'2026-10-01T00:00:00Z'}]}}]};
+   return base(url);
+  };
+  const result=await dispatchQueuedCourseJob(s.options);
+  assert.equal(result.status,'empty');
+ } finally { console.info=originalInfo; }
+ const blocked=events.find(line=>line.includes('course_dispatch_pool_blocked'));
+ assert.ok(blocked,'expected a course_dispatch_pool_blocked diagnostic');
+ assert.match(blocked,/pool-1/);
+ assert.match(blocked,/coord-1/);
+});

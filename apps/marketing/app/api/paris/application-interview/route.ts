@@ -126,7 +126,16 @@ async function loadSession(request: NextRequest, body?: z.infer<typeof requestSc
 export async function GET(request: NextRequest) {
   try {
     const session = await loadSession(request);
-    if (!session) return NextResponse.json({ ok: false, error: 'No resumable application interview found' }, { status: 404 });
+    // A first-time visitor has no session to resume. That is the normal entry
+    // path, not an error: answer 200 with ok:false so the browser does not log
+    // a failed-resource console error for every fresh visit (the workspace
+    // starts a new interview when ok is false). Returning 404 here used to fail
+    // the public-site runtime audit on /apply/student on every run.
+    if (!session)
+      return NextResponse.json(
+        { ok: false, error: 'No resumable application interview found' },
+        { status: 200, headers: { 'Cache-Control': 'no-store' } },
+      );
     const locale = (session.project.locale === 'es' ? 'es' : 'en') as ApplicationInterviewLocale;
     const state = stateFromMetadata(session.project.metadata, locale);
     const [messages, events] = await Promise.all([

@@ -32,7 +32,7 @@ vi.mock('@/lib/supabase/admin', () => ({
 
 const published = '2026-11-24T12:00:00Z';
 const partner = { id: 'catalog-partner', name: 'Catalog Salon LLC', status: 'active', account_status: 'active', approval_status: 'approved', public_slug: 'catalog-salon', public_profile_published_at: published, programs: ['esthetician-apprenticeship', 'nail-technician-apprenticeship'] };
-const profile = { id: partner.id, display_name: 'Catalog Salon LLC', public_slug: partner.public_slug, public_profile_published_at: published, city: 'Indianapolis', state: 'IN', programs: ['barber-apprenticeship'], phone: 'unverified' };
+const profile = { id: partner.id, display_name: 'Catalog Salon LLC', public_slug: partner.public_slug, public_profile_published_at: published, address_line1: '123 Main St', city: 'Indianapolis', state: 'IN', zip: '46201', programs: ['barber-apprenticeship'], phone: 'unverified' };
 const listing = { partner_id: partner.id, status: 'active', directory_listing: true };
 
 beforeEach(() => {
@@ -69,11 +69,13 @@ describe('public Host Shop partner-backed approvals', () => {
 
   it('does not duplicate an already visible shop', async () => {
     rows.host_shop_applications = [{ id: 'application-1', status: 'approved', shop_name: profile.display_name, address: '', intake: { programs: partner.programs } }];
+    rows.host_shop_partnerships = [{ ...listing, application_id: 'application-1' }];
     expect(await getApprovedShops()).toHaveLength(1);
   });
 
   it('unions canonical approvals without changing the primary trade or losing either profile URL', async () => {
     rows.host_shops = [{ id: 'active1234', name: profile.display_name, is_approved: true, shop_status: 'active', specializations: ['cosmetology-apprenticeship'] }];
+    rows.host_shop_partnerships = [{ ...listing, shop_id: 'active1234' }];
     const all = await getApprovedShops();
     expect(all).toHaveLength(1);
     expect(all[0]).toEqual(expect.objectContaining({
@@ -87,6 +89,33 @@ describe('public Host Shop partner-backed approvals', () => {
     expect(await getApprovedShops('nail')).toHaveLength(1);
     expect((await getApprovedShopByPublicSlug(partner.public_slug))?.id).toBe('active1234');
     expect((await getApprovedShopByPublicSlug('catalog-salon-llc-active12'))?.id).toBe('active1234');
+  });
+
+  it('does not combine identically named approved shops at different worksites', async () => {
+    rows.host_shop_applications = [{ id: 'unrelated', status: 'approved', shop_name: profile.display_name, address: '456 Other St, Indianapolis, IN 46202', intake: { programs: ['cosmetology'] } }];
+    const all = await getApprovedShops();
+    expect(all).toHaveLength(2);
+    expect(all.find(shop => shop.id === 'unrelated')).toEqual(expect.objectContaining({ programs: [PROGRAM_SLUGS.cosmetology] }));
+    expect(all.find(shop => shop.id === 'unrelated')?.publicSlug).not.toBe(partner.public_slug);
+    expect((await getApprovedShopByPublicSlug(partner.public_slug))?.id).toBe(partner.id);
+    expect(await getApprovedShops('esthetician')).toHaveLength(1);
+    expect(await getApprovedShops('barber')).toEqual([]);
+  });
+
+  it('corroborates a legacy application by complete worksite address, preserving one canonical profile', async () => {
+    rows.host_shop_applications = [{ id: 'legacy', status: 'approved', shop_name: profile.display_name, address: '123 Main St., Indianapolis, IN 46201', intake: { programs: ['cosmetology'] } }];
+    const all = await getApprovedShops();
+    expect(all).toHaveLength(1);
+    expect(all[0].id).toBe('legacy');
+    expect(all[0].programs).toContain(PROGRAM_SLUGS.cosmetology);
+    expect(all[0].programs).toContain(PROGRAM_SLUGS.esthetician);
+    expect(all[0].programs).not.toContain(PROGRAM_SLUGS.barber);
+  });
+
+  it('does not treat a matching name without location evidence as identity', async () => {
+    rows.host_shops = [{ id: 'unlinked', name: profile.display_name, is_approved: true, shop_status: 'active', specializations: ['cosmetology'] }];
+    expect(await getApprovedShops()).toHaveLength(2);
+    expect((await getApprovedShopByPublicSlug(partner.public_slug))?.id).toBe(partner.id);
   });
 
   it('does not add partner trades without public directory opt-in', async () => {

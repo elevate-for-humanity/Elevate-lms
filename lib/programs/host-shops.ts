@@ -49,6 +49,17 @@ function businessKey(value: string | null | undefined) {
     .replace(/[^a-z0-9]/g, '');
 }
 
+// Older application rows may lack a partner foreign key. Require a complete,
+// matching physical location as well as the business identity before linking them.
+function sameWorksite(left: Pick<HostShop, 'address' | 'city' | 'state' | 'zip'>, right: Pick<HostShop, 'address' | 'city' | 'state' | 'zip'>) {
+  const a = normalizeHostShopAddress(left);
+  const b = normalizeHostShopAddress(right);
+  const key = (value: string) => value.toLowerCase().replace(/[^a-z0-9]/g, '');
+  return Boolean(a.address && b.address && a.city && b.city && a.state && b.state && a.zip && b.zip &&
+    key(a.address) === key(b.address) && key(a.city) === key(b.city) &&
+    key(a.state) === key(b.state) && a.zip.slice(0, 5) === b.zip.slice(0, 5));
+}
+
 function publicSlug(name: string, id: string) {
   const base =
     name
@@ -115,7 +126,7 @@ export async function getApprovedShops(program?: ProgramKey): Promise<HostShop[]
     db
       .from('barbershop_partner_applications')
       .select(
-        'id, shop_legal_name, shop_dba_name, shop_address_line1, shop_city, shop_state, shop_zip, contact_phone, contact_email, supervisor_name',
+        'id, partner_id, shop_legal_name, shop_dba_name, shop_address_line1, shop_city, shop_state, shop_zip, contact_phone, contact_email, supervisor_name',
       )
       .eq('status', 'approved')
       .order('shop_legal_name'),
@@ -137,7 +148,7 @@ export async function getApprovedShops(program?: ProgramKey): Promise<HostShop[]
     db.from('partners').select('id,public_slug,programs')
       .eq('status', 'active').eq('account_status', 'active').eq('approval_status', 'approved')
       .not('public_profile_published_at', 'is', null),
-    db.from('host_shop_partnerships').select('partner_id')
+    db.from('host_shop_partnerships').select('partner_id,application_id,shop_id')
       .eq('status', 'active').eq('directory_listing', true),
   ]);
 
@@ -147,6 +158,39 @@ export async function getApprovedShops(program?: ProgramKey): Promise<HostShop[]
   const barberRows = barberResult.data;
   const hostRows = hostResult.data;
   const publicRows = publicResult.data;
+  const optedInLinks = optedInResult.data ?? [];
+  const optedInPartnerIds = new Set(optedInLinks.map(row => row.partner_id));
+  const canonicalPartners = new Map((approvedPartnerResult.data ?? [])
+    .filter(row => optedInPartnerIds.has(row.id)).map(row => [row.id, row]));
+  type SiteIdentity = Pick<HostShop, 'id' | 'name' | 'address' | 'city' | 'state' | 'zip'>;
+  type PublicProfile = NonNullable<typeof publicRows>[number];
+  function profileSite(profile: PublicProfile): SiteIdentity {
+    return { id: profile.id, name: profile.display_name ?? '', address: [profile.address_line1, profile.address_line2].filter(Boolean).join(', '), city: profile.city ?? '', state: profile.state ?? 'IN', zip: profile.zip ?? '' };
+  }
+  function matchesPartnerWorksite(site: SiteIdentity, profile: PublicProfile) {
+    const barberPartnerId = (barberRows ?? []).find(row => row.id === site.id)?.partner_id;
+    const linkedPartnerIds = new Set(optedInLinks.filter(row => row.application_id === site.id || row.shop_id === site.id).map(row => row.partner_id));
+    if (barberPartnerId) linkedPartnerIds.add(barberPartnerId);
+    if ([...linkedPartnerIds].some(id => id !== profile.id)) return false;
+    if (site.id === profile.id || linkedPartnerIds.has(profile.id)) return true;
+    return businessKey(site.name) === businessKey(profile.display_name) && sameWorksite(site, profileSite(profile));
+  }
+  function findPublicProfile(site: SiteIdentity & { phone?: string }) {
+    const canonical = (publicRows ?? []).filter(row => canonicalPartners.get(row.id)?.public_slug === row.public_slug &&
+      row.public_profile_published_at && matchesPartnerWorksite(site, row));
+    if (canonical.length === 1) return canonical[0];
+    if (canonical.length > 1) return undefined;
+    // Preserve existing legacy media enrichment, but never let it borrow a
+    // canonical partner's profile or occupation evidence by name alone.
+    return (publicRows ?? []).find(row => !canonicalPartners.has(row.id) &&
+      Boolean((digits(site.phone) && digits(site.phone) === digits(row.phone)) ||
+        (businessKey(site.name) && businessKey(site.name) === businessKey(row.display_name))));
+  }
+  function profilePrograms(profile: PublicProfile | undefined) {
+    if (!profile) return [];
+    const programs = canonicalPartners.get(profile.id)?.programs ?? profile.programs;
+    return Array.isArray(programs) ? programs : [];
+  }
 
   const barberShops: HostShop[] = (barberRows ?? []).map((shop) => ({
     id: shop.id,
@@ -165,9 +209,8 @@ export async function getApprovedShops(program?: ProgramKey): Promise<HostShop[]
   const hostShops: HostShop[] = (hostRows ?? []).map((shop) => {
     const parsed = parseHostShopAddress(shop.address ?? '');
     const rawPrograms: unknown[] = Array.isArray(shop.intake?.programs) ? shop.intake.programs : [];
-    const profile = (publicRows ?? []).find((row) => businessKey(row.display_name) === businessKey(shop.shop_name));
-    const profilePrograms = Array.isArray(profile?.programs) ? profile.programs : [];
-    const programs = [...rawPrograms, ...profilePrograms]
+    const profile = findPublicProfile({ id: shop.id, name: shop.shop_name, ...parsed });
+    const programs = [...rawPrograms, ...profilePrograms(profile)]
       .map(normalizeHostShopProgram)
       .filter((value): value is string => typeof value === 'string');
     return {
@@ -196,12 +239,7 @@ export async function getApprovedShops(program?: ProgramKey): Promise<HostShop[]
   ]
     .filter(isPubliclyListedHostShop)
     .map((shop) => {
-      const profile = (publicRows ?? []).find((row) => {
-        const phoneMatch = digits(shop.phone) && digits(shop.phone) === digits(row.phone);
-        const nameMatch =
-          businessKey(shop.name) && businessKey(shop.name) === businessKey(row.display_name);
-        return Boolean(phoneMatch || nameMatch);
-      });
+      const profile = findPublicProfile(shop);
 
       const sourceVerifiedPublicPhone =
         profile?.phone && (profile.source_url || profile.website_url || profile.website)
@@ -209,9 +247,9 @@ export async function getApprovedShops(program?: ProgramKey): Promise<HostShop[]
           : shop.phone;
       const enriched: HostShop = {
         ...shop,
-        programs: [...new Set([...shop.programs, ...(Array.isArray(profile?.programs) ? profile.programs : [])
+        programs: [...new Set([...shop.programs, ...profilePrograms(profile)
           .map(normalizeHostShopProgram).filter((value): value is string => Boolean(value))])],
-        primaryProgram: (Array.isArray(profile?.programs) ? profile.programs : [])
+        primaryProgram: profilePrograms(profile)
           .map(normalizeHostShopProgram).find((value): value is string => Boolean(value)) ?? shop.programs[0],
         phone: sourceVerifiedPublicPhone || shop.phone,
         // Every approved operational Host Site needs a stable public destination,
@@ -245,7 +283,6 @@ export async function getApprovedShops(program?: ProgramKey): Promise<HostShop[]
   // Older and migrated Host Sites can have their canonical approval on the
   // partner record rather than in either application table. This is an
   // additional approval source, not permission to publish profile-only rows.
-  const optedInPartnerIds = new Set((optedInResult.data ?? []).map(row => row.partner_id));
   const alreadyListed = [...existing, ...activeShopBacked];
   const partnerBacked: HostShop[] = [];
   for (const partner of approvedPartnerResult.data ?? []) {
@@ -278,25 +315,27 @@ export async function getApprovedShops(program?: ProgramKey): Promise<HostShop[]
       mediaGallery: parseMedia(profile.media_gallery),
     };
     if (!isPubliclyListedHostShop(shop) || archivedNames.has(businessKey(shop.name))) continue;
-    // Match the published identity first. Only use the existing directory's
-    // business-name fallback when it resolves to one unambiguous record.
-    const candidates = [...alreadyListed, ...partnerBacked];
-    const slugMatches = candidates.filter(existing => existing.publicSlug === shop.publicSlug);
-    const nameMatches = candidates.filter(existing => businessKey(existing.name) === businessKey(shop.name));
-    const matches = slugMatches.length ? slugMatches : nameMatches;
-    if (matches.length > 1) continue;
+    // A name or a previously enriched slug is not proof of worksite identity.
+    // Prefer explicit relationships; for legacy rows require matching address.
+    const matches = [...alreadyListed, ...partnerBacked].filter(existing => matchesPartnerWorksite(existing, profile));
+    if (matches.length > 1 && !matches.every(existing => sameWorksite(existing, shop))) continue;
     const duplicate = matches[0];
     if (duplicate) {
       // Union the independently authorized occupations. Preserve the operational
       // ID, primary trade and contact data, and keep the previous URL resolving.
-      const previousSlug = duplicate.publicSlug;
-      duplicate.programs = [...new Set([...duplicate.programs, ...shop.programs])];
+      duplicate.programs = [...new Set([...matches.flatMap(existing => existing.programs), ...shop.programs])];
       duplicate.primaryProgram ??= duplicate.programs[0];
+      duplicate.publicSlugAliases = [...new Set(matches.flatMap(existing => [
+        ...(existing.publicSlugAliases ?? []),
+        ...(existing.publicSlug ? [existing.publicSlug] : []),
+      ]))].filter(slug => slug !== shop.publicSlug);
       duplicate.publicSlug = shop.publicSlug;
-      duplicate.publicSlugAliases = [...new Set([
-        ...(duplicate.publicSlugAliases ?? []),
-        ...(previousSlug && previousSlug !== shop.publicSlug ? [previousSlug] : []),
-      ])].filter(slug => slug !== duplicate.publicSlug);
+      for (const redundant of matches.slice(1)) {
+        const index = alreadyListed.indexOf(redundant);
+        if (index >= 0) alreadyListed.splice(index, 1);
+        const partnerIndex = partnerBacked.indexOf(redundant);
+        if (partnerIndex >= 0) partnerBacked.splice(partnerIndex, 1);
+      }
       continue;
     }
     partnerBacked.push({

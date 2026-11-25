@@ -54,9 +54,7 @@ interface StreamedReply {
 /**
  * Read a PARIS server-sent-events stream, calling onDelta for each text
  * chunk as it arrives so the answer appears word by word. Returns the full
- * assembled text plus the stream's final mode. A stream that dies after
- * some text arrived returns the partial text; one that yields nothing throws
- * so the caller can show the usual fallback message.
+ * assembled text and final mode after receiving the server's completion event.
  */
 async function readStreamedReply(
   body: ReadableStream<Uint8Array>,
@@ -109,12 +107,10 @@ async function readStreamedReply(
       }
       if (done) break;
     }
-  } catch (error) {
-    if (!assembled) throw error;
   } finally {
     reader.releaseLock();
   }
-  if (!assembled) throw new Error('PARIS stream ended before completion');
+  if (!sawDone || !assembled) throw new Error('PARIS stream ended before completion');
   return { text: assembled, mode, liveAiAvailable };
 }
 
@@ -211,14 +207,18 @@ export default function ParisChat({
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [streamedDraft, setStreamedDraft] = useState('');
   const [autoSpeak, setAutoSpeak] = useState(voiceEnabled);
   const [isListening, setIsListening] = useState(false);
   const [speechInputAvailable, setSpeechInputAvailable] = useState(false);
   const [speechInputError, setSpeechInputError] = useState<string | null>(null);
+  const activeRequest = useRef<AbortController | null>(null);
   const recognitionRef = useRef<BrowserSpeechRecognition | null>(null);
   const initialGreetingSpokenRef = useRef(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => () => activeRequest.current?.abort(), []);
 
   useEffect(() => {
     if (!portalIssue) return;
@@ -323,7 +323,7 @@ export default function ParisChat({
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+  }, [messages, streamedDraft]);
 
   useEffect(() => {
     if (!voiceEnabled || !autoSpeak || initialGreetingSpokenRef.current) return;
@@ -342,7 +342,9 @@ export default function ParisChat({
   const sendToApi = useCallback(
     async (content: string) => {
       const trimmed = content.trim();
-      if (!trimmed || isLoading) return;
+      if (!trimmed || activeRequest.current) return;
+      const request = new AbortController();
+      activeRequest.current = request;
 
       const userMessage: Message = { role: 'user', content: trimmed };
       const requestMessages = [...messages, userMessage].slice(-20);
@@ -387,6 +389,7 @@ export default function ParisChat({
           method: 'POST',
           headers: { 'Content-Type': 'application/json', Accept: 'text/event-stream' },
           credentials: 'same-origin',
+          signal: request.signal,
           cache: 'no-store',
           body: JSON.stringify({
             messages: requestMessages,
@@ -412,37 +415,16 @@ export default function ParisChat({
         // (guided JSON, 503) falls through to the existing handling below.
         const contentType = response.headers.get('content-type') || '';
         if (response.ok && contentType.includes('text/event-stream') && response.body) {
-          let messageStarted = false;
-          const appendDelta = (delta: string) => {
-            if (messageStarted) {
-              setMessages((previous) => {
-                const next = [...previous];
-                const last = next[next.length - 1];
-                if (last && last.role === 'assistant') {
-                  next[next.length - 1] = { ...last, content: last.content + delta };
-                }
-                return next;
-              });
-            } else {
-              messageStarted = true;
-              setMessages((previous) => [...previous, { role: 'assistant', content: delta }]);
-            }
-          };
-          const streamed = await readStreamedReply(response.body, appendDelta);
+          const streamed = await readStreamedReply(response.body, (delta) => {
+            setStreamedDraft((previous) => previous + delta);
+          });
+          if (request.signal.aborted) return;
           const reply =
             streamed.mode === 'guided' || streamed.liveAiAvailable === false
               ? `Live AI is temporarily unavailable. This is basic program guidance, not a live AI answer.\n\n${streamed.text}`
               : streamed.text;
-          setMessages((previous) => {
-            const next = [...previous];
-            const last = next[next.length - 1];
-            if (last && last.role === 'assistant') {
-              next[next.length - 1] = { ...last, content: reply };
-            } else {
-              next.push({ role: 'assistant', content: reply });
-            }
-            return next;
-          });
+          setStreamedDraft('');
+          setMessages((previous) => [...previous, { role: 'assistant', content: reply }]);
           if (autoSpeak) {
             void voice.play(plainTextForSpeech(reply), {
               voice: 'coral',
@@ -456,6 +438,7 @@ export default function ParisChat({
         }
 
         const data = await response.json().catch(() => ({}));
+        if (request.signal.aborted) return;
         if (!response.ok && response.status === 503 && typeof data.error === 'string') {
           setMessages((previous) => [...previous, { role: 'assistant', content: data.error }]);
           return;
@@ -480,6 +463,7 @@ export default function ParisChat({
         }
         onComplete?.([]);
       } catch {
+        if (request.signal.aborted) return;
         setMessages((previous) => [
           ...previous,
           {
@@ -494,15 +478,18 @@ export default function ParisChat({
           },
         ]);
       } finally {
-        setIsLoading(false);
-        inputRef.current?.focus();
+        activeRequest.current = null;
+        if (!request.signal.aborted) {
+          setStreamedDraft('');
+          setIsLoading(false);
+          inputRef.current?.focus();
+        }
       }
     },
     [
       autoSpeak,
       courseProgress,
       courseTitle,
-      isLoading,
       learnerSurface,
       messages,
       nextLessonTitle,
@@ -562,7 +549,10 @@ export default function ParisChat({
         className="flex-1 space-y-4 overflow-y-auto bg-slate-50 px-4 py-4 sm:px-6"
         aria-live="polite"
       >
-        {messages.map((message, index) => (
+        {(streamedDraft
+          ? [...messages, { role: 'assistant' as const, content: streamedDraft }]
+          : messages
+        ).map((message, index) => (
           <div
             key={`${message.role}-${index}`}
             className={`flex gap-3 ${message.role === 'user' ? 'flex-row-reverse' : ''}`}
@@ -616,7 +606,7 @@ export default function ParisChat({
           </div>
         ))}
 
-        {isLoading && (
+        {isLoading && !streamedDraft && (
           <div className="flex gap-3">
             <div className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full bg-slate-950 text-white">
               <ParisAvatar size={32} className="h-8 w-8" fallbackIconClassName="h-4 w-4" />

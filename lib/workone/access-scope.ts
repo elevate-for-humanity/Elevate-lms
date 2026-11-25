@@ -15,4 +15,4 @@
  * To move the start (e.g. include applicants from an earlier agreed
  * date), change this one constant — do not remove the filters.
  */
-export const WORKONE_ACCESS_START_ISO = '2026-11-25T00:00:00.000Z';
+export const WORKONE_ACCESS_START_ISO = '2026-12-03T00:00:00.000Z';

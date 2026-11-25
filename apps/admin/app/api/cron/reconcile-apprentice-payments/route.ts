@@ -70,7 +70,7 @@ export async function POST(request: NextRequest) {
         });
         if (synced.duplicateSkipped) {
           duplicatesSkipped += 1;
-          logger.error('[apprentice-payment-reconciliation] duplicate PayPal payment skipped', {
+          logger.error('[apprentice-payment-reconciliation] duplicate PayPal payment skipped', undefined, {
             scheduleId: schedule.id,
             paymentId: transaction.id,
           });

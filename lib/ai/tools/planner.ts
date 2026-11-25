@@ -171,7 +171,9 @@ function matchAITool(command: string, context: Record<string, unknown>): Planned
     return { name: 'studio.repository.status', input: {} };
   }
   if (isOpenHandsStatusCommand(lower)) {
-    return { name: 'openhands.status', input: asAIRecord(context.toolInput) };
+    // OpenHands has been removed: there is no OpenHands status tool and no
+    // OpenHands route. A status query about it plans no tool.
+    return null;
   }
   // Read-only workflow inspection outranks generic engineering keywords.
   // Negated phrases such as "do not modify" describe a safety boundary, not
@@ -454,10 +456,6 @@ function matchAITool(command: string, context: Record<string, unknown>): Planned
           ? { courseId: id ?? selectedCourseId } : {}),
       },
     };
-  }
-  // OpenHands is an engineering worker, not a general platform action router.
-  if (isOpenHandsStatusCommand(lower)) {
-    return { name: 'openhands.status', input: asAIRecord(context.toolInput) };
   }
   if (isLiveBrowserWork(lower)) {
     return {

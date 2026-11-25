@@ -83,11 +83,11 @@ describe('engineering delegation', () => {
     });
   });
 
-  it('routes explicit OpenHands status checks to the status tool', () => {
+  it('plans no tool for OpenHands status checks — OpenHands is removed', () => {
     const planned = planAIToolFromCommand('Check OpenHands progress', {
       toolInput: { taskId: 'task-123' },
     });
-    expect(planned).toEqual({ name: 'openhands.status', input: { taskId: 'task-123' } });
+    expect(planned).toBeNull();
   });
 
   it('does not dispatch course generation for a read-only production audit', () => {

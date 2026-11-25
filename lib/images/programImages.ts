@@ -268,6 +268,11 @@ export const PROGRAM_IMAGES: Record<string, ProgramImageEntry> = {
     hero: '/images/pages/culinary-apprenticeship-hero.webp',
     alt: 'Chef demonstrating cooking techniques in a professional kitchen',
   },
+  'ai-engineering': {
+    card: '/images/hero/hero-tech-careers.webp',
+    hero: '/images/hero/hero-tech-careers.webp',
+    alt: 'Technology learner building and testing software on a computer',
+  },
   'it-help-desk': {
     card: '/images/refresh-20261014/technology.webp',
     hero: '/images/refresh-20261014/technology.webp',

@@ -1,14 +1,12 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {readFileSync} from 'node:fs';
+import {existsSync, readFileSync} from 'node:fs';
 
 function source(path) {
   return readFileSync(new URL('../../' + path, import.meta.url), 'utf8');
 }
 
 const access = source('lib/devstudio/openhands/task-access.ts');
-const chat = source('apps/admin/app/api/admin/dev-studio/openhands/chat/route.ts');
-const agent = source('apps/admin/app/api/admin/dev-studio/openhands/agent/route.ts');
 
 test('provider conversation IDs cannot authorize themselves', () => {
   assert.match(access, /\.eq\('id', input\.taskId\)/);
@@ -18,35 +16,24 @@ test('provider conversation IDs cannot authorize themselves', () => {
   assert.match(access, /external\.start_task_id !== input\.startTaskId/);
 });
 
-test('follow-up is removed: chat POST cannot send a Cloud message or continue a conversation', () => {
-  const post = chat.slice(chat.indexOf('export async function POST('), chat.indexOf('export async function GET('));
-  // The privileged dev-tool role is still checked first, then the route is
-  // permanently closed: OpenHands has been removed, so no ownership lookup,
-  // approval check, or provider call can ever follow.
-  assert.match(post, /canAccessDevTools\(auth\.effectiveRoles\)/);
-  assert.match(post, /OPENHANDS_REMOVED/);
-  assert.match(post, /status: 410/);
-  assert.doesNotMatch(post, /findOwnedOpenHandsTask\(/);
-  assert.doesNotMatch(post, /sendOpenHandsMessage\(/);
-  assert.doesNotMatch(post, /dispatchOpenHandsTask\(/);
+test('OpenHands HTTP routes are deleted: no chat or agent route file exists', () => {
+  assert.equal(
+    existsSync(new URL('../../apps/admin/app/api/admin/dev-studio/openhands/chat/route.ts', import.meta.url)),
+    false,
+  );
+  assert.equal(
+    existsSync(new URL('../../apps/admin/app/api/admin/dev-studio/openhands/agent/route.ts', import.meta.url)),
+    false,
+  );
 });
 
-test('new chat cannot start any task: no dispatcher or direct Cloud start remains in the route', () => {
-  assert.doesNotMatch(chat, /dispatchOpenHandsTask\(/);
-  assert.doesNotMatch(chat, /startOpenHandsTask\(/);
-  assert.doesNotMatch(chat, /sendOpenHandsMessage\(/);
-});
-
-test('all chat lifecycle reads require task ownership, not arbitrary external IDs', () => {
-  const get = chat.slice(chat.indexOf('export async function GET('));
-  assert.match(get, /findOwnedOpenHandsTask\(/);
-  assert.ok(get.indexOf('findOwnedOpenHandsTask(') < get.indexOf('refreshOpenHandsTask('));
-  assert.match(get, /taskId: owned\.taskId/);
-});
-
-test('Admin agent status verifies ownership before mutating task reconciliation', () => {
-  const get = agent.slice(agent.indexOf('export async function GET('));
-  assert.ok(get.indexOf('findOwnedOpenHandsTask(') < get.indexOf('refreshOpenHandsTask('));
-  assert.match(get, /Use the owned taskId to query OpenHands status/);
-  assert.doesNotMatch(get, /getOpenHandsLifecycle\(\{ startTaskId, conversationId \}\)/);
+test('no AI tool surface can dispatch to the deleted routes', () => {
+  const executor = source('lib/ai/tools/executor.ts');
+  const registry = source('lib/ai/tools/registry.ts');
+  const planner = source('lib/ai/tools/planner.ts');
+  assert.doesNotMatch(executor, /dev-studio\/openhands/);
+  assert.doesNotMatch(registry, /dev-studio\/openhands/);
+  assert.doesNotMatch(registry, /openhands\.execute/);
+  assert.doesNotMatch(registry, /openhands\.status/);
+  assert.doesNotMatch(planner, /name: 'openhands\.status'/);
 });

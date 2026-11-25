@@ -623,6 +623,10 @@ jobs:
             --max-time 180
 
       - name: Generate and email apprentice invoice fallback batch
+        # Reconciliation runs first, but a failed reconcile must not skip the
+        # fallback: the fallback dates invoices to the current run and
+        # advances past it, so a skipped week would never be recreated.
+        if: always()
         run: |
           curl -sf -X POST "$ADMIN_URL/api/cron/generate-apprentice-invoices" \
             -H "Authorization: Bearer $CRON_SECRET" \

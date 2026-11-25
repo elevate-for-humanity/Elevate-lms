@@ -29,6 +29,7 @@ on:
           - enrollment-automation
           - stale-applications
           - program-holder-payouts
+          - process-billing-fulfillment
           - expire-exam-authorizations
           - expire-credentials
           - expire-licenses
@@ -61,7 +62,6 @@ on:
           - testing-no-show
           - barber-reinstate
           - testing-lead-followup
-          - low-hours-pace
           - ops-scan
           - qa-scan
           - process-application-submissions
@@ -153,6 +153,7 @@ jobs:
          || github.event.inputs.job == 'video-render-queue'
          || github.event.inputs.job == 'course-builder-queue'
          || github.event.inputs.job == 'program-holder-payouts'
+         || github.event.inputs.job == 'process-billing-fulfillment'
          ))
     steps:
       # Notification Queue Worker is the single canonical POST processor.
@@ -234,6 +235,15 @@ jobs:
             echo "::error::workflow-event-processor returned HTTP $http_status"
             exit 1
           fi
+
+      - name: Process billing fulfillment jobs
+        id: process_billing_fulfillment
+        continue-on-error: true
+        run: |
+          curl -sf -X POST "$ADMIN_URL/api/cron/process-billing-fulfillment" \
+          -H "Authorization: Bearer $CRON_SECRET" \
+          -H "Content-Type: application/json" \
+          --max-time 55 || { echo "::error::process-billing-fulfillment HTTP request failed"; exit 1; }
 
       - name: AI operator triage
         id: ai_operator
@@ -603,7 +613,6 @@ jobs:
             github.event.inputs.job == 'all-weekly'
          || github.event.inputs.job == 'weekly-reminders'
          || github.event.inputs.job == 'weekly-verdicts'
-         || github.event.inputs.job == 'low-hours-pace'
          || github.event.inputs.job == 'ops-scan'
          || github.event.inputs.job == 'career-course-emails'
          || github.event.inputs.job == 'barber-reinstate'
@@ -641,11 +650,6 @@ jobs:
             -H "Authorization: Bearer $CRON_SECRET" --max-time 60 \
             || echo "::warning::weekly-verdicts failed"
 
-      - name: Low-hours pace check
-        run: |
-          curl -sf -X GET "$ADMIN_URL/api/cron/low-hours-pace" \
-            -H "Authorization: Bearer $CRON_SECRET" --max-time 120 \
-            || echo "::warning::low-hours-pace failed"
 
       - name: Re-embed platform knowledge (RAG refresh)
         run: |

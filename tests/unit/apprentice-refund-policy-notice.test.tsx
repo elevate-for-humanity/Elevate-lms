@@ -1,3 +1,4 @@
+import { siteUrls } from '@/lib/utils/site-urls';
 import { afterEach, expect, it, vi } from 'vitest';
 import { cleanup, render, screen } from '@testing-library/react';
 vi.mock('next/link', () => ({ default: ({ children, ...props }: any) => <a {...props}>{children}</a> }));
@@ -43,7 +44,7 @@ it('links to the full refund policy and is labelled as a policy notice', () => {
   render(<TuitionRefundPolicyNotice />);
   expect(screen.getByRole('link', { name: 'Read the full refund policy' })).toHaveAttribute(
     'href',
-    '/refund-policy',
+    `${siteUrls.site}/refund-policy`,
   );
   expect(screen.getByRole('region', { name: 'Tuition refund policy' })).toBeTruthy();
 });

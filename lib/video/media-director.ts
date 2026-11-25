@@ -254,7 +254,30 @@ function transitionValue(value: unknown): Transition {
     : 'cut';
 }
 
-function sceneTypeValue(value: unknown, index: number, total: number): InstructionalSceneType {
+/**
+ * The Course Factory compiler authors lesson timelines with a `purpose`
+ * vocabulary instead of the director's scene types. The practice scene is
+ * the lesson's knowledge check: it presents an authored assessment question
+ * to the learner ("Your turn… use the lesson evidence before choosing") and
+ * is backed by the timeline's required question event. Translate the
+ * authored vocabulary so compiled lessons keep the meaning their author
+ * gave them instead of falling through to positional guesses.
+ */
+const PURPOSE_SCENE_TYPES: Record<string, InstructionalSceneType> = {
+  introduction: 'problem_hook',
+  explanation: 'mental_model',
+  diagram: 'system_diagram',
+  demonstration: 'worked_example',
+  practice: 'knowledge_check',
+  summary: 'memory_recap',
+};
+
+function sceneTypeValue(
+  value: unknown,
+  purpose: unknown,
+  index: number,
+  total: number,
+): InstructionalSceneType {
   const allowed: InstructionalSceneType[] = [
     'problem_hook',
     'mental_model',
@@ -269,6 +292,18 @@ function sceneTypeValue(value: unknown, index: number, total: number): Instructi
   ];
   if (typeof value === 'string' && allowed.includes(value as InstructionalSceneType))
     return value as InstructionalSceneType;
+  if (typeof purpose === 'string') {
+    const authoredPurposeType = PURPOSE_SCENE_TYPES[purpose];
+    if (authoredPurposeType) return authoredPurposeType;
+  }
+  // Positional fallback for scenes carrying neither an authored type nor an
+  // authored purpose. The closing pair is reserved — knowledge check, then
+  // memory recap — so a board of any legal size (6-10 scenes) contains both.
+  // The previous proportional mapping into an eight-slot arc only reached
+  // the knowledge-check slot when the board had at least eight scenes, so
+  // every six- or seven-scene storyboard failed controlled review.
+  if (total >= 2 && index === total - 1) return 'memory_recap';
+  if (total >= 2 && index === total - 2) return 'knowledge_check';
   const arc: InstructionalSceneType[] = [
     'problem_hook',
     'mental_model',
@@ -276,13 +311,8 @@ function sceneTypeValue(value: unknown, index: number, total: number): Instructi
     'equipment_closeup',
     'worked_example',
     'common_mistake',
-    'memory_recap',
-    'knowledge_check',
   ];
-  return (
-    arc[Math.min(arc.length - 1, Math.floor((index * arc.length) / Math.max(1, total)))] ??
-    'worked_example'
-  );
+  return arc[Math.min(arc.length - 1, Math.max(0, index))] ?? 'worked_example';
 }
 
 function promptHash(input: unknown): string {
@@ -317,7 +347,7 @@ function scriptScenes(script: string, title: string): Record<string, unknown>[] 
     const detail = /angle|position|blade|guard|hand|finger|line|section|tool|watch|observe|(?:you (?:can|will) see)|shown? (?:here|on screen)|demonstrat/i.test(action);
     return {
       action,
-      scene_type: sceneTypeValue(undefined, index, groups.length),
+      scene_type: sceneTypeValue(undefined, undefined, index, groups.length),
       subject: title,
       dialogue: action,
       procedure_phase: phase,
@@ -484,6 +514,7 @@ export function directMedia(input: MediaDirectorInput): MediaStoryboard {
           undefined,
         sceneType: sceneTypeValue(
           scene.scene_type ?? scene.sceneType,
+          scene.purpose,
           index,
           sourceScenes.length,
         ),
@@ -555,3 +586,4 @@ export function scenePrompt(scene: MediaScene, characters: MediaCharacterReferen
     .filter(Boolean)
     .join('. ');
 }
+

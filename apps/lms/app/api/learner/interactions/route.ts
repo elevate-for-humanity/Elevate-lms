@@ -21,6 +21,11 @@ import {
   scoreManifoldGaugeAttempt,
   type ManifoldGaugeSimulationConfig,
 } from '@/lib/lms/manifold-gauge-simulation';
+import {
+  FORKLIFT_SIMULATOR_KEY,
+  scoreForkliftAttempt,
+  type ForkliftSimulationConfig,
+} from '@/lib/lms/forklift-simulation';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -341,13 +346,24 @@ function scoreAttempt(
   feedback: Record<string, unknown>;
 } | null {
   if (type === 'simulation') {
-    // Hands-on simulation modules (e.g. the manifold gauge charging lab)
-    // carry their authored scenario under experience.simulation and score
-    // with their own server-side scorer at the lesson's mastery threshold.
-    const config = experience.simulation as ManifoldGaugeSimulationConfig | undefined;
+    // Hands-on simulation modules (e.g. the manifold gauge charging lab,
+    // the forklift inspection & load lab) carry their authored scenario
+    // under experience.simulation and score with their own server-side
+    // scorer at the lesson's mastery threshold.
+    const config = experience.simulation as
+      | ManifoldGaugeSimulationConfig
+      | ForkliftSimulationConfig
+      | undefined;
     if (!config) return null;
+    if (config.simulator === FORKLIFT_SIMULATOR_KEY) {
+      return scoreForkliftAttempt(
+        config,
+        responses,
+        resolveLessonMasteryPolicy(experience).threshold,
+      );
+    }
     return scoreManifoldGaugeAttempt(
-      config,
+      config as ManifoldGaugeSimulationConfig,
       responses,
       resolveLessonMasteryPolicy(experience).threshold,
     );

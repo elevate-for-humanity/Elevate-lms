@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { siteUrls } from '@/lib/utils/site-urls';
 
 // Tuition refund policy, worded exactly as Section 7 of the enrollment
 // agreement (apps/marketing/app/legal/enrollment-agreement/page.tsx).
@@ -43,7 +44,7 @@ export default function TuitionRefundPolicyNotice() {
         Funding agency refund requirements supersede this policy where applicable.
       </p>
       <p className="mt-3 text-sm font-bold">
-        <Link href="/refund-policy" className="underline hover:text-brand-red-700">
+        <Link href={`${siteUrls.site}/refund-policy`} className="underline hover:text-brand-red-700">
           Read the full refund policy
         </Link>
       </p>

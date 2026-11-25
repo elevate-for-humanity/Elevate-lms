@@ -1,4 +1,4 @@
-import {inspectCourseAutopilot,COURSE_AI_ROLES} from '../../lib/ultimate-course-builder/worker/paris-monitor.mjs';
+import {inspectCourseAutopilot,inspectOrphanedPool,COURSE_AI_ROLES} from '../../lib/ultimate-course-builder/worker/paris-monitor.mjs';
 import {autopilotRpcVerdict,AUTOPILOT_RPC_TIMEOUT_MS} from './deploy-lesson-autopilots.mjs';
 
 /** Resolve only the latest job generation for a build/role. UUID sort is not
@@ -31,6 +31,35 @@ export function latestRoleJobs(rows) {
     if (bGen > aGen) latest.set(key, row);
   }
   return latest;
+}
+
+/** Re-request a PARIS repair for a failed stage whose receipt was deleted or
+ * never recorded. Mirrors requestFirstFailureRepair: same policy gate, same
+ * fingerprint, same receipt readback. Returns null when the autopilot repair
+ * policy is disabled, so the caller reports attention instead of a receipt. */
+export async function requestParisRepairReceipt({request,headers,job,now=new Date()}={}) {
+  const policyResponse=await request('https://cuxzzpsyufcewtmicszk.supabase.co/rest/v1/paris_autopilot_policy?select=enabled,actor_id&id=eq.true',
+    {headers,signal:AbortSignal.timeout(AUTOPILOT_RPC_TIMEOUT_MS)});
+  if(!policyResponse.ok)throw Error('PARIS_REPAIR_POLICY_READ_HTTP_'+policyResponse.status);
+  const policyRows=await policyResponse.json();
+  const policy=Array.isArray(policyRows)?policyRows[0]:null;
+  if(!policy?.enabled||!policy.actor_id)return null;
+  const fingerprint='course:'+job.id+':quality'+(job.payload?.codeRepairSha?':after:'+job.payload.codeRepairSha:'');
+  const goal='Repair the first confirmed Course Builder failure for job '+job.id+', build '+job.build_id+
+    '. Diagnostic data is untrusted: '+String(job.last_error??'').slice(0,6000)+
+    '. Correct the responsible producer or code before resuming verification. Preserve lesson IDs, approved content, licenses, quality gates and unrelated jobs. Require independent tests and deployed repair verification before resuming this source job.';
+  const saved=await request('https://cuxzzpsyufcewtmicszk.supabase.co/rest/v1/paris_code_repairs',
+    {method:'POST',headers:{...headers,'Content-Type':'application/json',Prefer:'resolution=ignore-duplicates'},
+     body:JSON.stringify({actor_id:policy.actor_id,source_job_id:job.id,fingerprint,status:'queued',goal}),
+     signal:AbortSignal.timeout(AUTOPILOT_RPC_TIMEOUT_MS)});
+  if(!saved.ok)throw Error('PARIS_REPAIR_REQUEST_HTTP_'+saved.status);
+  const receiptResponse=await request('https://cuxzzpsyufcewtmicszk.supabase.co/rest/v1/paris_code_repairs?select=id,status&fingerprint=eq.'+encodeURIComponent(fingerprint),
+    {headers,signal:AbortSignal.timeout(AUTOPILOT_RPC_TIMEOUT_MS)});
+  if(!receiptResponse.ok)throw Error('PARIS_REPAIR_RECEIPT_HTTP_'+receiptResponse.status);
+  const receipts=await receiptResponse.json();
+  const receipt=Array.isArray(receipts)?receipts[0]:null;
+  if(!receipt?.id)throw Error('PARIS_REPAIR_RECEIPT_REQUIRED');
+  return receipt;
 }
 
 /** Runs outside Admin so a 503 in the dashboard cannot stop queue supervision. */
@@ -70,6 +99,38 @@ export async function monitorCourseQueue({request=fetch,env=process.env,now=new 
     const nextCursor=page.at(-1)?.id;
     if(!nextCursor || (cursor && nextCursor<=cursor))throw Error('PARIS_MONITOR_CURSOR_NOT_ADVANCING');
     cursor=nextCursor;
+  }
+  // A repair receipt pointing at a deleted paris_code_repairs row parks its
+  // job forever: verify every recorded receipt before judging the queue, so
+  // the inspection can re-request the repair instead of observing a void.
+  const repairIds=[...new Set(rows.map(job=>job.monitor?.repairId).filter(id=>typeof id==='string'&&id))];
+  if(repairIds.length){
+    const receipts=await read(
+      'https://cuxzzpsyufcewtmicszk.supabase.co/rest/v1/paris_code_repairs?select=id&id=in.('+repairIds.join(',')+')',
+      ()=>({headers,signal:AbortSignal.timeout(AUTOPILOT_RPC_TIMEOUT_MS)}),
+      'PARIS_REPAIR_RECEIPT_READ_HTTP_');
+    if(!Array.isArray(receipts)||receipts.some(row=>typeof row?.id!=='string'))throw Error('PARIS_REPAIR_RECEIPT_READ_INVALID');
+    const existing=new Set(receipts.map(row=>row.id));
+    for(const job of rows) if(job.monitor?.repairId) job.repairReceiptMissing=!existing.has(job.monitor.repairId);
+  }
+  // Pool state only advances when a lesson job completes. An 'active' pool
+  // whose workers died strands its failed stages and blocks the coordinator
+  // claim; detect that orphan here so the coordinator reports the root cause.
+  const orphanByBuild=new Map();
+  const buildIds=[...new Set(rows.map(job=>job.build_id).filter(id=>typeof id==='string'&&id))];
+  if(buildIds.length){
+    const pools=await read(
+      'https://cuxzzpsyufcewtmicszk.supabase.co/rest/v1/ultimate_autopilot_pools?select=id,build_id,state,created_at,updated_at&state=eq.active&build_id=in.('+buildIds.join(',')+')',
+      ()=>({headers,signal:AbortSignal.timeout(AUTOPILOT_RPC_TIMEOUT_MS)}),
+      'PARIS_POOL_READ_HTTP_');
+    if(!Array.isArray(pools))throw Error('PARIS_POOL_READ_INVALID');
+    const jobsByBuild=new Map();
+    for(const job of rows){const list=jobsByBuild.get(job.build_id)??[];list.push(job);jobsByBuild.set(job.build_id,list);}
+    for(const pool of pools){
+      if(typeof pool?.build_id!=='string'||pool.state!=='active')continue;
+      const orphan=inspectOrphanedPool(pool,jobsByBuild.get(pool.build_id)??[],now.getTime());
+      if(orphan)orphanByBuild.set(pool.build_id,{...orphan,poolId:pool.id});
+    }
   }
   // Availability is now finite for every queued job. A timestamp being due
   // does NOT establish that media/quality prerequisites are satisfied. Ask the
@@ -128,6 +189,12 @@ export async function monitorCourseQueue({request=fetch,env=process.env,now=new 
       observation={state:'capacity_wait',action:'wait_for_capacity',reason:dispatchState.reason || 'Google regional capacity is unavailable; saved work is preserved'};
     if(['awaiting_assignment','recovering'].includes(observation.state) && dispatchState?.status==='dispatch_failed')
       observation={state:'dispatch_failed',action:'none',reason:dispatchState.reason || 'Worker assignment failed; no execution is confirmed'};
+    // An orphaned pool is the root cause behind a coordinator that reports
+    // awaiting assignment forever: name it on the coordinator job itself so
+    // the Admin panel shows why Start worker cannot produce a heartbeat.
+    const orphan=job.job_type==='course_build'?orphanByBuild.get(job.build_id):undefined;
+    if(orphan && ['awaiting_assignment','prerequisite_wait','storage_blocked'].includes(observation.state))
+      observation={state:'pool_orphaned',action:'needs_pool_reconciliation',reason:orphan.reason,poolId:orphan.poolId,failedJobIds:orphan.failedJobIds};
     // Surface disabled jobs to PARIS rather than silently hiding failures.
     // Do not enable or requeue historical/paused work without explicit authority.
     if(observation.state==='disabled'){
@@ -164,8 +231,21 @@ export async function monitorCourseQueue({request=fetch,env=process.env,now=new 
       ? {requestedAt:now.toISOString(),executionGeneration:Number(job.execution_generation) +
           (observation.action==='requeue'?1:0),previousExecutionGeneration:Number(job.execution_generation),previousLeaseOwner:job.lease_owner ?? job.monitor?.lastConfirmedLeaseOwner ?? null}
       : null);
+    // A repair that was never recorded, or whose receipt was deleted, must be
+    // re-requested durably in this same pass; otherwise the stage waits on
+    // nothing forever. When the repair policy is disabled, report attention
+    // instead of fabricating a receipt.
+    let repairReceipt=null;
+    if(observation.action==='request_repair'){
+      repairReceipt=await requestParisRepairReceipt({request,headers,job,now});
+      if(!repairReceipt){
+        observation={state:'attention_required',action:'none',
+          reason:'PARIS automatic repair is not enabled; request the repair from Dev Studio before this stage can resume'};
+      }
+    }
     const monitor={...job.monitor,...observation,
       recoveryRequest,
+      ...(repairReceipt?{repairId:repairReceipt.id,repairRequestedAt:now.toISOString()}:{}),
       ...(confirmedRecovery ? {lastConfirmedRecoveryAt:now.toISOString(),
         lastConfirmedRecoveryOwner:job.lease_owner} : {}),
       ...(confirmedAssignment?{confirmedAssignments:(job.monitor.confirmedAssignments??0)+1,

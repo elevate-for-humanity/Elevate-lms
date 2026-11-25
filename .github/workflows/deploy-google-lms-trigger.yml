@@ -26,7 +26,7 @@ on:
       - 'components/**'
       - 'styles/**'
       - 'packages/**'
-      - 'Dockerfile.northflank-lms'
+      - 'Dockerfile.google-lms'
       - 'scripts/gcp/preflight-billing.mjs'
       - 'scripts/gcp/preflight-billing.test.mjs'
       - '.github/workflows/build-google-migration-images.yml'

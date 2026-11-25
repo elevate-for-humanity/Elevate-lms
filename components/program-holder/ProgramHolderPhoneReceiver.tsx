@@ -7,6 +7,7 @@ import {
   type PhoneCall as BrowserPhoneCall,
   type PhoneClient,
 } from '@/lib/phone/browser-client';
+import { installAudioUnlock } from '@/lib/notifications/audio-unlock';
 import { Mic, MicOff, Phone, PhoneCall, PhoneOff } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -40,6 +41,12 @@ export function ProgramHolderPhoneReceiver({ phoneHref = '/program-holder/phone'
   const clientRef = useRef<PhoneClient | null>(null);
   const callRef = useRef<BrowserPhoneCall | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  // The ringtone's AudioContext stays suspended until the document has had a
+  // user gesture, and the receiver auto-connects without one. Prime audio on
+  // the first interaction — the same unlock the phone page installs — so a
+  // first incoming call can actually sound.
+  useEffect(() => installAudioUnlock(), []);
 
   useEffect(() => {
     if (phonePage) return;

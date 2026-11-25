@@ -9,11 +9,11 @@ import {
 
 test('operator zero and existing staff extensions pass both browser and server contracts', () => {
   const browser = new RegExp(`^(?:${PHONE_EXTENSION_PATTERN})$`, 'v');
-  for (const value of ['0', '10', '101', '999999']) {
+  for (const value of ['0', '101', '999']) {
     assert.equal(validPhoneExtension(value), true, value);
     assert.equal(browser.test(value), true, value);
   }
-  for (const value of ['', '1', '9', '-1', '1234567', '0\n', ' 0', '0 OR 1=1', '1.2']) {
+  for (const value of ['', '1', '9', '10', '00', '012', '1000', '999999', '-1', '1234567', '0\n', ' 0', '0 OR 1=1', '1.2']) {
     assert.equal(validPhoneExtension(value), false, value);
     assert.equal(browser.test(value), false, value);
   }
@@ -37,7 +37,7 @@ test('same-name login accounts have distinguishable labels without merging ident
 test('database and browser enforce the same extension contract', () => {
   const sql = readFileSync(
     new URL(
-      '../supabase/migrations/20261117090957_phone_number_operator_zero_assignment.sql',
+      '../supabase/migrations/20261125140000_phone_extension_contract.sql',
       import.meta.url,
     ),
     'utf8',
@@ -101,3 +101,4 @@ test('extension-only number edits preserve saved platform assignees under tenant
   assert.equal(options.find(p=>p.id==='platform-owner').email,undefined);
   assert.equal(phoneNumberProfileChoices(systemProfiles,null).length,1);
 });
+

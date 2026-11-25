@@ -63,3 +63,38 @@ it('excludes named QA fixture accounts from production directories', async () =>
   expect(isProductionRosterProfile({ id: 'staff', role: 'staff', full_name: 'Office Staff', email: 'staff@elevateforhumanity.org' })).toBe(true);
   expect(isProductionRosterProfile({ id: 'qa', role: 'admin', email: 'admin@qa.invalid' })).toBe(false);
 });
+
+describe('QA fixture holder roster boundary', () => {
+  it('admits the QA fixture student to its own QA holder roster', async () => {
+    const { isQaFixtureRosterProfile } = await import(
+      '@/lib/program-holder/roster-eligibility'
+    );
+    expect(
+      isQaFixtureRosterProfile({
+        id: 'qa-student-id',
+        role: 'student',
+        full_name: '[QA E2E] Holder Student',
+        email: 'qa-portal-e2e-1-holder-student@qa.invalid',
+      }),
+    ).toBe(true);
+  });
+  it('still rejects non-learner roles and missing identities', async () => {
+    const { isQaFixtureRosterProfile } = await import(
+      '@/lib/program-holder/roster-eligibility'
+    );
+    expect(isQaFixtureRosterProfile({ id: 'qa-id', role: 'program_holder' })).toBe(false);
+    expect(isQaFixtureRosterProfile({ role: 'student' })).toBe(false);
+    expect(isQaFixtureRosterProfile({ id: '', role: 'student' })).toBe(false);
+  });
+  it('does not change the production boundary', async () => {
+    const { isLearnerRosterProfile } = await import('@/lib/program-holder/roster-eligibility');
+    expect(
+      isLearnerRosterProfile({
+        id: 'qa-student-id',
+        role: 'student',
+        full_name: '[QA E2E] Holder Student',
+        email: 'qa-portal-e2e-1-holder-student@qa.invalid',
+      }),
+    ).toBe(false);
+  });
+});

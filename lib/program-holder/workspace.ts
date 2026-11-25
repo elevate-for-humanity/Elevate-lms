@@ -11,7 +11,7 @@ import { verifiedTrainingForEnrollment } from './verified-hours';
 import { hasActiveProgramEnrollment, learnerProgramKey } from './enrollment-identity';
 import { holderCredentialStatus, holderTrainingRecord } from './student-training';
 import { studentContactProjection } from './contact-privacy';
-import { isLearnerRosterProfile } from './roster-eligibility';
+import { isLearnerRosterProfile, isQaFixtureRosterProfile } from './roster-eligibility';
 import { requireProgramHolder } from '@/lib/auth/require-program-holder';
 import { calculateDistanceMiles, geocodeAddress, isGeocodingResult } from '@/lib/geo/geocode';
 
@@ -166,6 +166,15 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
   const applicantNotesColumns = contactProjection.notes;
   const programWideStudentAccess = holderRes.data?.features?.program_wide_student_access === true;
   const recruitingEnabled = hasRecruitingAssignment(holderRes.data?.features);
+  // A QA fixture holder's own roster is the one place QA-marked profiles
+  // belong: the isolated-QA provisioner creates the holder and its student
+  // together, and the E2E report tests certify that roster. Real holders
+  // keep the production exclusion, so a disposable QA identity can never
+  // leak into a live roster.
+  const isQaFixtureHolder = holderRes.data?.features?.qa_e2e === true;
+  const rosterProfileEligible = isQaFixtureHolder
+    ? isQaFixtureRosterProfile
+    : isLearnerRosterProfile;
   const allApplicantAccess = holderRes.data?.features?.all_applicant_access === true;
   const regionalAssignment =
     holderRes.data?.features?.regional_assignment &&
@@ -515,7 +524,7 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
       ...holderCredentialStatus(row, credentialUploads ?? []),
     });
   const eligibleRosterUserIds = new Set(
-    (rosterProfiles ?? []).filter(isLearnerRosterProfile).map((row: any) => row.id),
+    (rosterProfiles ?? []).filter(rosterProfileEligible).map((row: any) => row.id),
   );
   const nameByUserId = new Map<string, string>(
     (rosterProfiles ?? [])

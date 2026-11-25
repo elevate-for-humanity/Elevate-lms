@@ -1,4 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
+// CI re-trigger: the push to 34f4d17a created no workflow runs for this head; this comment-only commit re-runs the full check suite on the current branch.
 import { ACHIEVE_HOLDER_ID } from './achieve-holder';
 
 export async function programHolderReferralsReady(

@@ -1,5 +1,6 @@
-import { beforeEach, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import HvacCoursePage from '@/apps/lms/app/programs/hvac-technician/course/page';
+import { INSTRUCTOR_CURRICULUM_IP_VERSION_HASHES } from '@/lib/legal/instructorCurriculumLicense';
 
 const state = vi.hoisted(() => ({
   courseId: 'published-course',
@@ -10,6 +11,11 @@ const state = vi.hoisted(() => ({
     status: string;
     revoked_at: string | null;
   } | null,
+  profile: null as { id: string; role: string } | null,
+  versionRow: null as Record<string, unknown> | null,
+  acceptance: null as Record<string, unknown> | null,
+  license: null as Record<string, unknown> | null,
+  assignment: null as Record<string, unknown> | null,
   from: vi.fn(),
   learnerFrom: vi.fn(),
 }));
@@ -44,6 +50,11 @@ beforeEach(() => {
     status: 'active',
     revoked_at: null,
   };
+  state.profile = null;
+  state.versionRow = null;
+  state.acceptance = null;
+  state.license = null;
+  state.assignment = null;
   const makeQuery = (table: string) => {
     const filters: Array<(row: Record<string, unknown>) => boolean> = [];
     const query = {
@@ -60,15 +71,32 @@ beforeEach(() => {
       like: () => query,
       limit: () => query,
       order: () => query,
-      maybeSingle: async () => ({
-        data:
-          table === 'courses'
-            ? { id: state.courseId, title: 'HVAC Technician' }
-            : state.direct && filters.every((filter) => filter(state.direct!))
+      maybeSingle: async () => {
+        if (table === 'courses') {
+          return { data: { id: state.courseId, title: 'HVAC Technician' }, error: null };
+        }
+        const fixtures: Record<string, unknown> = {
+          profiles: state.profile,
+          agreement_versions: state.versionRow,
+          license_agreement_acceptances: state.acceptance,
+          instructor_curriculum_licenses: state.license,
+          instructor_assignments: state.assignment,
+        };
+        if (table in fixtures) {
+          const row = fixtures[table] as Record<string, unknown> | null;
+          return {
+            data: row && filters.every((filter) => filter(row)) ? row : null,
+            error: null,
+          };
+        }
+        return {
+          data:
+            state.direct && filters.every((filter) => filter(state.direct!))
               ? state.direct
               : null,
-        error: null,
-      }),
+          error: null,
+        };
+      },
       then: (resolve: (result: { data: unknown[]; error: null }) => unknown) =>
         Promise.resolve({ data: [], error: null }).then(resolve),
     };
@@ -103,3 +131,80 @@ it.each(['revoked', 'different learner', 'different course'])(
     expect(state.from).not.toHaveBeenCalledWith('course_lessons');
   },
 );
+
+describe('instructor license gate on the HVAC course page', () => {
+  function seedLicensedInstructor() {
+    state.direct = null;
+    state.profile = { id: 'learner', role: 'instructor' };
+    state.versionRow = {
+      agreement_type: 'instructor_curriculum_ip',
+      version: '1.0',
+      current_version: '1.0',
+      is_current: true,
+      document_hash: INSTRUCTOR_CURRICULUM_IP_VERSION_HASHES['1.0'],
+      created_at: '2026-11-25T00:00:00Z',
+    };
+    state.acceptance = {
+      id: 'acc-1',
+      user_id: 'learner',
+      agreement_type: 'instructor_curriculum_ip',
+      document_version: '1.0',
+    };
+    state.license = {
+      id: 'lic-1',
+      user_id: 'learner',
+      agreement_type: 'instructor_curriculum_ip',
+      agreement_version: '1.0',
+      status: 'active',
+      license_reference: 'ELV-INST-TEST1234',
+      scope: { course_ids: ['published-course'], program_ids: [] },
+      created_at: '2026-11-25T00:00:00Z',
+    };
+    state.assignment = {
+      id: 'assign-1',
+      instructor_id: 'learner',
+      course_id: 'published-course',
+      active: true,
+    };
+  }
+
+  it('opens the course for a licensed, assigned instructor with no learner enrollment', async () => {
+    seedLicensedInstructor();
+    const course = await HvacCoursePage();
+    expect(course.props.courseId).toBe('published-course');
+    expect(course.props.instructorLicenseRef).toBe('ELV-INST-TEST1234');
+    expect(state.from).toHaveBeenCalledWith('course_modules');
+  });
+
+  it('shows the license panel, not course content, to an unsigned instructor', async () => {
+    seedLicensedInstructor();
+    state.acceptance = null;
+    state.license = null;
+    const panel = await HvacCoursePage();
+    expect(panel.props.reason).toBe('unsigned');
+    expect(panel.props.version).toBe('1.0');
+    expect(state.from).not.toHaveBeenCalledWith('course_modules');
+    expect(state.from).not.toHaveBeenCalledWith('course_lessons');
+  });
+
+  it('shows the license panel to a licensed instructor whose license was revoked', async () => {
+    seedLicensedInstructor();
+    (state.license as Record<string, unknown>).status = 'revoked';
+    const panel = await HvacCoursePage();
+    expect(panel.props.reason).toBe('revoked');
+    expect(state.from).not.toHaveBeenCalledWith('course_modules');
+  });
+
+  it('does not let the old general services agreement open the course for an instructor', async () => {
+    seedLicensedInstructor();
+    state.acceptance = {
+      id: 'acc-old',
+      user_id: 'learner',
+      agreement_type: 'instructor_services',
+      document_version: '1.0',
+    };
+    const panel = await HvacCoursePage();
+    expect(panel.props.reason).toBe('unsigned');
+    expect(state.from).not.toHaveBeenCalledWith('course_modules');
+  });
+});

@@ -1,14 +1,65 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
 import { resolveCourseEnrollment } from '@/lib/enrollment/resolve-course-enrollment';
 import { getCurrentUser } from '@/lib/auth';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
+import {
+  INSTRUCTOR_CURRICULUM_IP_DOCUMENT_URL,
+  getInstructorCurriculumLicenseStatus,
+} from '@/lib/legal/instructorCurriculumLicense';
 import CanonicalHvacCourseHome from './CanonicalHvacCourseHome';
 import { findPublishedHvacCourseId } from '@/lib/courses/resolvers';
 import { loadCourseActivity } from '@/lib/learner/course-activity';
 import { getHvacSimulationDefinition } from '@/lib/lms/hvac-course-simulations';
 import { HVAC_COURSE_ID } from '@/lib/lms/hvac-workbook-contract';
+
+const INSTRUCTOR_LICENSE_DENIALS: Record<string, string> = {
+  unsigned:
+    'You have not signed the current Proprietary Curriculum and Authorized Instructor License.',
+  stale_version:
+    'A newer version of the instructor license agreement is published. Sign the current version to continue.',
+  hash_mismatch:
+    'The published instructor license agreement changed. Sign the current version to continue.',
+  no_license:
+    'Your instructor license is not active. Sign the current agreement to activate it.',
+  revoked:
+    'Your instructor license was revoked. Contact Elevate to renew your teaching authorization.',
+  no_assignment: 'You are not assigned to teach this course.',
+  unavailable: 'Your instructor license could not be verified right now. Try again later.',
+};
+
+function InstructorLicenseRequired({
+  reason,
+  version,
+}: {
+  reason: string;
+  version: string;
+}) {
+  return (
+    <main className="min-h-screen bg-slate-50 px-4 py-24">
+      <div className="mx-auto max-w-xl rounded-2xl border border-slate-200 bg-white p-8 text-center shadow-sm">
+        <h1 className="text-2xl font-bold text-slate-950">Instructor license required</h1>
+        <p className="mt-3 text-slate-700">
+          {INSTRUCTOR_LICENSE_DENIALS[reason] ??
+            'Your instructor license could not be verified.'}
+        </p>
+        <p className="mt-3 text-sm text-slate-600">
+          Teaching this course requires the current Proprietary Curriculum and Authorized
+          Instructor License (version {version}). The general instructor services agreement
+          does not satisfy this requirement.
+        </p>
+        <Link
+          href={INSTRUCTOR_CURRICULUM_IP_DOCUMENT_URL}
+          className="mt-6 inline-flex min-h-11 items-center rounded-lg bg-cyan-800 px-5 py-3 font-bold text-white"
+        >
+          Read and sign the instructor license agreement
+        </Link>
+      </div>
+    </main>
+  );
+}
 
 export const metadata: Metadata = {
   title: 'HVAC Technician Course',
@@ -52,6 +103,7 @@ export default async function HvacCoursePage() {
 
   const accessStatuses = ['active', 'enrolled', 'in_progress', 'confirmed', 'completed'];
   const enrollment = await resolveCourseEnrollment(user.id, course.id);
+  let instructorLicenseRef: string | null = null;
   if (!enrollment || !accessStatuses.includes(enrollment.status)) {
     // The paid digital bundle grants access to this course on its own.
     const { data: directEnrollment, error: directEnrollmentError } = await db
@@ -64,7 +116,29 @@ export default async function HvacCoursePage() {
       .limit(1)
       .maybeSingle();
     if (directEnrollmentError) throw new Error('HVAC_COURSE_ENROLLMENT_UNAVAILABLE');
-    if (!directEnrollment) notFound();
+    if (!directEnrollment) {
+      // Instructor entitlement: a licensed instructor assigned to teach this
+      // course may view it to teach, without a learner enrollment. Anyone
+      // else without enrollment gets the same 404 as before.
+      const { data: instructorProfile } = await db
+        .from('profiles')
+        .select('role')
+        .eq('id', user.id)
+        .maybeSingle();
+      if (instructorProfile?.role !== 'instructor') notFound();
+      const licenseStatus = await getInstructorCurriculumLicenseStatus(db, user.id, {
+        courseId: course.id,
+      });
+      if (!licenseStatus.authorized) {
+        return (
+          <InstructorLicenseRequired
+            reason={licenseStatus.reason}
+            version={licenseStatus.agreementVersion}
+          />
+        );
+      }
+      instructorLicenseRef = licenseStatus.licenseReference;
+    }
   }
 
   const [{ data: modules, error: modulesError }, { data: lessons, error: lessonsError }] =
@@ -161,6 +235,7 @@ export default async function HvacCoursePage() {
       completedLessonIds={completedLessonIds}
       totalTimeSeconds={totalTimeSeconds}
       savedActivity={savedActivity}
+      instructorLicenseRef={instructorLicenseRef}
     />
   );
 }

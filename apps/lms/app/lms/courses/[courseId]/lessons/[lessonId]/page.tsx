@@ -17,6 +17,7 @@ import InteractiveVideoPlayer, { type Checkpoint } from '@/components/lms/Intera
 import { resolveCoursePreview } from '@/lib/admin/course-preview';
 import { assertLessonAccess } from '@/lib/lms/access-control';
 import { requireAdminClient } from '@/lib/supabase/admin';
+import { getInstructorCurriculumLicenseStatus } from '@/lib/legal/instructorCurriculumLicense';
 import {
   canonicalBeautyApprenticeshipSlug,
   loadBeautyPaymentGate,
@@ -213,7 +214,28 @@ export default async function LessonPage({
     /^(hvac(?:-|$)|epa-?608(?:-|$))/i.test(course.slug || '');
   const lessonWidth = handsOnClockOnly ? 'w-full min-w-0' : 'mx-auto max-w-[1600px]';
 
-  if (!preview.active && user) {
+  // Instructor demonstration (HVAC only): a licensed instructor assigned to
+  // teach this course may view the lesson to demonstrate it, without a
+  // learner enrollment. Learner pacing and lesson gating do not apply to the
+  // demonstration view; unauthorized instructors fall through to the normal
+  // learner flow below and are denied exactly as before.
+  let instructorDemoRef: string | null = null;
+  if (!preview.active && user && course.id === HVAC_COURSE_ID) {
+    const adminDb = await requireAdminClient();
+    const { data: instructorProfile } = await adminDb
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .maybeSingle();
+    if (instructorProfile?.role === 'instructor') {
+      const licenseStatus = await getInstructorCurriculumLicenseStatus(adminDb, user.id, {
+        courseId: course.id,
+      });
+      if (licenseStatus.authorized) instructorDemoRef = licenseStatus.licenseReference;
+    }
+  }
+
+  if (!preview.active && user && !instructorDemoRef) {
     const { data: pacing, error: pacingError } = await supabase.rpc('get_my_course_pacing', {
       p_course_id: course.id,
     });
@@ -419,6 +441,13 @@ export default async function LessonPage({
               Administrator lesson view · Full content, playback and assessment inspection
             </div>
           ) : null}
+          {instructorDemoRef ? (
+            <div className="rounded-xl border border-amber-300 bg-amber-100 p-4 text-sm font-bold text-amber-950">
+              Licensed instructor demonstration view · Ref {instructorDemoRef} · Elevate
+              proprietary curriculum — for assigned teaching only. Do not copy, redistribute,
+              or share.
+            </div>
+          ) : null}
           {course.id === BOOKKEEPING_COURSE_ID && !preview.active ? (
             <div id="theory-timeclock-slot" className="my-4" />
           ) : null}
@@ -600,22 +629,24 @@ export default async function LessonPage({
                       lessonSlug={lesson.slug}
                       lessonId={lesson.id}
                     />
-                    <LessonProgressClient
-                      key={lesson.id}
-                      savedPassingScore={savedAssessment.data?.score ?? null}
-                      initiallyCompleted={savedCompletion.data?.completed === true}
-                      theoryClockEnabled={!handsOnClockOnly}
-                      courseId={course.id}
-                      lessonId={lesson.id}
-                      lessonType={lessonType}
-                      moduleOrder={moduleOrder}
-                      passingScore={passingScore}
-                      questions={questions.map((question: any, index: number) => ({
-                        id: question.id || `q-${index + 1}`,
-                        question: question.question || question.question_text || question.prompt,
-                        options: question.options || question.choices || [],
-                      }))}
-                    />
+                    {instructorDemoRef ? null : (
+                      <LessonProgressClient
+                        key={lesson.id}
+                        savedPassingScore={savedAssessment.data?.score ?? null}
+                        initiallyCompleted={savedCompletion.data?.completed === true}
+                        theoryClockEnabled={!handsOnClockOnly}
+                        courseId={course.id}
+                        lessonId={lesson.id}
+                        lessonType={lessonType}
+                        moduleOrder={moduleOrder}
+                        passingScore={passingScore}
+                        questions={questions.map((question: any, index: number) => ({
+                          id: question.id || `q-${index + 1}`,
+                          question: question.question || question.question_text || question.prompt,
+                          options: question.options || question.choices || [],
+                        }))}
+                      />
+                    )}
                   </>
                 )}
                 <nav className="flex flex-col justify-between gap-3 border-t border-slate-200 pt-6 sm:flex-row">

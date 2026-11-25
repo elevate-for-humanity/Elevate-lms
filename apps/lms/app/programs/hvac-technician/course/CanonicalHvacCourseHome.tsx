@@ -39,6 +39,11 @@ type Props = {
   completedLessonIds: string[];
   totalTimeSeconds: number;
   savedActivity?: { assessmentsPassed: number; videosCompleted: number } | null;
+  /**
+   * Set only when the viewer entered in an instructor capacity. Renders the
+   * license-reference watermark; never a name or email.
+   */
+  instructorLicenseRef?: string | null;
 };
 
 function lessonHref(courseId: string, lessonId: string) {
@@ -53,6 +58,7 @@ export default function CanonicalHvacCourseHome({
   completedLessonIds,
   totalTimeSeconds,
   savedActivity,
+  instructorLicenseRef,
 }: Props) {
   const [query, setQuery] = useState('');
   const completed = useMemo(() => new Set(completedLessonIds), [completedLessonIds]);
@@ -90,6 +96,12 @@ export default function CanonicalHvacCourseHome({
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-950">
+      {instructorLicenseRef ? (
+        <div className="bg-amber-100 px-4 py-3 text-center text-sm font-bold text-amber-950">
+          Licensed instructor view · Ref {instructorLicenseRef} · Elevate proprietary
+          curriculum — for assigned teaching only. Do not copy, redistribute, or share.
+        </div>
+      ) : null}
       <section className="relative isolate overflow-hidden bg-slate-950 text-white">
         <Image
           src="/images/pages/hvac-hero.webp"

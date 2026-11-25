@@ -88,8 +88,32 @@ Released content versions are immutable. Future scoring, stage, prerequisite or 
 
 1. 20261125014012_protect_hvac_simulation_progress.sql reserves authoritative writes and adds the authenticated readiness check. It changes no learner rows.
 2. 20261125014055_hvac_required_practice_module_links.sql repairs four stale quiz module links. It resolves verified course/module identity, refuses an unexpected prior mapping, runs atomically and is idempotent after repair. A fresh database without the authored course receives no synthetic lessons.
+3. 20261125080000_instructor_curriculum_ip_license.sql publishes agreement version 1.0 of the proprietary-curriculum instructor license (`instructor_curriculum_ip`, hash-pinned to `docs/legal/instructor-curriculum-ip-agreement-v1.md`) and creates the version-scoped, revocable `instructor_curriculum_licenses` table with RLS (owner/admin read; service-role issuance and revocation only).
 
 Apply only these scoped migrations through the approved Supabase path after release validation. Verify policy definitions, RPC grants, lesson/module counts, quiz content/score preservation and progress integrity. Do not run unrelated outstanding migrations as part of this change.
+
+## Instructor license gate
+
+An instructor accesses HVAC instructor content in a teaching capacity only with a
+current signed proprietary-curriculum IP agreement **and** an active
+`instructor_curriculum_licenses` row for that version, plus an active
+`instructor_assignments` row for the course. The general `instructor_services`
+acceptance does not satisfy the gate. Enforcement is server-side in
+`lib/legal/instructorCurriculumLicense.ts` at: the HVAC course page (teaching
+view with a license-reference watermark), the lesson page (HVAC demonstration
+view, no learner completion), the learner simulation API (demonstration
+practice saved under the instructor's own id), the workbook teaching path
+(HVAC program excluded without a license), and the admin instructor course
+workspace (HVAC only). Signing (LMS sign-agreement endpoint and the marketing
+legal page) records the acceptance with the canonical recorder and issues the
+license; revocation is an admin-only endpoint and fails the gate immediately.
+Stale versions and hash changes fail closed and require a fresh signature.
+
+No instructor license is issued until identity, entitlement and live
+positive/negative role tests are verified. The agreement text (version 1.0) is
+a draft pending legal review and owner approval. Workbook downloads remain
+disabled for everyone; the workbook save path stays per-user RPC/RLS enforced.
+Student enrollment-based access is unchanged.
 
 ## Verification and release evidence
 

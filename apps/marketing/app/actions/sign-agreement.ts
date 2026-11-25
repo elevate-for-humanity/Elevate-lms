@@ -16,6 +16,13 @@ import {
   type AchieveDocument,
 } from '@/lib/program-holder/achieve-cna-agreements';
 import { paymentAddendum } from '@/lib/program-holder/payment-addendum';
+import {
+  INSTRUCTOR_CURRICULUM_IP_AGREEMENT_TYPE,
+  INSTRUCTOR_CURRICULUM_IP_VERSION_HASHES,
+  getCurrentInstructorCurriculumAgreement,
+  issueInstructorCurriculumLicense,
+  logInstructorLicenseEvent,
+} from '@/lib/legal/instructorCurriculumLicense';
 
 export async function signAgreement(data: {
   agreementType: string;
@@ -40,6 +47,29 @@ export async function signAgreement(data: {
 
   const signingMou = data.agreementType === 'program_holder_mou';
   const signingAchieveNda = data.agreementType === 'nda' && data.agreementVersion?.startsWith('achieve-cna-');
+  // Proprietary-curriculum IP license: only instructors sign it, only the
+  // current published version counts, and signing must also issue the
+  // version-scoped license row (acceptance alone does not authorize access).
+  const signingCurriculumIp =
+    data.agreementType === INSTRUCTOR_CURRICULUM_IP_AGREEMENT_TYPE;
+  if (signingCurriculumIp && profile?.role !== 'instructor') {
+    return { success: false, error: 'Only instructors can sign the instructor license agreement.' };
+  }
+  let curriculumIpCurrent: { version: string; hash: string | null } | null = null;
+  if (signingCurriculumIp) {
+    const adminDb = await requireAdminClient();
+    curriculumIpCurrent = await getCurrentInstructorCurriculumAgreement(adminDb);
+    const expectedHash = INSTRUCTOR_CURRICULUM_IP_VERSION_HASHES[curriculumIpCurrent.version];
+    if (!expectedHash) {
+      return { success: false, error: 'The instructor license agreement is not published in this release.' };
+    }
+    if (data.agreementVersion !== curriculumIpCurrent.version) {
+      return { success: false, error: 'The agreement changed. Reload and review the current terms before signing.' };
+    }
+    if (curriculumIpCurrent.hash && curriculumIpCurrent.hash !== expectedHash) {
+      return { success: false, error: 'The agreement text changed under its version. Reload and review the current terms before signing.' };
+    }
+  }
   let signingPaymentAddendum = false;
   let holderId: string | undefined;
   let achieveSignature: {
@@ -109,6 +139,52 @@ export async function signAgreement(data: {
 
   if (!result.success)
     return { success: false, error: result.error || 'Agreement could not be recorded.' };
+
+  if (signingCurriculumIp && curriculumIpCurrent) {
+    const adminDb = await requireAdminClient();
+    const expectedHash = INSTRUCTOR_CURRICULUM_IP_VERSION_HASHES[curriculumIpCurrent.version];
+    const { data: assignments } = await adminDb
+      .from('instructor_assignments')
+      .select('course_id,program_id')
+      .eq('instructor_id', user.id)
+      .eq('active', true);
+    const scopeCourseIds = [...new Set((assignments ?? []).map((row: any) => row.course_id).filter(Boolean))].map(String);
+    const scopeProgramIds = [...new Set((assignments ?? []).map((row: any) => row.program_id).filter(Boolean))].map(String);
+    let license;
+    try {
+      license = await issueInstructorCurriculumLicense(adminDb, {
+        userId: user.id,
+        agreementVersion: curriculumIpCurrent.version,
+        agreementHash: expectedHash,
+        scopeCourseIds,
+        programIds: scopeProgramIds,
+      });
+    } catch (error) {
+      return {
+        success: false,
+        error:
+          'Your signature was recorded but the instructor license could not be issued. Sign again to finish activation.',
+      };
+    }
+    await logInstructorLicenseEvent(adminDb, {
+      userId: user.id,
+      action: 'instructor_curriculum_ip.signed',
+      details: {
+        agreement_version: curriculumIpCurrent.version,
+        agreement_hash: expectedHash,
+        license_reference: license.licenseReference,
+        already_active: license.alreadyActive,
+      },
+      ipAddress,
+    });
+    return {
+      success: true,
+      id: result.id,
+      alreadyExists: result.alreadyExists,
+      licenseReference: license.licenseReference,
+      timestamp: new Date().toISOString(),
+    };
+  }
 
   if (holderId && (achieveSignature || (signingMou && !signingPaymentAddendum))) {
     const db = await requireAdminClient();

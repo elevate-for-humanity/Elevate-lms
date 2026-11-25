@@ -1,5 +1,7 @@
 'use client';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Loader2, Square, Volume2 } from 'lucide-react';
+import { useNaturalVoice } from '@/components/voice/useNaturalVoice';
 import { groupSmsThreads, isSmsAutoReply, smsThreadPreview, type SmsMessageLike } from '@/lib/phone/sms-threads';
 
 export function TextWorkspace() {
@@ -13,7 +15,41 @@ export function TextWorkspace() {
     [requestKey, setKey] = useState(''),
     [composing, setComposing] = useState(false),
     [selectedKey, setSelectedKey] = useState<string | null>(null),
-    [replyBody, setReplyBody] = useState('');
+    [replyBody, setReplyBody] = useState(''),
+    [speakingId, setSpeakingId] = useState<string | null>(null);
+  const {
+    play: playVoice,
+    stop: stopVoice,
+    isLoading: voiceLoading,
+    isPlaying: voicePlaying,
+  } = useNaturalVoice();
+  const stopSpeaking = useCallback(() => {
+    stopVoice();
+    setSpeakingId(null);
+  }, [stopVoice]);
+  // Leaving a conversation always silences any message being read aloud.
+  useEffect(() => {
+    stopSpeaking();
+  }, [selectedKey, stopSpeaking]);
+  async function toggleSpeak(message: SmsMessageLike) {
+    const text = String(message.body ?? '').trim();
+    if (!text) return;
+    if (speakingId === message.id) {
+      stopSpeaking();
+      return;
+    }
+    setSpeakingId(message.id);
+    const clearIfCurrent = () =>
+      setSpeakingId((current) => (current === message.id ? null : current));
+    // The voice hook caps the request at the synthesis limit, so an over-long
+    // message is spoken up to the cap instead of failing.
+    const started = await playVoice(text, {
+      onEnded: clearIfCurrent,
+      onError: clearIfCurrent,
+      onPlaybackBlocked: clearIfCurrent,
+    });
+    if (!started) clearIfCurrent();
+  }
   const load = useCallback(async () => {
     try {
       const r = await fetch('/api/communications/texts', { cache: 'no-store' }),
@@ -180,6 +216,53 @@ export function TextWorkspace() {
                   {m.direction === 'inbound' ? 'Received' : 'Sent'} · {m.status}
                   {isSmsAutoReply(m) ? ' · Auto-reply' : ''} · {new Date(m.created_at).toLocaleString()}
                 </p>
+                {String(m.body ?? '').trim() && (
+                  <div className="mt-3 flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => void toggleSpeak(m)}
+                      aria-pressed={speakingId === m.id}
+                      aria-label={
+                        speakingId === m.id
+                          ? 'Stop reading this message aloud'
+                          : 'Listen to this message'
+                      }
+                      className={`inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-bold ${
+                        speakingId === m.id
+                          ? 'bg-red-700 text-white'
+                          : 'border bg-white text-slate-900'
+                      }`}
+                    >
+                      {speakingId === m.id ? (
+                        voiceLoading ? (
+                          <>
+                            <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
+                            Stop
+                          </>
+                        ) : (
+                          <>
+                            <Square className="h-4 w-4" aria-hidden />
+                            Stop
+                          </>
+                        )
+                      ) : (
+                        <>
+                          <Volume2 className="h-4 w-4" aria-hidden />
+                          Listen
+                        </>
+                      )}
+                    </button>
+                    {speakingId === m.id && (
+                      <span role="status" className="text-xs font-bold text-slate-600">
+                        {voiceLoading
+                          ? 'Loading voice…'
+                          : voicePlaying
+                            ? 'Reading aloud…'
+                            : ''}
+                      </span>
+                    )}
+                  </div>
+                )}
                 {m.error_message && <p className="mt-2 text-sm text-red-800">{m.error_message}</p>}
               </article>
             ))}
@@ -247,3 +330,4 @@ export function TextWorkspace() {
     </main>
   );
 }
+

@@ -225,6 +225,29 @@ describe('issueInstructorCurriculumLicense', () => {
     } })).rejects.toThrow('postdate revocation');
     expect(m.inserts).toEqual([]);
   });
+  it.each([undefined, 'a-previous-revocation'])('rejects replayed signatures even with a new processing timestamp (%s)', async renewalLicenseId => {
+    seedAuthorized();
+    m.tables.instructor_curriculum_licenses[0].status = 'revoked';
+    m.tables.instructor_curriculum_licenses[0].revoked_at = '2026-11-25T11:00:00Z';
+    await expect(issueInstructorCurriculumLicense(database(), {
+      userId, agreementVersion: '1.0', agreementHash: hash, scopeCourseIds: [courseId], programIds: [],
+      signatureReceipt: { acceptanceId: 'acc-1', signedAt: '2026-11-25T12:00:00Z', renewalLicenseId,
+        signerName: 'QA', signerEmail: 'qa@example.com', method: 'typed', signature: 'QA', ipAddress: '127.0.0.1', userAgent: 'test' },
+    })).rejects.toThrow('current revocation');
+    expect(m.inserts).toEqual([]);
+  });
+  it('issues a renewal only for the revoked license displayed by the current form', async () => {
+    seedAuthorized();
+    m.tables.instructor_curriculum_licenses[0].status = 'revoked';
+    m.tables.instructor_curriculum_licenses[0].revoked_at = '2026-11-25T11:00:00Z';
+    const result = await issueInstructorCurriculumLicense(database(), {
+      userId, agreementVersion: '1.0', agreementHash: hash, scopeCourseIds: [courseId], programIds: [],
+      signatureReceipt: { acceptanceId: 'acc-1', signedAt: '2026-11-25T12:00:00Z', renewalLicenseId: 'lic-1',
+        signerName: 'QA', signerEmail: 'qa@example.com', method: 'typed', signature: 'QA', ipAddress: '127.0.0.1', userAgent: 'test' },
+    });
+    expect(result.alreadyActive).toBe(false);
+    expect(m.inserts[0].signature_receipt).toMatchObject({ renewalLicenseId: 'lic-1' });
+  });
   it('returns the existing active license unchanged instead of issuing a second one', async () => {
     seedAuthorized();
     const result = await issueInstructorCurriculumLicense(database(), {

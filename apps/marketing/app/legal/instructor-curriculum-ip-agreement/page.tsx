@@ -1,3 +1,6 @@
+import { createClient } from '@/lib/supabase/server';
+import { requireAdminClient } from '@/lib/supabase/admin';
+import { getInstructorLicenseRenewalTarget, INSTRUCTOR_CURRICULUM_IP_CURRENT_VERSION } from '@/lib/legal/instructorCurriculumLicense';
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { DocumentPage, DocumentSection, DocumentSignatureBlock } from '@/components/documents';
@@ -9,7 +12,11 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-export default function InstructorCurriculumIpAgreementPage() {
+export default async function InstructorCurriculumIpAgreementPage() {
+  const db = await createClient();
+  const { data: { user } } = await db.auth.getUser();
+  const renewalLicenseId = user ? await getInstructorLicenseRenewalTarget(
+    await requireAdminClient(), user.id, INSTRUCTOR_CURRICULUM_IP_CURRENT_VERSION) : null;
   return (
     <>
       <div className="max-w-4xl mx-auto px-4 py-4">
@@ -103,6 +110,7 @@ export default function InstructorCurriculumIpAgreementPage() {
         </DocumentSection>
 
         <DocumentSignatureBlock
+          renewalLicenseId={renewalLicenseId}
           agreementType="instructor_curriculum_ip"
           agreementVersion="1.0"
           buttonLabel="Sign Instructor License Agreement"

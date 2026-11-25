@@ -163,7 +163,7 @@ function sign(body: Record<string, unknown>) {
     new NextRequest(`${url}/sign-agreement`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
+      body: JSON.stringify({ agreement_version: '1.0', ...body }),
     }),
   );
 }
@@ -208,6 +208,24 @@ describe('instructor IP agreement signing route', () => {
     });
   });
 
+  it('rejects a replay after revocation and renews only with the current form context', async () => {
+    const body = { agreement_type: 'instructor_curriculum_ip', signer_name: 'QA Instructor', signature_method: 'typed' };
+    expect((await sign(body)).status).toBe(200);
+    const first = m.tables.instructor_curriculum_licenses[0];
+    first.status = 'revoked'; first.revoked_at = '2026-11-25T00:00:00Z';
+    expect((await sign(body)).status).toBe(500);
+    expect(m.tables.instructor_curriculum_licenses).toHaveLength(1);
+    const context = await licenseGet(new NextRequest(`${url}/curriculum-license`));
+    expect((await context.json()).renewal_license_id).toBe(first.id);
+    expect((await sign({ ...body, renewal_license_id: first.id })).status).toBe(200);
+    expect(m.tables.instructor_curriculum_licenses).toHaveLength(2);
+    expect(m.tables.instructor_curriculum_licenses[1].signature_receipt).toMatchObject({ renewalLicenseId: first.id });
+  });
+  it('rejects an old agreement-version submission before recording or issuing', async () => {
+    expect((await sign({ agreement_type: 'instructor_curriculum_ip', agreement_version: '0.9', signer_name: 'QA' })).status).toBe(409);
+    expect(m.recordCalls).toEqual([]);
+    expect(m.tables.instructor_curriculum_licenses).toEqual([]);
+  });
   it('signing the old general services agreement does NOT authorize the IP gate', async () => {
     const response = await sign({ signer_name: 'David Nazario' });
     expect(response.status).toBe(200);

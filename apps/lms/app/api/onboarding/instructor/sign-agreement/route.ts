@@ -50,6 +50,7 @@ async function signCurriculumIpAgreement(
       : undefined;
 
   const current = await getCurrentInstructorCurriculumAgreement(db);
+  if (body.agreement_version !== current.version) return safeError('Reload and review the current agreement before signing.', 409);
   const expectedHash = INSTRUCTOR_CURRICULUM_IP_VERSION_HASHES[current.version];
   if (!expectedHash) {
     return safeError('Agreement version is not published in this release', 503);
@@ -100,6 +101,7 @@ async function signCurriculumIpAgreement(
       scopeCourseIds,
       programIds: scopeProgramIds,
       signatureReceipt: {
+        renewalLicenseId: typeof body.renewal_license_id === 'string' ? body.renewal_license_id : undefined,
         acceptanceId: recorded.id!,
         signedAt: new Date().toISOString(),
         signerName,

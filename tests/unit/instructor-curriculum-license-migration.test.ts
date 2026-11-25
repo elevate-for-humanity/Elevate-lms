@@ -172,7 +172,7 @@ describe('instructor curriculum IP license migration', () => {
       [
         userId,
         agreementHash,
-        JSON.stringify({
+        JSON.stringify({ renewalLicenseId: (await db.query<{id:string}>("SELECT id FROM instructor_curriculum_licenses WHERE status='revoked'")).rows[0].id,
           acceptanceId: 'receipt',
           signedAt: '2026-11-25T12:00:00Z',
           signerName: 'QA',
@@ -280,8 +280,15 @@ describe('instructor curriculum IP license migration', () => {
       VALUES ($1,'1.0',$2,'RENEWAL',$3::jsonb)`,
         [userId, agreementHash, receipt],
       ),
-    ).rejects.toThrow('postdate revocation');
+    ).rejects.toThrow(/current revoked license|postdate revocation/);
+    await expect(db.query(`INSERT INTO instructor_curriculum_licenses
+      (user_id,agreement_version,agreement_hash,license_reference,signature_receipt)
+      VALUES ($1,'1.0',$2,'TIMESTAMP_REPLAY',$3::jsonb)`,
+      [userId, agreementHash, JSON.stringify({ ...JSON.parse(receipt), signedAt: '2026-11-25T12:00:00Z' })]))
+      .rejects.toThrow('current revoked license');
+    const revokedLicenseId = (await db.query<{id:string}>("SELECT id FROM instructor_curriculum_licenses WHERE license_reference='FIRST'")).rows[0].id;
     const fresh = JSON.stringify({
+      renewalLicenseId: revokedLicenseId,
       ...JSON.parse(receipt),
       signedAt: '2026-11-25T12:00:00Z',
       signature: 'Fresh QA',

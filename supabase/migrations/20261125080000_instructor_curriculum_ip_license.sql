@@ -155,6 +155,18 @@ BEGIN
    SELECT 1 FROM public.instructor_curriculum_licenses prior
    WHERE prior.user_id=NEW.user_id AND prior.agreement_type=NEW.agreement_type
      AND prior.agreement_version=NEW.agreement_version AND prior.status='revoked'
+ ) AND (NEW.signature_receipt->>'renewalLicenseId') IS DISTINCT FROM (
+   SELECT prior.id::text FROM public.instructor_curriculum_licenses prior
+   WHERE prior.user_id=NEW.user_id AND prior.agreement_type=NEW.agreement_type
+     AND prior.agreement_version=NEW.agreement_version AND prior.status='revoked'
+   ORDER BY prior.created_at DESC LIMIT 1
+ ) THEN
+   RAISE EXCEPTION 'Signature must acknowledge the current revoked license';
+ END IF;
+ IF TG_OP='INSERT' AND EXISTS (
+   SELECT 1 FROM public.instructor_curriculum_licenses prior
+   WHERE prior.user_id=NEW.user_id AND prior.agreement_type=NEW.agreement_type
+     AND prior.agreement_version=NEW.agreement_version AND prior.status='revoked'
      AND (prior.revoked_at IS NULL OR
        (NEW.signature_receipt->>'signedAt')::timestamptz <= prior.revoked_at)
  ) THEN

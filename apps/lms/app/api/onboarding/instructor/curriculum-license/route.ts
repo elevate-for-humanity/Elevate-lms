@@ -5,6 +5,7 @@ import { safeError, safeInternalError } from '@/lib/api/safe-error';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import {
   getInstructorCurriculumLicenseStatus,
+  getInstructorLicenseRenewalTarget,
   logInstructorLicenseEvent,
 } from '@/lib/legal/instructorCurriculumLicense';
 
@@ -53,6 +54,7 @@ export async function GET(req: NextRequest) {
     reason: status.reason,
     agreement_version: status.agreementVersion,
     license_reference: status.licenseReference,
+    renewal_license_id: await getInstructorLicenseRenewalTarget(db, userId, status.agreementVersion),
   });
 }
 

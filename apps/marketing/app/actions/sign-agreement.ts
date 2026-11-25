@@ -31,6 +31,7 @@ export async function signAgreement(data: {
   signature?: string;
   typedName?: string;
   studentId?: string;
+  renewalLicenseId?: string;
 }) {
   const supabase = await createClient();
   const {
@@ -159,6 +160,7 @@ export async function signAgreement(data: {
         scopeCourseIds,
         programIds: scopeProgramIds,
         signatureReceipt: {
+          renewalLicenseId: data.renewalLicenseId,
           acceptanceId: result.id!, signedAt: new Date().toISOString(),
           signerName, signerEmail: user.email, method: data.method,
           signature: data.method === 'drawn' ? data.signature || '' : signerName,

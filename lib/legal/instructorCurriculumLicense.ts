@@ -219,6 +219,7 @@ export async function issueInstructorCurriculumLicense(
       signature: string;
       ipAddress: string;
       userAgent: string;
+      renewalLicenseId?: string;
     };
   },
 ): Promise<{ licenseReference: string; licenseId: string; alreadyActive: boolean }> {
@@ -254,6 +255,11 @@ export async function issueInstructorCurriculumLicense(
       Date.parse(receipt.signedAt) <= Date.parse(existing.data.revoked_at))
   )
     throw new Error('Signature receipt must postdate revocation');
+  // Bind the submission to the revocation displayed by the signing form.
+  // Replaying an old request must not become fresh merely because the server
+  // timestamps its processing after revocation.
+  if (existing.data?.status === 'revoked' && receipt.renewalLicenseId !== existing.data.id)
+    throw new Error('Review the current revocation and sign a new renewal form');
   const licenseReference = generateLicenseReference();
   const { data, error } = await db
     .from('instructor_curriculum_licenses')
@@ -296,4 +302,13 @@ export async function logInstructorLicenseEvent(
     // Audit failure must not break the enclosing request, but it must be visible.
     console.error('Instructor license audit log failed', error);
   }
+}
+
+/** A per-revocation signing context, scoped to the authenticated instructor. */
+export async function getInstructorLicenseRenewalTarget(db: any, userId: string, version: string) {
+  const result = await db.from('instructor_curriculum_licenses').select('id,status')
+    .eq('user_id', userId).eq('agreement_type', INSTRUCTOR_CURRICULUM_IP_AGREEMENT_TYPE)
+    .eq('agreement_version', version).order('created_at', { ascending: false }).limit(1).maybeSingle();
+  if (result.error) throw new Error('Instructor renewal context could not be verified');
+  return result.data?.status === 'revoked' ? String(result.data.id) : null;
 }

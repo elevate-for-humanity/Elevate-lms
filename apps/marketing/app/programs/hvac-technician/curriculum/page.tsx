@@ -47,8 +47,8 @@ export default function HVACCurriculumPage() {
         <Image
           placeholder="blur"
           blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8z8BQDwADhQGAWjR9awAAAABJRU5ErkJggg=="
-          src="/images/hvac-training-vibrant-2026.webp"
-          alt="HVAC Certification Training"
+          src="/images/hvac-hero.webp"
+          alt="HVAC technician inspecting an air-conditioning unit"
           fill
           sizes="100vw"
           className="object-cover"

@@ -154,9 +154,9 @@ export const PROGRAM_IMAGES: Record<string, ProgramImageEntry> = {
     alt: 'Illustrative Chef instructor supervising culinary skills practice in a teaching kitchen',
   },
   'hvac-technician': {
-    card: '/images/hvac-training-vibrant-2026.webp',
-    hero: '/images/hvac-training-vibrant-2026.webp',
-    alt: 'HVAC technicians examining an air-conditioning system',
+    card: '/images/hvac-hero.webp',
+    hero: '/images/hvac-hero.webp',
+    alt: 'HVAC technician inspecting an air-conditioning unit',
   },
   'cdl-training': {
     card: '/images/refresh-20261014/cdl.webp',
@@ -250,7 +250,7 @@ export const PROGRAM_IMAGES: Record<string, ProgramImageEntry> = {
   },
   esthetician: {
     card: '/images/beauty/esthetics-hero.webp',
-    hero: `${P}/cosmetology-hero.webp`,
+    hero: '/images/beauty/esthetics-hero.webp',
     alt: 'Esthetics learner practicing professional skincare and client services',
   },
   'esthetician-apprenticeship': {

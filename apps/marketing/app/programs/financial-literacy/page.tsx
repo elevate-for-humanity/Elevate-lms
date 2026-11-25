@@ -192,6 +192,9 @@ export default function FinancialLiteracyPage() {
             <p className="mt-3 text-sm leading-6 text-slate-700">
               Funding is not automatic. Participant eligibility and program authorization are determined by the responsible workforce agency. Self-pay and payment options remain available for participants who do not qualify.
             </p>
+            <p className="mt-3 text-sm leading-6 text-slate-700">
+              Self-pay tuition for the pathway is $1,500.
+            </p>
           </aside>
         </div>
       </section>

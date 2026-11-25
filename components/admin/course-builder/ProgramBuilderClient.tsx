@@ -85,13 +85,16 @@ export default function ProgramBuilderClient({ initialState, availableCredential
 
   // ── Publish ───────────────────────────────────────────────────────────────
 
+  // Build-standard gaps never dead-end the owner: with an explicit
+  // acknowledgment they publish anyway (the acknowledgment travels with
+  // the publish request; the canonical publish audits it and routes the
+  // gaps to PARIS). Other missing essentials still block here.
+  const standardMissing = derived.missingRequired.filter((m) => m.endsWith('(build standard)'));
+  const otherMissing = derived.missingRequired.filter((m) => !m.endsWith('(build standard)'));
+  const canPublishWithOverride =
+    otherMissing.length === 0 && standardMissing.length > 0 && standardOverride.acknowledged;
+
   const handlePublish = async () => {
-    // Build-standard gaps never dead-end the owner: with an explicit
-    // acknowledgment they publish anyway (the acknowledgment travels with
-    // the publish request; the canonical publish audits it and routes the
-    // gaps to PARIS). Other missing essentials still block here.
-    const standardMissing = derived.missingRequired.filter((m) => m.endsWith('(build standard)'));
-    const otherMissing = derived.missingRequired.filter((m) => !m.endsWith('(build standard)'));
     if (otherMissing.length > 0) return;
     if (standardMissing.length > 0 && !standardOverride.acknowledged) return;
     setSaving(true);
@@ -132,6 +135,7 @@ export default function ProgramBuilderClient({ initialState, availableCredential
         saving={saving}
         onSave={handleSave}
         onPublish={handlePublish}
+        canPublishWithOverride={canPublishWithOverride}
         onPreview={() => setShowPreview(true)}
         onTitleChange={(title) => patch({ title })}
       />

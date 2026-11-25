@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Branch refreshed to pick up main (a5daf49d): Course Builder merge; fresh CI after E2E shard 3/4 environment failure.
 """Read only the approved operator route and worker health; never emit caller data."""
 import json,re,subprocess,hashlib,base64,urllib.request
 from pathlib import Path

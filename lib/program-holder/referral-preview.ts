@@ -1,3 +1,4 @@
+// Branch refreshed to pick up main (71e31a22): /apply/student E2E fix + Dockerfile.google-lms.
 import 'server-only';
 import { createHmac, timingSafeEqual } from 'node:crypto';
 

@@ -11,7 +11,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { aiChat, aiChatStream, isAIAvailable } from '@/lib/ai/ai-service';
 import { findSiteFacts, formatProgramIndex, formatSiteFacts } from '@/lib/ai/paris-site-facts';
 import { formatWebResults, searchWebForParis, shouldWebSearch } from '@/lib/ai/paris-web-search';
-import { hydrateProcessEnv } from '@/lib/secrets';
+import { hydrateProcessEnvBounded } from '@/lib/secrets';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import { VERIFIED_WORKFORCE_FUNDED_PROGRAMS } from '@/lib/programs/funding-registry';
 
@@ -260,8 +260,11 @@ export async function POST(req: NextRequest) {
     }
 
     // Marketing must hydrate the same canonical runtime connection as Admin
-    // before deciding that the shared owned model is unavailable.
-    await hydrateProcessEnv();
+    // before deciding that the shared owned model is unavailable. Bounded:
+    // a cold or failing secret store must not hold this interactive route
+    // for the full read chain (measured live at up to 43s to first byte);
+    // hydration continues in the background and later requests are warm.
+    await hydrateProcessEnvBounded();
     signal.throwIfAborted();
     if (!isAIAvailable()) {
       if (wantsStream) return streamReplyResponse(null, lastUserMessage, context);
@@ -338,4 +341,5 @@ export async function POST(req: NextRequest) {
     }, { status: 503, headers: { 'Cache-Control': 'no-store' } });
   }
 }
+
 

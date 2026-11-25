@@ -52,6 +52,6 @@ describe('program and apprenticeship experience regressions', () => {
       'apps/marketing/app/programs/barber-apprenticeship/orientation/OrientationClient.tsx',
     );
     expect(source).not.toContain('src="/videos/barber-lessons/barber-apprenticeship-intro.mp4"');
-    expect(source).toContain('r2.dev/videos/barber-hero-final.mp4');
+    expect(source).toContain('src="/videos/barber-hero-final.mp4"');
   });
 });

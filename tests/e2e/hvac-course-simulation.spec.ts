@@ -1,5 +1,8 @@
 import { expect, test, type Locator, type Page } from '@playwright/test';
 import { appOrigin } from './helpers/app-origins';
+import { readFileSync } from 'node:fs';
+
+const workbook = JSON.parse(readFileSync(new URL('../../lib/lms/hvac-workbook-content.json', import.meta.url), 'utf8')) as { chapters: Array<{ lesson_id: string }> };
 import type { HvacSimulationResponse } from '../../lib/lms/hvac-simulation-types';
 
 const base = appOrigin('lms');
@@ -165,6 +168,70 @@ test.describe('Authenticated HVAC course simulations', () => {
       await expect(
         page.locator('a[href="/lms/courses/' + courseId + '/lessons/' + id + '"]'),
       ).toHaveCount(1);
+    }
+    // Leave Chapter 1 untouched and create a saved, unmastered later lab.
+    // The electrical lab above retains mastery across device runs, so it is
+    // deliberately excluded from the continuation candidate.
+    const resumeLessonId = workbook.chapters[4].lesson_id;
+    const resumeApi =
+      base + '/api/learner/hvac-simulations?courseId=' + courseId + '&lessonId=' + resumeLessonId;
+    const beforeResume = (await (
+      await page.request.get(resumeApi)
+    ).json()) as HvacSimulationResponse;
+    const observed = await page.request.post(base + '/api/learner/hvac-simulations', {
+      data: {
+        courseId,
+        lessonId: resumeLessonId,
+        simulationId: beforeResume.simulation.id,
+        expectedRevision: beforeResume.progress.revision,
+        requestId: await page.evaluate(() => crypto.randomUUID()),
+        action: { type: 'observe' },
+      },
+    });
+    expect(observed.status()).toBe(200);
+    const resumeState = (await observed.json()) as HvacSimulationResponse;
+    await page.goto(base + '/programs/hvac-technician/course');
+    const resumeLink = page.getByRole('link', {
+      name: 'Continue simulation practice',
+      exact: true,
+    });
+    await expect(resumeLink).toHaveAttribute(
+      'href',
+      '/lms/courses/' + courseId + '/lessons/' + resumeLessonId + '#hvac-simulation',
+    );
+    await resumeLink.click();
+    await expect(lab).toBeVisible();
+    await page.reload();
+    await expect(lab.getByText('Saved progress restored.', { exact: true })).toBeVisible();
+    expect((await (await page.request.get(resumeApi)).json()).progress.revision).toBe(
+      resumeState.progress.revision,
+    );
+
+    // Read every canonical lab on each configured device without creating extra
+    // attempts or rewriting any existing learner's evidence.
+    for (const chapter of workbook.chapters) {
+      await page.goto(
+        base + '/lms/courses/' + courseId + '/lessons/' + chapter.lesson_id + '#hvac-simulation',
+      );
+      await expect(lab).toBeVisible({ timeout: 30_000 });
+      await expect(
+        lab.getByRole('button', { name: 'Run virtual check', exact: true }),
+      ).toBeVisible();
+      expect(
+        await lab.evaluate((element) => element.scrollWidth - element.clientWidth),
+      ).toBeLessThanOrEqual(2);
+      for (const control of await lab.locator('input, select').all()) {
+        await expect(control).toHaveAccessibleName(/.+/);
+      }
+      const stored = await page.request.get(
+        base +
+          '/api/learner/hvac-simulations?courseId=' +
+          courseId +
+          '&lessonId=' +
+          chapter.lesson_id,
+      );
+      expect(stored.status()).toBe(200);
+      expect((await stored.json()).simulation.lessonId).toBe(chapter.lesson_id);
     }
     expect(errors, 'Course practice must not produce unhandled browser errors').toEqual([]);
     await info.attach('hvac-simulation-acceptance', {

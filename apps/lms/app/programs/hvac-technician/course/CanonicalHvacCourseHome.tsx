@@ -74,7 +74,9 @@ export default function CanonicalHvacCourseHome({
     (lesson) => lesson.simulation?.mastered,
   ).length;
   const nextSimulation =
-    simulationLessons.find((lesson) => !lesson.simulation?.mastered) ?? simulationLessons[0];
+    simulationLessons.find((lesson) => lesson.simulation?.started && !lesson.simulation.mastered) ??
+    simulationLessons.find((lesson) => !lesson.simulation?.mastered) ??
+    simulationLessons[0];
   const visibleCompleted = lessons.filter((lesson) => completed.has(lesson.id)).length;
   const nextLesson = lessons.find((lesson) => !completed.has(lesson.id)) ?? lessons[0] ?? null;
   const progress = lessons.length ? Math.round((visibleCompleted / lessons.length) * 100) : 0;
@@ -98,8 +100,8 @@ export default function CanonicalHvacCourseHome({
     <div className="min-h-screen bg-slate-50 text-slate-950">
       {instructorLicenseRef ? (
         <div className="bg-amber-100 px-4 py-3 text-center text-sm font-bold text-amber-950">
-          Licensed instructor view · Ref {instructorLicenseRef} · Elevate proprietary
-          curriculum — for assigned teaching only. Do not copy, redistribute, or share.
+          Licensed instructor view · Ref {instructorLicenseRef} · Elevate proprietary curriculum —
+          for assigned teaching only. Do not copy, redistribute, or share.
         </div>
       ) : null}
       <section className="relative isolate overflow-hidden bg-slate-950 text-white">

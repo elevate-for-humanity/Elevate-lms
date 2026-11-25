@@ -9,6 +9,7 @@ type DatabaseError = { code?: string; message: string };
 const m = vi.hoisted(() => ({
   user: { id: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa' } as { id: string } | null,
   access: vi.fn(),
+  capacity: 'learner' as 'learner' | 'instructor' | 'denied',
   rate: vi.fn(),
   client: vi.fn(),
   admin: vi.fn(),
@@ -21,6 +22,13 @@ const m = vi.hoisted(() => ({
   conflict: false,
   insertRace: false,
   writes: [] as { table: string; mode: string; values: Row; filters: [string, unknown][] }[],
+}));
+
+vi.mock('@/lib/lms/hvac-access-mode', () => ({
+  getHvacAccessMode: async () => ({
+    mode: m.capacity,
+    licenseReference: m.capacity === 'instructor' ? 'licensed' : null,
+  }),
 }));
 
 vi.mock('@/lib/auth/requireAuth', () => ({
@@ -243,6 +251,7 @@ async function pass() {
 beforeEach(() => {
   vi.clearAllMocks();
   m.user = { id: learnerId };
+  m.capacity = 'learner';
   m.access.mockResolvedValue(undefined);
   m.rate.mockResolvedValue(null);
   m.sessionReady = true;
@@ -276,7 +285,9 @@ describe('authorized HVAC visual-simulation API', () => {
     expect((await get()).status).toBe(401);
     expect((await post(request({ type: 'observe' }))).status).toBe(401);
     expect(m.access).not.toHaveBeenCalled();
-    expect(m.admin).not.toHaveBeenCalled();
+    // Authorization now needs privileged reads; denied requests must still
+    // perform zero privileged writes.
+    expect(m.writes).toEqual([]);
   });
 
   it('rate-limits by account before querying course data', async () => {
@@ -292,14 +303,18 @@ describe('authorized HVAC visual-simulation API', () => {
     expect((await get()).status).toBe(403);
     expect((await post(request({ type: 'observe' }))).status).toBe(403);
     expect(m.client).not.toHaveBeenCalled();
-    expect(m.admin).not.toHaveBeenCalled();
+    // Authorization now needs privileged reads; denied requests must still
+    // perform zero privileged writes.
+    expect(m.writes).toEqual([]);
   });
 
   it('preserves the authenticated session MFA gate, including on first save', async () => {
     m.sessionReady = false;
     expect((await get()).status).toBe(403);
     expect((await post(request({ type: 'observe' }))).status).toBe(403);
-    expect(m.admin).not.toHaveBeenCalled();
+    // Authorization now needs privileged reads; denied requests must still
+    // perform zero privileged writes.
+    expect(m.writes).toEqual([]);
   });
 
   it('fails closed when the security migration is unavailable', async () => {
@@ -307,7 +322,9 @@ describe('authorized HVAC visual-simulation API', () => {
     const response = await post(request({ type: 'observe' }));
     expect(response.status).toBe(503);
     expect((await response.json()).code).toBe('SIMULATION_STORAGE_NOT_READY');
-    expect(m.admin).not.toHaveBeenCalled();
+    // Authorization now needs privileged reads; denied requests must still
+    // perform zero privileged writes.
+    expect(m.writes).toEqual([]);
   });
 
   it('rejects a different course, mismatched course membership, and unpublished lessons', async () => {
@@ -318,7 +335,9 @@ describe('authorized HVAC visual-simulation API', () => {
     expect((await get()).status).toBe(404);
     m.lesson = { ...m.lesson, course_id: courseId, is_published: false };
     expect((await get()).status).toBe(404);
-    expect(m.admin).not.toHaveBeenCalled();
+    // Authorization now needs privileged reads; denied requests must still
+    // perform zero privileged writes.
+    expect(m.writes).toEqual([]);
   });
 
   it('does not replace separate practice exams with unconfigured simulations', async () => {
@@ -351,7 +370,9 @@ describe('authorized HVAC visual-simulation API', () => {
     'rejects client authority fields %j',
     async (extra) => {
       expect((await post(request({ type: 'observe' }, 0, extra))).status).toBe(400);
-      expect(m.admin).not.toHaveBeenCalled();
+      // Authorization now needs privileged reads; denied requests must still
+      // perform zero privileged writes.
+      expect(m.writes).toEqual([]);
     },
   );
 
@@ -510,4 +531,16 @@ describe('authorized HVAC visual-simulation API', () => {
     expect((await response.json()).code).toBe('INVALID_SAVED_STATE');
     expect(m.writes).toHaveLength(1);
   });
+});
+
+it('denies unsigned teaching access even if the generic lesson RPC would allow it', async () => {
+  m.capacity = 'denied';
+  expect((await get()).status).toBe(403);
+  expect(m.access).not.toHaveBeenCalled();
+  expect(m.writes).toEqual([]);
+});
+it('allows licensed demonstration without learner credit gates', async () => {
+  m.capacity = 'instructor';
+  expect((await get()).status).toBe(200);
+  expect(m.access).not.toHaveBeenCalled();
 });

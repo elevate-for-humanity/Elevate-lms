@@ -1,3 +1,4 @@
+import { getHvacAccessMode } from '@/lib/lms/hvac-access-mode';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
@@ -17,7 +18,6 @@ import InteractiveVideoPlayer, { type Checkpoint } from '@/components/lms/Intera
 import { resolveCoursePreview } from '@/lib/admin/course-preview';
 import { assertLessonAccess } from '@/lib/lms/access-control';
 import { requireAdminClient } from '@/lib/supabase/admin';
-import { getInstructorCurriculumLicenseStatus } from '@/lib/legal/instructorCurriculumLicense';
 import {
   canonicalBeautyApprenticeshipSlug,
   loadBeautyPaymentGate,
@@ -222,17 +222,9 @@ export default async function LessonPage({
   let instructorDemoRef: string | null = null;
   if (!preview.active && user && course.id === HVAC_COURSE_ID) {
     const adminDb = await requireAdminClient();
-    const { data: instructorProfile } = await adminDb
-      .from('profiles')
-      .select('role')
-      .eq('id', user.id)
-      .maybeSingle();
-    if (instructorProfile?.role === 'instructor') {
-      const licenseStatus = await getInstructorCurriculumLicenseStatus(adminDb, user.id, {
-        courseId: course.id,
-      });
-      if (licenseStatus.authorized) instructorDemoRef = licenseStatus.licenseReference;
-    }
+    const capacity = await getHvacAccessMode(adminDb, user.id, course.id);
+    if (capacity.mode === 'denied') notFound();
+    if (capacity.mode === 'instructor') instructorDemoRef = capacity.licenseReference;
   }
 
   if (!preview.active && user && !instructorDemoRef) {
@@ -443,9 +435,8 @@ export default async function LessonPage({
           ) : null}
           {instructorDemoRef ? (
             <div className="rounded-xl border border-amber-300 bg-amber-100 p-4 text-sm font-bold text-amber-950">
-              Licensed instructor demonstration view · Ref {instructorDemoRef} · Elevate
-              proprietary curriculum — for assigned teaching only. Do not copy, redistribute,
-              or share.
+              Licensed instructor demonstration view · Ref {instructorDemoRef} · Elevate proprietary
+              curriculum — for assigned teaching only. Do not copy, redistribute, or share.
             </div>
           ) : null}
           {course.id === BOOKKEEPING_COURSE_ID && !preview.active ? (
@@ -459,6 +450,7 @@ export default async function LessonPage({
             </p>
           ) : null}
           <LearningWorkspace
+            activityFragment={hasHvacSimulation ? 'hvac-simulation' : undefined}
             initialView={
               handsOnClockOnly || course.id === BOOKKEEPING_COURSE_ID ? 'preview' : 'split'
             }

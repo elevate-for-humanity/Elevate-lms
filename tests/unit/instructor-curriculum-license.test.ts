@@ -82,7 +82,12 @@ function seedAuthorized() {
       },
     ],
     license_agreement_acceptances: [
-      { id: 'acc-1', user_id: userId, agreement_type: 'instructor_curriculum_ip', document_version: '1.0' },
+      {
+        id: 'acc-1',
+        user_id: userId,
+        agreement_type: 'instructor_curriculum_ip',
+        document_version: '1.0',
+      },
     ],
     instructor_curriculum_licenses: [
       {
@@ -132,7 +137,12 @@ describe('instructor curriculum license status', () => {
   it('does not let the old general instructor services agreement satisfy the IP gate', async () => {
     seedAuthorized();
     m.tables.license_agreement_acceptances = [
-      { id: 'acc-old', user_id: userId, agreement_type: 'instructor_services', document_version: '1.0' },
+      {
+        id: 'acc-old',
+        user_id: userId,
+        agreement_type: 'instructor_services',
+        document_version: '1.0',
+      },
     ];
     const status = await getInstructorCurriculumLicenseStatus(database(), userId, { courseId });
     expect(status).toMatchObject({ authorized: false, reason: 'unsigned' });
@@ -164,7 +174,11 @@ describe('instructor curriculum license status', () => {
     (m.tables.agreement_versions[0] as Row).version = '2.0';
     (m.tables.agreement_versions[0] as Row).current_version = '2.0';
     const status = await getInstructorCurriculumLicenseStatus(database(), userId, { courseId });
-    expect(status).toMatchObject({ authorized: false, reason: 'stale_version', agreementVersion: '2.0' });
+    expect(status).toMatchObject({
+      authorized: false,
+      reason: 'stale_version',
+      agreementVersion: '2.0',
+    });
   });
 
   it('fails closed when the published text changed under the same version', async () => {
@@ -182,7 +196,9 @@ describe('instructor curriculum license status', () => {
     ).toMatchObject({ authorized: false, reason: 'not_instructor' });
     (m.tables.profiles[0] as Row).role = 'instructor';
     m.profileError = { message: 'Database unavailable' };
-    expect(await getInstructorCurriculumLicenseStatus(database(), userId, { courseId })).toMatchObject({
+    expect(
+      await getInstructorCurriculumLicenseStatus(database(), userId, { courseId }),
+    ).toMatchObject({
       authorized: false,
       reason: 'unavailable',
     });
@@ -197,6 +213,18 @@ describe('instructor curriculum license status', () => {
 });
 
 describe('issueInstructorCurriculumLicense', () => {
+  it('refuses renewal without fresh signature evidence', async () => {
+    seedAuthorized();
+    m.tables.instructor_curriculum_licenses[0].status = 'revoked';
+    m.tables.instructor_curriculum_licenses[0].revoked_at = '2026-11-25T11:00:00Z';
+    const input = { userId, agreementVersion: '1.0', agreementHash: hash, scopeCourseIds: [courseId], programIds: [] };
+    await expect(issueInstructorCurriculumLicense(database(), input)).rejects.toThrow('fresh signature');
+    await expect(issueInstructorCurriculumLicense(database(), { ...input, signatureReceipt: {
+      acceptanceId: 'old', signedAt: '2026-11-25T10:00:00Z', signerName: 'QA', signerEmail: 'qa@example.com',
+      method: 'typed', signature: 'QA', ipAddress: '127.0.0.1', userAgent: 'test',
+    } })).rejects.toThrow('postdate revocation');
+    expect(m.inserts).toEqual([]);
+  });
   it('returns the existing active license unchanged instead of issuing a second one', async () => {
     seedAuthorized();
     const result = await issueInstructorCurriculumLicense(database(), {
@@ -223,6 +251,16 @@ describe('issueInstructorCurriculumLicense', () => {
       agreementHash: hash,
       scopeCourseIds: [courseId],
       programIds: ['22222222-2222-4222-8222-222222222222'],
+      signatureReceipt: {
+        acceptanceId: 'acc-1',
+        signedAt: new Date().toISOString(),
+        signerName: 'QA',
+        signerEmail: 'qa@example.com',
+        method: 'typed',
+        signature: 'QA',
+        ipAddress: '127.0.0.1',
+        userAgent: 'test',
+      },
     });
     expect(result.alreadyActive).toBe(false);
     expect(result.licenseReference).toMatch(/^ELV-INST-[0-9A-F]{8}$/);

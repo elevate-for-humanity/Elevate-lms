@@ -32,8 +32,7 @@ import { isAssignedCourseInstructor } from '@/lib/lms/instructor-course-access';
  */
 
 export const INSTRUCTOR_CURRICULUM_IP_AGREEMENT_TYPE = 'instructor_curriculum_ip';
-export const INSTRUCTOR_CURRICULUM_IP_DOCUMENT_URL =
-  '/legal/instructor-curriculum-ip-agreement';
+export const INSTRUCTOR_CURRICULUM_IP_DOCUMENT_URL = '/legal/instructor-curriculum-ip-agreement';
 
 /** SHA-256 of docs/legal/instructor-curriculum-ip-agreement-v1.md, per version. */
 export const INSTRUCTOR_CURRICULUM_IP_VERSION_HASHES: Record<string, string> = {
@@ -95,7 +94,9 @@ async function getCurrentAgreement(db: any): Promise<CurrentInstructorCurriculum
     };
   }
   return {
-    version: String(data.current_version || data.version || INSTRUCTOR_CURRICULUM_IP_CURRENT_VERSION),
+    version: String(
+      data.current_version || data.version || INSTRUCTOR_CURRICULUM_IP_CURRENT_VERSION,
+    ),
     hash: data.document_hash ? String(data.document_hash) : null,
   };
 }
@@ -209,11 +210,21 @@ export async function issueInstructorCurriculumLicense(
     agreementHash: string;
     scopeCourseIds: string[];
     programIds: string[];
+    signatureReceipt?: {
+      acceptanceId: string;
+      signedAt: string;
+      signerName: string;
+      signerEmail: string;
+      method: string;
+      signature: string;
+      ipAddress: string;
+      userAgent: string;
+    };
   },
 ): Promise<{ licenseReference: string; licenseId: string; alreadyActive: boolean }> {
   const existing = await db
     .from('instructor_curriculum_licenses')
-    .select('id,license_reference,status')
+    .select('id,license_reference,status,revoked_at')
     .eq('user_id', input.userId)
     .eq('agreement_type', INSTRUCTOR_CURRICULUM_IP_AGREEMENT_TYPE)
     .eq('agreement_version', input.agreementVersion)
@@ -228,6 +239,21 @@ export async function issueInstructorCurriculumLicense(
       alreadyActive: true,
     };
   }
+  const receipt = input.signatureReceipt;
+  if (
+    !receipt ||
+    !receipt.acceptanceId ||
+    !receipt.signature.trim() ||
+    !Number.isFinite(Date.parse(receipt.signedAt))
+  )
+    throw new Error('A fresh signature receipt is required to issue an instructor license');
+  if (
+    existing.data &&
+    (existing.data.status !== 'revoked' ||
+      !existing.data.revoked_at ||
+      Date.parse(receipt.signedAt) <= Date.parse(existing.data.revoked_at))
+  )
+    throw new Error('Signature receipt must postdate revocation');
   const licenseReference = generateLicenseReference();
   const { data, error } = await db
     .from('instructor_curriculum_licenses')
@@ -239,6 +265,7 @@ export async function issueInstructorCurriculumLicense(
       scope: { course_ids: input.scopeCourseIds, program_ids: input.programIds },
       license_reference: licenseReference,
       status: 'active',
+      signature_receipt: receipt,
       effective_at: new Date().toISOString(),
     })
     .select('id')
@@ -252,7 +279,12 @@ export async function issueInstructorCurriculumLicense(
 /** Audit trail for signing, denial and revocation events. */
 export async function logInstructorLicenseEvent(
   db: any,
-  input: { userId: string; action: string; details?: Record<string, unknown>; ipAddress?: string | null },
+  input: {
+    userId: string;
+    action: string;
+    details?: Record<string, unknown>;
+    ipAddress?: string | null;
+  },
 ): Promise<void> {
   const { error } = await db.from('license_audit_log').insert({
     user_id: input.userId,

@@ -342,22 +342,20 @@ describe('full-course HVAC virtual practice', () => {
         { id: 'subcooling', label: 'Subcooling', value: 10, unit: '°F', status: 'neutral' },
       ],
     });
-    fetchMock
-      .mockResolvedValueOnce(response(initial))
-      .mockResolvedValueOnce(
-        response(
-          result(
-            {
-              ...initial.simulation,
-              controls: [{ ...initial.simulation.controls[0]!, value: 60 }],
-              readings: initial.simulation.readings.map((item) =>
-                item.id === 'superheat' ? { ...item, value: 20 } : item,
-              ),
-            },
-            { revision: 1, attemptCount: 1 },
-          ),
+    fetchMock.mockResolvedValueOnce(response(initial)).mockResolvedValueOnce(
+      response(
+        result(
+          {
+            ...initial.simulation,
+            controls: [{ ...initial.simulation.controls[0]!, value: 60 }],
+            readings: initial.simulation.readings.map((item) =>
+              item.id === 'superheat' ? { ...item, value: 20 } : item,
+            ),
+          },
+          { revision: 1, attemptCount: 1 },
         ),
-      );
+      ),
+    );
     const view = render(<HvacCourseSimulation courseId={courseId} lessonId={lessonId} />);
     const input = await screen.findByRole('slider', { name: 'Suction-line temperature (°F)' });
     expect(view.container.querySelector('[data-meter-id="superheat"]')).toHaveTextContent('15 °F');
@@ -437,9 +435,11 @@ describe('full-course HVAC virtual practice', () => {
     const select = screen.getByRole('combobox', { name: 'Diagnostic tool' });
     fireEvent.change(select, { target: { value: 'manifold' } });
     expect(figure.querySelector('[data-instrument-mode="temperature"]')).toBeInTheDocument();
-    fireEvent.submit(select.closest('form')!);
-    expect(posted().action).toEqual({ type: 'set-control', controlId: 'tool', value: 'manifold' });
+    const apply = screen.getByRole('button', { name: 'Apply Diagnostic tool' });
+    expect(apply).toBeEnabled();
+    fireEvent.click(apply);
     expect(await screen.findByRole('figure', { name: 'Virtual manifold bench' })).toBeVisible();
+    expect(posted().action).toEqual({ type: 'set-control', controlId: 'tool', value: 'manifold' });
     expect(view.container.querySelector('[data-instrument-mode="temperature"]')).toBeNull();
     expect(view.container.querySelector('[data-meter-id="superheat"]')).toHaveTextContent('10 °F');
   });
@@ -648,6 +648,36 @@ describe('full-course HVAC virtual practice', () => {
       ),
     );
     expect(view.container.querySelector('[data-meter-id="headroom"]')).toHaveTextContent('8 kg');
+  });
+
+  it('never draws indoor airflow from outdoor cooling capacity', async () => {
+    const initial = result({
+      panel: 'airflow',
+      chapter: 14,
+      readings: [
+        { id: 'airflow', label: 'Indoor airflow', value: 'Clear', status: 'normal' },
+        { id: 'capacity', label: 'Cooling index', value: 100, status: 'normal' },
+      ],
+    });
+    const updated = result(
+      {
+        ...initial.simulation,
+        readings: [
+          initial.simulation.readings[0],
+          { id: 'capacity', label: 'Cooling index', value: 60, status: 'warning' },
+        ],
+      },
+      { revision: 1, attemptCount: 1 },
+    );
+    fetchMock.mockResolvedValueOnce(response(initial)).mockResolvedValueOnce(response(updated));
+    const view = render(<HvacCourseSimulation courseId={courseId} lessonId={lessonId} />);
+    const button = await screen.findByRole('button', { name: 'Run virtual check' });
+    const path = view.container.querySelector('[data-normalized-flow]');
+    const before = path?.outerHTML;
+    fireEvent.click(button);
+    await waitFor(() => expect(screen.getByText('60', { exact: true })).toBeVisible());
+    expect(view.container.querySelector('[data-normalized-flow]')?.outerHTML).toBe(before);
+    expect(view.container.querySelector('[data-normalized-flow="60"]')).toBeNull();
   });
 
   it.each([

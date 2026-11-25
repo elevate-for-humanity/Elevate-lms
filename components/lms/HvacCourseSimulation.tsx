@@ -212,7 +212,8 @@ function EquipmentDiagram({ simulation }: { simulation: HvacSimulationView }) {
       ? Math.max(0, Math.min(1, material / capacity))
       : null;
   const flow = reading('airflow');
-  const flowReading = typeof flow?.value === 'number' ? flow : reading('capacity');
+  // Cooling capacity is not an indoor airflow measurement.
+  const flowReading = typeof flow?.value === 'number' ? flow : undefined;
   const flowPercent =
     typeof flowReading?.value === 'number' ? Math.max(0, Math.min(100, flowReading.value)) : null;
   const restriction = reading('restriction')?.value;

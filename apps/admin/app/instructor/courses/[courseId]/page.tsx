@@ -10,13 +10,15 @@ import {
 } from '@/lib/legal/instructorCurriculumLicense';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { siteUrls } from '@/lib/utils/site-urls';
+import HvacSimulationReview from '@/components/lms/HvacSimulationReview';
 import HvacSystemLab from '@/components/lms/HvacSystemLab';
 
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = { title: 'Instructor Course Workspace', robots: { index: false, follow: false } };
 
 export default async function InstructorCourseWorkspace({ params }: { params: Promise<{ courseId: string }> }) {
-  const { courseId } = await params;
+  const { courseId: requestedCourseId } = await params;
+  const courseId = requestedCourseId.toLowerCase();
   const { user, effectiveRoles } = await requireRole(['instructor', 'admin', 'super_admin']);
   if (!/^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i.test(courseId)) notFound();
 
@@ -76,6 +78,7 @@ export default async function InstructorCourseWorkspace({ params }: { params: Pr
         )}
       </nav>
       {course.id === HVAC_COURSE_ID && <HvacSystemLab />}
+      {course.id === HVAC_COURSE_ID && <HvacSimulationReview />}
     </main>
   );
 }

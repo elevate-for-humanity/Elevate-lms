@@ -84,8 +84,12 @@ async function signCurriculumIpAgreement(
     .select('course_id,program_id')
     .eq('instructor_id', auth.id)
     .eq('active', true);
-  const scopeCourseIds = [...new Set((assignments ?? []).map((row: any) => row.course_id).filter(Boolean))].map(String);
-  const scopeProgramIds = [...new Set((assignments ?? []).map((row: any) => row.program_id).filter(Boolean))].map(String);
+  const scopeCourseIds = [
+    ...new Set((assignments ?? []).map((row: any) => row.course_id).filter(Boolean)),
+  ].map(String);
+  const scopeProgramIds = [
+    ...new Set((assignments ?? []).map((row: any) => row.program_id).filter(Boolean)),
+  ].map(String);
 
   let license;
   try {
@@ -95,6 +99,16 @@ async function signCurriculumIpAgreement(
       agreementHash: expectedHash,
       scopeCourseIds,
       programIds: scopeProgramIds,
+      signatureReceipt: {
+        acceptanceId: recorded.id!,
+        signedAt: new Date().toISOString(),
+        signerName,
+        signerEmail: userEmail,
+        method: signatureMethod,
+        signature: signatureTyped || signerName,
+        ipAddress,
+        userAgent,
+      },
     });
   } catch (error) {
     return safeInternalError(error, 'Failed to issue instructor license');

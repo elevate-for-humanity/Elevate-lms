@@ -1,3 +1,4 @@
+import { getHvacAccessMode } from '@/lib/lms/hvac-access-mode';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { requireAuth } from '@/lib/auth/requireAuth';
@@ -6,7 +7,6 @@ import { assertLessonAccess, accessErrorResponse } from '@/lib/lms/access-contro
 import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { HVAC_PRACTICAL_COURSE_ID } from '@/lib/lms/hvac-practical-plan';
-import { getInstructorCurriculumLicenseStatus } from '@/lib/legal/instructorCurriculumLicense';
 import {
   getHvacSimulationDefinition,
   replayHvacSimulation,
@@ -163,25 +163,20 @@ async function authorizedContext(
       'COURSE_NOT_FOUND',
       'This course does not have this HVAC simulation.',
     );
-  try {
-    await assertLessonAccess(userId, identity.lessonId);
-  } catch (error) {
-    const denied = accessErrorResponse(error);
-    if (denied.status !== 403) {
-      throw new SimulatorError(denied.status, 'LESSON_ACCESS_DENIED', denied.body.error);
-    }
-    // Instructor demonstration: a licensed instructor assigned to teach this
-    // HVAC course may run simulations to demonstrate them. Practice is saved
-    // under the instructor's own id, exactly like learner practice. The
-    // general instructor services agreement does not satisfy this check.
-    const adminDb = await requireAdminClient();
-    if (!adminDb) {
-      throw new SimulatorError(denied.status, 'LESSON_ACCESS_DENIED', denied.body.error);
-    }
-    const licenseStatus = await getInstructorCurriculumLicenseStatus(adminDb, userId, {
-      courseId: identity.courseId,
-    });
-    if (!licenseStatus.authorized) {
+  const adminDb = await requireAdminClient();
+  if (!adminDb) throw new SimulatorError(503, 'LESSON_ACCESS_DENIED', 'Access is unavailable.');
+  const capacity = await getHvacAccessMode(adminDb, userId, identity.courseId);
+  if (capacity.mode === 'denied')
+    throw new SimulatorError(
+      403,
+      'LESSON_ACCESS_DENIED',
+      'Enrollment or instructor license required.',
+    );
+  if (capacity.mode === 'learner') {
+    try {
+      await assertLessonAccess(userId, identity.lessonId);
+    } catch (error) {
+      const denied = accessErrorResponse(error);
       throw new SimulatorError(denied.status, 'LESSON_ACCESS_DENIED', denied.body.error);
     }
   }

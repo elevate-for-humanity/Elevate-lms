@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { siteUrls } from '@/lib/utils/site-urls';
 import { notFound, redirect } from 'next/navigation';
 import { resolveCourseEnrollment } from '@/lib/enrollment/resolve-course-enrollment';
 import { getCurrentUser } from '@/lib/auth';
@@ -51,7 +52,7 @@ function InstructorLicenseRequired({
           does not satisfy this requirement.
         </p>
         <Link
-          href={INSTRUCTOR_CURRICULUM_IP_DOCUMENT_URL}
+          href={`${siteUrls.site}${INSTRUCTOR_CURRICULUM_IP_DOCUMENT_URL}`}
           className="mt-6 inline-flex min-h-11 items-center rounded-lg bg-cyan-800 px-5 py-3 font-bold text-white"
         >
           Read and sign the instructor license agreement

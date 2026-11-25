@@ -58,6 +58,21 @@ const props = {
 };
 
 describe('full HVAC course simulation navigation', () => {
+  it('resumes a later saved lab before an earlier untouched lab', () => {
+    const lessons = practicalLessons.map((lesson, index) => ({
+      ...lesson,
+      simulation: {
+        ...lesson.simulation,
+        mastered: false,
+        started: index === 4,
+      },
+    }));
+    render(<CanonicalHvacCourseHome {...props} modules={[{ ...props.modules[0], lessons }]} />);
+    expect(screen.getByRole('link', { name: 'Continue simulation practice' })).toHaveAttribute(
+      'href',
+      `/lms/courses/${HVAC_COURSE_ID}/lessons/${lessons[4].id}#hvac-simulation`,
+    );
+  });
   it('retains all 21 lesson links and exposes 17 mapped simulation labs', () => {
     render(<CanonicalHvacCourseHome {...props} />);
     expect(screen.getByText('17 interactive simulation labs')).toBeTruthy();

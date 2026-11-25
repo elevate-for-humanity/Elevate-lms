@@ -168,6 +168,8 @@ export async function getApprovedShops(program?: ProgramKey): Promise<HostShop[]
     return { id: profile.id, name: profile.display_name ?? '', address: [profile.address_line1, profile.address_line2].filter(Boolean).join(', '), city: profile.city ?? '', state: profile.state ?? 'IN', zip: profile.zip ?? '' };
   }
   function matchesPartnerWorksite(site: SiteIdentity, profile: PublicProfile) {
+    // Two distinct canonical partner records must never be collapsed by address.
+    if (canonicalPartners.has(site.id) && site.id !== profile.id) return false;
     const barberPartnerId = (barberRows ?? []).find(row => row.id === site.id)?.partner_id;
     const linkedPartnerIds = new Set(optedInLinks.filter(row => row.application_id === site.id || row.shop_id === site.id).map(row => row.partner_id));
     if (barberPartnerId) linkedPartnerIds.add(barberPartnerId);
@@ -176,7 +178,7 @@ export async function getApprovedShops(program?: ProgramKey): Promise<HostShop[]
     return businessKey(site.name) === businessKey(profile.display_name) && sameWorksite(site, profileSite(profile));
   }
   function findPublicProfile(site: SiteIdentity & { phone?: string }) {
-    const canonical = (publicRows ?? []).filter(row => canonicalPartners.get(row.id)?.public_slug === row.public_slug &&
+    const canonical = (publicRows ?? []).filter(row => canonicalPartners.has(row.id) && canonicalPartners.get(row.id)?.public_slug === row.public_slug &&
       row.public_profile_published_at && matchesPartnerWorksite(site, row));
     if (canonical.length === 1) return canonical[0];
     if (canonical.length > 1) return undefined;

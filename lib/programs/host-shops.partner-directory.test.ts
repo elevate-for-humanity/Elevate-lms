@@ -112,6 +112,17 @@ describe('public Host Shop partner-backed approvals', () => {
     expect(all[0].programs).not.toContain(PROGRAM_SLUGS.barber);
   });
 
+  it('preserves distinct canonical partner identities even at a shared address', async () => {
+    const second = { ...partner, id: 'other-partner', public_slug: 'other-salon', programs: ['cosmetology'] };
+    rows.partners.push(second);
+    rows.public_host_shops.push({ ...profile, id: second.id, public_slug: second.public_slug });
+    rows.host_shop_partnerships.push({ ...listing, partner_id: second.id });
+    const all = await getApprovedShops();
+    expect(all).toHaveLength(2);
+    expect(all.find(shop => shop.id === second.id)?.programs).toEqual([PROGRAM_SLUGS.cosmetology]);
+    expect(all.find(shop => shop.id === partner.id)?.programs).toEqual([PROGRAM_SLUGS.esthetician, PROGRAM_SLUGS.nail]);
+  });
+
   it('does not treat a matching name without location evidence as identity', async () => {
     rows.host_shops = [{ id: 'unlinked', name: profile.display_name, is_approved: true, shop_status: 'active', specializations: ['cosmetology'] }];
     expect(await getApprovedShops()).toHaveLength(2);

@@ -1,6 +1,6 @@
 import { createServer } from 'node:http';
 import { timingSafeEqual } from 'node:crypto';
-import {menuOptions, menuRoute, openingText} from './menu.mjs';
+import {menuOptions, menuRoute, openingText, operatorExtension as resolveOperatorExtension} from './menu.mjs';
 
 const PROJECT='elegant-racer-299721';
 const MAX_BODY=220000;
@@ -88,12 +88,12 @@ export async function converse(history,request=googleJson,{env=process.env,reque
 }
 // Routing is driven by a caller's explicit request, not by generated model text.
 // No external dial string or arbitrary extension can be routed by this service.
-export function callerRouteIntent(transcript,{allowedExtensions=process.env.PARIS_ALLOWED_EXTENSIONS || '',menu=process.env.PARIS_MENU_OPTIONS || '[]'}={}){
+export function callerRouteIntent(transcript,{allowedExtensions=process.env.PARIS_ALLOWED_EXTENSIONS || '',menu=process.env.PARIS_MENU_OPTIONS || '[]',operatorExtension=resolveOperatorExtension()}={}){
   const text=String(transcript||'').toLowerCase().trim();
   const asked=/(?:\b(?:transfer|connect|speak|talk|reach|put me through)\b.{0,48}\b(?:operator|administrator|human|person|representative|front desk)\b|\b(?:operator|administrator)\b.{0,28}\bplease\b)/i;
-  if(asked.test(text))return {type:'operator',extension:'0'};
+  if(asked.test(text))return {type:'operator',extension:operatorExtension};
   const choice=text.match(/^(?:(?:option|menu|extension|ext)\s*(?:number\s*)?)?([0-9])(?:\s+please)?[.!?]?$/);
-  if(choice)return menuRoute(choice[1],menuOptions(menu,allowedExtensions));
+  if(choice)return menuRoute(choice[1],menuOptions(menu,allowedExtensions,operatorExtension),operatorExtension);
   // Explicit caller-provided extension, restricted to a reviewed, deployed allowlist.
   // Never infer a destination from AI output or route a raw dial string.
   const match=text.match(/\b(?:extension|ext)\s*(?:number\s*)?(\d{3})\b/);
@@ -111,9 +111,9 @@ function authorized(given,expected){
   const a=Buffer.from(given.slice(7)),b=Buffer.from(expected);
   return a.length===b.length&&timingSafeEqual(a,b);
 }
-export function makeTurnHandler({stt=recognize,llm=converse,tts=synthesize,token=process.env.PARIS_TURN_TOKEN,greeting=process.env.PARIS_GREETING,menu=process.env.PARIS_MENU_OPTIONS || '[]',allowedExtensions=process.env.PARIS_ALLOWED_EXTENSIONS || ''}={}){
+export function makeTurnHandler({stt=recognize,llm=converse,tts=synthesize,token=process.env.PARIS_TURN_TOKEN,greeting=process.env.PARIS_GREETING,menu=process.env.PARIS_MENU_OPTIONS || '[]',allowedExtensions=process.env.PARIS_ALLOWED_EXTENSIONS || '',operatorExtension=resolveOperatorExtension()}={}){
   if(!token || token.length<32)throw Error('PARIS_TURN_TOKEN_MISSING');
-  const options=menuOptions(menu,allowedExtensions);
+  const options=menuOptions(menu,allowedExtensions,operatorExtension);
   // The approved opening is identical for every caller until settings restart
   // this service. Share one synthesis so every new call does not begin silently
   // while the provider regenerates the same minute of greeting/menu audio.
@@ -160,7 +160,7 @@ export function makeTurnHandler({stt=recognize,llm=converse,tts=synthesize,token
         const words=await stt(body.audioBase64);
         if(!words)return fail('NO_SPEECH',422);
         const history=[...prior.history,{role:'user',text:words}].slice(-12);
-        const route=callerRouteIntent(words,{allowedExtensions,menu});
+        const route=callerRouteIntent(words,{allowedExtensions,menu,operatorExtension});
         const reply=route?(route.type==='operator'?'I will connect you to the operator now.':'I will connect you to extension '+route.extension+' now.'):await llm(history);
         const audioReply=await tts(reply);
         prior.history=[...history,{role:'model',text:reply}].slice(-12);

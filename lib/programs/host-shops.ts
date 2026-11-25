@@ -242,17 +242,29 @@ export async function getApprovedShops(program?: ProgramKey): Promise<HostShop[]
     };
   });
 
-  const barberNameMap = new Map(barberShops.map((shop) => [businessKey(shop.name), shop]));
-  barberShops.forEach((barberShop) => {
-    const match = hostShops.find(
-      (hostShop) => businessKey(hostShop.name) === businessKey(barberShop.name),
+  // A shared trading name is not proof that two approved applications refer
+  // to the same worksite. Keep ambiguous or distinct sites independently listed.
+  const matchedHostApplications = new Set<string>();
+  for (const hostShop of hostShops) {
+    const key = businessKey(hostShop.name);
+    const candidates = barberShops.filter(barberShop =>
+      Boolean(key && businessKey(barberShop.name) === key && sameWorksite(barberShop, hostShop)),
     );
-    if (match) barberShop.programs = [...new Set([...barberShop.programs, ...match.programs])];
-  });
+    if (candidates.length !== 1) continue;
+    const barberShop = candidates[0];
+    const partnerId = (barberRows ?? []).find(row => row.id === barberShop.id)?.partner_id;
+    const barberLinks = new Set(optedInLinks.filter(row => row.application_id === barberShop.id).map(row => row.partner_id));
+    if (partnerId) barberLinks.add(partnerId);
+    const hostLinks = new Set(optedInLinks.filter(row => row.application_id === hostShop.id).map(row => row.partner_id));
+    if (barberLinks.size && hostLinks.size && [...barberLinks].some(id => !hostLinks.has(id))) continue;
+    barberShop.programs = [...new Set([...barberShop.programs, ...hostShop.programs])];
+    barberShop.publicSlugAliases = [...new Set([...(barberShop.publicSlugAliases ?? []), publicSlug(hostShop.name, hostShop.id)])];
+    matchedHostApplications.add(hostShop.id);
+  }
 
   const applicationBacked = [
     ...barberShops,
-    ...hostShops.filter((shop) => !barberNameMap.has(businessKey(shop.name))),
+    ...hostShops.filter((shop) => !matchedHostApplications.has(shop.id)),
   ]
     .filter(isPubliclyListedHostShop)
     .map((shop) => {
@@ -274,7 +286,7 @@ export async function getApprovedShops(program?: ProgramKey): Promise<HostShop[]
         // Every approved operational Host Site needs a stable public destination,
         // even before optional promotional media is added to public_host_shops.
         publicSlug: profileSlug || applicationSlug,
-        publicSlugAliases: profileSlug && profileSlug !== applicationSlug ? [applicationSlug] : undefined,
+        publicSlugAliases: [...new Set([...(shop.publicSlugAliases ?? []), ...(profileSlug && profileSlug !== applicationSlug ? [applicationSlug] : [])])],
         description: profile?.description || approvedDescription(shop),
         website: profile?.website_url || profile?.website || undefined,
         googleMapsUrl: approvedMapsUrl(shop),
@@ -291,7 +303,10 @@ export async function getApprovedShops(program?: ProgramKey): Promise<HostShop[]
   // can enter the network. Keep historical public profiles private from discovery.
   const existing = applicationBacked;
   const activeShopBacked: HostShop[] = (activeShopResult.data ?? [])
-    .filter((row) => !existing.some((shop) => businessKey(shop.name) === businessKey(row.name)))
+    .filter((row) => !existing.some((shop) =>
+      Boolean(businessKey(row.name) && businessKey(shop.name) === businessKey(row.name) &&
+        sameWorksite(shop, { address: row.address ?? '', city: row.city ?? '', state: row.state ?? 'IN', zip: row.zip_code ?? '' })),
+    ))
     .map((row) => {
       const slug = publicSlug(row.name, row.id);
       const featured = getFeaturedHostPartnerBySlug(slug);

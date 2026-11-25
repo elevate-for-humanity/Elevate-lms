@@ -129,6 +129,31 @@ describe('public Host Shop partner-backed approvals', () => {
     expect((await getApprovedShopByPublicSlug(partner.public_slug))?.id).toBe(partner.id);
   });
 
+  it('keeps same-name barber and general applications at separate worksites', async () => {
+    rows.barbershop_partner_applications = [{ id: 'barber-east', status: 'approved', shop_legal_name: 'Example Studio', shop_address_line1: '10 East St', shop_city: 'Indianapolis', shop_state: 'IN', shop_zip: '46201' }];
+    rows.host_shop_applications = [{ id: 'salon-west', status: 'approved', shop_name: 'Example Studio', address: '20 West St, Indianapolis, IN 46202', intake: { programs: ['cosmetology'] } }];
+    const all = await getApprovedShops();
+    expect(all.find(shop => shop.id === 'barber-east')?.programs).toEqual([PROGRAM_SLUGS.barber]);
+    expect(all.find(shop => shop.id === 'salon-west')?.programs).toEqual([PROGRAM_SLUGS.cosmetology]);
+  });
+
+  it('does not hide an independently approved active worksite by business name', async () => {
+    rows.barbershop_partner_applications = [{ id: 'barber-east', status: 'approved', shop_legal_name: 'Example Studio', shop_address_line1: '10 East St', shop_city: 'Indianapolis', shop_state: 'IN', shop_zip: '46201' }];
+    rows.host_shops = [{ id: 'salon-west', name: 'Example Studio', is_approved: true, shop_status: 'active', address: '20 West St', city: 'Indianapolis', state: 'IN', zip_code: '46202', specializations: ['cosmetology'] }];
+    const all = await getApprovedShops();
+    expect(all.find(shop => shop.id === 'barber-east')?.programs).toEqual([PROGRAM_SLUGS.barber]);
+    expect(all.find(shop => shop.id === 'salon-west')?.programs).toEqual([PROGRAM_SLUGS.cosmetology]);
+  });
+
+  it('merges corroborated application worksites and preserves the historical general application URL', async () => {
+    rows.barbershop_partner_applications = [{ id: 'barber-east', status: 'approved', shop_legal_name: 'Example Studio', shop_address_line1: '10 East St', shop_city: 'Indianapolis', shop_state: 'IN', shop_zip: '46201' }];
+    rows.host_shop_applications = [{ id: 'salon-east', status: 'approved', shop_name: 'Example Studio', address: '10 East St, Indianapolis, IN 46201', intake: { programs: ['cosmetology'] } }];
+    const all = await getApprovedShops();
+    expect(all.find(shop => shop.id === 'barber-east')?.programs).toEqual([PROGRAM_SLUGS.barber, PROGRAM_SLUGS.cosmetology]);
+    expect(all.find(shop => shop.id === 'salon-east')).toBeUndefined();
+    expect((await getApprovedShopByPublicSlug('example-studio-saloneas'))?.id).toBe('barber-east');
+  });
+
   it('does not add partner trades without public directory opt-in', async () => {
     rows.host_shops = [{ id: 'active1234', name: profile.display_name, is_approved: true, shop_status: 'active', specializations: ['cosmetology-apprenticeship'] }];
     rows.host_shop_partnerships = [{ ...listing, directory_listing: false }];

@@ -31,6 +31,7 @@ import { installAudioUnlock, startRingtone, stopRingtone, unlockAudio } from '@/
 import { PhoneRecordingPlayer } from '@/components/communications/PhoneRecordingPlayer';
 import { ProgramHolderPhoneIntroduction } from '@/components/program-holder/ProgramHolderPhoneIntroduction';
 import { phonePresenceDisplay } from '@/lib/phone/presence-display';
+import { claimPhoneContext, type PhoneContextLeadership } from '@/lib/phone/context-lock';
 
 type RingMode = 'ring' | 'vibrate' | 'silent' | 'do_not_disturb' | 'offline';
 type Schedule = Record<string, [string, string]>;
@@ -151,6 +152,8 @@ export function ProgramHolderPhone({
   const ringModeRef = useRef<RingMode>('ring');
   const autoConnectAttemptedRef = useRef(false);
   const reconnectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const heartbeatHealRef = useRef({ failures: 0, consumedEpoch: -1 });
+  const contextClaimRef = useRef<PhoneContextLeadership | null>(null);
   const userDisconnectedRef = useRef(false);
   const connectRef = useRef<() => Promise<void>>(async () => {});
   // Wake mode: this page was opened from a call-wake notification
@@ -226,6 +229,21 @@ export function ProgramHolderPhone({
     }
   }, [load]);
 
+  // Mirror the background receiver's self-healing: when the SIP layer reports
+  // offline/error, schedule a single reconnect instead of leaving a mounted
+  // page dead until it is manually reloaded. connect() tears down the stale
+  // client before registering again, exactly like the receiver's recover().
+  // The heartbeat heal passes a shorter, backed-off delay; the SIP-event
+  // callers keep the established 30-second default.
+  const scheduleReconnect = useCallback((delayMs = 30_000) => {
+    if (reconnectTimerRef.current || callRef.current) return;
+    reconnectTimerRef.current = setTimeout(() => {
+      reconnectTimerRef.current = null;
+      if (callRef.current || registeredRef.current || userDisconnectedRef.current) return;
+      void connectRef.current();
+    }, delayMs);
+  }, []);
+
   const heartbeat = useCallback(async () => {
     const controller = connectionAbortRef.current;
     const epoch = registrationEpochRef.current;
@@ -252,12 +270,36 @@ export function ProgramHolderPhone({
       setError(
         'Registration reachability is not yet verified. The phone will check again automatically.',
       );
+      // A failed heartbeat used to be display-only, so a registration the
+      // server could no longer see stayed dead until a manual reconnect.
+      // Heal instead: drop the stale local registration state and schedule
+      // a full reconnect (fresh token + registration) — at most once per
+      // registration, with a bounded backoff, so a dead server cannot spin
+      // a reconnect loop. A device_not_provisioned reply means the
+      // server-side lease is gone entirely and no heartbeat can ever fix
+      // it, so re-provision almost immediately.
+      const failureBody = response ? await response.json().catch(() => ({})) : {};
+      if (controller.signal.aborted || epoch !== registrationEpochRef.current) return;
+      if (userDisconnectedRef.current || callRef.current) return;
+      const leaseGone =
+        (failureBody as { code?: string } | null)?.code === 'device_not_provisioned';
+      const heal = heartbeatHealRef.current;
+      if (leaseGone || heal.consumedEpoch !== epoch) {
+        heal.consumedEpoch = epoch;
+        heal.failures += 1;
+        registrationEpochRef.current += 1;
+        registeredRef.current = false;
+        scheduleReconnect(
+          leaseGone ? 1_000 : Math.min(5_000 * 3 ** (heal.failures - 1), 60_000),
+        );
+      }
     } else {
+      heartbeatHealRef.current.failures = 0;
       setConnected(true);
       setError('');
       setMessage('Phone registration and reachability verified.');
     }
-  }, [apiBase]);
+  }, [apiBase, scheduleReconnect]);
 
   const disconnect = useCallback(async () => {
     connectionAbortRef.current?.abort();
@@ -294,7 +336,29 @@ export function ProgramHolderPhone({
   const disconnectByUser = useCallback(async () => {
     userDisconnectedRef.current = true;
     await disconnect();
+    // A deliberate disconnect also frees the device identity, so another
+    // context (a different tab or the installed app) may take over.
+    contextClaimRef.current?.release();
+    contextClaimRef.current = null;
   }, [disconnect]);
+
+  // The Asterisk endpoint for this device allows exactly one registration,
+  // so two live contexts of this page (installed app + browser tab, or two
+  // tabs) evict each other and flap offline. The first context leads; a
+  // later one defers until the leader closes or disconnects deliberately,
+  // then takes over and connects on its own.
+  const ensureContextClaim = useCallback(() => {
+    if (!contextClaimRef.current) {
+      const claim = claimPhoneContext(deviceId());
+      claim.onTakeover(() => {
+        if (contextClaimRef.current === claim && !userDisconnectedRef.current) {
+          void connectRef.current();
+        }
+      });
+      contextClaimRef.current = claim;
+    }
+    return contextClaimRef.current;
+  }, []);
 
   useEffect(() => {
     return () => {
@@ -304,27 +368,28 @@ export function ProgramHolderPhone({
       if (heartbeatRef.current) clearInterval(heartbeatRef.current);
       if (reconnectTimerRef.current) clearTimeout(reconnectTimerRef.current);
       reconnectTimerRef.current = null;
+      contextClaimRef.current?.release();
+      contextClaimRef.current = null;
       void clientRef.current?.disconnect();
       void outboundClientRef.current?.disconnect();
     };
   }, []);
 
-  // Mirror the background receiver's self-healing: when the SIP layer reports
-  // offline/error, schedule a single reconnect instead of leaving a mounted
-  // page dead until it is manually reloaded. connect() tears down the stale
-  // client before registering again, exactly like the receiver's recover().
-  const scheduleReconnect = useCallback(() => {
-    if (reconnectTimerRef.current || callRef.current) return;
-    reconnectTimerRef.current = setTimeout(() => {
-      reconnectTimerRef.current = null;
-      if (callRef.current || registeredRef.current || userDisconnectedRef.current) return;
-      void connectRef.current();
-    }, 30_000);
-  }, []);
-
   const connect = useCallback(async () => {
     if (connected || connecting || !data || data.readOnly) return;
     userDisconnectedRef.current = false;
+    // Defer to an earlier live context of this phone instead of evicting
+    // its registration (see ensureContextClaim). The takeover callback
+    // reconnects here if that context later goes away, so leadership is
+    // re-checked live rather than through the one-time acquired promise.
+    const claim = ensureContextClaim();
+    await claim.acquired;
+    if (!claim.isLeader()) {
+      setMessage(
+        'This phone is already open in another tab or app window. Use that one, or close it to connect here.',
+      );
+      return;
+    }
     // A connect attempt starts from a real tap on this page (or a heal
     // attempt right after one): prime the shared AudioContext inside the
     // gesture so the first incoming ring can sound instead of arriving
@@ -457,7 +522,7 @@ export function ProgramHolderPhone({
       clearDeadline();
       controller.signal.removeEventListener('abort', clearDeadline);
     }
-  }, [connected, connecting, data, disconnect, heartbeat, scheduleReconnect]);
+  }, [connected, connecting, data, disconnect, ensureContextClaim, heartbeat, scheduleReconnect]);
 
   useEffect(() => {
     connectRef.current = connect;

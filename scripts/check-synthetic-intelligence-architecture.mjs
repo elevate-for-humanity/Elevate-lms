@@ -1,4 +1,5 @@
 // Branch refreshed to pick up main (71e31a22): /apply/student E2E fix + Dockerfile.google-lms.
+// Branch refreshed to pick up main (e8b0e402): fresh CI after E2E shard 3/4 environment failure on the 71e31a22 base.
 import fs from 'node:fs';
 
 const errors = [];

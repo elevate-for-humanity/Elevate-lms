@@ -10,6 +10,7 @@ import { PARIS_SYSTEM_IDENTITY } from '@/lib/ai/paris-identity';
 import { NextRequest, NextResponse } from 'next/server';
 import { aiChat, aiChatStream, isAIAvailable } from '@/lib/ai/ai-service';
 import { findSiteFacts, formatProgramIndex, formatSiteFacts } from '@/lib/ai/paris-site-facts';
+import { formatWebResults, searchWebForParis, shouldWebSearch } from '@/lib/ai/paris-web-search';
 import { hydrateProcessEnv } from '@/lib/secrets';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import { VERIFIED_WORKFORCE_FUNDED_PROGRAMS } from '@/lib/programs/funding-registry';
@@ -236,8 +237,10 @@ export async function POST(req: NextRequest) {
     // question. The owned model cannot browse, so facts reach it here.
     // Retrieval never blocks the reply: a failure just means no site facts.
     let siteFacts = '';
+    let matchedProgramCount = 0;
+    let recentUserText = lastUserMessage;
     try {
-      const recentUserText = [...messages]
+      recentUserText = [...messages]
         .reverse()
         .filter((message) => message.role === 'user')
         .slice(0, 2)
@@ -245,6 +248,7 @@ export async function POST(req: NextRequest) {
         .map((message) => message.content)
         .join('\n');
       const matched = findSiteFacts(recentUserText);
+      matchedProgramCount = matched.length;
       siteFacts = matched.length > 0 ? formatSiteFacts(matched) : formatProgramIndex();
     } catch {
       siteFacts = '';
@@ -260,6 +264,23 @@ export async function POST(req: NextRequest) {
         { headers: { 'Cache-Control': 'no-store' } });
     }
 
+    // Web search for questions the site's own catalog cannot answer
+    // (external or general facts). Public surface only, and only when the
+    // site-facts retrieval found no confident program match or the question
+    // is about the outside world — program questions never pay this latency.
+    // Fails open: any problem just means no web results, exactly as before.
+    let webResults = '';
+    try {
+      if (
+        (context.surface ?? 'public') === 'public' &&
+        shouldWebSearch(recentUserText, matchedProgramCount)
+      ) {
+        webResults = formatWebResults(await searchWebForParis(recentUserText));
+      }
+    } catch {
+      webResults = '';
+    }
+
     try {
       const systemContent =
         PARIS_SYSTEM_IDENTITY +
@@ -268,6 +289,10 @@ export async function POST(req: NextRequest) {
         (siteFacts
           ? '\n\nSITE FACTS — retrieved from Elevate\u2019s own program catalog for this question. Use these exact facts; do not invent prices, durations, credentials, or funding beyond what is written here:\n' +
             siteFacts
+          : '') +
+        (webResults
+          ? '\n\nWEB RESULTS — retrieved from the public web for this question, for general and external facts only (for example licensing rules, job-market pay, or definitions). They may be imperfect or out of date. If a web result conflicts with the SITE FACTS above about Elevate\u2019s own programs, the SITE FACTS win. When you use a fact from these results, name its source:\n' +
+            webResults
           : '');
       if (wantsStream) {
         return streamReplyResponse(

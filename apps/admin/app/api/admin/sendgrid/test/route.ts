@@ -1,4 +1,5 @@
 // Admin-only: send a test email via SendGrid to verify configuration
+// Branch refreshed to pick up main (dbe7a427): fresh CI after E2E shard 3/4 environment failure on the 433802fb base.
 // Branch refreshed to pick up main (a5daf49d): Course Builder merge; fresh CI after E2E shard 3/4 environment failure.
 import { NextRequest, NextResponse } from 'next/server';
 import { requireRole } from '@/lib/auth/require-role';

@@ -36,7 +36,7 @@ const faculty: Card[] = [
     imageAlt: 'Illustrative HVAC training scene; not a portrait of David Nazario',
   },
   {
-    name: 'Josanna George', role: 'Program holder and independent host-shop partner',
+    name: 'Jozanna George', role: 'Program holder and independent host-shop partner',
     area: 'Esthetics and nail technology',
     offerings: ['Esthetics supervision and coordination', 'Nail technology supervision and coordination', 'Supervised host-shop training'],
     image: '/images/jozanna-george.jpg', imageAlt: 'Josanna George', portrait: true,

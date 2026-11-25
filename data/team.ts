@@ -15,6 +15,8 @@ export interface TeamMember {
   headshotSrc?: string;
   email?: string;
   linkedin?: string;
+  /** Verified degrees, licenses, and certifications. Omit when unverified. */
+  credentials?: string[];
 }
 
 export const TEAM: TeamMember[] = [
@@ -26,6 +28,16 @@ export const TEAM: TeamMember[] = [
     bio: 'U.S. Army veteran (Unit Supply Specialist), IRS Enrolled Agent (EA), EFIN/PTIN holder, ERO, and SBIN-authorized federal tax software submitter. Elizabeth is also a licensed barber, Indiana substitute teacher, OSHA 10-Hour certified, EPA 608 Certified Proctor (ESCO #358010 and Mainstream Engineering), and Certiport Authorized Testing Center (CATC) operator. She founded Elevate for Humanity — a DOL Registered Apprenticeship Sponsor and Indiana ETPL/WIOA/WRG/JRI-approved workforce provider — and also leads Elevate tax operations and Selfish Inc., a 501(c)(3) nonprofit providing VITA free tax prep and community services.',
     headshotSrc: '/images/team/elizabeth-greene-headshot.webp',
     email: '',
+    credentials: [
+      'U.S. Army Veteran — Unit Supply Specialist',
+      'IRS Enrolled Agent (EA)',
+      'EFIN / PTIN holder',
+      'Licensed Barber (Indiana)',
+      'Indiana Substitute Teacher',
+      'OSHA 10-Hour',
+      'EPA 608 Certified Proctor (ESCO #358010, Mainstream Engineering)',
+      'Certiport Authorized Testing Center (CATC) Operator',
+    ],
   },
   {
     id: '2',
@@ -35,6 +47,11 @@ export const TEAM: TeamMember[] = [
     bio: 'Jozanna George is a multi-licensed beauty professional holding Nail Technician, Nail Instructor, and Esthetician licenses. Through Mesmerized by Beauty Cosmetology Academy, she leads beauty-industry education and brings hands-on experience in nail care, skincare, sanitation, client consultation, salon and spa professionalism, technical skill development, and student preparation. At Elevate for Humanity, she directs enrollment and beauty-industry programs and supports Nail Technician and Esthetician apprentices from application through career readiness.',
     headshotSrc: '/images/jozanna-george.jpg',
     email: 'jozanna@elevateforhumanity.org',
+    credentials: [
+      'Indiana Nail Technician License',
+      'Indiana Nail Instructor License',
+      'Indiana Esthetician License',
+    ],
   },
   {
     id: '3',
@@ -44,6 +61,7 @@ export const TEAM: TeamMember[] = [
     bio: 'Dr. Carlina Wilkes brings more than 24 years of federal financial management experience with the Defense Finance and Accounting Service (DFAS) and holds DoD Financial Management Certification Level II. Her expertise includes federal cost accounting, budget development and monitoring, audit readiness, regulatory compliance, financial reporting, and long-term financial planning. At Elevate for Humanity, she oversees financial operations and organizational compliance and leads the Elevate Financial Empowerment Program, helping participants turn financial knowledge into practical plans for stability, independence, and long-term wellness.',
     headshotSrc: '/images/carlina-wilkes.jpg',
     email: 'carlina@elevateforhumanity.org',
+    credentials: ['DoD Financial Management Certification Level II'],
   },
   {
     id: '5',
@@ -86,6 +104,55 @@ With more than 27 years of professional experience in healthcare, Ameco's career
 Her teaching emphasizes hands-on learning, digital literacy, problem-solving, computer and information systems fundamentals, workplace technology, and practical application. She helps students connect technical skills to career opportunities in information technology, information systems, healthcare technology, business technology, and other technology-driven careers. Her philosophy is simple: technology is more than learning a computer - it is learning how to use information, systems, and innovation to create opportunities and solve real-world problems.`,
     headshotSrc: '/images/ameco-martin.jpg',
     email: 'amecosenterprise@gmail.com',
+    credentials: ["Bachelor's Degree in Business Information Systems (major: Computer Programming)"],
+  },
+  {
+    id: '12',
+    name: 'David Nazario',
+    title: 'HVAC Instructor',
+    orgRole: 'Skilled Trades Programs',
+    bio: 'David Nazario is Elevate for Humanity\u2019s HVAC instructor. He teaches HVAC fundamentals and EPA Section 608 examination preparation through instructor-led and practical sessions, built around a 48-hour hands-on syllabus covering residential split systems, gas furnaces, and core service procedures.',
+    // No portrait on file yet — do not substitute a generated or stock image.
+  },
+  {
+    id: '13',
+    name: 'Naomi Jordan',
+    title: 'Director of Healthcare Administration',
+    orgRole: 'Healthcare Programs',
+    bio: 'Naomi Jordan is the owner of Rebuilds Mind and Body Studio LLC, located at 6331 N Keystone Ave, Indianapolis, IN 46220. She holds active Indiana credentials as a Certified Nursing Assistant (CNA), Home Health Aide (HHA), Phlebotomy Technician, and Qualified Medication Aide (QMA). As Director of Healthcare Administration at Elevate for Humanity, Naomi oversees all healthcare program administration, clinical coordination, healthcare partner relationships, and curriculum compliance for CNA, HHA, Phlebotomy, QMA, Medical Assistant, Pharmacy Technician, and Peer Recovery Specialist programs. She brings direct clinical experience to program design and ensures that Elevate\u2019s healthcare graduates are fully prepared to pass state and national credentialing exams and enter the healthcare workforce.',
+    headshotSrc: '/images/naomi-jordan.jpg',
+    credentials: [
+      'Certified Nursing Assistant (CNA) — Indiana',
+      'Home Health Aide (HHA) — Indiana',
+      'Phlebotomy Technician — Indiana',
+      'Qualified Medication Aide (QMA) — Indiana',
+    ],
+  },
+  {
+    id: '14',
+    name: 'Alberta Davis',
+    title: 'Testing Center Coordinator & Exam Proctor',
+    orgRole: 'Credential Testing',
+    bio: 'Alberta Davis serves as a Testing Center Coordinator and Exam Proctor at Elevate for Humanity\u2019s Workforce Credential Testing Center in Indianapolis. She supports the administration of industry-recognized certification exams and workforce assessments for individuals, employers, schools, and workforce development partners. In her role, Alberta coordinates testing appointments, prepares testing stations, and assists candidates through the check-in and identity verification process to ensure each testing session begins smoothly. As an exam proctor, she monitors in-person and live testing sessions to maintain compliance with certification provider policies and exam security standards. Alberta also assists with onsite testing events for partner organizations and workforce programs, helping expand access to credential testing opportunities across the community.',
+    email: 'alberta@elevateforhumanity.org',
+    credentials: ['Certified Exam Proctor (Certiport, NHA, EPA 608)'],
+    // No portrait on file yet — do not substitute a generated or stock image.
+  },
+  {
+    id: '15',
+    name: 'Tempestt Barnes',
+    title: 'Gary-Area Site Coordinator',
+    orgRole: 'Regional Coordination',
+    bio: 'Tempestt Barnes is a Gary-area site coordinator for Elevate for Humanity, supporting local partner communications, site planning coordination, and community outreach across Northwest Indiana.',
+    // No portrait on file yet — do not substitute a generated or stock image.
+  },
+  {
+    id: '16',
+    name: 'Matthew Barnes',
+    title: 'Gary-Area Site Coordinator',
+    orgRole: 'Regional Coordination',
+    bio: 'Matthew Barnes is a Gary-area site coordinator for Elevate for Humanity, supporting local partner communications, site planning coordination, and community outreach across Northwest Indiana.',
+    // No portrait on file yet — do not substitute a generated or stock image.
   },
 ];
 

@@ -24,7 +24,7 @@ export default async function TeamPage() {
     const supabase = await createClient();
     const { data: dbStaff, error } = await supabase
       .from('team_members')
-      .select('id, name, title, bio, image_url, email')
+      .select('id, name, title, bio, image_url, email, credentials')
       .eq('is_active', true)
       .order('display_order');
 
@@ -38,6 +38,7 @@ export default async function TeamPage() {
         bio: p.bio ?? '',
         headshotSrc: teamPortrait(p) || TEAM.find(member => member.name === p.name)?.headshotSrc,
         email: p.email ?? '',
+        credentials: (Array.isArray(p.credentials) ? p.credentials : undefined) ?? TEAM.find(member => member.name === p.name)?.credentials,
       }));
     }
   } catch (err) {
@@ -84,6 +85,13 @@ export default async function TeamPage() {
               <div className="p-5">
                 <h2 className="text-xl font-semibold text-slate-900">{member.name}</h2>
                 <p className="text-sm leading-6 text-slate-700 mb-2">{member.title}</p>
+                {member.credentials && member.credentials.length > 0 && (
+                  <ul className="mb-2 list-disc pl-5 text-sm leading-6 text-slate-700">
+                    {member.credentials.map((credential) => (
+                      <li key={credential}>{credential}</li>
+                    ))}
+                  </ul>
+                )}
                 <p className="text-sm text-slate-700 line-clamp-3">{member.bio}</p>
                 {member.id && (
                   <Link

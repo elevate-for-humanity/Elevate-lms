@@ -30,6 +30,7 @@ export interface TeamMember {
   image_url: string | null;
   email: string | null;
   linkedin_url: string | null;
+  credentials?: string[] | null;
 }
 
 export interface SuccessStory {

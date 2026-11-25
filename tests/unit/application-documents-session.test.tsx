@@ -25,11 +25,18 @@ describe('application document session lifecycle', () => {
     const pending = new Promise((resolve) => {
       finishStart = resolve;
     });
-    const fetch = vi.fn().mockReturnValueOnce(pending);
+    const fetch = vi
+      .fn()
+      .mockResolvedValueOnce({ ok: false, status: 404 })
+      .mockReturnValueOnce(pending);
     vi.stubGlobal('fetch', fetch);
     render(<ParisApplicationWorkspace programs={[]} />);
-    await waitFor(() => expect(fetch).toHaveBeenCalledTimes(1));
-    expect(fetch).toHaveBeenCalledWith(
+    await waitFor(() => expect(fetch).toHaveBeenCalledTimes(2));
+    expect(fetch).toHaveBeenNthCalledWith(1, '/api/paris/application-interview', {
+      cache: 'no-store',
+    });
+    expect(fetch).toHaveBeenNthCalledWith(
+      2,
       '/api/paris/application-interview',
       expect.objectContaining({
         method: 'POST',

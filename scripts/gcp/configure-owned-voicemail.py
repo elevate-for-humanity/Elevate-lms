@@ -1,4 +1,5 @@
 # Branch refreshed to pick up main (71e31a22): /apply/student E2E fix + Dockerfile.google-lms.
+# Branch refreshed to pick up main (dbe7a427): fresh CI after E2E shard 3/4 environment failure on the 433802fb base.
 #!/usr/bin/env python3
 """Configure owned operator and assigned mailboxes without changing public carrier routing."""
 import base64

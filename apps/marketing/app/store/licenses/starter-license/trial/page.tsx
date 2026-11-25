@@ -254,7 +254,7 @@ export default function StarterTrialPage() {
               </button>
 
               <p className="text-xs text-slate-500 text-center">
-                Platform trial does not require a card. License purchase uses secure Stripe checkout
+                Platform trial does not require a card. License purchase uses secure QuickBooks invoicing
                 (sign-in required).
               </p>
             </form>

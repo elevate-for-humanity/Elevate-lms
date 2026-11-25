@@ -25,6 +25,7 @@ export type HostShop = {
   badge: string;
   publicSlug?: string;
   publicSlugAliases?: string[];
+  canonicalPartner?: boolean;
   description?: string;
   website?: string;
   googleMapsUrl?: string;
@@ -145,7 +146,7 @@ export async function getApprovedShops(program?: ProgramKey): Promise<HostShop[]
       .select('id,name,address,city,state,zip_code,phone,website,image_url,description,services,specializations')
       .eq('is_approved', true).eq('shop_status', 'active').order('name'),
     db.from('partners').select('name,shop_name,dba').or('status.in.(archived,inactive),account_status.eq.archived'),
-    db.from('partners').select('id,public_slug,programs')
+    db.from('partners').select('id,public_slug,programs,address')
       .eq('status', 'active').eq('account_status', 'active').eq('approval_status', 'approved')
       .not('public_profile_published_at', 'is', null),
     db.from('host_shop_partnerships').select('partner_id,application_id,shop_id')
@@ -165,7 +166,21 @@ export async function getApprovedShops(program?: ProgramKey): Promise<HostShop[]
   type SiteIdentity = Pick<HostShop, 'id' | 'name' | 'address' | 'city' | 'state' | 'zip'>;
   type PublicProfile = NonNullable<typeof publicRows>[number];
   function profileSite(profile: PublicProfile): SiteIdentity {
-    return { id: profile.id, name: profile.display_name ?? '', address: [profile.address_line1, profile.address_line2].filter(Boolean).join(', '), city: profile.city ?? '', state: profile.state ?? 'IN', zip: profile.zip ?? '' };
+    const street = [profile.address_line1, profile.address_line2].filter(Boolean).join(', ');
+    const legacy = normalizeHostShopAddress({
+      address: canonicalPartners.get(profile.id)?.address ?? '',
+      city: profile.city ?? undefined,
+      state: profile.state ?? undefined,
+      zip: profile.zip ?? undefined,
+    });
+    return {
+      id: profile.id,
+      name: profile.display_name ?? '',
+      address: street || legacy.address,
+      city: profile.city || legacy.city,
+      state: profile.state || legacy.state || 'IN',
+      zip: profile.zip || legacy.zip,
+    };
   }
   function matchesPartnerWorksite(site: SiteIdentity, profile: PublicProfile) {
     // Two distinct canonical partner records must never be collapsed by address.
@@ -247,6 +262,8 @@ export async function getApprovedShops(program?: ProgramKey): Promise<HostShop[]
         profile?.phone && (profile.source_url || profile.website_url || profile.website)
           ? profile.phone
           : shop.phone;
+      const applicationSlug = publicSlug(shop.name, shop.id);
+      const profileSlug = profile?.public_slug;
       const enriched: HostShop = {
         ...shop,
         programs: [...new Set([...shop.programs, ...profilePrograms(profile)
@@ -256,7 +273,8 @@ export async function getApprovedShops(program?: ProgramKey): Promise<HostShop[]
         phone: sourceVerifiedPublicPhone || shop.phone,
         // Every approved operational Host Site needs a stable public destination,
         // even before optional promotional media is added to public_host_shops.
-        publicSlug: profile?.public_slug ?? publicSlug(shop.name, shop.id),
+        publicSlug: profileSlug || applicationSlug,
+        publicSlugAliases: profileSlug && profileSlug !== applicationSlug ? [applicationSlug] : undefined,
         description: profile?.description || approvedDescription(shop),
         website: profile?.website_url || profile?.website || undefined,
         googleMapsUrl: approvedMapsUrl(shop),
@@ -297,12 +315,8 @@ export async function getApprovedShops(program?: ProgramKey): Promise<HostShop[]
       .map(normalizeHostShopProgram).filter((value): value is string => value !== null))];
     if (!programs.length) continue;
     const shop: HostShop = {
-      id: partner.id,
-      name: profile.display_name,
-      address: [profile.address_line1, profile.address_line2].filter(Boolean).join(', '),
-      city: profile.city ?? '',
-      state: profile.state ?? 'IN',
-      zip: profile.zip ?? '',
+      ...profileSite(profile),
+      canonicalPartner: true,
       phone: (profile.source_url || profile.website_url || profile.website) ? (profile.phone ?? '') : '',
       email: '',
       supervisor: '',
@@ -332,6 +346,12 @@ export async function getApprovedShops(program?: ProgramKey): Promise<HostShop[]
         ...(existing.publicSlug ? [existing.publicSlug] : []),
       ]))].filter(slug => slug !== shop.publicSlug);
       duplicate.publicSlug = shop.publicSlug;
+      duplicate.canonicalPartner = true;
+      duplicate.address ||= shop.address;
+      duplicate.city ||= shop.city;
+      duplicate.state ||= shop.state;
+      duplicate.zip ||= shop.zip;
+      duplicate.googleMapsUrl = approvedMapsUrl(duplicate);
       for (const redundant of matches.slice(1)) {
         const index = alreadyListed.indexOf(redundant);
         if (index >= 0) alreadyListed.splice(index, 1);
@@ -362,9 +382,13 @@ export async function getApprovedShops(program?: ProgramKey): Promise<HostShop[]
 /** Resolve an individual public profile back to the operationally approved Host Site. */
 export async function getApprovedShopByPublicSlug(publicSlug: string): Promise<HostShop | null> {
   const shops = await getApprovedShops();
+  const exact = shops.find((shop) => shop.publicSlug === publicSlug || shop.publicSlugAliases?.includes(publicSlug));
+  if (exact) return exact;
   const featured = getFeaturedHostPartnerBySlug(publicSlug);
-  return shops.find((shop) => shop.publicSlug === publicSlug || shop.publicSlugAliases?.includes(publicSlug) ||
-    (featured && (getFeaturedHostPartnerBySlug(shop.publicSlug ?? '')?.slug === featured.slug ||
-      businessKey(shop.name) === businessKey(featured.name) ||
-      (featured.dba && businessKey(shop.name) === businessKey(featured.dba))))) ?? null;
+  if (!featured) return null;
+  return shops.find((shop) =>
+    getFeaturedHostPartnerBySlug(shop.publicSlug ?? '')?.slug === featured.slug ||
+    (!shop.canonicalPartner && (businessKey(shop.name) === businessKey(featured.name) ||
+      (featured.dba && businessKey(shop.name) === businessKey(featured.dba)))),
+  ) ?? null;
 }

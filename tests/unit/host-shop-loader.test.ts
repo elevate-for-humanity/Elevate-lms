@@ -45,6 +45,25 @@ describe('approved host directory data', () => {
   it('resolves an approved shop profile by its published link', async () => {
     expect((await getApprovedShopByPublicSlug('style-and-scissors-hair-salon'))?.id).toBe('barber-1');
   });
+  it('preserves the prior application URL for an explicitly linked public profile', async () => {
+    fixture.rows.partners.data = [{
+      id: 'partner-linked', public_slug: 'new-approved-name', programs: ['cosmetology'],
+      address: '120 E Market St, Suite 930',
+    }];
+    fixture.rows.host_shop_partnerships.data = [{ partner_id: 'partner-linked', application_id: 'barber-1' }];
+    fixture.rows.public_host_shops.data = [{
+      id: 'partner-linked', public_slug: 'new-approved-name', display_name: 'New Approved Name',
+      public_profile_published_at: '2026-11-25T00:00:00Z', city: 'Indianapolis', state: 'IN', zip: '46204',
+    }];
+
+    const shop = await getApprovedShopByPublicSlug('style-and-scissors-barber1');
+    expect(shop).toMatchObject({
+      id: 'barber-1',
+      publicSlug: 'new-approved-name',
+      address: '120 E Market St, Suite 930',
+      programs: ['barber-apprenticeship', 'cosmetology-apprenticeship'],
+    });
+  });
   it('reports a directory query failure rather than showing a false empty category', async () => {
     fixture.rows.public_host_shops = { data: null, error: { message: 'unavailable' } };
     await expect(getApprovedShops()).rejects.toThrow('HOST_SHOP_DIRECTORY_QUERY_FAILED:unavailable');

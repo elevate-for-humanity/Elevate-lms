@@ -45,6 +45,7 @@ function approvedAddress(shop: HostShop) {
 function sameBusiness(approved: HostShop, featured: FeaturedHostPartner) {
   const knownProfile = getFeaturedHostPartnerBySlug(approved.publicSlug ?? '');
   if (knownProfile?.slug === featured.slug) return true;
+  if (approved.canonicalPartner) return false;
   const sameName =
     identityKey(approved.name) === identityKey(featured.name) ||
     (featured.dba ? identityKey(approved.name) === identityKey(featured.dba) : false);
@@ -72,7 +73,7 @@ export async function getHostShopNetwork(includeOnboarding = false): Promise<Hos
     return !/prestige[\s-]+elevation[\s-]+barber[\s-]+and[\s-]+beauty[\s-]+institute/.test(identity);
   });
 
-  const operational = approved.map((shop): HostShopNetworkEntry => {
+  const operational = approved.map((shop): HostShopNetworkEntry & { matchByName: boolean } => {
     const featured = FEATURED_BEAUTY_HOST_PARTNERS.find((candidate) =>
       sameBusiness(shop, candidate),
     );
@@ -102,6 +103,7 @@ export async function getHostShopNetwork(includeOnboarding = false): Promise<Hos
       gallery.sort((a, b) => Number(b.url === preferredPhoto) - Number(a.url === preferredPhoto));
     return {
       id: shop.id,
+      matchByName: !shop.canonicalPartner,
       slug: featured?.slug ?? shop.publicSlug!,
       name: featured?.dba ?? shop.name,
       city: shop.city || featured?.city || '',
@@ -138,7 +140,7 @@ export async function getHostShopNetwork(includeOnboarding = false): Promise<Hos
 
   // Multiple historical approval records can refer to the same public shop.
   // Keep one destination and preserve its independently approved pathways.
-  return uniqueHostShops(operational).sort(
+  return uniqueHostShops(operational).map(({ matchByName: _matchByName, ...entry }) => entry).sort(
     (left: HostShopNetworkEntry, right: HostShopNetworkEntry) =>
       left.city.localeCompare(right.city) || left.name.localeCompare(right.name),
   );

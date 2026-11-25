@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {canRetryVerifiedGithubAppRepair,isGithubAppBranchFailure} from '../../lib/ai/runtime/code-repair-policy.mjs';
+import {canRetryVerifiedGithubAppRepair,isGithubAppBranchFailure,isInfrastructureRepairFailure,hasOnlyInfrastructureAttemptFailures} from '../../lib/ai/runtime/code-repair-policy.mjs';
 import {readFileSync} from 'node:fs';
 
 const base={status:'blocked',attempt_count:1,source_job_id:null,
@@ -86,4 +86,59 @@ test('monitor verifies App explicitly and preserves attempts and error receipts'
  assert.match(section,/\.eq\('attempt_count',repair.attempt_count\)/);
  assert.doesNotMatch(section,/attempt_count\s*:/);
  assert.doesNotMatch(section,/ultimate_build_jobs/);
+});
+
+test('infrastructure failure vocabulary is exact and fails closed',()=>{
+ for(const error of [branchError,
+  'PARIS_PATCH_FAILED: OWNED_MODEL_TEMPORARILY_UNAVAILABLE:request_failed',
+  'PARIS_PATCH_FAILED: OWNED_MODEL_TEMPORARILY_UNAVAILABLE:model_unavailable',
+  'PARIS_OPENHANDS_PROTECTED_REPAIR_BOUNDARY'])
+  assert.equal(isInfrastructureRepairFailure(error),true);
+ for(const error of [
+  'PARIS_PATCH_FAILED: PARIS_PLANNER_REPEATED_INSPECTION',
+  'PARIS_PATCH_FAILED: Internal engineering finished without a verifiable repository change.',
+  'PARIS_PATCH_FAILED: OWNED_MODEL_TEMPORARILY_UNAVAILABLE:unknown_suffix',
+  'GITHUB_APP_401_TOKEN: Bad credentials','',undefined,null])
+  assert.equal(isInfrastructureRepairFailure(error),false);
+});
+
+// Exact production ledger shapes, 2026-11-25: both rows blocked at their
+// second attempt by the branch-creation credential wall, every prior
+// failure infrastructure-class, no branch sha, no release.
+const rowA519218b={status:'blocked',attempt_count:2,source_job_id:null,release_sha:null,
+ candidate:{kind:'openhands-checkpoint',checkpoint:{
+  branch:'studio/paris-openhands-a519218b-124b-4958-88c8-9eff3ae1c74e-1',branchPrepared:true}},
+ verification:{},error_code:branchError,
+ attempt_history:[{at:'2026-11-24T00:35:59.226+00:00',
+  error:'PARIS_OPENHANDS_PROTECTED_REPAIR_BOUNDARY',
+  retryReason:'owner-authorized-approval-unblock-2026-11-24'}]};
+const row3d6e44ee={status:'blocked',attempt_count:2,
+ source_job_id:'6408828b-4fb5-4b22-a31d-e0e6934ae32a',release_sha:null,
+ candidate:null,verification:{},error_code:branchError,
+ attempt_history:[{at:'2026-11-19T03:52:58.254+00:00',
+  error:'PARIS_PATCH_FAILED: OWNED_MODEL_TEMPORARILY_UNAVAILABLE:request_failed',
+  retryReason:'operator-fixed-error-code'}]};
+
+test('both walled second attempts are eligible for the audited third attempt',()=>{
+ assert.equal(hasOnlyInfrastructureAttemptFailures(rowA519218b),true);
+ assert.equal(hasOnlyInfrastructureAttemptFailures(row3d6e44ee),true);
+ assert.equal(canRetryVerifiedGithubAppRepair(rowA519218b),true);
+ // Source-linked included under Elizabeth's blanket fix order, 2026-11-25.
+ assert.equal(canRetryVerifiedGithubAppRepair(row3d6e44ee),true);
+});
+
+test('third-attempt credential recovery fails closed on any real attempt outcome',()=>{
+ for(const change of [
+  {attempt_history:[{error:'PARIS_PATCH_FAILED: Internal engineering finished without a verifiable repository change.'}]},
+  {attempt_history:[{error:'PARIS_OPENHANDS_PROTECTED_REPAIR_BOUNDARY',sha:'a'.repeat(40)}]},
+  {attempt_history:[]},{attempt_history:undefined},
+  {attempt_history:[{retryReason:'owner-authorized-approval-unblock-2026-11-24'}]},
+  {attempt_history:[...rowA519218b.attempt_history,{error:branchError,retryReason:'verified-github-app-recovery'}]},
+  {candidate:{branch:{sha:'a'.repeat(40)}}},{release_sha:'a'.repeat(40)},
+  {attempt_count:3},{attempt_count:0},{status:'queued'},
+  {verification:{reconciliation:{replay:false}}}])
+  assert.equal(canRetryVerifiedGithubAppRepair({...rowA519218b,...change}),false);
+ // The source-linked row is equally closed to a non-infrastructure history.
+ assert.equal(canRetryVerifiedGithubAppRepair({...row3d6e44ee,
+  attempt_history:[{error:'PARIS_PATCH_FAILED: PARIS_PLANNER_REPEATED_INSPECTION'}]}),false);
 });

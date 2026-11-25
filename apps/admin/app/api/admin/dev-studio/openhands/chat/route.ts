@@ -4,12 +4,10 @@ import { apiRequireDevStudio } from '@/lib/devstudio/api-auth';
 import { hasPermission, normalizeRoles } from '@/lib/rbac/role-matrix';
 import {
   getHydratedOpenHandsConfig,
-  sendOpenHandsMessage,
 } from '@/lib/devstudio/openhands/client';
-import { dispatchOpenHandsTask, refreshOpenHandsTask } from '@/lib/devstudio/openhands/runtime';
+import { refreshOpenHandsTask } from '@/lib/devstudio/openhands/runtime';
 import { findOwnedOpenHandsTask } from '@/lib/devstudio/openhands/task-access';
 import { publicOpenHandsLifecycle } from '@/lib/devstudio/openhands/public-lifecycle';
-import { isOpenHandsOptedIn } from '@/lib/devstudio/openhands-opt-in';
 
 function canAccessDevTools(effectiveRoles: readonly string[]): boolean {
   return normalizeRoles([...effectiveRoles]).some(role =>
@@ -27,92 +25,19 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Admin dev-tool access required' }, { status: 403 });
   }
 
-  // OpenHands is opt-in-only (PARIS_REPAIR_ENGINE=openhands). New dispatches
-  // and continuations fail closed without the opt-in; use the owned engine.
-  if (!isOpenHandsOptedIn()) {
-    return NextResponse.json(
-      { error: 'OpenHands is opt-in only; set PARIS_REPAIR_ENGINE=openhands to enable it' },
-      { status: 503 },
-    );
-  }
-
-  try {
-    const body = await request.json();
-    const message = typeof body?.message === 'string' ? body.message.trim() : '';
-    const repository = typeof body?.repository === 'string' ? body.repository.trim() : undefined;
-    const conversationId = typeof body?.conversationId === 'string' ? body.conversationId.trim() : '';
-    const taskId = typeof body?.taskId === 'string' ? body.taskId.trim() : '';
-
-    if (!message) return NextResponse.json({ error: 'message is required' }, { status: 400 });
-
-    const config = await getHydratedOpenHandsConfig();
-    if (!config.configured) {
-      return NextResponse.json({ error: 'OpenHands not configured' }, { status: 503 });
-    }
-
-    if (conversationId) {
-      // A provider conversation ID is not an access token. Require the same
-      // authenticated owner and the exact persisted external conversation.
-      const task = await findOwnedOpenHandsTask({ actorId: auth.userId, taskId, conversationId });
-      if (!task) return NextResponse.json({ error: 'OpenHands task not found' }, { status: 404 });
-      if (!['running', 'queued'].includes(task.status)) {
-        return NextResponse.json({
-          error: 'This OpenHands task is not active; a new approved run is required',
-        }, { status: 409 });
-      }
-      // `status=running` does not mean a provider confirmation was approved.
-      // A paused Cloud sandbox can still have a running canonical ai_tasks row.
-      // Fail closed on pending/unknown approvals before any send-message call.
-      const continuationAuthorized = task.approvalStatus === 'approved' ||
-        (task.requiresApproval === false && task.approvalStatus === 'not_required');
-      if (!continuationAuthorized) {
-        return NextResponse.json({
-          error: 'OpenHands confirmation must be resolved before continuation',
-        }, { status: 409 });
-      }
-      const result = await sendOpenHandsMessage(conversationId, message);
-      return NextResponse.json({
-        success: true,
-        provider: 'openhands',
-        apiVersion: 'v1',
-        taskId: task.taskId,
-        conversationId,
-        status: 'running',
-        sandboxStatus: result.sandbox_status ?? null,
-        message: result.message ?? null,
-      });
-    }
-
-    if (taskId) {
-      return NextResponse.json({ error: 'conversationId is required to continue a task' }, { status: 400 });
-    }
-
-    // Chat must create the same canonical task record as Admin engineering
-    // dispatch. Direct Cloud starts created unowned, untracked conversations.
-    const dispatched = await dispatchOpenHandsTask({
-      actorId: auth.userId,
-      task: message,
-      repository,
-      correlationId: request.headers.get('idempotency-key') ||
-        request.headers.get('x-correlation-id') ||
-        crypto.randomUUID(),
-      tenantId: null,
-    });
-    return NextResponse.json({
-      success: true,
-      provider: 'openhands',
-      apiVersion: 'v1',
-      taskId: dispatched.taskId,
-      startTaskId: dispatched.startTaskId,
-      conversationId: dispatched.conversationId ?? null,
-      status: dispatched.status,
-    }, { status: 202 });
-  } catch {
-    return NextResponse.json(
-      { error: 'OpenHands chat failed' },
-      { status: 502 },
-    );
-  }
+  // OPENHANDS_REMOVED: OpenHands has been removed. No new OpenHands task
+  // can be dispatched and no existing provider conversation can be
+  // continued from this route (or anywhere else); the owned internal
+  // engine is the only repair engine. This is permanent — no environment
+  // variable re-enables it. Status reads for historical tasks remain
+  // available through GET below.
+  return NextResponse.json(
+    {
+      error: 'OpenHands has been removed; the owned internal engine is the only repair engine',
+      code: 'OPENHANDS_REMOVED',
+    },
+    { status: 410 },
+  );
 }
 
 export async function GET(request: NextRequest) {
@@ -167,6 +92,6 @@ export async function GET(request: NextRequest) {
     repository: config.configuredRepository,
     model: config.model,
     endpoint: '/api/admin/dev-studio/openhands/chat',
-    continuationSupported: true,
+    continuationSupported: false,
   });
 }

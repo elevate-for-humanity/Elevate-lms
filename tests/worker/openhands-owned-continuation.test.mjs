@@ -18,23 +18,23 @@ test('provider conversation IDs cannot authorize themselves', () => {
   assert.match(access, /external\.start_task_id !== input\.startTaskId/);
 });
 
-test('follow-up requires same owner and privileged dev-tool role before Cloud message', () => {
-  assert.match(chat, /canAccessDevTools\(auth\.effectiveRoles\)/);
-  const fromContinuation = chat.slice(chat.indexOf('if (conversationId) {'), chat.indexOf('if (taskId) {'));
-  assert.ok(fromContinuation.indexOf('findOwnedOpenHandsTask(') >= 0);
-  assert.ok(fromContinuation.indexOf('findOwnedOpenHandsTask(') < fromContinuation.indexOf('sendOpenHandsMessage('));
-  assert.match(fromContinuation, /\['running', 'queued'\]\.includes\(task\.status\)/);
-  assert.match(fromContinuation, /task\.approvalStatus === 'approved'/);
-  assert.match(fromContinuation, /task\.requiresApproval === false && task\.approvalStatus === 'not_required'/);
-  assert.ok(fromContinuation.indexOf('continuationAuthorized') < fromContinuation.indexOf('sendOpenHandsMessage('));
-  assert.match(fromContinuation, /status: 404/);
-  assert.match(fromContinuation, /status: 409/);
+test('follow-up is removed: chat POST cannot send a Cloud message or continue a conversation', () => {
+  const post = chat.slice(chat.indexOf('export async function POST('), chat.indexOf('export async function GET('));
+  // The privileged dev-tool role is still checked first, then the route is
+  // permanently closed: OpenHands has been removed, so no ownership lookup,
+  // approval check, or provider call can ever follow.
+  assert.match(post, /canAccessDevTools\(auth\.effectiveRoles\)/);
+  assert.match(post, /OPENHANDS_REMOVED/);
+  assert.match(post, /status: 410/);
+  assert.doesNotMatch(post, /findOwnedOpenHandsTask\(/);
+  assert.doesNotMatch(post, /sendOpenHandsMessage\(/);
+  assert.doesNotMatch(post, /dispatchOpenHandsTask\(/);
 });
 
-test('new chat uses tracked dispatcher rather than unowned direct Cloud start', () => {
-  assert.match(chat, /dispatchOpenHandsTask\(/);
+test('new chat cannot start any task: no dispatcher or direct Cloud start remains in the route', () => {
+  assert.doesNotMatch(chat, /dispatchOpenHandsTask\(/);
   assert.doesNotMatch(chat, /startOpenHandsTask\(/);
-  assert.match(chat, /taskId: dispatched\.taskId/);
+  assert.doesNotMatch(chat, /sendOpenHandsMessage\(/);
 });
 
 test('all chat lifecycle reads require task ownership, not arbitrary external IDs', () => {

@@ -2,14 +2,12 @@ import { NextRequest, NextResponse } from 'next/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { apiRequireDevStudio } from '@/lib/devstudio/api-auth';
 import { hasPermission, normalizeRoles } from '@/lib/rbac/role-matrix';
-import { buildOpenHandsContextPrompt } from '@/lib/devstudio/openhands/context';
 import {
   getHydratedOpenHandsConfig,
 } from '@/lib/devstudio/openhands/client';
-import { dispatchOpenHandsTask, refreshOpenHandsTask } from '@/lib/devstudio/openhands/runtime';
+import { refreshOpenHandsTask } from '@/lib/devstudio/openhands/runtime';
 import { findOwnedOpenHandsTask } from '@/lib/devstudio/openhands/task-access';
 import { publicOpenHandsLifecycle } from '@/lib/devstudio/openhands/public-lifecycle';
-import { isOpenHandsOptedIn } from '@/lib/devstudio/openhands-opt-in';
 
 function canAccessDevTools(effectiveRoles: readonly string[]): boolean {
   return normalizeRoles([...effectiveRoles]).some((role) =>
@@ -33,66 +31,18 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  // OpenHands is opt-in-only (PARIS_REPAIR_ENGINE=openhands). New dispatches
-  // fail closed without the opt-in; use the owned engine instead.
-  if (!isOpenHandsOptedIn()) {
-    return NextResponse.json(
-      { error: 'OpenHands is opt-in only; set PARIS_REPAIR_ENGINE=openhands to enable it' },
-      { status: 503 },
-    );
-  }
-
-  try {
-    const body = await request.json();
-    const task = typeof body?.task === 'string' ? body.task.trim() : '';
-    const repository = typeof body?.repository === 'string' ? body.repository.trim() : undefined;
-
-    if (!task) {
-      return NextResponse.json({ error: 'task is required' }, { status: 400 });
-    }
-
-    const config = await getHydratedOpenHandsConfig();
-    if (!config.configured) {
-      return NextResponse.json({ error: 'OpenHands API key not configured' }, { status: 503 });
-    }
-
-    const correlationId =
-      request.headers.get('x-correlation-id') ||
-      request.headers.get('idempotency-key') ||
-      crypto.randomUUID();
-    const contextPrompt = await buildOpenHandsContextPrompt({
-      goal: task,
-      actorId: auth.userId,
-      tenantId: null,
-    });
-    const governedTask = `${task}\n\n${contextPrompt}`;
-
-    const dispatched = await dispatchOpenHandsTask({
-      actorId: auth.userId,
-      task: governedTask,
-      repository,
-      correlationId,
-      tenantId: null,
-    });
-
-    return NextResponse.json(
-      {
-        success: true,
-        taskId: dispatched.taskId,
-        startTaskId: dispatched.startTaskId,
-        conversationId: dispatched.conversationId ?? null,
-        status: dispatched.status,
-        provider: 'openhands',
-        apiVersion: 'v1',
-      },
-      { status: 202 },
-    );
-  } catch {
-    return NextResponse.json(
-      { error: 'OpenHands connection failed' },
-      { status: 502 },
-    );
-  }
+  // OPENHANDS_REMOVED: OpenHands has been removed. No new OpenHands task
+  // can be dispatched from this route (or anywhere else); the owned
+  // internal engine is the only repair engine. This is permanent — no
+  // environment variable re-enables it. Status reads for historical tasks
+  // remain available through GET below.
+  return NextResponse.json(
+    {
+      error: 'OpenHands has been removed; the owned internal engine is the only repair engine',
+      code: 'OPENHANDS_REMOVED',
+    },
+    { status: 410 },
+  );
 }
 
 export async function GET(request: NextRequest) {
@@ -142,10 +92,10 @@ export async function GET(request: NextRequest) {
 
   return NextResponse.json({
     configured: config.configured,
-    // Executable only with the explicit OpenHands opt-in; otherwise the
-    // owned engine is the execution path and this route reports status only.
-    executable: canAccessDevTools(auth.effectiveRoles) && isOpenHandsOptedIn(),
-    optInRequired: !isOpenHandsOptedIn(),
+    // Execution is permanently removed: this route reports status for
+    // historical tasks only. New work runs on the owned internal engine.
+    executable: false,
+    removed: true,
     provider: 'openhands',
     apiVersion: 'v1',
     baseUrl: config.origin,

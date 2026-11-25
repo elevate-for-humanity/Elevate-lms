@@ -1,6 +1,7 @@
 import 'server-only';
 
 import { twilioAccountSid, twilioAuthorization } from './twilio';
+import { derivePhoneDevicePresence } from './availability';
 import { usesGooglePhoneBindings } from './runtime-authority';
 import {
   READINESS_FRESH_MS,
@@ -194,14 +195,13 @@ async function probePbxRegistrations(
 ): Promise<PhoneReadinessCheck> {
   const now = deps.now ?? new Date();
   const observedAt = now.toISOString();
-  const freshSince = new Date(now.getTime() - READINESS_FRESH_MS).toISOString();
-  const { count, error } = await db
+  const { data, error } = await db
     .from('phone_webrtc_devices')
-    .select('id', { count: 'exact', head: true })
+    .select('registration_state, connection_state, last_seen_at, registration_verified_at')
     .eq('provider', 'asterisk')
     .eq('status', 'active')
     .eq('connection_state', 'connected')
-    .gte('registration_verified_at', freshSince);
+    .limit(500);
   if (error) {
     return readinessCheck(
       'pbx_registrations',
@@ -210,7 +210,20 @@ async function probePbxRegistrations(
       observedAt,
     );
   }
-  const live = count ?? 0;
+  // Stored state alone is not evidence: a handset that vanished without
+  // disconnecting leaves a 'registered' row behind. A device counts only
+  // while both its last-seen and its PBX registration verification are
+  // inside the freshness window.
+  const live = (data ?? []).filter((device: any) => {
+    if (!derivePhoneDevicePresence(device, now).live) return false;
+    const verifiedAge =
+      now.getTime() - Date.parse(device.registration_verified_at ?? '');
+    return (
+      Number.isFinite(verifiedAge) &&
+      verifiedAge >= -5_000 &&
+      verifiedAge <= READINESS_FRESH_MS
+    );
+  }).length;
   return readinessCheck(
     'pbx_registrations',
     live > 0 ? 'pass' : 'fail',

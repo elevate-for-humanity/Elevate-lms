@@ -82,10 +82,18 @@ export async function getHostShopNetwork(includeOnboarding = false): Promise<Hos
     );
 
     const shopWorksite = hostShopWorksiteKey(approvedAddress(shop));
+    // B-52’s approved record writes Suite C as part of the street number.
+    // Normalize only this verified listing for portfolio lookup, not for public
+    // display or deduplication. A different suite keeps its own identity.
+    const profileWorksite =
+      shop.publicSlug === 'b-52-s-barber-shop-llc-183dd1d7' &&
+      shopWorksite === hostShopWorksiteKey('314C Parkview Dr., New Castle, IN 47362')
+        ? hostShopWorksiteKey('314 Parkview Drive, Suite C, New Castle, IN 47362')
+        : shopWorksite;
     const publicProfile = onboardingProfiles.find((profile) =>
       profile.slug === shop.publicSlug || (
         identityKey(profile.name) === identityKey(shop.name) &&
-        shopWorksite && hostShopWorksiteKey(profile.address) === shopWorksite
+        profileWorksite && hostShopWorksiteKey(profile.address) === profileWorksite
       ),
     );
     const gallery = curateShopGallery(featured?.slug ?? shop.publicSlug ?? '', [

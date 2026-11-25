@@ -1,4 +1,5 @@
 import { google } from './runtime-config.mjs';
+// Branch refreshed to pick up main (e8b0e402): fresh CI after E2E shard 3/4 environment failure on the fcad399b base.
 import { inspectRegionalCapacity, executionAllocationCount } from './regional-capacity.mjs';
 import { pathToFileURL } from 'node:url';
 

@@ -89,3 +89,19 @@ registerSimulation({
   description:
     'Hands-on manifold gauge lab: connect the gauges, calculate superheat and subcooling from the PT chart, and charge an undercharged R-410A TXV system to its subcooling target — recover, never vent.',
 });
+
+// Forklift pre-operation inspection + safe load handling lab for the
+// Forklift and Manufacturing Operations course
+// (components/lms/ForkliftSimulator.tsx, scenario + server-side scorer in
+// lib/lms/forklift-simulation.ts). Attempts are scored through the learner
+// interactions API and recorded in interaction_progress; operating a truck
+// with known safety defects, lifting past rated capacity, or travelling
+// with the load raised hard-fails the attempt under OSHA 29 CFR 1910.178.
+registerSimulation({
+  id: 'forklift-inspection-load-lab',
+  title: 'Forklift Inspection & Safe Load Handling Simulator',
+  trade: 'forklift',
+  component: 'ForkliftSimulator',
+  description:
+    'Hands-on forklift lab: work a ten-item pre-operation inspection with planted defects, make the tag-out decision, calculate derated capacity from the data plate, judge three loads, and finish with safe travel and shutdown — per OSHA 1910.178.',
+});

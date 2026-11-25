@@ -22,7 +22,7 @@ class ProvisioningError extends Error {
 }
 
 // Only fixed vocabulary crosses the journal boundary; never reflect exceptions.
-const FAILURE_CODES = new Set('asterisk_command_failed asterisk_endpoint_unverified asterisk_aor_unverified asterisk_dialplan_unverified asterisk_revocation_unverified asterisk_reload_failed asterisk_configuration_rejected asterisk_rollback_failed provisioner_quarantined provisioner_unavailable ownership_unavailable device_authorization_unavailable phone_system_configuration_invalid invalid_stored_record invalid_generation invalid_stored_state unknown'.split(' '));
+const FAILURE_CODES = new Set('asterisk_command_failed asterisk_endpoint_unverified asterisk_aor_unverified asterisk_dialplan_unverified asterisk_revocation_unverified asterisk_reload_failed asterisk_configuration_rejected asterisk_rollback_failed provisioner_quarantined provisioner_unavailable ownership_unavailable device_authorization_unavailable phone_system_configuration_invalid invalid_stored_record invalid_generation invalid_stored_state duplicate_extension unknown'.split(' '));
 export function reportFailure(operation, phase, error, write = line => process.stderr.write(line)) {
   const code = error instanceof ProvisioningError && FAILURE_CODES.has(error.code) ? error.code : 'unknown';
   if (!['provision', 'status', 'revoke', 'expiry', 'reconciliation'].includes(operation) ||
@@ -334,9 +334,11 @@ export function createProvisioner(config, dependencies = {}) {
     }
     // Retain only the active and previous generations for rollback. These are
     // service-owned files; production call records and voicemail are untouched.
-    for (const name of await readdir(config.generatedRoot)) {
+    // Cleanup cannot turn an applied credential into a failed API response:
+    // listing the directory is part of cleanup, so its failure is isolated too.
+    const generations = await readdir(config.generatedRoot).catch(() => []);
+    for (const name of generations) {
       if (/^generation-[0-9a-f]{24}$/.test(name) && name !== generation && name !== previous) {
-        // Cleanup cannot turn an applied credential into a failed API response.
         await rm(path.join(config.generatedRoot, name), { recursive: true, force: true }).catch(() => {});
       }
     }
@@ -463,7 +465,12 @@ export function createProvisioner(config, dependencies = {}) {
         { error: error instanceof ProvisioningError ? error.code : 'provisioner_unavailable' });
     }
   });
-  server.requestTimeout = 15000;
+  // A verified apply can legitimately outlast 15s: reload settling retries in
+  // reloadAndVerify, doubled by a rollback, are many sequential Asterisk
+  // readbacks. Match the 60s the HTTPS proxy in front of this service already
+  // allows so a slow success is never cut off at the socket and misreported
+  // to the caller as a provisioning failure.
+  server.requestTimeout = 60000;
   server.headersTimeout = 10000;
   return { server, initialize, reconcile, pruneExpired };
 }

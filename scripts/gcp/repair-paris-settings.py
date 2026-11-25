@@ -35,10 +35,14 @@ def settings(system, extensions, menu_options=None):
         if not isinstance(value, str) or not value.strip() or len(value) > limit or '\0' in value:
             raise ValueError('PARIS_SAVED_SETTINGS_INVALID')
         result[key] = value
+    admin_extension = system.get('admin_extension')
+    if not isinstance(admin_extension, str) or not re.fullmatch(r'0|[1-9][0-9]{2}', admin_extension):
+        raise ValueError('PARIS_SAVED_SETTINGS_INVALID')
+    result['PARIS_OPERATOR_EXTENSION'] = admin_extension
     numbers = [row.get('extension') for row in extensions]
     if not numbers or any(not isinstance(n, str) or not re.fullmatch(r'0|[1-9][0-9]{2}', n) for n in numbers) or len(numbers) != len(set(numbers)):
         raise ValueError('PARIS_SAVED_EXTENSIONS_INVALID')
-    result['PARIS_ALLOWED_EXTENSIONS'] = ','.join(sorted(n for n in numbers if n != '0'))
+    result['PARIS_ALLOWED_EXTENSIONS'] = ','.join(sorted(n for n in numbers if n != admin_extension))
     menu = []
     digits = set()
     for option in menu_options or []:
@@ -46,7 +50,7 @@ def settings(system, extensions, menu_options=None):
         targets = [row['extension'] for row in extensions if row.get('destination_id') and row.get('destination_id') == option.get('destination_id')]
         if (type(digit) is not int or not 0 <= digit <= 9 or digit in digits or
                 not isinstance(label, str) or not label.strip() or len(label) > 160 or any(ord(c) < 32 for c in label) or
-                len(targets) != 1 or (digit == 0 and targets[0] != '0')):
+                len(targets) != 1 or (digit == 0 and targets[0] != admin_extension)):
             raise ValueError('PARIS_SAVED_MENU_INVALID')
         digits.add(digit)
         menu.append({'digit': str(digit), 'label': label.strip(), 'extension': targets[0]})
@@ -98,7 +102,7 @@ def read_authority():
     key = base64.b64decode(secret['payload']['data']).decode().strip()
     headers = {'apikey': key, 'Authorization': 'Bearer ' + key}
     base = config['SUPABASE_URL'].rstrip('/') + '/rest/v1/'
-    systems = get(base + 'phone_systems?select=status,ai_enabled,greeting,ai_instructions&id=eq.' + system_id, headers)
+    systems = get(base + 'phone_systems?select=status,ai_enabled,greeting,ai_instructions,admin_extension&id=eq.' + system_id, headers)
     workspaces = get(base + 'communication_workspaces?select=id&phone_system_id=eq.' + system_id, headers)
     if len(systems) != 1 or len(workspaces) != 1:
         raise ValueError('PARIS_SETTINGS_SCOPE_UNVERIFIED')

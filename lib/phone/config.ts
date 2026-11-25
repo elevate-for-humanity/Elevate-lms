@@ -70,7 +70,7 @@ export function validMenuDigit(value: FormDataEntryValue | null): number | null 
 }
 
 /** Operator zero is a first-class extension; keep browser/server validation aligned. */
-export const PHONE_EXTENSION_PATTERN = '(0|[0-9]{2,6})';
+export const PHONE_EXTENSION_PATTERN = '(0|[1-9][0-9]{2})';
 export function validPhoneExtension(value: string): boolean {
   return new RegExp(`^${PHONE_EXTENSION_PATTERN}$`).test(value);
 }
@@ -85,3 +85,4 @@ export function phoneProfileLabel(profile: {
     ? `${name} (${profile.email})`
     : name || profile.email || 'Team member';
 }
+

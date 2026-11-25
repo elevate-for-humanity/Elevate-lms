@@ -143,7 +143,15 @@ test.describe('Program Holder Portal', () => {
     test('should view pending students', async ({ page }) => {
       await page.goto('/program-holder/students/pending');
 
-      await expect(page.locator('h1:has-text("Pending Students")')).toBeVisible();
+      // The "Pending Students" h1 now lives in the recruiting section
+      // (/program-holder/recruiting, `Applicants`), which requires a
+      // recruiting assignment the disposable QA holder does not have. The
+      // pending route itself renders the unassigned-recruiter state: the
+      // assignment hero plus the recruiting-tools notice. Assert that real
+      // view instead of a heading this route no longer renders.
+      await expect(
+        page.getByText('Applicant recruiting tools are available only to assigned recruiters.'),
+      ).toBeVisible();
     });
 
     test('should search for students', async ({ page }) => {

@@ -48,8 +48,14 @@ describe('program-holder dashboard hero', () => {
 
   it('requires every roster row to belong to an assigned program and learner role', () => {
     expect(holderData).toContain(".in('program_id', programIds)");
-    expect(holderData).toContain("import { isLearnerRosterProfile } from './roster-eligibility'");
-    expect(holderData).toContain('.filter(isLearnerRosterProfile)');
+    expect(holderData).toContain("from './roster-eligibility'");
+    expect(holderData).toContain('.filter(rosterProfileEligible)');
+    // The eligibility selector is the production learner-role filter for
+    // real holders; only a QA fixture holder's own roster uses the QA
+    // variant (which still requires a learner role).
+    expect(holderData).toContain('isQaFixtureHolder');
+    expect(holderData).toContain('? isQaFixtureRosterProfile');
+    expect(holderData).toContain(': isLearnerRosterProfile');
     expect(holderData).toContain('eligibleRosterUserIds.has(row.user_id)');
     expect(holderData).not.toContain("'pending',\n        'applied'");
   });

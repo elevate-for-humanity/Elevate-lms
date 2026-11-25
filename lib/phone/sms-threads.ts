@@ -17,8 +17,22 @@ export type SmsMessageLike = {
   media?: unknown;
   status?: string | null;
   error_message?: string | null;
+  provider_event_id?: string | null;
   created_at?: string | null;
 };
+
+/**
+ * Marker prefix written to provider_event_id on the outbound row that
+ * records an SMS auto-reply (see lib/phone/sms-auto-reply). The row is an
+ * ordinary outbound message in the thread; the marker is how the UI and
+ * the 24-hour dedupe recognize it as automatic.
+ */
+export const SMS_AUTO_REPLY_EVENT_PREFIX = 'auto-reply:';
+
+/** True when a message row is an automatic reply sent by the phone system. */
+export function isSmsAutoReply(message: SmsMessageLike): boolean {
+  return String(message.provider_event_id ?? '').startsWith(SMS_AUTO_REPLY_EVENT_PREFIX);
+}
 
 export type SmsThread = {
   /** Stable grouping key: the normalized counterparty number when possible. */

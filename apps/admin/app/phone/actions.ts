@@ -219,6 +219,52 @@ export async function savePhoneSettings(
   }
 }
 
+export async function saveSmsAutoReplySettings(
+  _state: PhoneActionState,
+  formData: FormData,
+): Promise<PhoneActionState> {
+  try {
+    const { db, id } = await requireSystemId();
+    const enabled = checked(formData, 'smsAutoReplyEnabled');
+    const message = String(formData.get('smsAutoReplyMessage') ?? '').trim();
+    if (message.length > 480)
+      return { ok: false, message: 'Keep the auto-reply under 480 characters.' };
+    if (enabled && message.length < 10)
+      return {
+        ok: false,
+        message: 'Write the auto-reply message people will receive, or turn the auto-reply off.',
+      };
+    const { error } = await db
+      .from('phone_systems')
+      .update({
+        sms_auto_reply_enabled: enabled,
+        sms_auto_reply_message: message || null,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', id);
+    if (error) {
+      // Until the sms_auto_reply_settings migration is applied the columns
+      // do not exist; say so plainly instead of surfacing a schema error.
+      if (/sms_auto_reply|column|schema cache/i.test(error.message))
+        return {
+          ok: false,
+          message:
+            'Text auto-reply cannot be saved yet — the database update for this feature has not been applied. Nothing else was changed.',
+        };
+      return { ok: false, message: error.message };
+    }
+    revalidatePath('/phone');
+    return {
+      ok: true,
+      message: enabled
+        ? 'Text auto-reply is on. Someone who texts your business number gets this reply right away — at most once per person per day.'
+        : 'Text auto-reply is off.',
+    };
+  } catch (error) {
+    return failure(error, 'Unable to save text auto-reply settings.');
+  }
+}
+
 export async function addExternalNumber(
   _state: PhoneActionState,
   formData: FormData,

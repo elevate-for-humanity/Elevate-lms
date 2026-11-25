@@ -6,6 +6,7 @@ import {
   CalendarClock,
   CheckCircle2,
   ChevronDown,
+  MessageSquareText,
   PhoneForwarded,
   Route,
   Sparkles,
@@ -15,6 +16,7 @@ import {
   addExternalNumber,
   saveMenuOption,
   savePhoneSettings,
+  saveSmsAutoReplySettings,
   type PhoneActionState,
 } from './actions';
 
@@ -81,6 +83,8 @@ export type PhoneSettings = {
   aiInstructions: string;
   aiAllowInterruptions: boolean;
   aiHumanHandoffEnabled: boolean;
+  smsAutoReplyEnabled: boolean;
+  smsAutoReplyMessage: string;
 };
 
 export type PhoneSetupStep = { label: string; complete: boolean };
@@ -150,6 +154,10 @@ export function PhoneSetupForms({
   const [saved, saveAction, savePending] = useActionState(savePhoneSettings, initial);
   const [number, numberAction, numberPending] = useActionState(addExternalNumber, initial);
   const [menu, menuAction, menuPending] = useActionState(saveMenuOption, initial);
+  const [autoReply, autoReplyAction, autoReplyPending] = useActionState(
+    saveSmsAutoReplySettings,
+    initial,
+  );
 
   return (
     <div className="space-y-6">
@@ -420,6 +428,38 @@ export function PhoneSetupForms({
             {menuPending ? 'Saving…' : 'Save menu route'}
           </button>
           <Result state={menu} />
+        </form>
+        <form
+          action={autoReplyAction}
+          className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
+        >
+          <MessageSquareText className="h-5 w-5 text-orange-600" />
+          <h2 className="mt-2 font-black">Text message auto-reply</h2>
+          <p className="mt-1 text-sm text-slate-600">
+            When someone texts your business number, this reply is sent back right away — at most
+            once per person per day, and never in response to another auto-reply.
+          </p>
+          <div className="mt-4 space-y-3">
+            <Toggle
+              name="smsAutoReplyEnabled"
+              label="Auto-reply to incoming texts"
+              defaultChecked={settings.smsAutoReplyEnabled}
+            />
+            <label className="block text-sm font-bold">
+              Auto-reply message
+              <textarea
+                name="smsAutoReplyMessage"
+                rows={3}
+                maxLength={480}
+                defaultValue={settings.smsAutoReplyMessage}
+                className={field}
+              />
+            </label>
+          </div>
+          <button disabled={autoReplyPending} className={button}>
+            {autoReplyPending ? 'Saving…' : 'Save auto-reply'}
+          </button>
+          <Result state={autoReply} />
         </form>
       </section>
     </div>

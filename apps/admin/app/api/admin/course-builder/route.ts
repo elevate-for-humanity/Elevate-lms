@@ -530,7 +530,10 @@ export async function POST(req: NextRequest) {
 
   if (action === 'publish') {
     try {
-      const result = await publishGovernedCourse((body.template ?? body) as any);
+      const result = await publishGovernedCourse((body.template ?? body) as any, undefined, {
+        actorId: auth.id,
+        publishOverride: body.publishOverride ?? null,
+      });
       return NextResponse.json(result, { status: result.ok ? 202 : 422 });
     } catch (error) {
       logger.error('[course-builder] Governed publication failed', error);

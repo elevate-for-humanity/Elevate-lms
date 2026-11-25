@@ -89,7 +89,11 @@ async function controlRequest<T>(path: string, identity: DeviceIdentity): Promis
       body: JSON.stringify(identity),
       cache: 'no-store',
       redirect: 'error',
-      signal: AbortSignal.timeout(15_000),
+      // The provisioner verifies every apply against Asterisk readbacks (and
+      // a rollback doubles them), and its proxy already allows 60s. A shorter
+      // client abort would report a slow-but-successful provision as a
+      // failure after the credential was already applied.
+      signal: AbortSignal.timeout(60_000),
     });
   } catch (cause) {
     throw new PhoneConnectionError(

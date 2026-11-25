@@ -12,6 +12,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { sendWorkOneSurveyEmail, sendWorkOneSurveyBatch } from '@/lib/notifications/workone-survey-email';
 import { WORKONE_SURVEY } from '@/lib/surveys/workone-survey';
+import { WORKONE_ACCESS_START_ISO } from '@/lib/workone/access-scope';
 
 export const runtime = 'nodejs';
 
@@ -56,8 +57,9 @@ export async function POST(request: NextRequest) {
 
     // Or send to all eligible applicants
     if (sendToAll) {
-      // Send to all applicants who have submitted (not drafts)
-      query = query.not('submitted_at', 'is', null);
+      // Send to all applicants who have submitted (not drafts).
+      // WorkOne scope: NEW applicants only — never email the pre-access backlog from this dashboard.
+      query = query.not('submitted_at', 'is', null).gte('created_at', WORKONE_ACCESS_START_ISO);
     }
 
     const { data: applications, error } = await query;

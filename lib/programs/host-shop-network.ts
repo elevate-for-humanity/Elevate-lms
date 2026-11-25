@@ -43,6 +43,16 @@ function approvedAddress(shop: HostShop) {
 }
 
 function sameBusiness(approved: HostShop, featured: FeaturedHostPartner) {
+  // This gallery depicts the planned downtown training rooms, not the
+  // current Michigan Road location. A business slug cannot prove that an
+  // approved operational record covers the same training site.
+  if (
+    featured.slug === 'mesmerized-by-beauty-cosmetology-academy-8420fefa' &&
+    !/^120eastmarketstsuite560indianapolisin(?:46204(?:[0-9]{4})?)?$/.test(
+      hostShopWorksiteKey(approvedAddress(approved).replace(/\bE\.?\s+Market\b/i, 'East Market')),
+    )
+  ) return false;
+
   const knownProfile = getFeaturedHostPartnerBySlug(approved.publicSlug ?? '');
   if (knownProfile?.slug === featured.slug) return true;
   if (approved.canonicalPartner) return false;

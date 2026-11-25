@@ -21,8 +21,10 @@ SOURCE_SHA = '087a160226a4aaff8057acaf0525961a1301c989076460bdb1fc92bae3d21257'
 REVIEWED_RELOAD_SOURCES = {
     'dc9ee2515796a2581be2a78fd67ea8847d17115eed1118507b9650cde09b9b96',
     '9bfd10cb3237aa4484e6b01ffdaf7d7e66afd7bef90adf258de28ea968a9259d',
+    '1230ecea16c649ef267e5deb14fed5170036ba63c32f65a80b7b3617012b336e',
+    '196808eb6e5381b185dba90456f0725dd2fa1a4e4201665a2d8a24849e96439a',
 }
-PROBE_SHA = 'd01db04c092c0b41caf79da40447475f91b30e67c8abc9579cd0bdc5178a4faf'
+PROBE_SHA = '3ce1f3659ad3ee3ffa68de8d90fe0301083a41dc44968621618c598db2395544'
 EXPECTED_UID = 0
 ENDPOINT = re.compile(r'pwa-[a-f0-9]{40}')
 
@@ -279,4 +281,5 @@ if __name__ == '__main__':
         print(json.dumps({'result': 'BLOCKED', 'code': str(error) if isinstance(error, Blocked) else 'recovery_precondition_unverified',
                           'callsPlaced': 0}))
         raise SystemExit(1)
+
 

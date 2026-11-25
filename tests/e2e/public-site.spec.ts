@@ -175,6 +175,30 @@ async function collectInternalLinks(page: Page, selector: string): Promise<strin
 }
 
 async function assertNoRuntimeFailure(page: Page, route: string) {
+  try {
+    await checkPageOnce(page, route);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    if (!RESTART_TRANSIENT_MESSAGE.test(message)) throw error;
+    // The failure looks like the dev server restarting under the check
+    // (Next exits 77 past its heap threshold and drops in-flight requests:
+    // 503 resources, an empty body, an aborted load). Wait until the server
+    // answers again, then re-check once; a failure on the second pass is a
+    // real failure, not a restart. This mirrors the restart handling the
+    // link check in this file already has (run 45254389225).
+    const ready = await waitForServerReady(page.request);
+    if (!ready) throw error;
+    await checkPageOnce(page, route);
+  }
+}
+
+// A failure that can be produced by a `next dev` restart mid-check: the
+// document or a sub-resource 503s, the load aborts, a chunk fails to load,
+// or the page briefly serves a loading shell / upstream-error body.
+const RESTART_TRANSIENT_MESSAGE =
+  /503|empty body|did not return a response|ERR_ABORTED|ECONNRESET|ChunkLoadError|no healthy upstream|returned 5\d\d/i;
+
+async function checkPageOnce(page: Page, route: string) {
   const pageErrors: string[] = [];
   const consoleErrors: string[] = [];
 
@@ -197,6 +221,17 @@ async function assertNoRuntimeFailure(page: Page, route: string) {
 
   await page.waitForLoadState('networkidle').catch(() => undefined);
 
+  // Re-poll after networkidle: hydration can swap the server-rendered body
+  // for a transient client loading shell while it fetches data, so a single
+  // immediate read can catch the shell (observed: 34 chars) on an otherwise
+  // healthy page.
+  await expect
+    .poll(async () => (await documentBody.innerText()).trim().length, {
+      message: `${route} rendered an empty body`,
+      timeout: 15_000,
+    })
+    .toBeGreaterThan(80);
+
   // innerText excludes embedded scripts. The application shell intentionally
   // contains chunk-recovery source code whose text includes "ChunkLoadError";
   // that source is not a rendered failure and must not trip the visible-page check.
@@ -204,7 +239,6 @@ async function assertNoRuntimeFailure(page: Page, route: string) {
   for (const placeholder of FORBIDDEN_PLACEHOLDERS) {
     expect(body, `${route} contains forbidden placeholder: ${placeholder}`).not.toContain(placeholder);
   }
-  expect(body.trim().length, `${route} rendered an empty body`).toBeGreaterThan(80);
   expect(body, `${route} rendered an application exception`).not.toMatch(
     /Application error|client-side exception|server-side exception|ChunkLoadError|no healthy upstream/i,
   );
@@ -249,6 +283,9 @@ test.describe('page-by-page public production audit', () => {
 
   for (const route of [...CRITICAL_PUBLIC_ROUTES, ...CRITICAL_PROGRAM_ROUTES]) {
     test(`${route} renders without runtime failure`, async ({ page }) => {
+      // Headroom above the 60s global test timeout for a cold / under-load
+      // dev server, plus a full restart cycle (see assertNoRuntimeFailure).
+      test.setTimeout(300_000);
       await assertNoRuntimeFailure(page, route);
     });
   }
@@ -285,8 +322,19 @@ test.describe('responsive navigation acceptance', () => {
 });
 
 test.describe('application entry audit', () => {
-  for (const route of ['/apply', '/apply/student', '/programs/barber-apprenticeship/apply']) {
+  test('/apply exposes an actionable application experience', async ({ page }) => {
+    test.setTimeout(300_000);
+    // /apply is intentionally a choice page ("Choose your application") with
+    // links, not a form — it has no form/input/select/textarea/submit
+    // control by design. The actionable experience is the choice links.
+    await assertNoRuntimeFailure(page, '/apply');
+    await expect(page.getByRole('link', { name: 'Intake Application' })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Full Enrollment Application' })).toBeVisible();
+  });
+
+  for (const route of ['/apply/student', '/programs/barber-apprenticeship/apply']) {
     test(`${route} exposes an actionable application experience`, async ({ page }) => {
+      test.setTimeout(300_000);
       await assertNoRuntimeFailure(page, route);
       const control = page.locator('form, input, select, textarea, button[type="submit"]').first();
       await expect(control, `${route} has no actionable application control`).toBeVisible();
@@ -309,12 +357,14 @@ test.describe('application entry audit', () => {
 
 test.describe('pricing and testing integrity', () => {
   test('pricing page has a useful populated or graceful empty state', async ({ page }) => {
+    test.setTimeout(300_000);
     await assertNoRuntimeFailure(page, '/pricing');
     const body = (await page.locator('body').textContent()) ?? '';
     expect(body).not.toMatch(/0 programs available/i);
   });
 
   test('WorkKeys page shows non-zero prices and purchase controls', async ({ page }) => {
+    test.setTimeout(300_000);
     await assertNoRuntimeFailure(page, '/testing/workkeys');
     await expect(page.getByText(/\$104|\$168/).first()).toBeVisible({ timeout: 10_000 });
     await expect(page.getByRole('button', { name: /add to cart/i }).first()).toBeVisible();

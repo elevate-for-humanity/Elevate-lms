@@ -1,8 +1,9 @@
+// Branch refreshed to pick up main (71e31a22): /apply/student E2E fix + Dockerfile.google-lms.
 // GitHub workflow conclusion alone does not prove a service reached production.
 // Validation-only jobs can succeed while all deployment stages were skipped.
 const requiredReleaseJobs = Object.freeze({
   'deploy-admin.yml': ['Deploy and verify Admin on Google', 'acceptance'],
-  'deploy-google-lms-trigger.yml': ['deploy', 'acceptance'],
+  'deploy-google-lms-trigger.yml': ['deploy / deploy (lms)', 'acceptance'],
   'deploy-google-marketing-trigger.yml': ['Deploy and verify Marketing on Google', 'acceptance'],
   'deploy-google-store-runtime.yml': ['Deploy and verify Store on Google', 'acceptance'],
 });

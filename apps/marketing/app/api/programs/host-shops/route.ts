@@ -15,7 +15,11 @@ export async function GET(request: NextRequest) {
   if (rateLimited) return rateLimited;
   try {
     const program = new URL(request.url).searchParams.get('program') as ProgramKey | null;
-    const shops = await getApprovedShops(program ?? undefined);
+    const shops = (await getApprovedShops(program ?? undefined)).map((shop) => {
+      // Operational application contacts are never part of this public API.
+      const { email: _email, supervisor: _supervisor, ...publicShop } = shop;
+      return publicShop;
+    });
     return NextResponse.json({ shops });
   } catch (err) {
     return safeInternalError(err, 'Failed to load host shops');

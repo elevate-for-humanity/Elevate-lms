@@ -127,7 +127,7 @@ export async function getApprovedShops(program?: ProgramKey): Promise<HostShop[]
     db
       .from('barbershop_partner_applications')
       .select(
-        'id, partner_id, shop_legal_name, shop_dba_name, shop_address_line1, shop_city, shop_state, shop_zip, contact_phone, contact_email, supervisor_name',
+        'id, partner_id, shop_legal_name, shop_dba_name, shop_address_line1, shop_address_line2, shop_city, shop_state, shop_zip, contact_phone, contact_email, supervisor_name',
       )
       .eq('status', 'approved')
       .order('shop_legal_name'),
@@ -192,9 +192,16 @@ export async function getApprovedShops(program?: ProgramKey): Promise<HostShop[]
     if (site.id === profile.id || linkedPartnerIds.has(profile.id)) return true;
     return businessKey(site.name) === businessKey(profile.display_name) && sameWorksite(site, profileSite(profile));
   }
+  function canonicalProfilesForSite(site: SiteIdentity) {
+    return (publicRows ?? []).filter(row =>
+      canonicalPartners.has(row.id) &&
+      canonicalPartners.get(row.id)?.public_slug === row.public_slug &&
+      row.public_profile_published_at &&
+      matchesPartnerWorksite(site, row),
+    );
+  }
   function findPublicProfile(site: SiteIdentity & { phone?: string }) {
-    const canonical = (publicRows ?? []).filter(row => canonicalPartners.has(row.id) && canonicalPartners.get(row.id)?.public_slug === row.public_slug &&
-      row.public_profile_published_at && matchesPartnerWorksite(site, row));
+    const canonical = canonicalProfilesForSite(site);
     if (canonical.length === 1) return canonical[0];
     if (canonical.length > 1) return undefined;
     // Preserve existing legacy media enrichment, but never let it borrow a
@@ -212,7 +219,7 @@ export async function getApprovedShops(program?: ProgramKey): Promise<HostShop[]
   const barberShops: HostShop[] = (barberRows ?? []).map((shop) => ({
     id: shop.id,
     name: shop.shop_dba_name || shop.shop_legal_name,
-    address: shop.shop_address_line1 ?? '',
+    address: [shop.shop_address_line1, shop.shop_address_line2].filter(Boolean).join(', '),
     city: shop.shop_city ?? '',
     state: shop.shop_state ?? 'IN',
     zip: shop.shop_zip ?? '',
@@ -348,7 +355,14 @@ export async function getApprovedShops(program?: ProgramKey): Promise<HostShop[]
     if (!isPubliclyListedHostShop(shop) || archivedNames.has(businessKey(shop.name))) continue;
     // A name or a previously enriched slug is not proof of worksite identity.
     // Prefer explicit relationships; for legacy rows require matching address.
-    const matches = [...alreadyListed, ...partnerBacked].filter(existing => matchesPartnerWorksite(existing, profile));
+    const matches = [...alreadyListed, ...partnerBacked].filter(existing => {
+      if (!matchesPartnerWorksite(existing, profile)) return false;
+      if (existing.canonicalPartner) return true;
+      // A legacy application or active-shop row can match multiple canonical
+      // profiles at the same worksite. Only its sole eligible owner may claim it.
+      const eligibleOwners = canonicalProfilesForSite(existing);
+      return eligibleOwners.length === 1 && eligibleOwners[0].id === profile.id;
+    });
     if (matches.length > 1 && !matches.every(existing => sameWorksite(existing, shop))) continue;
     const duplicate = matches[0];
     if (duplicate) {
@@ -382,9 +396,12 @@ export async function getApprovedShops(program?: ProgramKey): Promise<HostShop[]
     });
   }
 
-  const all = [...alreadyListed, ...partnerBacked].map(shop => ({ ...shop, ...normalizeHostShopAddress(shop) })).filter((shop) =>
-    isPubliclyListedHostShop(shop) && !archivedNames.has(businessKey(shop.name)),
-  );
+  const all = [...alreadyListed, ...partnerBacked]
+    .map(shop => ({ ...shop, ...normalizeHostShopAddress(shop) }))
+    .filter(shop => isPubliclyListedHostShop(shop) && !archivedNames.has(businessKey(shop.name)))
+    // Application email is used above only to reject synthetic records. These
+    // operational rows contain no independently verified publication consent.
+    .map(shop => ({ ...shop, email: '' }));
 
 
   if (program) {

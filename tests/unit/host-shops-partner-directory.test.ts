@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { getApprovedShops, getApprovedShopByPublicSlug, PROGRAM_SLUGS } from './host-shops';
+import { getApprovedShops, getApprovedShopByPublicSlug, PROGRAM_SLUGS } from '@/lib/programs/host-shops';
 
 const { rows } = vi.hoisted(() => ({ rows: {} as Record<string, Record<string, unknown>[]> }));
 vi.mock('@/lib/supabase/admin', () => ({
@@ -123,6 +123,25 @@ describe('public Host Shop partner-backed approvals', () => {
     expect(all.find(shop => shop.id === partner.id)?.programs).toEqual([PROGRAM_SLUGS.esthetician, PROGRAM_SLUGS.nail]);
   });
 
+  it('does not let multiple canonical partners claim one ambiguous legacy application', async () => {
+    const second = { ...partner, id: 'other-partner', public_slug: 'other-salon', programs: ['barber'] };
+    rows.partners.push(second);
+    rows.public_host_shops.push({ ...profile, id: second.id, public_slug: second.public_slug });
+    rows.host_shop_partnerships.push({ ...listing, partner_id: second.id });
+    rows.host_shop_applications = [{
+      id: 'ambiguous-legacy', status: 'approved', shop_name: profile.display_name,
+      address: '123 Main St, Indianapolis, IN 46201', intake: { programs: ['cosmetology'] },
+    }];
+
+    const all = await getApprovedShops();
+    expect(all).toHaveLength(3);
+    expect(all.find(shop => shop.id === 'ambiguous-legacy')?.programs).toEqual([PROGRAM_SLUGS.cosmetology]);
+    expect(all.find(shop => shop.id === partner.id)?.programs).toEqual([PROGRAM_SLUGS.esthetician, PROGRAM_SLUGS.nail]);
+    expect(all.find(shop => shop.id === second.id)?.programs).toEqual([PROGRAM_SLUGS.barber]);
+    expect((await getApprovedShopByPublicSlug(partner.public_slug))?.id).toBe(partner.id);
+    expect((await getApprovedShopByPublicSlug(second.public_slug))?.id).toBe(second.id);
+  });
+
   it('does not treat a matching name without location evidence as identity', async () => {
     rows.host_shops = [{ id: 'unlinked', name: profile.display_name, is_approved: true, shop_status: 'active', specializations: ['cosmetology'] }];
     expect(await getApprovedShops()).toHaveLength(2);
@@ -152,6 +171,69 @@ describe('public Host Shop partner-backed approvals', () => {
     expect(all.find(shop => shop.id === 'barber-east')?.programs).toEqual([PROGRAM_SLUGS.barber, PROGRAM_SLUGS.cosmetology]);
     expect(all.find(shop => shop.id === 'salon-east')).toBeUndefined();
     expect((await getApprovedShopByPublicSlug('example-studio-saloneas'))?.id).toBe('barber-east');
+  });
+
+  it('merges matching suite addresses from barber and general applications', async () => {
+    rows.partners = [];
+    rows.public_host_shops = [];
+    rows.host_shop_partnerships = [];
+    rows.barbershop_partner_applications = [{
+      id: 'barber-suite', status: 'approved', shop_legal_name: 'Example Studio',
+      shop_address_line1: '10 East St', shop_address_line2: 'Suite 2',
+      shop_city: 'Indianapolis', shop_state: 'IN', shop_zip: '46201',
+    }];
+    rows.host_shop_applications = [{
+      id: 'salon-suite', status: 'approved', shop_name: 'Example Studio',
+      address: '10 East St, Suite 2, Indianapolis, IN 46201', intake: { programs: ['cosmetology'] },
+    }];
+
+    const all = await getApprovedShops();
+    expect(all).toHaveLength(1);
+    expect(all[0]).toEqual(expect.objectContaining({
+      id: 'barber-suite',
+      address: '10 East St, Suite 2',
+      programs: [PROGRAM_SLUGS.barber, PROGRAM_SLUGS.cosmetology],
+    }));
+    expect((await getApprovedShopByPublicSlug('example-studio-salonsui'))?.id).toBe('barber-suite');
+  });
+
+  it('keeps different suites at one street address as separate worksites', async () => {
+    rows.partners = [];
+    rows.public_host_shops = [];
+    rows.host_shop_partnerships = [];
+    rows.barbershop_partner_applications = [{
+      id: 'barber-suite-2', status: 'approved', shop_legal_name: 'Example Studio',
+      shop_address_line1: '10 East St', shop_address_line2: 'Suite 2',
+      shop_city: 'Indianapolis', shop_state: 'IN', shop_zip: '46201',
+    }];
+    rows.host_shop_applications = [{
+      id: 'salon-suite-3', status: 'approved', shop_name: 'Example Studio',
+      address: '10 East St, Suite 3, Indianapolis, IN 46201', intake: { programs: ['cosmetology'] },
+    }];
+
+    const all = await getApprovedShops();
+    expect(all).toHaveLength(2);
+    expect(all.find(shop => shop.id === 'barber-suite-2')?.programs).toEqual([PROGRAM_SLUGS.barber]);
+    expect(all.find(shop => shop.id === 'salon-suite-3')?.programs).toEqual([PROGRAM_SLUGS.cosmetology]);
+  });
+
+  it('does not publish application contact emails without verified consent', async () => {
+    rows.partners = [];
+    rows.public_host_shops = [];
+    rows.host_shop_partnerships = [];
+    rows.barbershop_partner_applications = [{
+      id: 'barber-email', status: 'approved', shop_legal_name: 'Private Contact Barber',
+      shop_address_line1: '1 Main St', shop_city: 'Indianapolis', shop_state: 'IN', shop_zip: '46201',
+      contact_email: 'private-barber@example.test',
+    }];
+    rows.host_shop_applications = [{
+      id: 'salon-email', status: 'approved', shop_name: 'Private Contact Salon',
+      address: '2 Main St, Indianapolis, IN 46201', intake: { programs: ['cosmetology'] },
+      email: 'private-salon@example.test',
+    }];
+
+    const all = await getApprovedShops();
+    expect(all.map(shop => shop.email)).toEqual(['', '']);
   });
 
   it('does not add partner trades without public directory opt-in', async () => {

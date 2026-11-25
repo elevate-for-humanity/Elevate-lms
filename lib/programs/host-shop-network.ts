@@ -1,5 +1,5 @@
 import onboardingProfiles from '@/lib/partners/host-shop-onboarding-profiles.json';
-import { uniqueHostShops } from '@/lib/partners/dedupe-host-shops.mjs';
+import { hostShopWorksiteKey, uniqueHostShops } from '@/lib/partners/dedupe-host-shops.mjs';
 import { curateShopGallery } from '@/lib/partners/curated-shop-media';
 import 'server-only';
 import { formatHostShopAddress } from '@/lib/partners/host-shop-address';
@@ -52,9 +52,12 @@ function sameBusiness(approved: HostShop, featured: FeaturedHostPartner) {
   const approvedPhone = phoneKey(approved.phone);
   const featuredPhone = phoneKey(featured.phone);
   const samePhone = Boolean(approvedPhone && featuredPhone && approvedPhone === featuredPhone);
+  const approvedWorksite = hostShopWorksiteKey(approvedAddress(approved));
+  const featuredWorksite = hostShopWorksiteKey(featuredAddress(featured));
+  const sameWorksite = Boolean(approvedWorksite && featuredWorksite && approvedWorksite === featuredWorksite);
   // Independent businesses can share a campus, address, or suite. Location
   // alone must never replace a shop's identity, portfolio, or occupations.
-  return sameName || samePhone;
+  return sameName && (samePhone || sameWorksite);
 }
 
 /**
@@ -78,8 +81,12 @@ export async function getHostShopNetwork(includeOnboarding = false): Promise<Hos
       sameBusiness(shop, candidate),
     );
 
-    const publicProfile = onboardingProfiles.find(
-      (profile) => identityKey(profile.name) === identityKey(shop.name),
+    const shopWorksite = hostShopWorksiteKey(approvedAddress(shop));
+    const publicProfile = onboardingProfiles.find((profile) =>
+      profile.slug === shop.publicSlug || (
+        identityKey(profile.name) === identityKey(shop.name) &&
+        shopWorksite && hostShopWorksiteKey(profile.address) === shopWorksite
+      ),
     );
     const gallery = curateShopGallery(featured?.slug ?? shop.publicSlug ?? '', [
       ...(shop.mediaGallery ?? []),

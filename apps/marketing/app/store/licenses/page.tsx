@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+// Branch refreshed to pick up main (e8b0e402): fresh CI after E2E shard 3/4 environment failure on the fcad399b base.
 import Link from 'next/link';
 import { ArrowRight, Check, Code, Shield } from 'lucide-react';
 import { STORE_PRODUCTS, CLONE_LICENSES } from '@/lib/data/store-products';

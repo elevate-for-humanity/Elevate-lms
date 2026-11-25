@@ -1,7 +1,15 @@
 import 'server-only';
 
-import { hydrateProcessEnv } from '@/lib/secrets';
-import { resolveSendingNumber } from './sending-number';
+/**
+ * Retired carrier boundary. Telnyx was replaced by Twilio and the Elevate
+ * PBX; this module intentionally exposes no working provider client. The
+ * two entry points below throw so any resurrected call path fails loudly
+ * instead of sending through a second provider. The TelnyxCallEvent type
+ * remains because lib/phone/event-processing.ts still types the durable
+ * historical-event records with it. Provider-neutral helpers that used to
+ * live here (call-state codec, menu prompt, open hours, public number)
+ * now live in lib/phone/call-helpers.ts.
+ */
 
 export type TelnyxCallEvent = {
   data: {
@@ -39,52 +47,4 @@ export async function telnyxClient(): Promise<never> {
 
 export async function verifyTelnyxWebhook(_body: string, _headers: Headers): Promise<TelnyxCallEvent> {
   throw new Error('Retired carrier webhooks are disabled. Use Twilio and Elevate PBX.');
-}
-
-export function encodeCallState(value: Record<string, string>) {
-  return Buffer.from(JSON.stringify(value), 'utf8').toString('base64');
-}
-
-export function decodeCallState(value?: string): Record<string, string> {
-  if (!value) return {};
-  try {
-    return JSON.parse(Buffer.from(value, 'base64').toString('utf8'));
-  } catch {
-    return {};
-  }
-}
-
-export async function publicPhoneNumber() {
-  await hydrateProcessEnv();
-  const { requireAdminClient } = await import('@/lib/supabase/admin');
-  const number = await resolveSendingNumber(await requireAdminClient());
-  if (!number) throw new Error('An active primary Twilio number is not configured');
-  return number;
-}
-
-export function menuPrompt(greeting: string, options: Array<{ digit: number; label: string }>) {
-  const choices = options.map((option) => `Press ${option.digit} for ${option.label}.`).join(' ');
-  return `${greeting} ${choices}`.trim();
-}
-
-export function isOpenNow(
-  hours: Record<string, [string, string]>,
-  timeZone: string,
-  now = new Date(),
-) {
-  const parts = new Intl.DateTimeFormat('en-US', {
-    timeZone,
-    weekday: 'short',
-    hour: '2-digit',
-    minute: '2-digit',
-    hourCycle: 'h23',
-  }).formatToParts(now);
-  const weekday = parts.find((part) => part.type === 'weekday')?.value.toLowerCase();
-  const hour = parts.find((part) => part.type === 'hour')?.value;
-  const minute = parts.find((part) => part.type === 'minute')?.value;
-  if (!weekday || !hour || !minute) return false;
-  const window = hours[weekday];
-  if (!window) return false;
-  const current = `${hour}:${minute}`;
-  return current >= window[0] && current < window[1];
 }

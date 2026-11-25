@@ -112,9 +112,7 @@ export default async function SignMouPage() {
         ) : (
           <DocumentSignatureBlock
             agreementType="program_holder_mou"
-            agreementVersion={packet?.signingArtifactComplete && revisionId
-              ? achieveDocumentVersion('mou', packet.digest, revisionId)
-              : `3.0-${holder.id}`}
+            agreementVersion={packet?.signingArtifactComplete && revisionId ? achieveDocumentVersion('mou', packet.digest, revisionId) : `3.0-${holder.id}`}
             buttonLabel="Sign Program Holder MOU & Continue"
             nextUrl="/program-holder/dashboard"
           />

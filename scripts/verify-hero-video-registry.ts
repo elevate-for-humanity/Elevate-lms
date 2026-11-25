@@ -7,6 +7,7 @@ import {
 } from '../lib/video/registry';
 
 const LIVE = process.argv.includes('--live');
+const LIVE_ORIGIN = process.env.HERO_REGISTRY_LIVE_ORIGIN || 'https://www.elevateforhumanity.org';
 const errors: string[] = [];
 const liveAccessErrors: string[] = [];
 const expectedPageKeys = [
@@ -65,7 +66,13 @@ for (const pageKey of expectedPageKeys) {
   if (video.status !== 'live') fail(`${pageKey}: ${videoId} is not marked live`);
   if (video.mime_type !== 'video/mp4') fail(`${pageKey}: ${videoId} must be video/mp4`);
   if (!video.cors_enabled) fail(`${pageKey}: ${videoId} must declare CORS enabled`);
-  if (!video.video_url.startsWith('https://')) fail(`${pageKey}: ${videoId} must use HTTPS`);
+  if (video.video_url.startsWith('/')) {
+    if (!video.video_url.startsWith('/videos/') || !localPosterExists(video.video_url)) {
+      fail(`${pageKey}: same-origin video file does not exist under public/videos: ${video.video_url}`);
+    }
+  } else if (!video.video_url.startsWith('https://')) {
+    fail(`${pageKey}: ${videoId} must use HTTPS or a same-origin /videos/ path`);
+  }
   if (!video.thumbnail_url) fail(`${pageKey}: ${videoId} is missing a poster`);
   if (video.thumbnail_url && !localPosterExists(video.thumbnail_url)) {
     fail(`${pageKey}: poster file does not exist: ${video.thumbnail_url}`);
@@ -93,7 +100,7 @@ if (LIVE) {
     if (!video) continue;
     try {
       const probe = async (headers: Record<string, string>) =>
-        fetch(video.video_url, { headers, redirect: 'follow' });
+        fetch(new URL(video.video_url, LIVE_ORIGIN), { headers, redirect: 'follow' });
 
       // Some object-storage/CDN front doors reject byte-range probes from
       // datacenter runners even though ordinary browser GET playback is healthy.

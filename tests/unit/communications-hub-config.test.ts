@@ -7,7 +7,7 @@ import {
   validMenuDigit,
 } from '@/lib/phone/config';
 import { communicationsKnowledgeFor } from '@/lib/paris/communications-knowledge';
-import { isOpenNow, menuPrompt } from '@/lib/phone/telnyx';
+import { isOpenNow, menuPrompt } from '@/lib/phone/call-helpers';
 
 describe('Communications Hub configuration', () => {
   it('normalizes US cell phones without changing ownership semantics', () => {
@@ -55,7 +55,7 @@ describe('Communications Hub configuration', () => {
   });
 });
 
-describe('Telnyx routing helpers', () => {
+describe('Phone routing helpers', () => {
   it('builds a spoken menu from enabled options', () => {
     expect(menuPrompt('Welcome.', [{ digit: 1, label: 'Admissions' }])).toBe(
       'Welcome. Press 1 for Admissions.',

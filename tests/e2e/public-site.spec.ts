@@ -332,7 +332,24 @@ test.describe('application entry audit', () => {
     await expect(page.getByRole('link', { name: 'Full Enrollment Application' })).toBeVisible();
   });
 
-  for (const route of ['/apply/student', '/programs/barber-apprenticeship/apply']) {
+  // /programs/barber-apprenticeship/apply is intentionally a choice page
+  // ("Choose the correct Barber application") with link cards, not a form
+  // — it has no form/input/select/textarea/submit control by design. The
+  // actionable experience is the three choice links (Free Inquiry,
+  // Enrollment Application, Host Shop). It must not be in the form-control
+  // loop below: that loop failed on every attempt in runs 45618248042,
+  // 45623494284, 45623385379, 45623494305 and 45623487036.
+  test('/programs/barber-apprenticeship/apply exposes an actionable application experience', async ({
+    page,
+  }) => {
+    test.setTimeout(300_000);
+    await assertNoRuntimeFailure(page, '/programs/barber-apprenticeship/apply');
+    await expect(page.getByRole('link', { name: 'Submit Free Inquiry' })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Start Enrollment' })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Start Host Site Application' })).toBeVisible();
+  });
+
+  for (const route of ['/apply/student']) {
     test(`${route} exposes an actionable application experience`, async ({ page }) => {
       test.setTimeout(300_000);
       await assertNoRuntimeFailure(page, route);

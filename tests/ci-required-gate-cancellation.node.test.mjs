@@ -25,3 +25,11 @@ test('the actual required-gate script accepts only a completely successful diagn
     assert.notEqual(execute({ ...success, [name]: result }), 0, `${name}=${result} must block acceptance`);
   }
 });
+
+
+test('pending exact-head browser evidence exits normally before the CI job timeout so the completion finalizer can retry', () => {
+  const step = gate.split('      - name: Require completed exact-head browser acceptance for pull requests\n')[1];
+  assert.ok(step, 'The required exact-head browser receipt must remain present');
+  assert.match(step, /^\s+E2E_EVIDENCE_TIMEOUT_MS:\s*'0'\s*$/m, 'Use a single evidence check; the trusted completion finalizer handles pending browsers');
+  assert.match(step, /^\s+run: node scripts\/ci\/require-exact-pr-browser-evidence\.mjs\s*$/m);
+});

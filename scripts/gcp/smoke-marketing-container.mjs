@@ -1,4 +1,5 @@
 // Branch refreshed to pick up main (71e31a22): /apply/student E2E fix + Dockerfile.google-lms.
+// Branch refreshed to pick up main (dbe7a427): fresh CI after E2E shard 3/4 environment failure on the 433802fb base.
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
 import { assertStorePageChrome } from './store-page-contract.mjs';

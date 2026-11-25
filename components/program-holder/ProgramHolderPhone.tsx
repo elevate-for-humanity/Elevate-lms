@@ -198,7 +198,7 @@ export function ProgramHolderPhone({
   // whichever way this page was opened.
   useEffect(() => {
     if (callState === 'ringing') {
-      document.getElementById('incoming-call-card')?.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      document.getElementById('incoming-call-card')?.scrollIntoView?.({ block: 'center', behavior: 'smooth' });
     }
   }, [callState]);
 

@@ -21,12 +21,29 @@ const db = createClient(supabaseUrl, serviceRoleKey, {
   auth: { autoRefreshToken: false, persistSession: false },
 });
 
+// The isolated QA project is the default. The release-acceptance workflow
+// runs these fixtures against production with disposable, per-run identities
+// (owner-approved 2026-11-24: throwaway users on the live site, removed by
+// the workflow cleanup step). Production is allowed only with the explicit
+// opt-in flag, and only for the production host — any other host is rejected.
+const allowProductionDisposables =
+  process.env.QA_E2E_ALLOW_PRODUCTION_DISPOSABLES === '1';
 const qaHostname = new URL(supabaseUrl).hostname;
 if (qaHostname !== 'isdgjcdabhxxozarmxta.supabase.co') {
-  throw new Error('This fixture may run only against the isolated QA project');
+  if (!(allowProductionDisposables && qaHostname === 'cuxzzpsyufcewtmicszk.supabase.co')) {
+    throw new Error(
+      'This fixture may run only against the isolated QA project, or against production with QA_E2E_ALLOW_PRODUCTION_DISPOSABLES=1',
+    );
+  }
 }
 
 const tenantId = '6ba71334-58f4-4104-9b2a-5114f2a7614c';
+// Production disposables are the only mode that may touch the live
+// project. In that mode the disposable enrollment must never be a paid
+// enrollment (see the enrollment insert below): a paid row invites
+// billing/reconciliation and RAPIDS side effects that cleanup cannot
+// fully unwind. QA mode keeps the verified self-pay grant.
+const isProductionDisposable = qaHostname === 'cuxzzpsyufcewtmicszk.supabase.co';
 // The desktop-chrome workflow runs shards in parallel against the same QA
 // project: QA_PORTAL_E2E_RUN_ID is per-shard (run-attempt-shard), while
 // GITHUB_RUN_ID is shared, so a shared marker would collide on the
@@ -89,9 +106,22 @@ async function createQaUser(kind, role, fullName, profileTenantId) {
 }
 
 async function provision() {
-  let state = { runId, marker, host: null, apprentice: null, partnerId: null, shopId: null, hostShopId: null, enrollmentId: null, placementId: null };
+  let state = { runId, marker, host: null, apprentice: null, approver: null, partnerId: null, shopId: null, hostShopId: null, enrollmentId: null, placementId: null };
 
   try {
+    // Production disposables are approved by a dedicated QA approver
+    // identity created by this fixture — never by a real administrator.
+    // The learner gate admits a waived enrollment only with a recorded
+    // manual approval (approved_at + approved_by), so the approver must
+    // exist before the enrollment is inserted. QA mode does not create
+    // one: it keeps the verified self-pay grant and needs no approver.
+    let approver = null;
+    if (isProductionDisposable) {
+      approver = await createQaUser('approver', 'admin', '[QA E2E] Approver');
+      state.approver = approver;
+      // Persist every completed resource immediately so interrupted QA can clean it.
+      await writePrivateQaState(statePath, state);
+    }
     const program = await must(
       db.from('programs').select('id,slug,organization_id,tenant_id').eq('slug', 'barber-apprenticeship').maybeSingle(),
       'load barber apprenticeship program',
@@ -236,6 +266,40 @@ async function provision() {
       'create QA shop supervisor assignment',
     );
 
+    // The apprentice layout admits only enrollments that pass
+    // hasApprovedPaidLearnerEnrollment (lib/learner/approved-paid-admission.mjs):
+    // access_status active/granted + access_granted_at + (manual approval
+    // OR verified self-pay with a payment reference) + a settled payment
+    // status. The old row set access_granted_at but no access_status,
+    // payment_status 'qa_test' (which the admission test explicitly lists
+    // as non-admitting), and no approval or verification, so the
+    // disposable apprentice landed on /lms/access-pending and no
+    // apprentice surface could be certified (run 45266295624, shard 4/4).
+    // Production disposables are WAIVED, never paid: a paid row carries a
+    // synthetic payment_reference and self-pay verification, and invites
+    // billing/reconciliation side effects that cleanup cannot fully
+    // unwind. The gate admits 'waived' as a settled payment status, so
+    // the production enrollment is waived + fixture-approved by the QA
+    // approver identity created above (no payment reference, no self-pay
+    // verification). QA mode keeps the verified self-pay grant so the
+    // isolated-QA playback path is unchanged. A voucher (WIOA) shape was
+    // rejected: it would fabricate a funding claim for a synthetic
+    // enrollment and could trigger voucher-payout processing. The QA
+    // marker survives on funding_pathway 'qa_e2e', draft_data and
+    // source 'qa_e2e'.
+    const productionPayment = {
+      payment_status: 'waived',
+      funding_status: 'waived',
+      approved_at: new Date().toISOString(),
+      approved_by: approver ? approver.id : null,
+    };
+    const qaPayment = {
+      payment_status: 'paid',
+      funding_status: 'unfunded_self_continuing',
+      payment_reference: `qa-e2e-${runId}`,
+      self_pay_application_verified_at: new Date().toISOString(),
+    };
+    const enrollmentPayment = isProductionDisposable ? productionPayment : qaPayment;
     const enrollment = await must(
       db.from('program_enrollments').insert({
         user_id: apprentice.id,
@@ -250,26 +314,10 @@ async function provision() {
         enrolled_at: new Date().toISOString(),
         started_at: new Date().toISOString(),
         access_granted_at: new Date().toISOString(),
-        // The apprentice layout admits only enrollments that pass
-        // hasApprovedPaidLearnerEnrollment (lib/learner/approved-paid-admission.mjs):
-        // access_status active/granted + access_granted_at + (manual approval
-        // OR verified self-pay with a payment reference) + a paid payment
-        // status. The fixture is self-pay QA, so it carries the verified
-        // self-pay grant — the same fields PR #2822's paid-access grant
-        // writes for real paid enrollments. The old row set access_granted_at
-        // but no access_status, payment_status 'qa_test' (which the admission
-        // test explicitly lists as non-admitting), and no approval or
-        // verification, so the disposable apprentice landed on
-        // /lms/access-pending and no apprentice surface could be certified
-        // (run 45266295624, shard 4/4). The QA marker survives on
-        // funding_pathway 'qa_e2e', draft_data and source 'qa_e2e'.
         access_status: 'active',
-        self_pay_application_verified_at: new Date().toISOString(),
-        payment_reference: `qa-e2e-${runId}`,
         funding_source: 'SELF_PAY',
         funding_pathway: 'qa_e2e',
-        funding_status: 'unfunded_self_continuing',
-        payment_status: 'paid',
+        ...enrollmentPayment,
         ...isolatedAccess,
         funding_verified: false,
         organization_id: program.organization_id,
@@ -354,7 +402,7 @@ async function cleanup() {
   }
 
   const expectedEmail = (kind) => `${state.marker}-${kind}@qa.invalid`;
-  for (const kind of ['host', 'apprentice']) {
+  for (const kind of ['host', 'apprentice', 'approver']) {
     if (state[kind] && (!state[kind].id || state[kind].email !== expectedEmail(kind))) {
       throw new Error(`QA cleanup rejected unexpected ${kind} identity`);
     }
@@ -365,9 +413,31 @@ async function cleanup() {
     if (error) throw new Error(`QA cleanup ${label}: ${error.message}`);
     return data;
   };
+  // Derived tables may not exist in the isolated QA project (minimal
+  // schema: 58 migrations vs production's 1515). A missing table means
+  // no derived rows could have been created there, so "table does not
+  // exist" is ignored; every other error still fails cleanup.
+  const isMissingTableError = (error) => {
+    const code = String(error?.code || '');
+    const message = String(error?.message || '');
+    return code === 'PGRST205' || /could not find the table|relation .* does not exist|42P01/i.test(message);
+  };
+  const deleteDerived = async (promise, label) => {
+    const { error } = await promise;
+    if (error && !isMissingTableError(error)) throw new Error(`QA cleanup ${label}: ${error.message}`);
+  };
+  const assertDerivedGone = async (promise, label) => {
+    const { data, error } = await promise;
+    if (error) {
+      if (isMissingTableError(error)) return;
+      throw new Error(`QA cleanup verify ${label}: ${error.message}`);
+    }
+    if ((data || []).length) throw new Error(`QA cleanup incomplete: ${label}`);
+  };
   const { enrollmentId, placementId, shopId, hostShopId, partnerId } = state;
   const hostId = state.host?.id;
   const apprenticeId = state.apprentice?.id;
+  const approverId = state.approver?.id;
   // Fail BEFORE any destructive action if this fixture gained regulated records.
   if (placementId) {
     const placement = await checked(db.from('apprentice_placements')
@@ -410,17 +480,46 @@ async function cleanup() {
       throw new Error('QA cleanup rejected non-fixture partner');
     }
   }
-  for (const [userId, kind] of [[hostId, 'host'], [apprenticeId, 'apprentice']]) {
+  for (const [userId, kind] of [[hostId, 'host'], [apprenticeId, 'apprentice'], [approverId, 'approver']]) {
     if (!userId) continue;
     const profile = await checked(db.from('profiles').select('id,email').eq('id', userId).maybeSingle(),
       `load ${kind} profile`);
     if (profile && profile.email !== expectedEmail(kind)) throw new Error('QA cleanup rejected non-fixture profile');
   }
 
+  // Derived rows created by database triggers on the active enrollment
+  // insert. program_holder_students and course_enrollments reference the
+  // enrollment and are removed BEFORE it; the outbox/queue/event rows
+  // below reference it only by id/payload and are removed AFTER it.
+  if (enrollmentId) await deleteDerived(db.from('program_holder_students')
+    .delete().eq('enrollment_id', enrollmentId), 'delete holder-student link');
+  if (apprenticeId) await deleteDerived(db.from('course_enrollments')
+    .delete().eq('student_id', apprenticeId), 'delete mirrored course enrollments');
   if (enrollmentId) await checked(db.from('apprentice_competency_records')
     .delete().eq('enrollment_id', enrollmentId), 'delete competency records');
   if (placementId) await checked(db.from('apprentice_placements').delete().eq('id', placementId), 'delete placement');
   if (enrollmentId) await checked(db.from('program_enrollments').delete().eq('id', enrollmentId), 'delete enrollment');
+  if (enrollmentId) {
+    // Trigger-derived outbox and queue rows. The RAPIDS queue entry, the
+    // staff notification, the welcome email and the platform event are
+    // created for ANY active apprenticeship enrollment (not only paid
+    // ones), so they must be removed even in the waived production path.
+    // The enrollment_insert_audit row is intentionally retained: it is an
+    // append-only audit trail of the fixture insert, not a billing or
+    // lifecycle record.
+    await deleteDerived(db.from('rapids_action_queue').delete()
+      .eq('entity_type', 'apprentice').eq('entity_id', enrollmentId)
+      .eq('action_type', 'register_apprentice'), 'delete RAPIDS queue entry');
+    await deleteDerived(db.from('staff_notifications').delete()
+      .eq('type', 'apprentice_ready_for_rapids')
+      .eq('metadata->>enrollment_id', enrollmentId), 'delete RAPIDS staff notification');
+    await deleteDerived(db.from('notification_outbox').delete()
+      .eq('template_key', 'enrollment_welcome').eq('entity_type', 'program_enrollment')
+      .eq('entity_id', enrollmentId), 'delete welcome outbox entry');
+    await deleteDerived(db.from('platform_events').delete()
+      .eq('event_type', 'enrollment.confirmed').eq('subject_type', 'program_enrollment')
+      .eq('subject_id', enrollmentId), 'delete enrollment platform event');
+  }
   if (shopId) await checked(db.from('shop_staff').delete().eq('shop_id', shopId), 'delete shop staff');
   if (hostId && partnerId) await checked(db.from('partner_users').delete()
     .eq('user_id', hostId).eq('partner_id', partnerId), 'delete partner membership');
@@ -428,7 +527,9 @@ async function cleanup() {
   if (recoveredHostShopId) await checked(db.from('host_shops').delete().eq('id', recoveredHostShopId), 'delete host shop');
   if (partnerId) await checked(db.from('partners').delete().eq('id', partnerId), 'delete partner');
 
-  for (const [userId, kind] of [[apprenticeId, 'apprentice'], [hostId, 'host']]) {
+  // The approver is removed after the enrollment it approved, so the
+  // approval foreign key stays valid until the enrollment is gone.
+  for (const [userId, kind] of [[apprenticeId, 'apprentice'], [hostId, 'host'], [approverId, 'approver']]) {
     if (!userId) continue;
     await checked(db.from('profiles').delete().eq('id', userId), `delete ${kind} profile`);
     const { error } = await db.auth.admin.deleteUser(userId, true);
@@ -449,13 +550,33 @@ async function cleanup() {
       `verify ${table} teardown`);
     if (remaining.length) throw new Error(`QA cleanup incomplete: ${table}`);
   }
-  for (const userId of [apprenticeId, hostId].filter(Boolean)) {
+  for (const userId of [apprenticeId, hostId, approverId].filter(Boolean)) {
     const remaining = await checked(db.from('profiles').select('id').eq('id', userId).limit(1),
       'verify profile teardown');
     if (remaining.length) throw new Error('QA cleanup incomplete: profile');
     const { data, error } = await db.auth.admin.getUserById(userId);
     if (error && !/not found/i.test(error.message)) throw new Error(`QA Auth readback: ${error.message}`);
     if (data?.user && !data.user.deleted_at) throw new Error('QA Auth identity remains active');
+  }
+  // Verify the trigger-derived rows are gone (skipped where the table
+  // does not exist in the QA project).
+  if (apprenticeId) await assertDerivedGone(db.from('course_enrollments')
+    .select('id').eq('student_id', apprenticeId).limit(1), 'course enrollments');
+  if (enrollmentId) {
+    await assertDerivedGone(db.from('program_holder_students')
+      .select('id').eq('enrollment_id', enrollmentId).limit(1), 'holder-student link');
+    await assertDerivedGone(db.from('rapids_action_queue')
+      .select('id').eq('entity_type', 'apprentice').eq('entity_id', enrollmentId)
+      .eq('action_type', 'register_apprentice').limit(1), 'RAPIDS queue entry');
+    await assertDerivedGone(db.from('staff_notifications')
+      .select('id').eq('type', 'apprentice_ready_for_rapids')
+      .eq('metadata->>enrollment_id', enrollmentId).limit(1), 'RAPIDS staff notification');
+    await assertDerivedGone(db.from('notification_outbox')
+      .select('id').eq('template_key', 'enrollment_welcome')
+      .eq('entity_type', 'program_enrollment').eq('entity_id', enrollmentId).limit(1), 'welcome outbox entry');
+    await assertDerivedGone(db.from('platform_events')
+      .select('id').eq('event_type', 'enrollment.confirmed')
+      .eq('subject_type', 'program_enrollment').eq('subject_id', enrollmentId).limit(1), 'enrollment platform event');
   }
   console.log(JSON.stringify({ ok: true, cleanedRunId: state.runId }));
 }

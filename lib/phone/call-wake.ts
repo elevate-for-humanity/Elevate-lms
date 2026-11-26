@@ -67,6 +67,12 @@ export type CallWakePlan =
   | { send: true }
   | { send: false; reason: Exclude<CallWakeReason, 'sent'> };
 
+function isCallWakeSkip(
+  plan: CallWakePlan,
+): plan is { send: false; reason: Exclude<CallWakeReason, 'sent'> } {
+  return !plan.send;
+}
+
 const MUTED_RING_MODES = new Set(['offline', 'do_not_disturb', 'silent']);
 
 /** Pure targeting decision, in priority order. */
@@ -171,7 +177,7 @@ export async function sendCallWakePush(
     liveDeviceCount,
     pushEnabled: preferences?.push_enabled,
   });
-  if (!plan.send) return { sent: false, reason: plan.reason };
+  if (isCallWakeSkip(plan)) return { sent: false, reason: plan.reason };
   let acceptedDeviceCount = 0;
   try {
     acceptedDeviceCount = await sendPush(profileId, buildCallWakeNotification(input));

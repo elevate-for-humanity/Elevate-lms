@@ -7,6 +7,10 @@ on:
   workflow_dispatch:
   deployment_status:
 
+permissions:
+  contents: read
+  pull-requests: write
+
 jobs:
   # Skip non-terminal deployment states gracefully
   check-state:
@@ -91,86 +95,66 @@ jobs:
           - [View Workflow](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
           EOF
 
-      - name: Comment on PR (if applicable)
-        if: github.event.deployment_status.state == 'success' && github.event.pull_request
+      - name: Comment on associated PR
+        if: github.event.deployment_status.state == 'success' && steps.deployment.outputs.commit != ''
         uses: actions/github-script@v7
+        env:
+          HEALTH_RESULT: ${{ steps.health.outputs.result || 'Skipped' }}
+          DEPLOYMENT_URL: ${{ steps.deployment.outputs.url }}
+          DEPLOYMENT_ENVIRONMENT: ${{ steps.deployment.outputs.environment }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         with:
           script: |
-            const { data: comments } = await github.rest.issues.listComments({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.payload.pull_request.number,
+            // Ported from fix PR #3 (acde0ac): deployment_status events carry no
+            // github.event.pull_request, so resolve the PR from the deployment SHA.
+            const { owner, repo } = context.repo;
+            const { data: pulls } = await github.rest.repos.listPullRequestsAssociatedWithCommit({
+              owner, repo, commit_sha: '${{ steps.deployment.outputs.commit }}',
             });
-
-            const botComment = comments.find(comment =>
-              comment.user.type === 'Bot' &&
-              comment.body.includes('Deployment Status')
-            );
-
-            const body = `## 🚀 Deployment Status: ${{ steps.deployment.outputs.state == 'success' && '✅ Success' || '❌ Failed' }}
-
-            **Environment:** ${{ steps.deployment.outputs.environment }}
-            **URL:** ${{ steps.deployment.outputs.url }}
-            **Health Check:** ${{ steps.health.outputs.result || 'N/A' }}
-
-            [View Deployment](${{ steps.deployment.outputs.url }}) | [View Logs](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})`;
-
-            if (botComment) {
-              await github.rest.issues.updateComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                comment_id: botComment.id,
-                body: body
-              });
+            if (pulls.length !== 1) {
+              core.info(`Skipping PR comment: found ${pulls.length} associated PRs.`);
+              return;
+            }
+            const issue_number = pulls[0].number;
+            const marker = '<!-- deployment-notification -->';
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              owner, repo, issue_number,
+            });
+            const existing = comments.find(comment =>
+              comment.user?.login === 'github-actions[bot]' &&
+              comment.body?.startsWith(marker));
+            const body = [
+              marker,
+              '## Deployment Status: Success',
+              `**Environment:** ${process.env.DEPLOYMENT_ENVIRONMENT}`,
+              `**Health check:** ${process.env.HEALTH_RESULT}`,
+              process.env.DEPLOYMENT_URL ? `[View deployment](${process.env.DEPLOYMENT_URL})` : '',
+              `[View workflow](${process.env.RUN_URL})`,
+            ].filter(Boolean).join('\n\n');
+            if (existing) {
+              await github.rest.issues.updateComment({ owner, repo, comment_id: existing.id, body });
             } else {
-              await github.rest.issues.createComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: context.payload.pull_request.number,
-                body: body
-              });
+              await github.rest.issues.createComment({ owner, repo, issue_number, body });
             }
 
-      - name: Send Slack notification (optional)
-        if: env.SLACK_WEBHOOK_URL != ''
+      - name: Send Slack notification
+        if: ${{ !cancelled() && env.SLACK_WEBHOOK_URL != '' }}
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          HEALTH_RESULT: ${{ steps.health.outputs.result || 'Skipped' }}
+          DEPLOYMENT_STATE: ${{ steps.deployment.outputs.state }}
+          DEPLOYMENT_ENVIRONMENT: ${{ steps.deployment.outputs.environment }}
+          DEPLOYMENT_URL: ${{ steps.deployment.outputs.url }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
-          STATUS_EMOJI="${{ steps.deployment.outputs.state == 'success' && '✅' || '❌' }}"
-          STATUS_TEXT="${{ steps.deployment.outputs.state == 'success' && 'Success' || 'Failed' }}"
-
-          curl -X POST "$SLACK_WEBHOOK_URL" \
-            -H 'Content-Type: application/json' \
-            -d "{
-              \"text\": \"${STATUS_EMOJI} Deployment ${STATUS_TEXT}\",
-              \"blocks\": [
-                {
-                  \"type\": \"section\",
-                  \"text\": {
-                    \"type\": \"mrkdwn\",
-                    \"text\": \"*Deployment ${STATUS_TEXT}*\n\n*Environment:* ${{ steps.deployment.outputs.environment }}\n*URL:* ${{ steps.deployment.outputs.url }}\n*Health:* ${{ steps.health.outputs.result || 'N/A' }}\"
-                  }
-                },
-                {
-                  \"type\": \"actions\",
-                  \"elements\": [
-                    {
-                      \"type\": \"button\",
-                      \"text\": {
-                        \"type\": \"plain_text\",
-                        \"text\": \"View Deployment\"
-                      },
-                      \"url\": \"${{ steps.deployment.outputs.url }}\"
-                    },
-                    {
-                      \"type\": \"button\",
-                      \"text\": {
-                        \"type\": \"plain_text\",
-                        \"text\": \"View Logs\"
-                      },
-                      \"url\": \"https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\"
-                    }
-                  ]
-                }
-              ]
-            }"
+          # Ported from fix PR #3 (acde0ac): encode the Slack payload with jq
+          # instead of interpolating values into a JSON string.
+          payload=$(jq -n --arg state "$DEPLOYMENT_STATE" \
+            --arg environment "$DEPLOYMENT_ENVIRONMENT" --arg health "$HEALTH_RESULT" \
+            --arg deployment "$DEPLOYMENT_URL" --arg run "$RUN_URL" '
+              {text: ("Deployment " + $state + "\nEnvironment: " + $environment +
+                "\nHealth: " + $health +
+                (if $deployment == "" then "" else "\nDeployment: " + $deployment end) +
+                "\nWorkflow: " + $run)}')
+          curl --fail --silent --show-error --connect-timeout 5 --max-time 15 \
+            --output /dev/null --json "$payload" -- "$SLACK_WEBHOOK_URL"

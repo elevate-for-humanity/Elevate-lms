@@ -12,26 +12,33 @@ import time
 import urllib.request
 import io
 import wave
-OPERATOR="; Managed Elevate operator fallback\n[internal]\nexten => 0,1,Gosub(elevate-operator,s,1)\n same => n,Hangup()\n[elevate-operator]\nexten => s,1,GotoIf($[${DIALPLAN_EXISTS(elevate-pwa-extensions,0,1)}=0]?voicemail)\n same => n,Gosub(elevate-pwa-extensions,0,1)\n same => n,GotoIf($[\"${DIALSTATUS}\"=\"ANSWER\"]?done)\n same => n(voicemail),VoiceMail(0@elevate,u)\n same => n(done),Return()\n"
+OPERATOR_TEMPLATE="; Managed Elevate operator fallback\n[internal]\nexten => 0,1,Gosub(elevate-operator,s,1)\n same => n,Hangup()\n[elevate-operator]\nexten => s,1,GotoIf($[${DIALPLAN_EXISTS(elevate-pwa-extensions,{admin},1)}=0]?voicemail)\n same => n,Gosub(elevate-pwa-extensions,{admin},1)\n same => n,GotoIf($[\"${DIALSTATUS}\"=\"ANSWER\"]?done)\n same => n(voicemail),VoiceMail({admin}@elevate,u)\n same => n(done),Return()\n"
+def operator_template(admin_extension):
+    # The caller-facing operator entry stays digit 0 in [internal]; the ring
+    # target and the voicemail box follow phone_systems.admin_extension.
+    return OPERATOR_TEMPLATE.replace('{admin}',admin_extension)
+OPERATOR=operator_template('0')
 FORWARD_NUMBER='+13179562748'
 OWNER='964dc85a-bce8-4e67-92eb-198ffafb2384'
 ANNOUNCEMENT='Elevate for Humanity. Press 1 to accept this call.'
 
 def operator_route(system,owner):
-    if system.get('id')!='341f59a3-b1d6-4360-8463-0ce0402f86fe' or system.get('tenant_id','missing') is not None or system.get('status')!='active' or system.get('admin_extension')!='0':
+    admin=system.get('admin_extension')
+    if system.get('id')!='341f59a3-b1d6-4360-8463-0ce0402f86fe' or system.get('tenant_id','missing') is not None or system.get('status')!='active' or not isinstance(admin,str) or not re.fullmatch('(0|[1-9][0-9]{2})',admin):
         raise ValueError('operator_system_unverified')
-    if owner.get('profile_id')!=OWNER or owner.get('extension')!='0' or owner.get('enabled') is not True:
+    if owner.get('profile_id')!=OWNER or owner.get('extension')!=admin or owner.get('enabled') is not True:
         raise ValueError('operator_owner_unverified')
+    base=operator_template(admin)
     if not owner.get('admin_external_fallback'):
-        return OPERATOR
+        return base
     if owner.get('external_fallback_number')!=FORWARD_NUMBER:
         raise ValueError('operator_forward_number_requires_review')
     # An offline extension (no app/handset online) still forwards to the cell;
     # only explicit Do Not Disturb goes straight to voicemail.
     if owner.get('ring_mode')=='do_not_disturb':
-        return OPERATOR
-    return OPERATOR.replace('?voicemail)', '?cellular)').replace(
-        ' same => n(voicemail),VoiceMail(0@elevate,u)',
+        return base
+    return base.replace('?voicemail)', '?cellular)').replace(
+        ' same => n(voicemail),VoiceMail('+admin+'@elevate,u)',
         ' same => n(cellular),Set(ELEVATE_ORIGINAL_NAME=${CALLERID(name)})\n'
         ' same => n,Set(ELEVATE_ORIGINAL_NUMBER=${CALLERID(num)})\n'
         ' same => n,Set(CALLERID(name)=Elevate for Humanity)\n'
@@ -41,7 +48,7 @@ def operator_route(system,owner):
         ' same => n,Set(CALLERID(name)=${ELEVATE_ORIGINAL_NAME})\n'
         ' same => n,Set(CALLERID(num)=${ELEVATE_ORIGINAL_NUMBER})\n'
         ' same => n,GotoIf($["${ELEVATE_OWNER_ACCEPTED}"="1"]?done)\n'
-        ' same => n(voicemail),VoiceMail(0@elevate,u)') + (
+        ' same => n(voicemail),VoiceMail('+admin+'@elevate,u)') + (
         '[elevate-owner-accept]\n'
         'exten => s,1,Read(ELEVATE_ACCEPT,custom/elevate-owner-call,1,,1,8)\n'
         ' same => n,GotoIf($["${ELEVATE_ACCEPT}"="1"]?accepted)\n'
@@ -143,15 +150,17 @@ def configure():
     if not re.fullmatch('[0-9a-f-]{36}',system): raise ValueError('voicemail_phone_system_invalid')
     systems=get(values['SUPABASE_URL']+'/rest/v1/phone_systems?select=id,tenant_id,status,admin_extension&id=eq.'+system,headers)
     if len(systems)!=1:raise ValueError('operator_system_unverified')
+    admin_extension=str(systems[0].get('admin_extension') or '')
+    base=operator_template(admin_extension)
     workspaces=get(values['SUPABASE_URL']+'/rest/v1/communication_workspaces?select=id&phone_system_id=eq.'+system,headers)
     if len(workspaces)!=1: raise ValueError('voicemail_workspace_unverified')
     rows=get(values['SUPABASE_URL']+'/rest/v1/communication_extensions?select=extension,display_name,department&enabled=eq.true&workspace_id=eq.'+workspaces[0]['id'],headers)
-    owners=get(values['SUPABASE_URL']+'/rest/v1/communication_extensions?select=profile_id,extension,enabled,admin_external_fallback,external_fallback_number,ring_mode&extension=eq.0&workspace_id=eq.'+workspaces[0]['id'],headers)
+    owners=get(values['SUPABASE_URL']+'/rest/v1/communication_extensions?select=profile_id,extension,enabled,admin_external_fallback,external_fallback_number,ring_mode&extension=eq.'+admin_extension+'&workspace_id=eq.'+workspaces[0]['id'],headers)
     if len(owners)!=1:raise ValueError('operator_owner_unverified')
     route=operator_route(systems[0],owners[0])
     enhanced=operator_route(systems[0],{**owners[0],'admin_external_fallback':True,'external_fallback_number':FORWARD_NUMBER,'ring_mode':'ring'})
-    rows=[row for row in rows if row['extension']=='0' or 'prestige' not in (str(row.get('display_name',''))+' '+str(row.get('department',''))).lower()]
-    if not rows or not any(row['extension']=='0' for row in rows) or any(not re.fullmatch('(0|[1-9][0-9]{2})',row['extension']) for row in rows):
+    rows=[row for row in rows if row['extension']==admin_extension or 'prestige' not in (str(row.get('display_name',''))+' '+str(row.get('department',''))).lower()]
+    if not rows or not any(row['extension']==admin_extension for row in rows) or any(not re.fullmatch('(0|[1-9][0-9]{2})',row['extension']) for row in rows):
         raise ValueError('assigned_operator_and_mailboxes_required')
     mailbox=ROOT/'voicemail.conf'
     previous=mailbox.read_text() if mailbox.exists() else ''
@@ -173,9 +182,9 @@ def configure():
     destination=ROOT/'elevate-operator.conf'
     if destination.is_symlink():raise ValueError('existing_operator_route_requires_review')
     prior_operator=destination.read_text() if destination.exists() else None
-    if prior_operator is not None and prior_operator not in [OPERATOR,enhanced]: raise ValueError('existing_operator_route_requires_review')
+    if prior_operator is not None and prior_operator not in [base,enhanced]: raise ValueError('existing_operator_route_requires_review')
     prompt=None;prior_prompt=None
-    if route!=OPERATOR:
+    if route!=base:
         container=json.loads(run(['docker','inspect','pbx_asterisk_1']))[0]
         if container['Config']['Image']!='mlan/asterisk:xtra-1.1.13':raise ValueError('operator_container_unverified')
         mounts=[m for m in container['Mounts'] if m['Destination']=='/var/lib/asterisk' and m.get('RW')]
@@ -213,8 +222,11 @@ def configure():
         plan=run(['docker','exec','pbx_asterisk_1','asterisk','-rx','dialplan show 0@internal'])
         if not match or int(match[1])!=len(rows) or 'Gosub(elevate-operator,s,1)' not in plan:
             raise ValueError('operator_or_mailbox_verification_failed')
-        if route!=OPERATOR:
-            forwarding=run(['docker','exec','pbx_asterisk_1','asterisk','-rx','dialplan show s@elevate-operator'])
+        operator_plan=run(['docker','exec','pbx_asterisk_1','asterisk','-rx','dialplan show s@elevate-operator'])
+        if 'Gosub(elevate-pwa-extensions,'+admin_extension+',1)' not in operator_plan or 'VoiceMail('+admin_extension+'@elevate,u)' not in operator_plan:
+            raise ValueError('operator_or_mailbox_verification_failed')
+        if route!=base:
+            forwarding=operator_plan
             whisper=run(['docker','exec','pbx_asterisk_1','asterisk','-rx','dialplan show s@elevate-owner-accept'])
             if 'Dial(PJSIP/'+FORWARD_NUMBER+'@twilio,25,U(elevate-owner-accept))' not in forwarding or 'custom/elevate-owner-call' not in whisper or 'MASTER_CHANNEL(ELEVATE_OWNER_ACCEPTED)' not in whisper:
                 raise ValueError('operator_forwarding_readback_failed')
@@ -230,7 +242,7 @@ def configure():
         run(['docker','exec','pbx_asterisk_1','asterisk','-rx','module reload app_voicemail.so'])
         run(['docker','exec','pbx_asterisk_1','asterisk','-rx','dialplan reload'])
         raise
-    return {'result':'PASS',**application,'alternateVoicemailProvidersDisabled':True,'operatorConfigured':True,'mailboxCount':len(rows),'adminCellularFallbackConfigured':route!=OPERATOR,'forwardingNumber':FORWARD_NUMBER if route!=OPERATOR else None,'spokenAnnouncementConfigured':prompt is not None,'pressOneAcceptanceRequired':prompt is not None,'carrierRoutingChanged':False,'liveCallAcceptance':'NOT TESTED'}
+    return {'result':'PASS',**application,'alternateVoicemailProvidersDisabled':True,'operatorConfigured':True,'mailboxCount':len(rows),'adminCellularFallbackConfigured':route!=base,'forwardingNumber':FORWARD_NUMBER if route!=base else None,'spokenAnnouncementConfigured':prompt is not None,'pressOneAcceptanceRequired':prompt is not None,'carrierRoutingChanged':False,'liveCallAcceptance':'NOT TESTED'}
 if __name__=='__main__':
     try: result=configure()
     except Exception as error:

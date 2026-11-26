@@ -384,6 +384,11 @@ export async function ProgramHolderWorkspaceView({
   if (section === 'pending')
     return (
       <>
+        <Hero
+          eyebrow="Program holder"
+          title="Pending Students"
+          description="School applications and applicant records that are not yet enrolled. Enrolled students appear under Students."
+        />
         <SchoolApplicantRoster
           pending
           rows={(data.schoolApplicants || []).filter(

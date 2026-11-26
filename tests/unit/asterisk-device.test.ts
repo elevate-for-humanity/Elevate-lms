@@ -28,14 +28,24 @@ afterEach(() => {
   vi.unstubAllEnvs();
 });
 
-function setup() {
+function setup(existingRows: Array<{ id: string }> = []) {
   vi.stubEnv('PBX_PROVISIONING_TOKEN', 't'.repeat(48));
   vi.stubEnv('PBX_CONTROL_URL', 'https://phone.elevateforhumanity.org');
   vi.stubEnv('PBX_STUN_URLS', '');
   vi.stubEnv('PBX_TURN_URLS', '');
   const upsert = vi.fn().mockResolvedValue({ error: null });
-  const db = { from: vi.fn().mockReturnValue({ upsert }) };
-  return { db, upsert };
+  const updatePatches: Array<Record<string, unknown>> = [];
+  const chain: Record<string, unknown> = {
+    upsert,
+    update: (patch: Record<string, unknown>) => {
+      updatePatches.push(patch);
+      return chain;
+    },
+    eq: () => chain,
+    select: async () => ({ data: existingRows, error: null }),
+  };
+  const db = { from: vi.fn().mockReturnValue(chain) };
+  return { db, upsert, updatePatches };
 }
 
 describe('independent phone credential boundary', () => {
@@ -56,6 +66,29 @@ describe('independent phone credential boundary', () => {
     expect(JSON.stringify(record)).not.toContain(credential.sipPassword);
     expect(options.onConflict).toBe('profile_id,device_id');
     expect(request.mock.calls[0][1]).toMatchObject({ redirect: 'error', cache: 'no-store' });
+  });
+
+  it('refreshes only the credential binding when the device already exists', async () => {
+    const { db, upsert, updatePatches } = setup([{ id: 'device-row-1' }]);
+    const request = vi.fn().mockResolvedValue({ ok: true, json: async () => credential });
+    vi.stubGlobal('fetch', request);
+    const result = await provisionAsteriskDevice(db, identity);
+    expect(result.sipPassword).toBe(credential.sipPassword);
+    // No insert happens for an existing row, and the refresh must not wipe
+    // the verified presence a live registration already earned: presence is
+    // written by the heartbeat route once the new registration verifies.
+    expect(upsert).not.toHaveBeenCalled();
+    expect(updatePatches).toHaveLength(1);
+    expect(updatePatches[0]).toMatchObject({
+      provider_credential_id: credential.endpointId,
+      sip_username: credential.sipUsername,
+      status: 'active',
+    });
+    expect(updatePatches[0]).not.toHaveProperty('registration_state');
+    expect(updatePatches[0]).not.toHaveProperty('connection_state');
+    expect(updatePatches[0]).not.toHaveProperty('last_seen_at');
+    expect(updatePatches[0]).not.toHaveProperty('registration_verified_at');
+    expect(JSON.stringify(updatePatches[0])).not.toContain(credential.sipPassword);
   });
 
   it('rejects another extension credential and never persists it', async () => {
@@ -96,6 +129,31 @@ describe('independent phone credential boundary', () => {
     expect((await asteriskDeviceStatus(identity)).connectionState).toBe('disconnected');
     status.observedAt = new Date(Date.now() - 60_000).toISOString();
     await expect(asteriskDeviceStatus(identity)).rejects.toThrow('not current');
+  });
+
+  it('distinguishes a held lease from a lease the provisioner has dropped', async () => {
+    setup();
+    const base = {
+      provider: 'asterisk',
+      registered: false,
+      contactCount: 0,
+      reachableContactCount: 0,
+      connectionState: 'disconnected',
+      observedAt: new Date().toISOString(),
+    };
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({ ...base, expiresAt: new Date(Date.now() + 300_000).toISOString() }),
+      }),
+    );
+    expect((await asteriskDeviceStatus(identity)).provisioned).toBe(true);
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({ ok: true, json: async () => ({ ...base, expiresAt: null }) }),
+    );
+    expect((await asteriskDeviceStatus(identity)).provisioned).toBe(false);
   });
 
   it('issues bounded endpoint-specific TURN credentials without returning the shared secret', () => {

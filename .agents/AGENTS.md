@@ -74,8 +74,6 @@ Open Studio
 | Endpoint | Purpose |
 |----------|---------|
 | `/api/admin/dev-studio/chat` | AI chat (Dev Studio) |
-| `/api/admin/dev-studio/openhands/chat` | OpenHands chat (needs `access_dev_tools`) |
-| `/api/admin/dev-studio/openhands/agent` | OpenHands agent dispatch |
 | `/api/admin/dev-studio/muse-loop` | Muse-style loop: branch → PR → CI check (no OpenHands) |
 | `/api/admin/dev-studio/workflows` | Workflow management |
 | `/api/admin/dev-studio/system-health` | System health status |

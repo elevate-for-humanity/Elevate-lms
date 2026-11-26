@@ -9,6 +9,7 @@ import CurriculumTreeSection from './CurriculumTreeSection';
 import DeliveryStructureSection from './DeliveryStructureSection';
 import EnrollmentCtaSection from './EnrollmentCtaSection';
 import ComplianceFundingSection from './ComplianceFundingSection';
+import PublishStandardSection from './PublishStandardSection';
 import BuilderSidebar from './BuilderSidebar';
 import { validateProgram } from './types';
 import type { ProgramBuilderState, ProgramDerivedState } from './types';
@@ -31,6 +32,7 @@ export default function ProgramBuilderClient({ initialState, availableCredential
   const [saveError, setSaveError] = useState<string | null>(null);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
+  const [standardOverride, setStandardOverride] = useState({ acknowledged: false, note: '' });
 
   const derived = useMemo(() => validateProgram(state), [state]);
 
@@ -83,14 +85,33 @@ export default function ProgramBuilderClient({ initialState, availableCredential
 
   // ── Publish ───────────────────────────────────────────────────────────────
 
+  // Build-standard gaps never dead-end the owner: with an explicit
+  // acknowledgment they publish anyway (the acknowledgment travels with
+  // the publish request; the canonical publish audits it and routes the
+  // gaps to PARIS). Other missing essentials still block here.
+  const standardMissing = derived.missingRequired.filter((m) => m.endsWith('(build standard)'));
+  const otherMissing = derived.missingRequired.filter((m) => !m.endsWith('(build standard)'));
+  const canPublishWithOverride =
+    otherMissing.length === 0 && standardMissing.length > 0 && standardOverride.acknowledged;
+
   const handlePublish = async () => {
-    if (!derived.canPublish) return;
+    if (otherMissing.length > 0) return;
+    if (standardMissing.length > 0 && !standardOverride.acknowledged) return;
     setSaving(true);
     setSaveError(null);
     try {
       // Save first, then publish
       await handleSave();
-      const res = await fetch(`/api/admin/programs/${state.id}/publish`, { method: 'POST' });
+      const res = await fetch(`/api/admin/programs/${state.id}/publish`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          publishOverride:
+            standardMissing.length > 0
+              ? { acknowledged: true, note: standardOverride.note, missing: standardMissing }
+              : null,
+        }),
+      });
       const body = await res.json().catch(() => null);
       if (!res.ok) {
         // 422 = validation failure — surface the missing list
@@ -114,6 +135,7 @@ export default function ProgramBuilderClient({ initialState, availableCredential
         saving={saving}
         onSave={handleSave}
         onPublish={handlePublish}
+        canPublishWithOverride={canPublishWithOverride}
         onPreview={() => setShowPreview(true)}
         onTitleChange={(title) => patch({ title })}
       />
@@ -173,6 +195,11 @@ export default function ProgramBuilderClient({ initialState, availableCredential
             <DeliveryStructureSection state={state} onChange={patch} />
             <EnrollmentCtaSection state={state} onChange={patch} />
             <ComplianceFundingSection state={state} onChange={patch} />
+            <PublishStandardSection
+              state={state}
+              override={standardOverride}
+              onOverrideChange={setStandardOverride}
+            />
           </main>
 
           {/* Sidebar */}

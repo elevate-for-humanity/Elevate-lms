@@ -33,6 +33,16 @@ const db = createClient(supabaseUrl, serviceRoleKey, { auth: { autoRefreshToken:
 const runId = String(process.env.QA_PORTAL_E2E_RUN_ID || process.env.GITHUB_RUN_ID || Date.now());
 const marker = `qa-portal-e2e-${runId}`;
 const QA_HVAC_COURSE_ID = 'd48c61c4-8880-4d9d-9ab5-fab4dd51b201';
+// Production disposables must never be a paid enrollment: a paid row
+// invites billing/reconciliation side effects that cleanup cannot fully
+// unwind. In production mode the disposable enrollments are waived (free);
+// the gate admits 'waived' as a settled payment status, and both
+// enrollments already carry a recorded manual approval (approved_at +
+// approved_by), which is the other prong the gate requires. QA mode
+// keeps payment_status 'paid' so the isolated-QA playback path is
+// unchanged.
+const isProductionDisposable = new URL(supabaseUrl).hostname === 'cuxzzpsyufcewtmicszk.supabase.co';
+const paymentStatus = isProductionDisposable ? 'waived' : 'paid';
 
 function password() { return `Qa!${randomBytes(18).toString('base64url')}9x`; }
 async function must(resultPromise, label) { const result = await resultPromise; if (result.error) throw new Error(`${label}: ${result.error.message}`); return result.data; }
@@ -55,6 +65,10 @@ async function provision() {
     .eq('tenant_id', anchor.tenant_id)
     .in('role', ['admin', 'super_admin']);
   if (adminEmail) approvalAdminQuery = approvalAdminQuery.eq('email', adminEmail);
+  // In production mode, never resolve a real administrator as the
+  // approver of a disposable test enrollment: without an explicit admin
+  // email, only a fixture-created (qa.invalid) admin may approve.
+  if (isProductionDisposable && !adminEmail) approvalAdminQuery = approvalAdminQuery.like('email', '%@qa.invalid');
   const approvalAdmins = await must(
     approvalAdminQuery.order('id', { ascending: true }).limit(1),
     'resolve authorized isolated-QA approval administrator',
@@ -74,7 +88,7 @@ async function provision() {
       user_id: learner.id, student_id: learner.id, email: learner.email,
       full_name: '[QA E2E] Learner', program_id: hvac.program_id, course_id: hvac.id,
       program_slug: 'hvac-technician', status: 'active', enrollment_state: 'active',
-      payment_status: 'paid', approved_at: new Date().toISOString(),
+      payment_status: paymentStatus, approved_at: new Date().toISOString(),
       approved_by: approvalAdmin.id, access_granted_at: new Date().toISOString(),
       access_status: 'active',
       funding_source: 'qa-e2e', funding_status: 'unfunded_self_continuing',
@@ -103,7 +117,7 @@ async function provision() {
       full_name: '[QA E2E] Holder Student', program_id: qaProgram.id, program_slug: qaProgram.slug,
       program_holder_id: holder.id,
       status: 'active', enrollment_state: 'active',
-      payment_status: 'paid', approved_at: new Date().toISOString(),
+      payment_status: paymentStatus, approved_at: new Date().toISOString(),
       approved_by: approvalAdmin.id,
       funding_source: 'qa-e2e', funding_status: 'unfunded_self_continuing',
       funding_verified: false, amount_paid_cents: 0,
@@ -131,6 +145,50 @@ async function provision() {
 
 async function cleanup() {
   let state; try { state = JSON.parse(await readFile(statePath, 'utf8')); } catch { console.log('No Learner/Program Holder QA state file found; nothing to clean up.'); return; }
+  // Derived tables may not exist in the isolated QA project (minimal
+  // schema). A missing table means no derived rows could have been
+  // created there, so "table does not exist" is ignored; every other
+  // error still fails cleanup.
+  const isMissingTableError = (error) => {
+    const code = String(error?.code || '');
+    const message = String(error?.message || '');
+    return code === 'PGRST205' || /could not find the table|relation .* does not exist|42P01/i.test(message);
+  };
+  const deleteDerived = async (promise, label) => {
+    const { error } = await promise;
+    if (error && !isMissingTableError(error)) throw new Error('QA cleanup ' + label + ': ' + error.message);
+  };
+  const assertDerivedGone = async (promise, label) => {
+    const { data, error } = await promise;
+    if (error) {
+      if (isMissingTableError(error)) return;
+      throw new Error('QA cleanup verify ' + label + ': ' + error.message);
+    }
+    if ((data || []).length) throw new Error('QA cleanup incomplete: ' + label);
+  };
+  const deleteEnrollmentDerived = async (enrollmentId) => {
+    // Trigger-derived outbox and queue rows. The welcome email and the
+    // platform event are created for ANY active enrollment (not only paid
+    // ones), so they must be removed even in the waived production path.
+    // The enrollment_insert_audit row is intentionally retained: it is an
+    // append-only audit trail of the fixture insert.
+    await deleteDerived(db.from('notification_outbox').delete()
+      .eq('template_key', 'enrollment_welcome').eq('entity_type', 'program_enrollment')
+      .eq('entity_id', enrollmentId), 'delete welcome outbox entry');
+    await deleteDerived(db.from('platform_events').delete()
+      .eq('event_type', 'enrollment.confirmed').eq('subject_type', 'program_enrollment')
+      .eq('subject_id', enrollmentId), 'delete enrollment platform event');
+  };
+  const assertEnrollmentDerivedGone = async (enrollmentId, label) => {
+    await assertDerivedGone(db.from('program_holder_students')
+      .select('id').eq('enrollment_id', enrollmentId).limit(1), label + ' holder-student link');
+    await assertDerivedGone(db.from('notification_outbox')
+      .select('id').eq('template_key', 'enrollment_welcome')
+      .eq('entity_type', 'program_enrollment').eq('entity_id', enrollmentId).limit(1), label + ' welcome outbox entry');
+    await assertDerivedGone(db.from('platform_events')
+      .select('id').eq('event_type', 'enrollment.confirmed')
+      .eq('subject_type', 'program_enrollment').eq('subject_id', enrollmentId).limit(1), label + ' enrollment platform event');
+  };
   if (state.learner?.id) {
     // Playback stores QA events, never formal credits. Remove only this run's
     // disposable learner rows before its profile and login are removed.
@@ -148,6 +206,10 @@ async function cleanup() {
     }
   }
   if (state.hvacEnrollmentId) {
+    // The auto-assign trigger may have linked this enrollment to a
+    // program holder; remove the link before the enrollment itself.
+    await deleteDerived(db.from('program_holder_students').delete()
+      .eq('enrollment_id', state.hvacEnrollmentId), 'delete HVAC holder-student link');
     const { data, error } = await db.from('program_enrollments').delete()
       .eq('id', state.hvacEnrollmentId).eq('user_id', state.learner.id).select('id');
     if (error || data?.length !== 1)
@@ -155,12 +217,22 @@ async function cleanup() {
     const { error: courseError } = await db.from('course_enrollments').delete()
       .eq('student_id', state.learner.id);
     if (courseError) throw new Error('QA course enrollment cleanup failed: ' + courseError.message);
+    await deleteEnrollmentDerived(state.hvacEnrollmentId);
   }
   if (state.holderEnrollmentId && state.holderStudent?.id) {
+    await deleteDerived(db.from('program_holder_students').delete()
+      .eq('enrollment_id', state.holderEnrollmentId), 'delete holder holder-student link');
     const { data, error } = await db.from('program_enrollments').delete()
       .eq('id', state.holderEnrollmentId).eq('user_id', state.holderStudent.id).select('id');
     if (error || data?.length !== 1)
       throw new Error('QA holder-student enrollment cleanup was not independently confirmed: ' + (error?.message || 'row count mismatch'));
+    // The sync trigger mirrors program enrollments into course_enrollments
+    // for the holder student too; the old cleanup only removed the
+    // learner's mirrored rows.
+    const { error: holderCourseError } = await db.from('course_enrollments').delete()
+      .eq('student_id', state.holderStudent.id);
+    if (holderCourseError) throw new Error('QA holder course enrollment cleanup failed: ' + holderCourseError.message);
+    await deleteEnrollmentDerived(state.holderEnrollmentId);
   }
   if (state.holderProgramId) await db.from('program_holder_programs').delete().eq('id', state.holderProgramId);
   if (state.holderId) await db.from('program_holders').delete().eq('id', state.holderId);
@@ -170,6 +242,14 @@ async function cleanup() {
     const { error } = await db.auth.admin.deleteUser(userId, true);
     if (error && !/not found/i.test(error.message)) console.error(`soft-delete auth user ${userId}: ${error.message}`);
   }
+  // Verify the trigger-derived rows are gone (skipped where the table
+  // does not exist in the QA project).
+  if (state.learner?.id) await assertDerivedGone(db.from('course_enrollments')
+    .select('id').eq('student_id', state.learner.id).limit(1), 'learner course enrollments');
+  if (state.holderStudent?.id) await assertDerivedGone(db.from('course_enrollments')
+    .select('id').eq('student_id', state.holderStudent.id).limit(1), 'holder-student course enrollments');
+  if (state.hvacEnrollmentId) await assertEnrollmentDerivedGone(state.hvacEnrollmentId, 'HVAC');
+  if (state.holderEnrollmentId) await assertEnrollmentDerivedGone(state.holderEnrollmentId, 'holder-student');
   console.log(JSON.stringify({ ok: true, cleanedRunId: state.runId }));
 }
 

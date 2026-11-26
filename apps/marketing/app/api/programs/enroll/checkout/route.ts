@@ -211,7 +211,8 @@ export async function POST(request: NextRequest) {
       try {
         requestedDownCents = programInstallmentTerms(program.slug, fullAmountCents, body.down_payment_cents).downPaymentCents;
       } catch (error) {
-        return NextResponse.json({ error: error instanceof Error ? error.message : 'Invalid down payment.' }, { status: 400 });
+        const msg = error instanceof Error ? error.message : '';
+        return NextResponse.json({ error: msg || 'Invalid down payment.' }, { status: 400 });
       }
     }
     let appliedCoupon: { code: string; discountAmountCents: number; scope: 'deposit' | 'tuition' } | null = null;
@@ -431,10 +432,10 @@ export async function POST(request: NextRequest) {
         },
         { onConflict: 'provider,customer_external_key,canonical_product_key' },
       );
-      if (schedule.error)
-        throw new Error(
-          `Initial invoice created but installment schedule failed: ${schedule.error.message}`,
-        );
+      if (schedule.error) {
+        logger.error('Program enrollment installment schedule failed', { error: schedule.error.message });
+        throw new Error('Initial invoice created but installment schedule failed');
+      }
       if (fullApplicationRequired) {
         // A learner can pay an already-open provider link while this retry is
         // saving its schedule. Recheck after upsert so a concurrently completed
@@ -475,8 +476,10 @@ export async function POST(request: NextRequest) {
       coupon: appliedCoupon,
     });
   } catch (error) {
-    if (error instanceof InvoiceTermsConflict)
-      return NextResponse.json({ error: error.message }, { status: 409 });
+    if (error instanceof InvoiceTermsConflict) {
+      const msg = error.message;
+      return NextResponse.json({ error: msg }, { status: 409 });
+    }
     logger.error(
       'Program enrollment checkout error',
       error instanceof Error ? error : new Error(String(error)),

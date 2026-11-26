@@ -18,6 +18,7 @@ import { appOrigin } from './helpers/app-origins';
 import { test, expect } from '@playwright/test';
 
 const BASE = appOrigin('lms');
+const MARKETING = appOrigin('marketing');
 const STUDENT_EMAIL = process.env.TEST_STUDENT_EMAIL || '';
 const STUDENT_PASSWORD = process.env.TEST_STUDENT_PASSWORD || '';
 const HAS_CREDENTIALS = !!STUDENT_EMAIL && !!STUDENT_PASSWORD;
@@ -110,8 +111,12 @@ test.describe('Authenticated student flow', () => {
     await page.goto(`${BASE}/onboarding/learner?reason=profile_missing`, {
       waitUntil: 'domcontentloaded',
     });
-    // Should render the onboarding page, not redirect to /unauthorized
+    // The legacy LMS path must reach the existing Marketing-owned checklist,
+    // including its query, rather than passing this test with a 404 document.
+    await expect(page).toHaveURL(url => url.origin === new URL(MARKETING).origin && url.pathname === '/onboarding/learner' && url.searchParams.get('reason') === 'profile_missing');
+    await expect(page.getByRole('heading', { level: 1, name: /Welcome to/ })).toBeVisible();
     expect(page.url()).not.toContain('/unauthorized');
+    await page.waitForLoadState('load');
     const status = await page.evaluate(() => document.readyState);
     expect(status).toBe('complete');
   });

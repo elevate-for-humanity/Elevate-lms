@@ -3,6 +3,7 @@ import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, relative, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { hasGetRouteHandler } from './portal-route-contract.mjs';
+import { hasProgramHolderWorkspaceGuard } from './portal-guard-contract.mjs';
 
 const ROOT = join(fileURLToPath(new URL('.', import.meta.url)), '..');
 const APPS = { marketing: 'apps/marketing/app', lms: 'apps/lms/app', admin: 'apps/admin/app' };
@@ -137,12 +138,15 @@ const requiredHelpers = [
   ['apps/marketing/app/provider/settings/page.tsx', 'requireProviderPortal'],
   ['apps/lms/app/parent-portal/dashboard/page.tsx', 'requireParentPortal'],
   ['apps/lms/app/parent-portal/student/[id]/page.tsx', 'requireParentStudentAccess'],
-  ['apps/lms/app/program-holder/dashboard/page.tsx', 'requireProgramHolder'],
+  ['apps/lms/app/program-holder/dashboard/page.tsx', 'requireProgramHolder', 'lib/program-holder/workspace.ts'],
 ];
-for (const [rel, helper] of requiredHelpers) {
+for (const [rel, helper, guardedLoader] of requiredHelpers) {
   try {
     const source = readFileSync(join(ROOT, rel), 'utf8');
-    if (!source.includes(helper)) fail(`${rel} bypasses canonical ${helper}`); else pass(`${rel} uses ${helper}`);
+    const guarded = guardedLoader
+      ? hasProgramHolderWorkspaceGuard(source, readFileSync(join(ROOT, guardedLoader), 'utf8'))
+      : source.includes(helper);
+    if (!guarded) fail(`${rel} bypasses canonical ${helper}`); else pass(`${rel} uses ${helper}`);
   } catch { fail(`${rel} missing`); }
 }
 

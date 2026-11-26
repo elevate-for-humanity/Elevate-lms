@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { ProgramHolderWorkspaceView } from '@/components/program-holder/ProgramHolderWorkspaceView';
-import { requireProgramHolder } from '@/lib/auth/require-program-holder';
+import { getProgramHolderWorkspace } from '@/lib/program-holder/workspace';
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: 'Program Holder Dashboard',
@@ -10,9 +10,11 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 export default async function Page() {
-  const context = await requireProgramHolder();
-  if (context.mode === 'admin') return <AdminProgramHolderPreview />;
-  return <ProgramHolderWorkspaceView section="dashboard" />;
+  // The workspace loader already verifies the full holder approval and ownership
+  // boundary. Reuse its result instead of repeating the same serial auth reads.
+  const workspace = await getProgramHolderWorkspace();
+  if (workspace.mode === 'admin') return <AdminProgramHolderPreview />;
+  return <ProgramHolderWorkspaceView section="dashboard" workspace={workspace} />;
 }
 
 function AdminProgramHolderPreview() {

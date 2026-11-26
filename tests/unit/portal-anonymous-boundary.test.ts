@@ -45,7 +45,7 @@ describe('anonymous portal request boundary', () => {
       });
     }
   }
-  it.each(['/scorm/job-ready/introduction/dispatch.html', '/scorm/job-ready/mindsets/package.zip', '/lms/career/job-ready', '/lms/scorm', '/employer/export.json', '/host-shop/export.json', '/parent-portal', '/cosmetology-host-shop/dashboard', '/future/dashboard'])('does not let LMS %s bypass authentication', async (path) => {
+  it.each(['/scorm/job-ready/introduction/dispatch.html', '/scorm/job-ready/mindsets/package.zip', '/lms/career/job-ready', '/lms/scorm', '/onboarding/learner', '/onboarding/learner/documents', '/onboarding/learner/complete', '/employer/export.json', '/host-shop/export.json', '/parent-portal', '/cosmetology-host-shop/dashboard', '/future/dashboard'])('does not let LMS %s bypass authentication', async (path) => {
     const response = await lms(new NextRequest(`https://app.elevateforhumanity.org${path}`));
     expect(response.status).toBe(307);
     expect(response.headers.get('location')).toContain('/login');
@@ -76,6 +76,26 @@ describe('anonymous portal request boundary', () => {
     const response = await lms(new NextRequest('https://app.elevateforhumanity.org/employer/dashboard'));
     expect(response.status).toBe(307);
     expect(response.headers.get('location')).toContain('/login');
+  });
+  it('retains the legacy onboarding return through sign-in and rejects an expired session', async () => {
+    auth.cookie = true;
+    auth.getUser.mockResolvedValue({ data: { user: null }, error: new Error('expired session') });
+    const response = await lms(new NextRequest('https://lms.elevateforhumanity.org/onboarding/learner?reason=profile_missing'));
+    const target = new URL(response.headers.get('location')!);
+    expect(response.status).toBe(307);
+    expect(target.pathname).toBe('/login');
+    expect(target.searchParams.get('redirect')).toBe('/onboarding/learner?reason=profile_missing');
+    expect(response.headers.get('cache-control')).toContain('no-store');
+  });
+  it('lets the authenticated onboarding bridge reach its Marketing owner without a middleware loop', async () => {
+    auth.cookie = true;
+    auth.getUser.mockResolvedValue({ data: { user: { id: 'current-user' } }, error: null });
+    const entry = await lms(new NextRequest('https://lms.elevateforhumanity.org/onboarding/learner/orientation'));
+    expect(entry.status).toBe(200);
+    expect(entry.headers.get('location')).toBeNull();
+    const owner = await marketing(new NextRequest('https://www.elevateforhumanity.org/onboarding/learner/orientation', { headers: { host: 'www.elevateforhumanity.org' } }));
+    expect(owner.status).toBe(200);
+    expect(owner.headers.get('location')).toBeNull();
   });
   it.each(['/login', '/host-shop/login'])('keeps LMS %s available without a session', async (path) => {
     const response = await lms(new NextRequest(`https://app.elevateforhumanity.org${path}`));

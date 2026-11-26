@@ -116,6 +116,8 @@ const PEER_APPS: Record<string, E2EApp[]> = {
   'program-e2e-flows.spec.ts': ['lms'],
   'portal-responsive-design.spec.ts': ['admin', 'marketing'],
   'registered-apprenticeship-authenticated.spec.ts': ['admin'],
+  'student-login-flow.spec.ts': ['marketing'],
+  'jordan-magic-link.spec.ts': ['marketing'],
 };
 
 // CLI file filters (e.g. `playwright test tests/e2e/admin-portal.spec.ts`) only

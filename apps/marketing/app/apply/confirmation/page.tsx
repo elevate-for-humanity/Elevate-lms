@@ -228,7 +228,7 @@ export default async function ConfirmationPage({
               {/* Employer — employer resources */}
               {role === 'employer' && !isEnrolled && (
                 <Link
-                  href="/employer"
+                  href="/employers"
                   className="inline-flex items-center justify-center bg-brand-blue-600 hover:bg-brand-blue-700 text-white font-bold px-6 py-3 rounded-lg transition-colors text-sm"
                 >
                   Employer Resources <ArrowRight className="w-4 h-4 ml-2" />

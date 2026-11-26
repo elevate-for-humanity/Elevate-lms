@@ -5,6 +5,13 @@ const { PGlite } = await import(process.env.ELEVATE_PGLITE_MODULE || '@electric-
 const db = new PGlite();
 const owner = '11111111-1111-4111-8111-111111111111';
 const tenant = '22222222-2222-4222-8222-222222222222';
+const migration = await readFile(
+  new URL(
+    '../../supabase/migrations/20261124153906_restore_trusted_auth_profile_authority.sql',
+    import.meta.url,
+  ),
+  'utf8',
+);
 let checks = 0;
 const equal = (actual, expected) => {
   assert.deepEqual(actual, expected);
@@ -21,7 +28,10 @@ try {
   `);
   await db.exec(
     await readFile(
-      new URL('../../scripts/manual/harden-auth-provisioning.sql', import.meta.url),
+      new URL(
+        '../../supabase/migrations/20260812144247_fix_auth_profile_tenant_resolution.sql',
+        import.meta.url,
+      ),
       'utf8',
     ),
   );
@@ -37,7 +47,61 @@ try {
     return (await db.query('select role,tenant_id,full_name from profiles where id=$1', [id]))
       .rows[0];
   }
-  for (const role of ['admin', 'super_admin', 'instructor', 'program_holder', 'site_coordinator']) {
+  const profileSnapshot = async () => (await db.query('select * from profiles order by id')).rows;
+  const functionDefinition = async () =>
+    (
+      await db.query(
+        "select pg_get_functiondef('public.handle_new_user()'::regprocedure) as definition",
+      )
+    ).rows[0].definition;
+  const accountCounts = async () =>
+    (
+      await db.query(
+        'select (select count(*) from auth.users) as users, count(*) as profiles from profiles',
+      )
+    ).rows[0];
+  async function rejectsAccount(trustedMetadata, message) {
+    const before = await accountCounts();
+    await assert.rejects(create({}, trustedMetadata), message);
+    checks++;
+    equal(await accountCounts(), before);
+  }
+
+  // Reproduce the observed production defect in this disposable PostgreSQL
+  // database, then exercise the actual versioned repair rather than a SQL copy.
+  equal(await create({ role: 'admin', tenant_id: tenant }), {
+    role: 'admin',
+    tenant_id: tenant,
+    full_name: null,
+  });
+  const beforeMigration = await profileSnapshot();
+  await db.exec(migration);
+  equal(await profileSnapshot(), beforeMigration);
+  const repairedDefinition = await functionDefinition();
+  equal(
+    (
+      await db.query(
+        "select md5(pg_get_functiondef('public.handle_new_user()'::regprocedure)) as hash",
+      )
+    ).rows[0].hash,
+    '40bcbfb2756d833e358f1d59cd03234f',
+  );
+  equal(await create(), { role: 'student', tenant_id: owner, full_name: null });
+  equal(await create(null, null), { role: 'student', tenant_id: owner, full_name: null });
+  equal(await create({ requested_role: 'employer' }), {
+    role: 'student',
+    tenant_id: owner,
+    full_name: null,
+  });
+  for (const role of [
+    'admin',
+    'super_admin',
+    'instructor',
+    'program_holder',
+    'site_coordinator',
+    'provider_admin',
+    'employer',
+  ]) {
     const profile = await create({ role, tenant_id: tenant, full_name: 'Display Name' });
     equal(profile, { role: 'student', tenant_id: owner, full_name: 'Display Name' });
   }
@@ -48,6 +112,17 @@ try {
   });
   equal((await create({}, { role: 'site_coordinator' })).role, 'site_coordinator');
   equal((await create({}, { role: 'org_admin', tenant_id: tenant })).role, 'org_admin');
+  equal((await create({}, { role: 'ADMIN', tenant_id: tenant })).role, 'admin');
+  equal(await create({ tenant_id: 'invalid', first_name: 'First', last_name: 'Last' }), {
+    role: 'student',
+    tenant_id: owner,
+    full_name: 'First Last',
+  });
+  equal(
+    (await create({ full_name: 'Preferred Name', first_name: 'First', last_name: 'Last' }))
+      .full_name,
+    'Preferred Name',
+  );
   for (const role of [
     'workforce_board',
     'host_shop_admin',
@@ -73,19 +148,36 @@ try {
     tenant_id: tenant,
     full_name: 'Preserved',
   });
+  const existingStudent = randomUUID();
+  await db.query('insert into profiles(id,role,tenant_id,full_name) values ($1,$2,$3,$4)', [
+    existingStudent,
+    'student',
+    tenant,
+    'Preserved Student',
+  ]);
+  equal(await create({ role: 'super_admin' }, { role: 'program_holder' }, existingStudent), {
+    role: 'program_holder',
+    tenant_id: tenant,
+    full_name: 'Preserved Student',
+  });
   for (const tenant_id of ['invalid', randomUUID()]) {
-    await assert.rejects(
-      create({}, { role: 'admin', tenant_id }),
+    await rejectsAccount(
+      { role: 'admin', tenant_id },
       /Trusted profile tenant is not an active configured tenant/,
     );
-    checks++;
   }
   await db.query('update tenants set status=$1 where id=$2', ['inactive', tenant]);
-  await assert.rejects(create({}, { role: 'admin', tenant_id: tenant }), /Trusted profile tenant/);
-  checks++;
+  await rejectsAccount({ role: 'admin', tenant_id: tenant }, /Trusted profile tenant/);
   await db.exec('update tenants set is_platform_owner=false');
-  await assert.rejects(create(), /No active platform-owner tenant/);
-  checks++;
+  await rejectsAccount({}, /No active platform-owner tenant/);
+  equal(
+    (
+      await db.query(
+        "select has_function_privilege('anon','public.handle_new_user()','EXECUTE') as allowed",
+      )
+    ).rows[0].allowed,
+    false,
+  );
   equal(
     (
       await db.query(
@@ -102,6 +194,18 @@ try {
     ).rows[0].allowed,
     true,
   );
+  // A re-run is safe, including environments where the earlier hardened block
+  // was already applied. An unrelated function change must never be overwritten.
+  const beforeRepeat = await profileSnapshot();
+  await db.exec(migration);
+  equal(await profileSnapshot(), beforeRepeat);
+  equal(await functionDefinition(), repairedDefinition);
+  await db.exec('alter function public.handle_new_user() set search_path to pg_catalog');
+  const unreviewedDefinition = await functionDefinition();
+  await assert.rejects(db.exec(migration), /handle_new_user definition changed since review/);
+  checks++;
+  equal(await functionDefinition(), unreviewedDefinition);
+  equal(await profileSnapshot(), beforeRepeat);
   console.log(
     `Auth provisioning PostgreSQL: ${checks} checks passed; no production records created.`,
   );

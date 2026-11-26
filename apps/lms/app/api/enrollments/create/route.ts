@@ -176,6 +176,30 @@ async function _POST(request: NextRequest) {
       return NextResponse.json({ error: 'Failed to create enrollment' }, { status: 500 });
     }
 
+    // Mirror the enrollment into course_enrollments so the learner exists
+    // in BOTH canonical enrollment tables (same as completeEnrollment).
+    // Readers such as the lessons syllabus endpoint consult
+    // course_enrollments alone. Non-fatal: a mirror failure must not fail
+    // an otherwise-created enrollment (the session client may not have
+    // insert rights on that table in some environments).
+    {
+      const { error: mirrorError } = await supabase.from('course_enrollments').upsert(
+        { student_id: user.id, course_id: courseId, status: 'active' },
+        { onConflict: 'student_id,course_id', ignoreDuplicates: true },
+      );
+      if (mirrorError) {
+        logger.warn('Course enrollment mirror failed (non-fatal)', { error: mirrorError, requestId });
+      }
+    }
+
+    // Deliberately NO access/payment fields here: this route verifies no
+    // payment, so stamping access_status / self_pay_application_verified_at
+    // would misrepresent an unverified enrollment as a verified paid one
+    // and would not pass the approved-paid gate anyway (payment_status is
+    // null). Paid course enrollments go through the checkout/fulfillment
+    // paths, which grant access. Free-course enrollments still need a
+    // gate decision for payment_status 'waived' — see PR #2822 notes.
+
     if (idempotencyKey) {
       void Promise.resolve(
         supabase.from('enrollment_idempotency').insert({

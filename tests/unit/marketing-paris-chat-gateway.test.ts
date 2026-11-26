@@ -1,11 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { NextRequest } from 'next/server';
 
-const { aiChat } = vi.hoisted(() => ({ aiChat: vi.fn() }));
-vi.mock('@/lib/ai/ai-service', () => ({ aiChat, isAIAvailable: () => true }));
+const { aiChat, aiChatStream } = vi.hoisted(() => ({ aiChat: vi.fn(), aiChatStream: vi.fn() }));
+vi.mock('@/lib/ai/ai-service', () => ({ aiChat, aiChatStream, isAIAvailable: () => true }));
 vi.mock('@/lib/config/platform-config', () => ({ PLATFORM_DEFAULTS: {} }));
 
-import { POST } from '../../apps/marketing/app/api/ai-chat/route';
+import { POST, maxDuration } from '../../apps/marketing/app/api/ai-chat/route';
 
 function storeQuestion() {
   return new NextRequest('https://store.elevateforhumanity.org/api/ai-chat', {
@@ -20,6 +20,33 @@ function storeQuestion() {
 describe('Marketing PARIS gateway', () => {
   beforeEach(() => {
     aiChat.mockReset();
+    aiChatStream.mockReset();
+  });
+
+  it('streams the live provider reply as server-sent events', async () => {
+    aiChatStream.mockImplementation(async function* () {
+      yield 'Compare plans ';
+      yield 'on the Store plans page.';
+    });
+    const request = new NextRequest('https://store.elevateforhumanity.org/api/ai-chat', {
+      method: 'POST',
+      headers: { Accept: 'text/event-stream' },
+      body: JSON.stringify({
+        context: { surface: 'store' },
+        messages: [{ role: 'user', content: 'How do I compare plans?' }],
+      }),
+    });
+    const response = await POST(request);
+    expect(response.status).toBe(200);
+    expect(response.headers.get('content-type')).toContain('text/event-stream');
+    expect(response.headers.get('cache-control')).toBe('no-store');
+    const text = await response.text();
+    expect(text).toContain('data: {"delta":"Compare plans "}');
+    expect(text).toContain('data: {"delta":"on the Store plans page."}');
+    expect(text).toContain('"done":true');
+    expect(text).toContain('"mode":"ai"');
+    expect(text).toContain('"reply":"Compare plans on the Store plans page."');
+    expect(aiChat).not.toHaveBeenCalled();
   });
 
   it('returns the live provider reply', async () => {
@@ -48,7 +75,13 @@ describe('Marketing PARIS gateway', () => {
       });
 
       const response = await POST(storeQuestion());
-      expect(timeout).toHaveBeenCalledWith(45_000);
+      // The warm-model budget must still leave a full minute for cleanup and fallback.
+      expect(maxDuration).toBe(180);
+      expect(timeout).toHaveBeenCalledTimes(1);
+      expect(timeout).toHaveBeenCalledWith(120_000);
+      expect(maxDuration * 1_000 - timeout.mock.calls[0][0]).toBeGreaterThanOrEqual(60_000);
+      expect(aiChat).toHaveBeenCalledTimes(1);
+      expect(deadline.signal.aborted).toBe(true);
       expect(await response.json()).toMatchObject({ mode: 'guided' });
     } finally {
       timeout.mockRestore();

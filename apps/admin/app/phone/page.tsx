@@ -25,10 +25,21 @@ import { findPhoneWorkspace, phoneWorkspaceTenant } from '@/lib/phone/workspace'
 import { scopePhoneProfileQuery, phoneNumberProfileChoices } from '@/lib/phone/profile-scope';
 import { PHONE_MANAGER_ROLES } from '@/lib/phone/access';
 import { hydrateProcessEnv } from '@/lib/secrets';
+import { probePhoneReadiness } from '@/lib/phone/readiness-probe';
+import { DEFAULT_SMS_AUTO_REPLY_MESSAGE } from '@/lib/phone/sms-auto-reply';
+import {
+  DEFAULT_VOICEMAIL_GREETING,
+  VOICEMAIL_GREETING_BUCKET,
+  extensionVoicemailGreetingSlot,
+  systemVoicemailGreetingSlot,
+} from '@/lib/phone/voicemail-greeting';
+import { derivePhoneDevicePresence } from '@/lib/phone/availability';
+import { summarizePhoneReadiness } from '@/lib/phone/readiness';
 import {
   CapabilityGuide,
   NewSystemNotice,
   PhoneSetupForms,
+  type ExtensionGreetingOption,
   type PhoneSettings,
 } from './PhoneSetupForms';
 import {
@@ -122,9 +133,9 @@ export default async function PhonePage() {
           .order('extension'),
         db
           .from('phone_webrtc_devices')
-          .select('id', { count: 'exact', head: true })
+          .select('registration_state, connection_state, last_seen_at')
           .eq('status', 'active')
-          .gte('last_seen_at', new Date(Date.now() - 120_000).toISOString()),
+          .limit(500),
       ])
     : ([
         { data: [] },
@@ -136,7 +147,7 @@ export default async function PhonePage() {
         { data: [] },
         { data: [] },
         { data: [] },
-        { count: 0 },
+        { data: [] },
       ] as any);
 
   // Retired carrier inventory must not appear as a current dashboard number.
@@ -152,6 +163,12 @@ export default async function PhonePage() {
     (profile: any) => !String(profile.email || '').endsWith('@qa.invalid'),
   );
   const extensions = extensionsResult.data ?? [];
+  // Stored device state is never trusted on its own: a handset that vanished
+  // without disconnecting leaves 'registered' rows behind. Presence is
+  // derived from last_seen_at freshness.
+  const liveDeviceCount = (devicesResult.data ?? []).filter(
+    (device: any) => derivePhoneDevicePresence(device).live,
+  ).length;
   const directoryEntries = extensions.filter((entry: any) => entry.enabled);
   const settings: PhoneSettings = {
     greeting:
@@ -185,7 +202,57 @@ export default async function PhonePage() {
       'Identify yourself as PARIS with Elevate for Humanity. Answer ordinary caller questions first using verified Elevate website and platform knowledge. Use the live enabled extension directory when the caller asks for a person or department or needs a human. Name the staff member and extension before offering the transfer. Never identify an individual staff member as the administrator unless their live role says so. Never guess unverified program, funding, enrollment, licensing, payment, or compliance information; offer a human transfer when uncertain.',
     aiAllowInterruptions: system?.ai_allow_interruptions ?? true,
     aiHumanHandoffEnabled: system?.ai_human_handoff_enabled ?? true,
+    smsAutoReplyEnabled: system?.sms_auto_reply_enabled ?? false,
+    smsAutoReplyMessage: system?.sms_auto_reply_message ?? DEFAULT_SMS_AUTO_REPLY_MESSAGE,
+    voicemailGreetingText:
+      systemVoicemailGreetingSlot(system).text || DEFAULT_VOICEMAIL_GREETING,
+    voicemailGreetingMode: systemVoicemailGreetingSlot(system).mode,
+    voicemailGreetingRecordingPath: systemVoicemailGreetingSlot(system).recordingPath,
+    voicemailGreetingRecordingUrl: null,
   };
+  // Signed preview links for greetings already recorded in the dashboard,
+  // so the saved recording can be played back (and re-recorded) in place.
+  const greetingRecordingUrl = async (recordingPath: string): Promise<string | null> => {
+    if (!recordingPath) return null;
+    const { data } = await db.storage
+      .from(VOICEMAIL_GREETING_BUCKET)
+      .createSignedUrl(recordingPath, 3600);
+    return data?.signedUrl ?? null;
+  };
+  settings.voicemailGreetingRecordingUrl = await greetingRecordingUrl(
+    settings.voicemailGreetingRecordingPath,
+  );
+  // The greeting columns arrive with the voicemail_greeting_config
+  // migration; until then this lookup fails and every greeting simply
+  // reads as unset — a settings column must never break the directory.
+  const greetingById = new Map<string, any>();
+  if (extensions.length) {
+    const { data: greetingRows } = await db
+      .from('communication_extensions')
+      .select(
+        'id,voicemail_greeting,voicemail_greeting_mode,voicemail_greeting_recording_path',
+      )
+      .in(
+        'id',
+        extensions.map((entry: any) => entry.id),
+      );
+    for (const row of greetingRows ?? []) greetingById.set(row.id, row);
+  }
+  const extensionGreetings: ExtensionGreetingOption[] = await Promise.all(
+    extensions.map(async (entry: any) => {
+      const slot = extensionVoicemailGreetingSlot(greetingById.get(entry.id));
+      return {
+        id: entry.id,
+        extension: entry.extension,
+        name: entry.display_name || entry.department || `Extension ${entry.extension}`,
+        enabled: entry.enabled !== false,
+        text: slot.text,
+        mode: slot.mode,
+        recordingPath: slot.recordingPath,
+        recordingUrl: await greetingRecordingUrl(slot.recordingPath),
+      };
+    }),
+  );
 
   const cards = [
     ['Business numbers', numbers.length, Phone],
@@ -203,6 +270,21 @@ export default async function PhonePage() {
     system?.routing_mode === 'ai_receptionist'
       ? Boolean(system?.ai_enabled)
       : menuOptions.some((option: any) => option.enabled && option.destination_id);
+  // Live readiness is probed server-side on load (issue #2166): Twilio
+  // account + primary voice number, PBX config + PBX-verified SIP
+  // registrations. A failed or slow probe never blocks the page — it
+  // renders as unverified, never as ready. This must run before
+  // `setupSteps` below, which reads `liveReadiness` (declaring it after
+  // use was a TDZ error: TS2448, and a runtime ReferenceError).
+  let liveReadiness: Awaited<ReturnType<typeof probePhoneReadiness>> | null = null;
+  try {
+    liveReadiness = await Promise.race([
+      probePhoneReadiness(db),
+      new Promise<null>((resolve) => setTimeout(() => resolve(null), 12_000)),
+    ]);
+  } catch {
+    liveReadiness = null;
+  }
   const setupSteps = [
     {
       label: 'Assign PWA extensions',
@@ -215,9 +297,16 @@ export default async function PhonePage() {
     },
     {
       label: 'Connect one PWA phone',
-      complete: (devicesResult.count ?? 0) > 0,
+      complete: liveDeviceCount > 0,
     },
-    { label: 'Call history recorded', complete: (callsResult.count ?? 0) > 0 },
+    {
+      label: 'Call history recorded',
+      complete: (callsResult.count ?? 0) > 0,
+    },
+    {
+      label: 'Live carrier verified',
+      complete: liveReadiness?.ready === true,
+    },
   ];
   const phoneConfigured =
     Boolean(primaryNumber) && routingReady && extensions.some((entry: any) => entry.enabled);
@@ -311,15 +400,17 @@ export default async function PhonePage() {
         ))}
       </div>
       <div className="grid gap-3 md:grid-cols-2">
-        <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-950">
+        <div
+          className={`rounded-xl border p-4 text-sm ${liveReadiness?.ready ? 'border-emerald-200 bg-emerald-50 text-emerald-950' : 'border-amber-200 bg-amber-50 text-amber-950'}`}
+        >
           <div className="flex items-center gap-2 font-black">
             <Radio className="h-4 w-4" />
             Phone configuration: {phoneConfigured ? 'Saved' : 'Setup incomplete'}
           </div>
-          <p className="mt-1">
-            Live carrier status is unverified here. Saved numbers and routes do not confirm phone
-            registration, ringing, or two-way audio. Open the dial pad to check your connection.
-          </p>
+          <p className="mt-1">{summarizePhoneReadiness(liveReadiness)}</p>
+          {!liveReadiness?.ready ? (
+            <p className="mt-1">Open the dial pad to check your connection.</p>
+          ) : null}
         </div>
         <div
           className={`rounded-xl border p-4 text-sm ${meetingReady ? 'border-emerald-200 bg-emerald-50 text-emerald-950' : 'border-blue-200 bg-blue-50 text-blue-950'}`}
@@ -344,6 +435,7 @@ export default async function PhonePage() {
       <CapabilityGuide />
       <PhoneSetupForms
         settings={settings}
+        extensionGreetings={extensionGreetings}
         destinations={destinations.map((item: any) => ({
           id: item.id,
           name: item.name,

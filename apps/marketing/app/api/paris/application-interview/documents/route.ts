@@ -44,6 +44,17 @@ async function resolveProgramId(programSlug: string | undefined) {
   return data?.id ?? null;
 }
 
+function isMissingDocumentColumnError(error: { code?: string | null; message?: string | null }) {
+  const code = error?.code ?? '';
+  const message = error?.message ?? '';
+  return (
+    code === 'PGRST204' ||
+    code === '42703' ||
+    message.includes('verified') ||
+    message.includes('rejection_reason')
+  );
+}
+
 export async function GET(request: NextRequest) {
   try {
     const project = await authorizedProject(request);
@@ -73,12 +84,31 @@ export async function GET(request: NextRequest) {
         .eq('owner_id', project.id)
         .order('created_at', { ascending: false }),
     ]);
-    if (documentError) throw documentError;
+    let resolvedDocuments = documents;
+    if (documentError && isMissingDocumentColumnError(documentError)) {
+      // Older schemas (the isolated QA project) predate the `verified` and
+      // `rejection_reason` columns on documents. Retry without them and present
+      // them as unknown instead of failing the whole list with a 500.
+      const legacy = await db
+        .from('documents')
+        .select('id, document_type, file_name, status, verification_status, created_at, updated_at')
+        .eq('owner_type', 'agentic_application')
+        .eq('owner_id', project.id)
+        .order('created_at', { ascending: false });
+      if (legacy.error) throw legacy.error;
+      resolvedDocuments = (legacy.data ?? []).map((row) => ({
+        ...row,
+        verified: null,
+        rejection_reason: null,
+      }));
+    } else if (documentError) {
+      throw documentError;
+    }
 
     return NextResponse.json({
       ok: true,
       requirements: requirements ?? [],
-      documents: documents ?? [],
+      documents: resolvedDocuments ?? [],
     }, { headers: { 'Cache-Control': 'no-store' } });
   } catch (error) {
     console.error('paris.application.documents.list.failed', error instanceof Error ? error.message : String(error));

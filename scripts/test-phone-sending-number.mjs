@@ -4,7 +4,7 @@ import { readFile } from 'node:fs/promises';
 import { stripTypeScriptTypes } from 'node:module';
 const source = stripTypeScriptTypes(await readFile(new URL('../lib/phone/sending-number.ts', import.meta.url), 'utf8'));
 const { resolveSendingNumber } = await import('data:text/javascript;base64,' + Buffer.from(source).toString('base64'));
-function fixture({ system = { id: 'platform' }, number = { e164: '+15555550123' }, error = null } = {}) {
+function fixture({ system = { id: 'platform' }, number = { e164: '+15555550123', capabilities: { sms: true } }, error = null } = {}) {
   const filters = [];
   const db = { from(table) {
     const q = { select: () => q, is: (...args) => { filters.push([table, ...args]); return q; }, eq: (...args) => { filters.push([table, ...args]); return q; }, maybeSingle: async () => ({ data: table === 'phone_systems' ? system : number, error }) };
@@ -22,6 +22,11 @@ test('retains an explicit valid runtime sender without querying unrelated lines'
 });
 test('rejects malformed explicit configuration instead of silently replacing it', async () => {
   assert.equal(await resolveSendingNumber(null, { TWILIO_PHONE_NUMBER: 'contact us' }), null);
+});
+test('a primary line without SMS capability is not selected as a sender', async () => {
+  for (const number of [{ e164: '+15555550123' }, { e164: '+15555550123', capabilities: {} }, { e164: '+15555550123', capabilities: { sms: false, voice: true } }]) {
+    assert.equal(await resolveSendingNumber(fixture({ number }).db, {}), null);
+  }
 });
 test('ambiguous database results and missing provider records fail closed', async () => {
   for (const data of [{ error: { message: 'multiple rows' } }, { system: null }, { number: null }, { number: { e164: '317' } }]) {

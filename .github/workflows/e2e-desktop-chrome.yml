@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
     inputs:
       exhaustive:
-        description: Run focused regressions in addition to the normal eight browser shards
+        description: Run focused regressions in addition to the normal four browser shards
         type: boolean
         default: false
   pull_request:
@@ -23,12 +23,12 @@ permissions:
 
 jobs:
   desktop-chrome-shard:
-    name: E2E desktop-chrome shard ${{ matrix.shard }}/8
+    name: E2E desktop-chrome shard ${{ matrix.shard }}/4
     strategy:
       fail-fast: false
       max-parallel: 2
       matrix:
-        shard: [1, 2, 3, 4, 5, 6, 7, 8]
+        shard: [1, 2, 3, 4]
     runs-on: ubuntu-24.04
     container:
       image: mcr.microsoft.com/playwright:v1.57.0-noble@sha256:3bed4b1a12f2338642f3d8cba28e291deef3c66bd4a964bbeb3e57bbff511dbd
@@ -93,10 +93,10 @@ jobs:
         run: node scripts/qa/test-builder-authorization.mjs
       - name: Provision disposable Employer, Instructor, Staff, Case Manager and Admin QA identities
         run: node scripts/qa/provision-remaining-portal-e2e.mjs provision
-      - name: Provision disposable Apprentice and Host Shop QA identities
-        run: node scripts/qa/provision-apprenticeship-e2e.mjs provision
       - name: Provision disposable Learner and Program Holder QA identities
         run: node scripts/qa/provision-learner-program-holder-e2e.mjs provision
+      - name: Provision disposable Apprentice and Host Shop QA identities
+        run: node scripts/qa/provision-apprenticeship-e2e.mjs provision
       - name: Verify preinstalled Playwright browsers
         run: node scripts/verify-playwright-runtime.mjs chromium
       - name: Verify published marketing artwork through Next image loader
@@ -142,7 +142,7 @@ jobs:
         run: |
           args=()
           if [[ "$EXHAUSTIVE_BROWSER_RUN" == true ]]; then args+=(--max-failures=0); fi
-          pnpm test:e2e --shard=${{ matrix.shard }}/8 --reporter=line,html,json "${args[@]}"
+          pnpm test:e2e --shard=${{ matrix.shard }}/4 --reporter=line,html,json "${args[@]}"
       - name: Enforce authenticated portal certification
         if: ${{ !cancelled() && matrix.shard == 1 && steps.portal_certification.outcome != 'success' }}
         run: |
@@ -153,12 +153,12 @@ jobs:
         run: |
           echo "Focused exhaustive browser regression failed; all shard evidence was retained."
           exit 1
+      - name: Clean up disposable Apprentice and Host Shop QA identities
+        if: always()
+        run: node scripts/qa/provision-apprenticeship-e2e.mjs cleanup  
       - name: Clean up disposable Learner and Program Holder QA identities
         if: always()
         run: node scripts/qa/provision-learner-program-holder-e2e.mjs cleanup
-      - name: Clean up disposable Apprentice and Host Shop QA identities
-        if: always()
-        run: node scripts/qa/provision-apprenticeship-e2e.mjs cleanup
       - name: Clean up disposable Employer, Instructor, Staff, Case Manager and Admin QA identities
         if: always()
         run: node scripts/qa/provision-remaining-portal-e2e.mjs cleanup

@@ -31,4 +31,14 @@ export async function refreshOwnedProgramPayment(db: any, row: any, userId: stri
     payload: row.fulfillment_payload, status: 'pending', updated_at: paidAt,
   }, { onConflict: 'billing_invoice_id', ignoreDuplicates: true });
   if (queued.error) throw new Error('Confirmed payment fulfillment could not be queued.');
+  // Advance the enrollment now, in this request: the fulfillment outbox
+  // used to wait for a cron call that might never come, leaving a learner
+  // whose payment just verified stuck at a checkout state. Best effort —
+  // a processing failure leaves the job pending for the cron sweeper and
+  // must not hide the confirmed payment from the learner.
+  try {
+    const { processBillingFulfillmentJobs } = await import('./handlers/process-billing-fulfillment');
+    await processBillingFulfillmentJobs(db);
+  } catch { /* fulfillment stays queued for the cron sweeper */ }
 }
+

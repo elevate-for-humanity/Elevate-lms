@@ -76,7 +76,9 @@ describe('Host Shop communications contract', () => {
   });
 
   it('uses Host Shop language in mailbox previews', () => {
-    expect(hostShopEmail).toContain('<EmailWorkspace roleLabel="Host Shop" />');
+    expect(hostShopEmail).toContain('roleLabel="Host Shop"');
+    expect(hostShopEmail).toContain('guideHref="/communications/email/help?mailbox=host-shop"');
+    expect(emailWorkspace).toContain('How to use Interoffice Email');
     expect(emailWorkspace).toContain("roleLabel = 'Program Holder'");
     expect(emailWorkspace).toContain('selected {roleLabel} mailbox');
     expect(emailWorkspace).not.toContain('selected Program Holder’s mailbox');

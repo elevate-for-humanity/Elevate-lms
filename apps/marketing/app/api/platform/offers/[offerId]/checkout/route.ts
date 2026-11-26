@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { createQuickBooksBillingProvider } from '@/lib/billing/providers/quickbooks';
 import { requireAdminClient } from '@/lib/supabase/admin';
+import { logger } from '@/lib/logger';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -145,10 +146,10 @@ export async function POST(
         },
         { onConflict: 'provider,customer_external_key,canonical_product_key' },
       );
-      if (scheduled.error)
-        throw new Error(
-          `Invoice created but subscription schedule failed: ${scheduled.error.message}`,
-        );
+      if (scheduled.error) {
+        logger.error('Offer checkout subscription schedule failed', { error: scheduled.error.message });
+        throw new Error('Invoice created but subscription schedule failed');
+      }
     }
     return NextResponse.json({
       checkoutUrl: invoice.paymentUrl,
@@ -161,8 +162,11 @@ export async function POST(
       .update({ status: 'failed', updated_at: new Date().toISOString() })
       .eq('id', orderId)
       .eq('status', 'pending');
+    logger.error('Offer checkout failed', {
+      error: cause instanceof Error ? cause.message : String(cause),
+    });
     return NextResponse.json(
-      { error: cause instanceof Error ? cause.message : 'Could not create checkout.' },
+      { error: 'Could not create checkout.' },
       { status: 502 },
     );
   }

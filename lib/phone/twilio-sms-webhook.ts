@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { hydrateProcessEnv } from '@/lib/secrets';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { storeSmsEvent } from './sms-inbound';
+import { maybeSendSmsAutoReply } from './sms-auto-reply';
 import { inboundTwilioMedia, TWILIO_SMS_WEBHOOK, twilioAccountSid, validTwilioSignature } from './twilio';
 
 export async function twilioSmsWebhook(request: Request, statusCallback = false) {
@@ -56,10 +57,26 @@ export async function twilioSmsWebhook(request: Request, statusCallback = false)
     const { data: number, error } = await db.from('phone_numbers').select('id').eq('e164', to)
       .eq('provider', 'twilio').eq('status', 'active').maybeSingle();
     if (error || !number) return new Response(null, { status: 503 });
-    await storeSmsEvent(db, { data: { id: `twilio:${sid}`, event_type: 'message.received', payload: {
+    const stored = await storeSmsEvent(db, { data: { id: `twilio:${sid}`, event_type: 'message.received', payload: {
       id: sid, from: { phone_number: from }, to: [{ phone_number: to }], text: params.get('Body') || '',
       media: inboundTwilioMedia(params),
     } } });
+    if (stored?.phoneSystemId) {
+      // Best effort: the inbound text is already stored, so an auto-reply
+      // problem must never fail this webhook — Twilio would retry the
+      // delivery and re-run the whole intake. maybeSendSmsAutoReply also
+      // dedupes to at most one reply per sender per 24 hours.
+      try {
+        await maybeSendSmsAutoReply(db, {
+          phoneSystemId: stored.phoneSystemId,
+          businessNumber: to,
+          senderNumber: from,
+          inboundBody: params.get('Body') || '',
+          inboundEventId: `twilio:${sid}`,
+          ownerProfileId: stored.ownerProfileId,
+        });
+      } catch { /* The auto-reply is best effort; the inbox copy is authoritative. */ }
+    }
     return new Response('<?xml version="1.0" encoding="UTF-8"?><Response/>', {
       headers: { 'Content-Type': 'text/xml; charset=utf-8' },
     });

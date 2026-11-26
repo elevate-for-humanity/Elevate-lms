@@ -11,7 +11,7 @@ export const COSMETOLOGY: ProgramSchema = {
   programType: 'apprenticeship',
   heroImage: '/images/pexels/cosmetology.webp',
   heroImageAlt: 'Cosmetology apprentice styling hair in a salon',
-  videoSrc: '/videos/beauty-cosmetology.mp4',
+  videoSrc: '/videos/cosmetology-salon.mp4',
   deliveryMode: 'in-person',
   deliveredBy: 'Partner',
   durationWeeks: 52,

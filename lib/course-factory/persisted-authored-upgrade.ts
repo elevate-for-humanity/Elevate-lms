@@ -79,6 +79,52 @@ function specificSource(
   };
 }
 
+function passThroughEntry(lesson: Record<string, any>) {
+  // The atomic upgrade RPC requires one payload entry per persisted lesson
+  // and rewrites every field it is given. A lesson that cannot be compiled
+  // is carried with its current persisted values verbatim, so the RPC leaves
+  // its content byte-identical while the lessons that do compile are
+  // upgraded in the same transaction.
+  return {
+    id: lesson.id,
+    title: lesson.title,
+    content: lesson.content ?? null,
+    content_json: lesson.content_json ?? null,
+    rendered_html: lesson.rendered_html ?? null,
+    learning_objectives: lesson.learning_objectives ?? null,
+    quiz_questions: lesson.quiz_questions ?? null,
+    key_terms: lesson.key_terms ?? null,
+    activities: lesson.activities ?? null,
+    resources: lesson.resources ?? null,
+    video_config: lesson.video_config ?? null,
+    script_text: lesson.script_text ?? null,
+    script: lesson.script ?? null,
+    bullet_points: lesson.bullet_points ?? null,
+    scene_data: lesson.scene_data ?? null,
+  };
+}
+
+export type AuthoredCompileFailure = {
+  lessonId: string;
+  slug: string;
+  title: string;
+  error: string;
+};
+
+export class AuthoredCompileError extends Error {
+  failures: AuthoredCompileFailure[];
+
+  constructor(courseTitle: string, failures: AuthoredCompileFailure[]) {
+    super(
+      `${courseTitle}: no lessons could be compiled — ${failures
+        .map((failure) => `${failure.slug}: ${failure.error}`)
+        .join('; ')}`,
+    );
+    this.name = 'AuthoredCompileError';
+    this.failures = failures;
+  }
+}
+
 export async function upgradePersistedAuthoredCourse(
   courseId: string,
   client?: SupabaseClient,
@@ -108,7 +154,7 @@ export async function upgradePersistedAuthoredCourse(
   const { data: lessons, error: lessonError } = await db
     .from('course_lessons')
     .select(
-      'id,course_id,module_id,title,slug,content,content_json,rendered_html,learning_objectives,quiz_questions,key_terms,activities,resources,video_url,video_config,lesson_type,domain_key,approved,is_published,order_index',
+      'id,course_id,module_id,title,slug,content,content_json,rendered_html,learning_objectives,quiz_questions,key_terms,activities,resources,video_url,video_config,lesson_type,domain_key,approved,is_published,order_index,script_text,script,bullet_points,scene_data',
     )
     .eq('course_id', courseId)
     .order('order_index');
@@ -143,10 +189,17 @@ export async function upgradePersistedAuthoredCourse(
     throw new Error(`Selective authored repair referenced missing lesson(s): ${missing.join(', ')}`);
   }
 
-  // Compile only the requested failed lesson components before the transaction.
-  // A normal authored upgrade still compiles the complete course, while repair
-  // callers can preserve every passing lesson byte-for-byte.
-  const payload = lessonsToUpgrade.map((lesson) => {
+  // Compile each requested lesson independently before the transaction. A
+  // lesson that cannot compile must not hold the whole course hostage: it is
+  // reported with its exact reason and carried into the atomic upgrade with
+  // its persisted values untouched, while every lesson that does compile is
+  // upgraded and queued. Repair callers can still preserve every passing
+  // lesson byte-for-byte by selecting lessonIds.
+  const failures: AuthoredCompileFailure[] = [];
+  const compiledEntries: Array<Record<string, any>> = [];
+  const payload: Array<Record<string, any>> = [];
+
+  const compileLessonEntry = (lesson: Record<string, any>) => {
     const module = modulesById.get(lesson.module_id);
     if (!module) throw new Error(`${lesson.title}: module is missing`);
     const source = specificSource(
@@ -237,7 +290,31 @@ export async function upgradePersistedAuthoredCourse(
       // locked media package has rendered and passed the canonical quality gate.
       generation_status: 'generating',
     };
-  });
+  };
+
+  for (const lesson of lessons) {
+    if (requestedLessonIds && !requestedLessonIds.has(lesson.id)) {
+      payload.push(passThroughEntry(lesson));
+      continue;
+    }
+    try {
+      const entry = compileLessonEntry(lesson);
+      compiledEntries.push(entry);
+      payload.push(entry);
+    } catch (compileError) {
+      failures.push({
+        lessonId: lesson.id,
+        slug: lesson.slug,
+        title: lesson.title,
+        error: compileError instanceof Error ? compileError.message : String(compileError),
+      });
+      payload.push(passThroughEntry(lesson));
+    }
+  }
+
+  if (compiledEntries.length === 0 && failures.length > 0) {
+    throw new AuthoredCompileError(course.title, failures);
+  }
 
   const { data, error } = await db.rpc('apply_authored_course_experience_upgrade', {
     p_course_id: courseId,
@@ -245,7 +322,7 @@ export async function upgradePersistedAuthoredCourse(
   });
   if (error) throw error;
 
-  for (const lesson of payload) {
+  for (const lesson of compiledEntries) {
     await createJob({
       lesson_id: lesson.id,
       course_id: courseId,
@@ -263,7 +340,9 @@ export async function upgradePersistedAuthoredCourse(
     courseSlug: course.slug,
     moduleCount: modules?.length ?? 0,
     lessonCount: lessons?.length ?? 0,
-    repairedLessonCount: payload.length,
+    repairedLessonCount: compiledEntries.length,
+    compiledLessonCount: compiledEntries.length,
+    failures,
     result: data,
   };
 }

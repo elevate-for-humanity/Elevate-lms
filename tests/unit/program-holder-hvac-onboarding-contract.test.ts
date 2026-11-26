@@ -42,7 +42,8 @@ describe('HVAC Program Holder onboarding contract', () => {
   it('uses the assigned Program Holder record and activates it after signature', () => {
     const page = readFileSync('apps/lms/app/program-holder/sign-mou/page.tsx', 'utf8');
     const action = readFileSync('apps/marketing/app/actions/sign-agreement.ts', 'utf8');
-    expect(page).toContain('agreementVersion={`3.0-${holder.id}`}');
+    expect(page).toContain("agreementVersion={packet ? achieveDocumentVersion('mou', packet.digest) : `3.0-${holder.id}`}");
+    expect(action).toContain('data.agreementVersion !== `3.0-${holderId}`');
     expect(page).toContain('{holder.organization_name}');
     expect(page).toContain("from('program_holder_programs')");
     expect(page).not.toContain('INDY ON DEMAND SERVICES LLC');

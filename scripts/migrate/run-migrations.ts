@@ -2,7 +2,9 @@
  * Database Migration Runner
  * Run all Supabase migrations in order
  * 
- * Usage: npx tsx scripts/migrate/run-migrations.ts
+ * Usage: npx tsx scripts/migrate/run-migrations.ts   (dry-run by default)
+ *        APPLY_MIGRATIONS=true npx tsx scripts/migrate/run-migrations.ts
+ *        Production additionally requires APPLY_PRODUCTION=true
  */
 
 import { createClient } from '@supabase/supabase-js';
@@ -11,6 +13,26 @@ import * as path from 'path';
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+// Starter 1e02e5e intent, ported as a gate (not as a file port): dry-run by
+// default. Apply only with APPLY_MIGRATIONS=true. Production (the live
+// elevate project) additionally requires APPLY_PRODUCTION=true, so a stray
+// `npx tsx scripts/migrate/run-migrations.ts` can never write to prod.
+const APPLY_MIGRATIONS = process.env.APPLY_MIGRATIONS === 'true';
+const IS_PRODUCTION_TARGET = Boolean(SUPABASE_URL && SUPABASE_URL.includes('cuxzzpsyufcewtmicszk'));
+const APPLY_PRODUCTION = process.env.APPLY_PRODUCTION === 'true';
+
+if (IS_PRODUCTION_TARGET && APPLY_MIGRATIONS && !APPLY_PRODUCTION) {
+  console.error('❌ Refusing to apply migrations to the production project.');
+  console.error('   Set APPLY_PRODUCTION=true explicitly to proceed.');
+  process.exit(1);
+}
+
+if (!APPLY_MIGRATIONS) {
+  console.log('🔍 DRY RUN (default) — no migrations will be applied.');
+  console.log('   To apply: APPLY_MIGRATIONS=true npx tsx scripts/migrate/run-migrations.ts');
+  console.log('   Production also requires: APPLY_PRODUCTION=true');
+}
 
 if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
   console.error('❌ Missing required environment variables:');
@@ -76,8 +98,14 @@ async function runMigrations() {
       }
     }
 
+    if (!APPLY_MIGRATIONS) {
+      console.log(`   🔍 Dry run: ${migrationFile} would be applied (${statements.length} statements parsed, 0 executed)`);
+      continue;
+    }
+
     let successCount = 0;
     let skippedCount = 0;
+    let errorCount = 0;
 
     for (const statement of statements) {
       if (!statement.trim() || statement.length < 10) {
@@ -86,17 +114,26 @@ async function runMigrations() {
       }
 
       try {
-        const { error } = await supabase.rpc('pg_execute', { 
-          sql_query: statement 
-        }).catch(() => ({ error: null })); // Ignore RPC errors
-        
-        successCount++;
+        const { error } = await supabase.rpc('pg_execute', {
+          sql_query: statement
+        });
+        if (error) {
+          console.error(`   ❌ Statement failed: ${error.message}`);
+          errorCount++;
+        } else {
+          successCount++;
+        }
       } catch (e) {
-        successCount++;
+        console.error(`   ❌ Statement threw: ${(e as Error).message}`);
+        errorCount++;
       }
     }
 
-    console.log(`   ✅ {successCount} statements, {skippedCount} skipped`);
+    console.log(`   ✅ ${successCount} statements, ${skippedCount} skipped, ${errorCount} failed`);
+    if (errorCount > 0) {
+      console.error(`\n❌ ${errorCount} statement(s) failed in ${migrationFile} — stopping.`);
+      process.exit(1);
+    }
   }
 
   console.log('\n✅ All migrations completed!');

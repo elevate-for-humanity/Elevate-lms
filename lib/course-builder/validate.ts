@@ -14,7 +14,6 @@ import {
   type CourseTemplate,
 } from './schema';
 import { findUnregisteredKeys, getCompetenciesForProgram } from './competencies';
-import { resolveCourseId } from './schema';
 import { validateHours } from './hours-engine';
 import { logger } from '@/lib/logger';
 import {
@@ -242,11 +241,11 @@ export function validateCourseTemplate(template: CourseTemplate): CourseValidati
   const allErrors: LessonValidationError[] = [];
   const cErr = (field: string, msg: string, sev: 'error' | 'warning' = 'error') =>
     allErrors.push(mkErr('_course', '_course', field, msg, sev));
-  if (!resolveCourseId(template.programSlug))
-    cErr(
-      'programSlug',
-      `'${template.programSlug}' is not available in the static compatibility map — register the program/course relationship through the canonical Course Builder authority before using this legacy synchronous validator`,
-    );
+  // Program/course identity is resolved from the database by the canonical
+  // Course Builder authority (lib/course-builder/program-resolver.ts), never
+  // from a static slug map, so any program registered in the DB can be built
+  // through this validator. Identity checks live in the DB-backed save and
+  // publish paths; this synchronous validator checks template structure only.
   if (!template.courseSlug || !/^[a-z0-9]+(-[a-z0-9]+)*$/.test(template.courseSlug))
     cErr('courseSlug', 'must be lowercase kebab-case');
   if (!template.title || template.title.trim().length < 3) cErr('title', 'course title required');

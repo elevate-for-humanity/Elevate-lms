@@ -54,15 +54,18 @@ describe('unified engineering runner planning', () => {
     ]);
   });
 
-  it('dispatches internal engineering in-process and keeps OpenHands opt-in', () => {
+  it('dispatches internal engineering in-process; OpenHands is removed from the planner', () => {
     const executor = readFileSync(resolve('lib/ai/tools/executor.ts'), 'utf8');
     const planner = readFileSync(resolve('lib/ai/tools/planner.ts'), 'utf8');
     expect(executor).toContain("tool.name === 'studio.engineering.execute'");
     expect(executor).toContain(
       "@/apps/admin/app/api/admin/dev-studio/engineering/route",
     );
-    expect(planner).toContain(
-      "/\\bopenhands\\b/.test(lower) ? 'openhands.execute' : 'studio.engineering.execute'",
-    );
+    // OpenHands has been removed: the planner has no OpenHands execution
+    // route at all. Naming OpenHands in a command routes to the owned
+    // engine, and no opt-in check remains in the planner source.
+    expect(planner).toContain('routeEngineeringExecution(lower)');
+    expect(planner).not.toContain('isOpenHandsOptedIn');
+    expect(planner).not.toContain("'openhands.execute'");
   });
 });

@@ -12,8 +12,15 @@
  *   - lib/ai/**          ← provider implementations live here
  *   - lib/groq-client.ts ← legacy shim, kept for streaming routes
  *   - lib/gemini-client.ts
- *   - apps/admin/app/api/devstudio/execute/route.ts  ← intentional multi-provider tool-calling
- *   - apps/admin/app/api/devstudio/chat/route.ts
+ *   - apps/admin/app/api/admin/dev-studio/chat/route.ts
+ *       ← intentional multi-provider tool-calling (Dev Studio chat).
+ *       Corrected 2026-11-23: the exemption previously named the legacy
+ *       apps/admin/app/api/devstudio/{chat,execute}/route.ts paths, which
+ *       do not exist at HEAD. The canonical Dev Studio chat route is the
+ *       one above; it uses aiChat() from lib/ai plus the lib/* client
+ *       shims, and its multi-provider tool-calling is intentional — it
+ *       does not route through lib/ai/orchestrator.ts (see
+ *       docs/systems-side-by-side.md).
  */
 
 'use strict';
@@ -31,8 +38,10 @@ const ALLOWED_PATHS = [
   /^lib[\\/]ai[\\/]/,
   /^lib[\\/]groq-client\./,
   /^lib[\\/]gemini-client\./,
-  /devstudio[\\/]execute[\\/]route\./,
-  /devstudio[\\/]chat[\\/]route\./,
+  // Canonical Dev Studio chat route (multi-provider tool-calling).
+  // The legacy /api/devstudio/{chat,execute} paths this once named do not
+  // exist at HEAD; they are not listed here anymore.
+  /admin[\\/]dev-studio[\\/]chat[\\/]route\./,
 ];
 
 function toRepoRelativePath(filename) {

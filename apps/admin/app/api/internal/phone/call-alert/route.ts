@@ -63,6 +63,7 @@ export async function POST(request: Request) {
     }
     const body = await readBody(request);
     const callerName =
+      // eslint-disable-next-line no-control-regex -- intentional: strip control characters from the caller name
       typeof body.callerName === 'string' ? body.callerName.replace(/[\u0000-\u001f\u007f]/g, ' ').trim() : '';
     if (
       !UUID.test(body.id || '') ||

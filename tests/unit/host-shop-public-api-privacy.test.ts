@@ -46,7 +46,7 @@ it('omits operational application contacts from the public host-shop API', async
 
 it('never renders operational contact fields in the public profile source', () => {
   const source = readFileSync(
-    new URL('../../apps/marketing/app/host-shops/[slug]/page.tsx', import.meta.url),
+    'apps/marketing/app/host-shops/[slug]/page.tsx',
     'utf8',
   );
   expect(source).not.toMatch(/\b(?:approved|shop)\.(?:email|supervisor)\b/);

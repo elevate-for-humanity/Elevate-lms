@@ -21,6 +21,37 @@ describe('phone delivery evidence', () => {
     expect(await deliverPhoneNotification(db,identity,send)).toBe('duplicate');
     expect(send).not.toHaveBeenCalled();
   });
+  it('re-claims a claim whose send was definitively not accepted',async () => {
+    const writes: any[] = []; const row = { id: 'claim-1' };
+    const db = { from: vi.fn(() => ({
+      insert: () => ({ select: () => ({ single: async () => ({ data: null, error: { code: '23505' } }) }) }),
+      select: () => { const q: any = { eq: () => q, single: async () => ({ data: row, error: null }) }; return q; },
+      update: (updateRow: any) => { writes.push(updateRow);
+        const q: any = { eq: () => q, select: () => q, single: async () => ({ data: row, error: null }),
+          then: (resolve: any) => Promise.resolve({ error: null }).then(resolve) };
+        return q; },
+    })) };
+    const send = vi.fn(async () => ({ accepted: true, providerMessageId: 'retry-receipt' }));
+    expect(await deliverPhoneNotification(db, identity, send)).toBe('accepted');
+    expect(send).toHaveBeenCalledTimes(1);
+    expect(writes[0]).toMatchObject({ status: 'processing' });
+    expect(writes.at(-1)).toMatchObject({ status: 'accepted', provider_message_id: 'retry-receipt' });
+  });
+  it('never re-claims a claim held for acceptance reconciliation',async () => {
+    const db = { from: vi.fn(() => ({
+      insert: () => ({ select: () => ({ single: async () => ({ data: null, error: { code: '23505' } }) }) }),
+      select: () => { const q: any = { eq: () => q, single: async () => ({ data: null, error: { code: 'PGRST116' } }) }; return q; },
+      update: () => { throw new Error('must not update'); },
+    })) };
+    const send = vi.fn();
+    expect(await deliverPhoneNotification(db, identity, send)).toBe('duplicate');
+    expect(send).not.toHaveBeenCalled();
+  });
+  it('records a refused send as retryable, distinct from reconciliation',async () => {
+    const {db,writes}=database();
+    expect(await deliverPhoneNotification(db,identity,async()=>({accepted:false}))).toBe('review_required');
+    expect(writes.at(-1)).toMatchObject({status:'review_required',outcome_code:'send_not_accepted'});
+  });
   it('never sends if the durable claim fails',async () => {
     const {db}=database({error:{code:'unavailable'}}); const send=vi.fn();
     await expect(deliverPhoneNotification(db,identity,send)).rejects.toThrow();
@@ -48,3 +79,4 @@ describe('voicemail notification identity',()=>{
   expect(phoneNotificationKind({source:'paris',awaitingTranscript:true})).toBe('paris');
  });
 });
+

@@ -102,6 +102,18 @@ export interface ProgramBuilderState {
   etpl_listed: boolean;
   /** Compliance profile key — maps to COMPLIANCE_PROFILES in lib/course-builder/compliance-profiles.ts */
   compliance_profile_key: string | null;
+  /** Industry alignment (build standard) — required at publish; drafts may save incomplete. */
+  governing_body?: string | null;
+  governing_standard_version?: string | null;
+  soc_code?: string | null;
+  cip_code?: string | null;
+  /** Tuition in dollars; publish requires a positive tuition or tuition_is_free. */
+  tuition_cost_dollars?: number | null;
+  tuition_is_free?: boolean;
+  /** digital_workbooks.id of the workbook that ships with this program's courses. */
+  workbook_id?: string | null;
+  /** Machine/equipment trade — publish requires a simulation activity on a lesson. */
+  hands_on_trade?: boolean;
   /** Org this program belongs to */
   org_id: string | null;
 
@@ -135,6 +147,19 @@ export function validateProgram(state: ProgramBuilderState): ProgramDerivedState
   if (state.ctas.length === 0) missing.push('Primary CTA (apply / enroll link)');
   if (!state.estimated_weeks) missing.push('Program duration (weeks)');
   if (!state.delivery_method) missing.push('Delivery mode');
+
+  // Build-standard alignment: required at publish (the server enforces it
+  // with an owner-override path). Listed here so the author sees each item
+  // and can fix it inline in the Compliance & Funding section, instead of
+  // hitting a dead end at publish time.
+  if (!state.governing_body?.trim()) missing.push('Governing body (build standard)');
+  if (!state.governing_standard_version?.trim())
+    missing.push('Governing standard / version (build standard)');
+  if (!state.soc_code?.trim()) missing.push('SOC code (build standard)');
+  if (!state.cip_code?.trim()) missing.push('CIP code (build standard)');
+  if (!state.tuition_is_free && !(state.tuition_cost_dollars && state.tuition_cost_dollars > 0))
+    missing.push('Tuition / fee (build standard)');
+  if (!state.workbook_id) missing.push('Workbook attached (build standard)');
 
   const totalModules = state.phases.reduce((n, p) => n + p.modules.length, 0);
   const allLessons = state.phases.flatMap((p) => p.modules.flatMap((m) => m.lessons));

@@ -17,17 +17,36 @@ export default async function RapidsPage() {
     pendingProgressResult,
     pendingCompletionResult,
     { data: recentSubmissions },
-    { data: actionQueue },
     { data: licensingEvidence },
   ] = await Promise.all([
     db.from('rapids_progress_updates').select('*', { count: 'exact', head: true }).not('submitted_to_rapids', 'is', true),
     db.from('rapids_registrations').select('*', { count: 'exact', head: true }).eq('status', 'completed').is('submitted_at', null),
     db.from('rapids_submissions').select('id, submission_type, submission_date, record_count, status, submitted_by').order('submission_date', { ascending: false }).limit(10),
-    db.from('rapids_action_queue').select('id,entity_type,entity_id,action_type,status,payload,created_at').in('status', ['pending','blocked']).order('created_at', { ascending: true }).limit(100),
     db.from('apprentice_licensing_evidence').select('student_id,occupation_code,requirement_key,status').limit(1000),
   ]);
 
-  const rawQueue = actionQueue ?? [];
+  // Read the FULL pending/blocked action queue, oldest first, in pages.
+  // Thousands of Sep-2026 QA E2E fixture rows sit ahead of the real actions,
+  // so a single limit(100) fetch never reached a real apprentice or host
+  // shop: the QA exclusion and dedupe below ran over a window that contained
+  // nothing else, and the worklist showed zero ready actions while real
+  // registrations waited. Paginate past the fixture rows so the in-memory
+  // filtering sees the whole queue.
+  const actionQueue: any[] = [];
+  const QUEUE_PAGE_SIZE = 1000;
+  for (let offset = 0; offset < 10000; offset += QUEUE_PAGE_SIZE) {
+    const { data: pageRows } = await db
+      .from('rapids_action_queue')
+      .select('id,entity_type,entity_id,action_type,status,payload,created_at')
+      .in('status', ['pending', 'blocked'])
+      .order('created_at', { ascending: true })
+      .range(offset, offset + QUEUE_PAGE_SIZE - 1);
+    if (!pageRows?.length) break;
+    actionQueue.push(...pageRows);
+    if (pageRows.length < QUEUE_PAGE_SIZE) break;
+  }
+
+  const rawQueue = actionQueue;
   const apprenticeProfileIds = [...new Set(
     rawQueue
       .filter((item: any) => item.entity_type === 'apprentice')
@@ -103,3 +122,4 @@ export default async function RapidsPage() {
     </div>
   );
 }
+

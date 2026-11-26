@@ -5,7 +5,7 @@ export async function resolveSendingNumber(db: any, env: Record<string, string |
   if (configured) return /^\+[1-9]\d{7,14}$/.test(configured) ? configured : null;
   const { data: system, error: systemError } = await db.from('phone_systems').select('id').is('tenant_id', null).maybeSingle();
   if (systemError || !system?.id) return null;
-  const { data: number, error } = await db.from('phone_numbers').select('e164').eq('phone_system_id', system.id) .eq('provider', 'twilio').eq('source', 'provider').eq('is_primary', true).eq('status', 'active').maybeSingle();
-  if (error || !/^\+[1-9]\d{7,14}$/.test(number?.e164 ?? '')) return null;
+  const { data: number, error } = await db.from('phone_numbers').select('e164,capabilities').eq('phone_system_id', system.id) .eq('provider', 'twilio').eq('source', 'provider').eq('is_primary', true).eq('status', 'active').maybeSingle();
+  if (error || number?.capabilities?.sms !== true || !/^\+[1-9]\d{7,14}$/.test(number?.e164 ?? '')) return null;
   return number.e164;
 }

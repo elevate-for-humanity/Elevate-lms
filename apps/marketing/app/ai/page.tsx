@@ -13,7 +13,7 @@ const aiProducts = [
     slug: 'paris',
     name: 'PARIS AI',
     tagline: 'Your AI Workforce Advisor',
-    description: 'Intelligent career guidance, program matching, and student support powered by Claude AI.',
+    description: 'Intelligent career guidance, program matching, and student support powered by PARIS AI.',
     icon: '🤖',
     features: ['Career pathway recommendations', 'Program matching', 'Funding eligibility checks', '24/7 student support'],
     color: 'from-purple-600 to-blue-600',

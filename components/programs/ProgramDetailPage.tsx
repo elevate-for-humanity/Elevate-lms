@@ -1182,7 +1182,7 @@ export default function ProgramDetailPage({
                 <span
                   className={`text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider ${enrollmentTracks.selfPay.available ? 'bg-brand-blue-100 text-brand-blue-700' : 'bg-slate-100 text-slate-500'}`}
                 >
-                  {enrollmentTracks.selfPay.available ? 'Start Immediately' : 'Enrollment Pending'}
+                  {enrollmentTracks.selfPay.available ? 'Review Enrollment' : 'Enrollment Pending'}
                 </span>
               </div>
               <h3 className="text-lg font-extrabold text-slate-900 mb-1">
@@ -1194,6 +1194,12 @@ export default function ProgramDetailPage({
               </p>
               <p className="text-slate-600 text-sm leading-relaxed mb-4 flex-1">
                 {enrollmentTracks.selfPay.description}
+                {isApprenticeship && enrollmentTracks.selfPay.available && (
+                  <span className="mt-2 block">
+                    Admissions confirms your training location, approved Host Shop placement, and
+                    start date before training begins.
+                  </span>
+                )}
               </p>
 
               {/* Legacy direct checkout link, when one is configured. */}
@@ -1203,6 +1209,7 @@ export default function ProgramDetailPage({
                     slug={p.slug}
                     cost={enrollmentTracks.selfPay.cost}
                     quickbooksCheckoutHref={p.cta.quickbooksCheckoutHref}
+                    label={isApprenticeship ? 'Start Enrollment Application' : undefined}
                   />
                 </div>
               )}

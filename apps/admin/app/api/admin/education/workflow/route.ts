@@ -18,7 +18,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
-import { safeDbError, safeError } from '@/lib/api/safe-error';
+import { safeError } from '@/lib/api/safe-error';
+import { logger } from '@/lib/logger';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -197,7 +198,14 @@ export async function POST(request: NextRequest) {
         })
         .select('id, user_id, program_id, status')
         .single();
-      if (error) return safeDbError(error, 'education workflow: enroll student', 'Enrollment could not be saved');
+      if (error) {
+        // Never return the raw database message to the client (it can
+        // contain internal details); log it server-side and return a
+        // generic message. The integrity LEAKS audit blocks on
+        // error.message in a response body.
+        logger.error('education workflow: enroll student failed', { error: error.message });
+        return fail('Failed to enroll student', 500);
+      }
       return ok({ enrollment });
     }
     case 'update_lesson_progress': {
@@ -227,7 +235,12 @@ export async function POST(request: NextRequest) {
       };
       if (existing) {
         const { error } = await db.from('lesson_progress').update(patch).eq('id', existing.id);
-        if (error) return safeDbError(error, 'education workflow: update lesson progress', 'Lesson progress could not be saved');
+        if (error) {
+          logger.error('education workflow: update lesson progress failed', {
+            error: error.message,
+          });
+          return fail('Failed to update lesson progress', 500);
+        }
       } else {
         const { error } = await db.from('lesson_progress').insert({
           user_id: data.user_id,
@@ -236,7 +249,12 @@ export async function POST(request: NextRequest) {
           program_id: course?.program_id ?? null,
           ...patch,
         });
-        if (error) return safeDbError(error, 'education workflow: record lesson progress', 'Lesson progress could not be saved');
+        if (error) {
+          logger.error('education workflow: record lesson progress failed', {
+            error: error.message,
+          });
+          return fail('Failed to update lesson progress', 500);
+        }
       }
       return ok({ updated: true });
     }

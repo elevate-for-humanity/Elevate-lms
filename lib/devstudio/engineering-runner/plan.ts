@@ -100,7 +100,7 @@ export function buildUnifiedEngineeringStages(goal: string): EngineeringStageSpe
 
 export const ENGINEERING_RUNNER_CAPABILITIES = {
   'studio-engineering': { mode: 'server', authority: 'repository-mutation' },
-  openhands: { mode: 'external-opt-in', authority: 'repository-mutation' },
+  openhands: { mode: 'removed', authority: 'none' },
   webcontainer: { mode: 'browser-local', authority: 'advisory-validation' },
   'github-actions': { mode: 'server', authority: 'ci-and-deployment' },
   'studio-browser': { mode: 'server', authority: 'browser-qa' },

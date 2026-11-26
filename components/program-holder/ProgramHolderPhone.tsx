@@ -1,5 +1,7 @@
 // Branch refreshed to pick up main (71e31a22): /apply/student E2E fix + Dockerfile.google-lms.
 'use client';
+// Branch refreshed to pick up main (a11d77d8): CI Preflight test fixes for the worker-start dispatcher/resume changes.
+// Branch refreshed to pick up main (2c73e61c): fresh CI after E2E shard 3/4 environment failure on the 71e31a22 base.
 
 import { DashboardVideoCalls } from '@/components/communications/DashboardVideoCalls';
 import { AudioOutputControl } from '@/components/communications/AudioOutputControl';
@@ -28,12 +30,21 @@ import {
 } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { getPushNotificationClient } from '@/lib/notifications/push-client';
-import { installAudioUnlock, startRingtone, stopRingtone } from '@/lib/notifications/audio-unlock';
+import {
+  installAudioUnlock,
+  onRingtoneStatusChange,
+  startRingtone,
+  stopRingtone,
+  unlockAudio,
+  type RingtoneStatus,
+} from '@/lib/notifications/audio-unlock';
+import { log } from '@/lib/logger';
 import { PhoneRecordingPlayer } from '@/components/communications/PhoneRecordingPlayer';
 import { ProgramHolderPhoneIntroduction } from '@/components/program-holder/ProgramHolderPhoneIntroduction';
 import { TextWorkspace } from '@/components/communications/TextWorkspace';
 import { PwaInstallButton } from '@/components/pwa/PwaInstallButton';
 import { phonePresenceDisplay } from '@/lib/phone/presence-display';
+import { claimPhoneContext, type PhoneContextLeadership } from '@/lib/phone/context-lock';
 
 type RingMode = 'ring' | 'vibrate' | 'silent' | 'do_not_disturb' | 'offline';
 type Schedule = Record<string, [string, string]>;
@@ -154,6 +165,30 @@ export function ProgramHolderPhone({
   const registeredRef = useRef(false);
   const ringModeRef = useRef<RingMode>('ring');
   const autoConnectAttemptedRef = useRef(false);
+  const reconnectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const heartbeatHealRef = useRef({ failures: 0, consumedEpoch: -1 });
+  const contextClaimRef = useRef<PhoneContextLeadership | null>(null);
+  const userDisconnectedRef = useRef(false);
+  const connectRef = useRef<() => Promise<void>>(async () => {});
+  // Wake mode: this page was opened from a call-wake notification
+  // (lib/phone/call-wake.ts) because a call is ringing this extension NOW.
+  const wakeRef = useRef<{ callId: string; from: string } | null>(null);
+  const wakeAttemptsRef = useRef(0);
+  const [wakeMode, setWakeMode] = useState(false);
+  const [ringtoneStatus, setRingtoneStatus] = useState<RingtoneStatus>('idle');
+  const [testingRing, setTestingRing] = useState(false);
+  const fallbackRingingRef = useRef(false);
+  const testRingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Cancels a test ring's auto-stop timer. The beep itself is stopped by the
+  // caller (startRingtone stops any previous ring; answer/hangup stop it too).
+  const stopTestRing = useCallback(() => {
+    if (testRingTimerRef.current) {
+      clearTimeout(testRingTimerRef.current);
+      testRingTimerRef.current = null;
+    }
+    setTestingRing(false);
+  }, []);
 
   useEffect(() => {
     if (data) ringModeRef.current = data.extension.ringMode;
@@ -163,8 +198,20 @@ export function ProgramHolderPhone({
   // an inbound call can ring without the operator touching the phone first.
   useEffect(() => {
     const removeAudioUnlock = installAudioUnlock();
+    const removeRingtoneStatus = onRingtoneStatusChange((status) => {
+      setRingtoneStatus(status);
+      if (status === 'ringing' && fallbackRingingRef.current) {
+        // The primary beep is sounding; silence the SIP fallback.
+        fallbackRingingRef.current = false;
+        log.info('[phone] ringtone: primary beep sounding; stopping SIP fallback');
+        callRef.current?.stopRingtone();
+      }
+    });
     return () => {
+      removeRingtoneStatus();
       removeAudioUnlock();
+      if (testRingTimerRef.current) clearTimeout(testRingTimerRef.current);
+      testRingTimerRef.current = null;
       stopRingtone();
     };
   }, []);
@@ -184,6 +231,22 @@ export function ProgramHolderPhone({
       document.getElementById('incoming-call-alert-mode')?.scrollIntoView({ block: 'center' });
     }
   }, [loading, data?.extension.id]);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('wake') !== '1') return;
+    wakeRef.current = { callId: params.get('call') || '', from: params.get('from') || '' };
+    setWakeMode(true);
+    if (params.get('from')) setIncomingNumber(params.get('from') || '');
+  }, []);
+
+  // Bring the incoming-call card into view the moment a call actually rings,
+  // whichever way this page was opened.
+  useEffect(() => {
+    if (callState === 'ringing') {
+      document.getElementById('incoming-call-card')?.scrollIntoView?.({ block: 'center', behavior: 'smooth' });
+    }
+  }, [callState]);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -208,6 +271,21 @@ export function ProgramHolderPhone({
       });
     }
   }, [load]);
+
+  // Mirror the background receiver's self-healing: when the SIP layer reports
+  // offline/error, schedule a single reconnect instead of leaving a mounted
+  // page dead until it is manually reloaded. connect() tears down the stale
+  // client before registering again, exactly like the receiver's recover().
+  // The heartbeat heal passes a shorter, backed-off delay; the SIP-event
+  // callers keep the established 30-second default.
+  const scheduleReconnect = useCallback((delayMs = 30_000) => {
+    if (reconnectTimerRef.current || callRef.current) return;
+    reconnectTimerRef.current = setTimeout(() => {
+      reconnectTimerRef.current = null;
+      if (callRef.current || registeredRef.current || userDisconnectedRef.current) return;
+      void connectRef.current();
+    }, delayMs);
+  }, []);
 
   const heartbeat = useCallback(async () => {
     const controller = connectionAbortRef.current;
@@ -235,12 +313,36 @@ export function ProgramHolderPhone({
       setError(
         'Registration reachability is not yet verified. The phone will check again automatically.',
       );
+      // A failed heartbeat used to be display-only, so a registration the
+      // server could no longer see stayed dead until a manual reconnect.
+      // Heal instead: drop the stale local registration state and schedule
+      // a full reconnect (fresh token + registration) — at most once per
+      // registration, with a bounded backoff, so a dead server cannot spin
+      // a reconnect loop. A device_not_provisioned reply means the
+      // server-side lease is gone entirely and no heartbeat can ever fix
+      // it, so re-provision almost immediately.
+      const failureBody = response ? await response.json().catch(() => ({})) : {};
+      if (controller.signal.aborted || epoch !== registrationEpochRef.current) return;
+      if (userDisconnectedRef.current || callRef.current) return;
+      const leaseGone =
+        (failureBody as { code?: string } | null)?.code === 'device_not_provisioned';
+      const heal = heartbeatHealRef.current;
+      if (leaseGone || heal.consumedEpoch !== epoch) {
+        heal.consumedEpoch = epoch;
+        heal.failures += 1;
+        registrationEpochRef.current += 1;
+        registeredRef.current = false;
+        scheduleReconnect(
+          leaseGone ? 1_000 : Math.min(5_000 * 3 ** (heal.failures - 1), 60_000),
+        );
+      }
     } else {
+      heartbeatHealRef.current.failures = 0;
       setConnected(true);
       setError('');
       setMessage('Phone registration and reachability verified.');
     }
-  }, [apiBase]);
+  }, [apiBase, scheduleReconnect]);
 
   const disconnect = useCallback(async () => {
     connectionAbortRef.current?.abort();
@@ -271,12 +373,46 @@ export function ProgramHolderPhone({
     setCallState('idle');
   }, [apiBase]);
 
+  // A deliberate disconnect (the header button, or saving an offline/do-not-
+  // disturb mode) must not be undone by the self-healing below; a failed
+  // connect attempt leaves the flag clear so recovery can still run.
+  const disconnectByUser = useCallback(async () => {
+    userDisconnectedRef.current = true;
+    await disconnect();
+    // A deliberate disconnect also frees the device identity, so another
+    // context (a different tab or the installed app) may take over.
+    contextClaimRef.current?.release();
+    contextClaimRef.current = null;
+  }, [disconnect]);
+
+  // The Asterisk endpoint for this device allows exactly one registration,
+  // so two live contexts of this page (installed app + browser tab, or two
+  // tabs) evict each other and flap offline. The first context leads; a
+  // later one defers until the leader closes or disconnects deliberately,
+  // then takes over and connects on its own.
+  const ensureContextClaim = useCallback(() => {
+    if (!contextClaimRef.current) {
+      const claim = claimPhoneContext(deviceId());
+      claim.onTakeover(() => {
+        if (contextClaimRef.current === claim && !userDisconnectedRef.current) {
+          void connectRef.current();
+        }
+      });
+      contextClaimRef.current = claim;
+    }
+    return contextClaimRef.current;
+  }, []);
+
   useEffect(() => {
     return () => {
       connectionAbortRef.current?.abort();
       registrationEpochRef.current += 1;
       registeredRef.current = false;
       if (heartbeatRef.current) clearInterval(heartbeatRef.current);
+      if (reconnectTimerRef.current) clearTimeout(reconnectTimerRef.current);
+      reconnectTimerRef.current = null;
+      contextClaimRef.current?.release();
+      contextClaimRef.current = null;
       void clientRef.current?.disconnect();
       void outboundClientRef.current?.disconnect();
     };
@@ -284,6 +420,24 @@ export function ProgramHolderPhone({
 
   const connect = useCallback(async () => {
     if (connected || connecting || !data || data.readOnly) return;
+    userDisconnectedRef.current = false;
+    // Defer to an earlier live context of this phone instead of evicting
+    // its registration (see ensureContextClaim). The takeover callback
+    // reconnects here if that context later goes away, so leadership is
+    // re-checked live rather than through the one-time acquired promise.
+    const claim = ensureContextClaim();
+    await claim.acquired;
+    if (!claim.isLeader()) {
+      setMessage(
+        'This phone is already open in another tab or app window. Use that one, or close it to connect here.',
+      );
+      return;
+    }
+    // A connect attempt starts from a real tap on this page (or a heal
+    // attempt right after one): prime the shared AudioContext inside the
+    // gesture so the first incoming ring can sound instead of arriving
+    // silently behind the browser's autoplay gate.
+    void unlockAudio();
     setConnecting(true);
     setError('');
     connectionAbortRef.current?.abort();
@@ -326,6 +480,8 @@ export function ProgramHolderPhone({
       let ready = false;
       client.on('ready', () => {
         if (controller.signal.aborted) return;
+        if (reconnectTimerRef.current) clearTimeout(reconnectTimerRef.current);
+        reconnectTimerRef.current = null;
         registrationEpochRef.current += 1;
         registeredRef.current = true;
         ready = true;
@@ -341,6 +497,7 @@ export function ProgramHolderPhone({
         setConnected(false);
         setConnecting(false);
         setMessage('Phone is offline.');
+        scheduleReconnect();
       });
       client.on('error', (event: any) => {
         if (controller.signal.aborted) return;
@@ -353,6 +510,7 @@ export function ProgramHolderPhone({
         setError(
           event?.error?.message || event?.message || 'The phone connection reported an error.',
         );
+        scheduleReconnect();
       });
       client.on('call', (notification: any) => {
         if (controller.signal.aborted) return;
@@ -366,13 +524,34 @@ export function ProgramHolderPhone({
           );
           setCallState('ringing');
           if (ringModeRef.current === 'ring') {
-            // Use the gesture-primed context once, rather than also starting a
-            // second SDK AudioContext that mobile autoplay may keep suspended.
-            startRingtone();
+            // A test ring must never outlive a real call: cancel its timer so
+            // it cannot stop the real ringtone.
+            stopTestRing();
+            void Promise.resolve(startRingtone()).then((status) => {
+              if (callRef.current?.id !== call.id) return;
+              if (status === 'ringing') {
+                log.info('[phone] ringtone: primary beep sounding');
+                return;
+              }
+              // The primary beep did not start (audio still locked or this
+              // browser has no audio): fall back to the SIP ringtone, which
+              // retries on its own interval. The fallback is silenced as soon
+              // as the primary beep starts.
+              log.info('[phone] ringtone: primary beep did not start; starting SIP fallback', {
+                status,
+              });
+              try {
+                call.playRingtone();
+                fallbackRingingRef.current = true;
+              } catch {
+                log.info('[phone] ringtone: SIP fallback could not start');
+              }
+            });
           }
           if (ringModeRef.current === 'vibrate') navigator.vibrate?.([350, 150, 350, 150, 700]);
         } else if (state === 'active') {
           stopRingtone();
+          fallbackRingingRef.current = false;
           callRef.current = call;
           setCallState('active');
           setMuted(false);
@@ -380,6 +559,7 @@ export function ProgramHolderPhone({
           navigator.vibrate?.(0);
         } else if (state === 'hangup' || state === 'destroy' || state === 'purge') {
           stopRingtone();
+          fallbackRingingRef.current = false;
           if (callRef.current?.id === call.id) {
             callRef.current = null;
             setCallState('idle');
@@ -407,7 +587,11 @@ export function ProgramHolderPhone({
       clearDeadline();
       controller.signal.removeEventListener('abort', clearDeadline);
     }
-  }, [connected, connecting, data, disconnect, heartbeat]);
+  }, [connected, connecting, data, disconnect, ensureContextClaim, heartbeat, scheduleReconnect, stopTestRing]);
+
+  useEffect(() => {
+    connectRef.current = connect;
+  }, [connect]);
 
   useEffect(() => {
     if (
@@ -423,6 +607,37 @@ export function ProgramHolderPhone({
     autoConnectAttemptedRef.current = true;
     void connect();
   }, [connect, connected, connecting, data]);
+
+  // Backgrounded tabs get their timers throttled or frozen, so a lapsed
+  // registration may never fire its scheduled reconnect while the page is
+  // hidden. Re-check on return: if the registration has lapsed, reconnect
+  // right away — unless the user deliberately disconnected.
+  useEffect(() => {
+    const onVisibilityChange = () => {
+      if (document.visibilityState !== 'visible') return;
+      if (!data || data.readOnly || userDisconnectedRef.current) return;
+      if (['offline', 'do_not_disturb'].includes(ringModeRef.current)) return;
+      if (callRef.current || registeredRef.current) return;
+      void connectRef.current();
+    };
+    document.addEventListener('visibilitychange', onVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', onVisibilityChange);
+  }, [data]);
+
+  // Wake mode: a caller is ringing this extension right now, so connecting is
+  // not optional and a dropped attempt is retried while the wake is fresh.
+  // The first attempt waits a beat so the standard auto-connect above (which
+  // fires on the same data load for ring/vibrate modes) wins when it applies;
+  // wake mode additionally covers the modes auto-connect skips and retries
+  // after a drop, which auto-connect never does.
+  useEffect(() => {
+    if (!wakeMode || !data || data.readOnly || connected || connecting || callState !== 'idle') return;
+    if (wakeAttemptsRef.current >= 4) return;
+    const attempt = wakeAttemptsRef.current + 1;
+    wakeAttemptsRef.current = attempt;
+    const timer = setTimeout(() => void connect(), attempt === 1 ? 1200 : 2000 * attempt);
+    return () => clearTimeout(timer);
+  }, [wakeMode, data, connected, connecting, callState, connect]);
 
   async function saveSettings() {
     if (!data || data.readOnly) return;
@@ -451,7 +666,7 @@ export function ProgramHolderPhone({
     }
     setMessage('Phone settings saved.');
     setError('');
-    if (['offline', 'do_not_disturb'].includes(data.extension.ringMode)) await disconnect();
+    if (['offline', 'do_not_disturb'].includes(data.extension.ringMode)) await disconnectByUser();
     else if (!connected) await connect();
   }
 
@@ -472,6 +687,7 @@ export function ProgramHolderPhone({
       );
       if (mode !== 'ring') {
         callRef.current?.stopRingtone();
+        fallbackRingingRef.current = false;
         stopRingtone();
       }
       if (mode !== 'vibrate') navigator.vibrate?.(0);
@@ -495,6 +711,39 @@ export function ProgramHolderPhone({
     }
   }
 
+  /**
+   * Play the actual inbound ringtone for five seconds so the operator can
+   * verify sound before a real call. Starting a real call, answering, or
+   * hanging up always stops a test ring first.
+   */
+  async function testRing() {
+    if (testingRing) {
+      stopTestRing();
+      stopRingtone();
+      setMessage('Test ring stopped.');
+      return;
+    }
+    setError('');
+    const status = await Promise.resolve(startRingtone());
+    if (status === 'unavailable') {
+      setError(
+        'The test ring could not play on this device. Check the volume and that this browser allows sound, then try again.',
+      );
+      return;
+    }
+    setTestingRing(true);
+    setMessage(
+      status === 'pending'
+        ? 'Waiting for audio — tap anywhere on the page if you do not hear the ring.'
+        : 'Test ring playing — you should hear a repeating beep.',
+    );
+    testRingTimerRef.current = setTimeout(() => {
+      testRingTimerRef.current = null;
+      stopRingtone();
+      setTestingRing(false);
+    }, 5000);
+  }
+
   async function enableNotifications() {
     if (data?.readOnly) return;
     setError('');
@@ -513,7 +762,9 @@ export function ProgramHolderPhone({
   async function answer() {
     const call = callRef.current;
     if (!call) return;
+    void unlockAudio();
     call.stopRingtone();
+    fallbackRingingRef.current = false;
     stopRingtone();
     navigator.vibrate?.(0);
     try {
@@ -527,6 +778,7 @@ export function ProgramHolderPhone({
     const call = callRef.current;
     if (!call) return;
     call.stopRingtone();
+    fallbackRingingRef.current = false;
     stopRingtone();
     navigator.vibrate?.(0);
     await call.hangup();
@@ -557,6 +809,7 @@ export function ProgramHolderPhone({
   }
 
   async function pressDialDigit(digit: string) {
+    void unlockAudio();
     if (callState === 'active' && callRef.current) {
       if (!callRef.current.dtmf) {
         setError('This phone connection cannot send menu choices.');
@@ -574,6 +827,7 @@ export function ProgramHolderPhone({
   }
 
   async function returnCall(number = returnNumber) {
+    void unlockAudio();
     if (callState !== 'idle' || callRef.current || outboundClientRef.current) {
       setError('Finish the current call before placing another.');
       return;
@@ -787,7 +1041,7 @@ export function ProgramHolderPhone({
             className="min-h-11 rounded-xl bg-white px-4 font-black text-blue-900"
           />
           <button
-            onClick={connected ? disconnect : connect}
+            onClick={connected ? disconnectByUser : connect}
             disabled={
               data.readOnly ||
               connecting ||
@@ -855,60 +1109,6 @@ export function ProgramHolderPhone({
 
       <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col gap-6 px-4 py-4 sm:px-6 lg:flex-row">
         <div className="w-full shrink-0 space-y-6 lg:w-[26rem]">
-          {callState !== 'idle' && (
-            <section className="w-full rounded-3xl border-2 border-cyan-300 bg-slate-950 p-5 text-center text-white shadow-2xl">
-              <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-cyan-500/20">
-                <PhoneCall className="h-10 w-10 text-cyan-300" />
-              </div>
-              <p className="mt-4 text-sm font-black uppercase tracking-widest text-cyan-300">
-                {callState === 'ringing'
-                  ? 'Elevate for Humanity — incoming call'
-                  : callState === 'calling'
-                    ? 'Calling'
-                    : 'Call connected'}
-              </p>
-              <h2 className="mt-2 text-3xl font-black">{friendlyNumber(incomingNumber)}</h2>
-              <div className="mt-6 flex flex-wrap justify-center gap-3">
-                {callState === 'ringing' && (
-                  <button
-                    onClick={answer}
-                    className="min-h-12 rounded-full bg-emerald-500 px-7 font-black text-white"
-                  >
-                    <Phone className="mr-2 inline h-5 w-5" />
-                    Answer
-                  </button>
-                )}
-                {callState === 'active' && (
-                  <button
-                    onClick={toggleMute}
-                    className="min-h-12 rounded-full bg-slate-700 px-6 font-black"
-                  >
-                    {muted ? (
-                      <MicOff className="mr-2 inline h-5 w-5" />
-                    ) : (
-                      <Mic className="mr-2 inline h-5 w-5" />
-                    )}
-                    {muted ? 'Unmute' : 'Mute'}
-                  </button>
-                )}
-                <button
-                  onClick={hangup}
-                  className="min-h-12 rounded-full bg-red-600 px-7 font-black text-white"
-                >
-                  <PhoneOff className="mr-2 inline h-5 w-5" />
-                  {callState === 'ringing' ? 'Decline' : 'Hang up'}
-                </button>
-                {callState === 'active' && callRef.current?.hold && (
-                  <button
-                    onClick={toggleHold}
-                    className="min-h-12 rounded-full bg-slate-700 px-6 font-black"
-                  >
-                    {held ? 'Resume call' : 'Hold'}
-                  </button>
-                )}
-              </div>
-            </section>
-          )}
 
           <section className="w-full rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
         <h2 className="text-xl font-black text-slate-950">Dial pad</h2>
@@ -997,6 +1197,81 @@ export function ProgramHolderPhone({
           ))}
         </div>
       </section>
+      {wakeMode && callState === 'idle' && (
+        <section className="mx-auto w-full max-w-md rounded-3xl border-2 border-amber-300 bg-amber-50 p-5 text-center shadow" aria-live="polite">
+          <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-amber-400/20">
+            <PhoneCall className="h-10 w-10 text-amber-600" />
+          </div>
+          <p className="mt-4 text-sm font-black uppercase tracking-widest text-amber-700">
+            Incoming call
+          </p>
+          <h2 className="mt-2 text-3xl font-black text-slate-950">{friendlyNumber(incomingNumber)}</h2>
+          <p className="mt-2 text-sm font-semibold text-slate-700">
+            {connected
+              ? 'Your phone is connected — the call will appear here the moment it reaches you.'
+              : 'Connecting your phone now… keep this screen open to answer.'}
+          </p>
+        </section>
+      )}
+
+      {callState !== 'idle' && (
+        <section id="incoming-call-card" className="w-full rounded-3xl border-2 border-cyan-300 bg-slate-950 p-5 text-center text-white shadow-2xl">
+          <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-cyan-500/20">
+            <PhoneCall className="h-10 w-10 text-cyan-300" />
+          </div>
+          <p className="mt-4 text-sm font-black uppercase tracking-widest text-cyan-300">
+            {callState === 'ringing'
+              ? 'Elevate for Humanity — incoming call'
+              : callState === 'calling'
+                ? 'Calling'
+                : 'Call connected'}
+          </p>
+          <h2 className="mt-2 text-3xl font-black">{friendlyNumber(incomingNumber)}</h2>
+          {callState === 'ringing' && ringtoneStatus === 'pending' && (
+            <p className="mt-3 text-sm font-bold text-amber-300">Tap anywhere to hear the ring.</p>
+          )}
+          <div className="mt-6 flex flex-wrap justify-center gap-3">
+            {callState === 'ringing' && (
+              <button
+                onClick={answer}
+                className="min-h-12 rounded-full bg-emerald-500 px-7 font-black text-white"
+              >
+                <Phone className="mr-2 inline h-5 w-5" />
+                Answer
+              </button>
+            )}
+            {callState === 'active' && (
+              <button
+                onClick={toggleMute}
+                className="min-h-12 rounded-full bg-slate-700 px-6 font-black"
+              >
+                {muted ? (
+                  <MicOff className="mr-2 inline h-5 w-5" />
+                ) : (
+                  <Mic className="mr-2 inline h-5 w-5" />
+                )}
+                {muted ? 'Unmute' : 'Mute'}
+              </button>
+            )}
+            <button
+              onClick={hangup}
+              className="min-h-12 rounded-full bg-red-600 px-7 font-black text-white"
+            >
+              <PhoneOff className="mr-2 inline h-5 w-5" />
+              {callState === 'ringing' ? 'Decline' : 'Hang up'}
+            </button>
+            {callState === 'active' && callRef.current?.hold && (
+              <button
+                onClick={toggleHold}
+                className="min-h-12 rounded-full bg-slate-700 px-6 font-black"
+              >
+                {held ? 'Resume call' : 'Hold'}
+              </button>
+            )}
+          </div>
+        </section>
+      )}
+
       <AudioOutputControl audio={remoteAudioRef} />
     </div>
     <div className="min-w-0 flex-1">
@@ -1221,6 +1496,14 @@ export function ProgramHolderPhone({
               )}
               {notificationsEnabled ? 'Alerts enabled' : 'Enable missed-call alerts'}
             </button>
+            <button
+              onClick={() => void testRing()}
+              disabled={data.readOnly || callState !== 'idle'}
+              className="min-h-12 rounded-xl border border-slate-300 bg-white px-5 font-black text-slate-900 disabled:opacity-50"
+            >
+              <BellRing className="mr-2 inline h-5 w-5" />
+              {testingRing ? 'Stop test ring' : 'Test ring'}
+            </button>
           </div>
           <label className="mt-4 flex items-start gap-3 rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm font-bold text-slate-800">
             <input
@@ -1277,7 +1560,8 @@ export function ProgramHolderPhone({
           <p className="mt-4 text-xs leading-5 text-slate-500">
             For the most reliable live ringing, install the PWA and keep it open or recently active.
             If the phone is asleep, offline, outside your hours, or unanswered, PARIS takes the call
-            and sends a secure missed-call alert.
+            and sends a secure missed-call alert. Test ring plays the incoming-call sound on this
+            device so you can check the volume before a real call.
           </p>
         </section>
         <div className="mt-6">

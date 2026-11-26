@@ -220,6 +220,27 @@ async function cleanup() {
     console.log('No remaining portal QA state file found; nothing to clean.');
     return;
   }
+  // Derived tables may not exist in the isolated QA project (minimal
+  // schema). A missing table means no derived rows could have been
+  // created there, so "table does not exist" is ignored; every other
+  // error still fails cleanup.
+  const isMissingTableError = (error) => {
+    const code = String(error?.code || '');
+    const message = String(error?.message || '');
+    return code === 'PGRST205' || /could not find the table|relation .* does not exist|42P01/i.test(message);
+  };
+  const deleteDerived = async (promise, label) => {
+    const { error } = await promise;
+    if (error && !isMissingTableError(error)) throw new Error(`QA cleanup ${label}: ${error.message}`);
+  };
+  const assertDerivedGone = async (promise, label) => {
+    const { data, error } = await promise;
+    if (error) {
+      if (isMissingTableError(error)) return;
+      throw new Error(`QA cleanup verify ${label}: ${error.message}`);
+    }
+    if ((data || []).length) throw new Error(`QA cleanup incomplete: ${label}`);
+  };
   for (const user of state.users || []) {
     if (user.kind === 'employer') {
       if (user.documentId)
@@ -243,6 +264,14 @@ async function cleanup() {
         const application = await db.from('applications').delete().eq('id', user.applicationId);
         if (application.error)
           throw new Error(`case manager application cleanup: ${application.error.message}`);
+        // The submitted application enqueues a platform event; remove it
+        // so no downstream consumer acts on a disposable application.
+        await deleteDerived(db.from('platform_events').delete()
+          .eq('event_type', 'application.submitted').eq('subject_type', 'application')
+          .eq('subject_id', user.applicationId), 'delete application platform event');
+        await assertDerivedGone(db.from('platform_events').select('id')
+          .eq('event_type', 'application.submitted').eq('subject_type', 'application')
+          .eq('subject_id', user.applicationId).limit(1), 'application platform event');
       }
       const manager = await db.from('case_managers').delete().eq('id', user.id);
       if (manager.error)

@@ -1,5 +1,4 @@
 export function GET(){return Response.json({
-// Branch refreshed to pick up main (dbe7a427): fresh CI after E2E shard 3/4 environment failure on the 433802fb base.
   "id": "org.elevateforhumanity.phone",
   "name": "Elevate Phone",
   "short_name": "Phone",

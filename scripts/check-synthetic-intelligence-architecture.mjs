@@ -11,6 +11,13 @@ const requireText = (path, token, label = token) => {
   if (!exists(path)) return errors.push(`missing required file: ${path}`);
   if (!read(path).includes(token)) errors.push(`${path} missing ${label}`);
 };
+const forbidFile = (path) => {
+  if (exists(path)) errors.push(`removed file still exists: ${path}`);
+};
+const forbidText = (path, token, label = token) => {
+  if (!exists(path)) return errors.push(`missing required file: ${path}`);
+  if (read(path).includes(token)) errors.push(`${path} must not contain ${label}`);
+};
 
 for (const path of [
   'lib/ai/ai-service.ts',
@@ -32,8 +39,6 @@ for (const path of [
   'lib/devstudio/openhands/client.ts',
   'lib/devstudio/openhands/runtime.ts',
   'lib/devstudio/openhands/github-verifier.ts',
-  'apps/admin/app/api/admin/dev-studio/openhands/chat/route.ts',
-  'apps/admin/app/api/admin/dev-studio/openhands/agent/route.ts',
   'apps/admin/app/api/admin/dev-studio/plan/route.ts',
   'services/llm-gpu-worker/Dockerfile',
   'services/llm-gpu-worker/entrypoint.sh',
@@ -66,12 +71,17 @@ requireText('lib/ai/tools/registry.ts', 'approvalRequired', 'tool approval polic
 requireText('lib/ai/tools/registry.ts', 'idempotent', 'tool idempotency policy');
 requireText('lib/ai/tools/registry.ts', 'retryAttempts', 'tool retry policy');
 requireText('lib/ai/tools/registry.ts', 'audit', 'tool audit policy');
-requireText('lib/ai/tools/registry.ts', "name: 'openhands.execute'", 'governed OpenHands execution tool');
-requireText('lib/ai/tools/registry.ts', "name: 'openhands.status'", 'governed OpenHands status tool');
-requireText('lib/ai/tools/registry.ts', 'CONFIRM OPENHANDS EXECUTION', 'OpenHands human approval boundary');
-requireText('lib/ai/tools/planner.ts', "name: /\\bopenhands\\b/.test(lower) ? 'openhands.execute' : 'studio.engineering.execute'", 'conditional authorized engineering routing');
-requireText('lib/ai/tools/planner.ts', "name: 'openhands.status'", 'OpenHands status routing');
+requireText('lib/ai/tools/planner.ts', 'routeEngineeringExecution(lower)', 'unconditional owned-engine engineering routing (OpenHands removed)');
 requireText('lib/ai/tools/planner.ts', "name: 'courses.generate'", 'Course Builder remains outside OpenHands');
+// OpenHands removal contract: the API routes are deleted and no AI tool,
+// planner route, or executor branch may reference them.
+forbidFile('apps/admin/app/api/admin/dev-studio/openhands/chat/route.ts');
+forbidFile('apps/admin/app/api/admin/dev-studio/openhands/agent/route.ts');
+forbidText('lib/ai/tools/registry.ts', 'openhands.execute', 'removed OpenHands execution tool');
+forbidText('lib/ai/tools/registry.ts', 'openhands.status', 'removed OpenHands status tool');
+forbidText('lib/ai/tools/registry.ts', '/api/admin/dev-studio/openhands', 'removed OpenHands route path');
+forbidText('lib/ai/tools/executor.ts', 'dev-studio/openhands', 'removed OpenHands route dispatch');
+forbidText('lib/ai/tools/planner.ts', "name: 'openhands.status'", 'removed OpenHands status routing');
 requireText('lib/ai/tools/executor.ts', "status: 'accepted'", 'asynchronous governed tool status');
 requireText('lib/ai/runtime/command-executor.ts', "status: 'running'", 'async command lifecycle');
 
@@ -90,11 +100,6 @@ requireText('lib/devstudio/openhands/runtime.ts', 'verifyOpenHandsGitHubOutcome'
 requireText('lib/devstudio/openhands/runtime.ts', 'REQUIRES_HUMAN_REVIEW', 'OpenHands verification approval fallback');
 requireText('lib/devstudio/openhands/github-verifier.ts', '/pulls/', 'OpenHands PR verification');
 requireText('lib/devstudio/openhands/github-verifier.ts', '/check-runs', 'OpenHands CI verification');
-requireText('apps/admin/app/api/admin/dev-studio/openhands/chat/route.ts', 'sendOpenHandsMessage', 'thin V1 chat continuation route');
-requireText('apps/admin/app/api/admin/dev-studio/openhands/chat/route.ts', 'continuationSupported: true', 'OpenHands V1 continuation capability');
-requireText('apps/admin/app/api/admin/dev-studio/openhands/agent/route.ts', 'dispatchOpenHandsTask', 'thin governed OpenHands execution route');
-requireText('apps/admin/app/api/admin/dev-studio/openhands/agent/route.ts', 'refreshOpenHandsTask', 'OpenHands status lifecycle route');
-
 requireText('lib/platform/planner.ts', "'awaiting_approval'", 'approval-aware plan state');
 requireText('lib/platform/planner.ts', 'verification_rule', 'plan verification contract');
 requireText('apps/admin/app/api/admin/dev-studio/plan/route.ts', 'createAiTask', 'canonical persisted task execution');
@@ -141,7 +146,7 @@ console.log('- canonical agent/tool runtime retained');
 console.log('- planner checkpoints and uses persisted ai_tasks');
 console.log('- shared context composes existing memory/workflow/RAG authorities');
 console.log('- evaluator and approval-aware plan state present');
-console.log('- OpenHands uses current Cloud V1 API, follow-up messaging, and configured model selection through one canonical server client');
-console.log('- owned engineering and explicitly selected OpenHands routing retain approval and verification controls');
+console.log('- historical OpenHands observation uses one canonical server client; it cannot dispatch new work');
+console.log('- OpenHands API routes and AI tools are removed; engineering execution is owned-engine only');
 console.log('- Course Builder remains on the normal inference path, not the OpenHands engineering path');
 console.log('- workflow primitives are governed separately from domain AI tools');

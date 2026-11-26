@@ -9,13 +9,14 @@
  * - 'implemented-unverified': code exists, no live proof yet.
  * - 'unproven': code exists, the live record contradicts it.
  * - 'pending': waiting on an open PR to merge.
+ * - 'removed': the engine was removed; the entry remains as the record.
  *
  * Do not upgrade a status without evidence (a live run, a green CI run,
  * or a merged PR). When an engine is unproven, `fallback` names the path
  * that can do the job instead.
  */
 
-export type CapabilityStatus = 'working' | 'implemented-unverified' | 'unproven' | 'pending';
+export type CapabilityStatus = 'working' | 'implemented-unverified' | 'unproven' | 'pending' | 'removed';
 
 export type DevStudioCapability = {
   id: string;
@@ -58,10 +59,10 @@ export const DEV_STUDIO_CAPABILITIES: DevStudioCapability[] = [
   },
   {
     id: 'code-fix-openhands',
-    capability: 'Code fix / autofix via OpenHands',
-    engine: 'OpenHands (lib/devstudio/openhands/), opt-in only via PARIS_REPAIR_ENGINE=openhands',
-    status: 'unproven',
-    evidence: '29 tasks, 22 failed, 0 completed; key untested since 2026-09-15; HEAD fails closed on missing PARIS start receipt / pending approval. Opt-in-only since the own-engine PR: routes, planner, and PARIS staging all fail closed without the opt-in; adapter retained, gated off.',
+    capability: 'Code fix / autofix via OpenHands (removed)',
+    engine: 'Removed 2026-11-25 — the owned internal engine (code-fix-own-engine) is the only repair engine',
+    status: 'removed',
+    evidence: '29 tasks, 22 failed, 0 completed; key untested since 2026-09-15. Removed by owner order: no route, planner path, or PARIS staging path can dispatch to OpenHands, and no environment variable can re-enable it. Historical OpenHands checkpoints are restaged on the owned engine.',
     fallback: 'code-fix-own-engine',
   },
   {

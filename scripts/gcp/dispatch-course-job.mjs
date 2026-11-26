@@ -67,6 +67,33 @@ export async function dispatchQueuedCourseJob({run = (_command, args) => google(
   console.info(JSON.stringify({event:'course_dispatch_queue_scan',candidateCount:candidates.length,
     runnableCount:queued.length,activeExecutions:active.length,
     candidateIds:queued.map(job=>job.id)}));
+  // A zero scan is ambiguous: it can mean an empty queue or coordinators the
+  // pool anti-join hid. Name pool-blocked coordinators explicitly so a stuck
+  // course is diagnosable from this log instead of looking idle. Diagnostics
+  // must never break dispatch, so every failure here is swallowed.
+  if (queued.length === 0) {
+    try {
+      const blockedUrl = new URL('https://cuxzzpsyufcewtmicszk.supabase.co/rest/v1/ultimate_build_jobs');
+      blockedUrl.searchParams.set('job_type','not.like.lesson_autopilot:*');
+      blockedUrl.searchParams.set('select','id,build_id,build:ultimate_course_builds!inner(active_pools:ultimate_autopilot_pools(id,state,created_at))');
+      blockedUrl.searchParams.set('build.active_pools.state','eq.active');
+      blockedUrl.searchParams.set('build.active_pools','not.is.null');
+      blockedUrl.searchParams.set('status','in.(queued,running)');
+      blockedUrl.searchParams.set('limit','10');
+      const blockedResponse = await request(blockedUrl, {headers:{apikey:token,Authorization:'Bearer '+token},signal:AbortSignal.timeout(15000)});
+      if (blockedResponse.ok) {
+        const blockedRows = await blockedResponse.json();
+        for (const row of Array.isArray(blockedRows) ? blockedRows : []) {
+          const pools = row?.build?.active_pools;
+          const pool = Array.isArray(pools) ? pools[0] : pools;
+          if (!row?.id || !pool?.id) continue;
+          console.info(JSON.stringify({event:'course_dispatch_pool_blocked',jobId:row.id,buildId:row.build_id ?? null,
+            poolId:pool.id,poolState:pool.state ?? 'active',poolCreatedAt:pool.created_at ?? null,
+            reason:'coordinator_excluded_by_active_pool'}));
+        }
+      }
+    } catch { /* diagnostics only */ }
+  }
   // A leased task can enqueue its next lesson only after finishing the current
   // one. Keep the coordinator alive across that handoff without launching more tasks.
   // An already-running Cloud Run execution owns its task independently.

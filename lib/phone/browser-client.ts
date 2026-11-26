@@ -68,9 +68,21 @@ function ringtone() {
     stop,
     play() {
       stop();
-      context = new AudioContext();
+      try {
+        context = new AudioContext();
+      } catch {
+        // No WebAudio on this browser; the caller keeps the visual banner.
+        return;
+      }
       const ring = () => {
-        if (!context || context.state !== 'running') return;
+        if (!context) return;
+        if (context.state === 'suspended') {
+          // The first resume may not latch without a gesture; retry on each
+          // tick so the ring starts as soon as the page is interacted with.
+          void context.resume().catch(() => undefined);
+          return;
+        }
+        if (context.state !== 'running') return;
         const gain = context.createGain();
         gain.gain.value = 0.08;
         gain.connect(context.destination);
@@ -82,11 +94,22 @@ function ringtone() {
           oscillator.stop(context.currentTime + 1.5);
         }
       };
-      void context
-        .resume()
-        .then(ring)
-        .catch(() => undefined);
-      interval = setInterval(ring, 3500);
+      // A fresh context starts suspended until the page has had a user
+      // gesture. Retry the resume on every ring instead of no-oping in
+      // silence for the whole call when the first attempt does not take.
+      const attemptRing = () => {
+        if (!context) return;
+        if (context.state === 'running') {
+          ring();
+          return;
+        }
+        void context
+          .resume()
+          .then(ring)
+          .catch(() => undefined);
+      };
+      attemptRing();
+      interval = setInterval(attemptRing, 3500);
     },
   };
 }

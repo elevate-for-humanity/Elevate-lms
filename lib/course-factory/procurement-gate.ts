@@ -1,4 +1,5 @@
 import type { ProgramBuilderTemplate, BuilderLesson } from '@/lib/course-builder/schema';
+import { getSocCode } from '@/lib/onet/soc-map';
 import { LearningIntelligenceSchema } from './learning-intelligence';
 import { getCredentialStandardByRegistryKey } from '@/lib/course-builder/credential-engine/registry-loader';
 import { buildObjectiveCoverageReport } from '@/lib/course-builder/standards-registry';
@@ -211,12 +212,54 @@ function requireExperienceAssets(
   }
 }
 
+/**
+ * Government job-feed evidence check, kept as a pure function so it is
+ * unit-testable without a full course fixture.
+ *
+ * A credentialed (non-INTERNAL) course whose occupation has a SOC mapping
+ * must carry job-feed evidence on the template (`workforceEvidence` with at
+ * least one source). INTERNAL courses are exempt. A course with no SOC
+ * mapping at all warns instead of failing — the feed cannot be keyed, but
+ * that is a mapping gap, not a failed build.
+ */
+export function checkWorkforceEvidence(template: ProgramBuilderTemplate): ProcurementIssue[] {
+  const issues: ProcurementIssue[] = [];
+  const socCode = template.socCode?.trim() || getSocCode(template.slug) || null;
+  if (!socCode) {
+    issues.push({
+      severity: 'warning',
+      code: 'SOC_CODE_UNMAPPED',
+      path: 'socCode',
+      message: `No SOC mapping exists for ${template.slug}; government job-feed evidence cannot be attached.`,
+    });
+    return issues;
+  }
+  if (template.credentialTarget === 'INTERNAL') return issues;
+  const evidence = template.workforceEvidence;
+  if (!evidence || !Array.isArray(evidence.sources) || evidence.sources.length === 0) {
+    issues.push({
+      severity: 'error',
+      code: 'WORKFORCE_EVIDENCE_REQUIRED',
+      path: 'workforceEvidence',
+      message: `Credentialed course has a SOC mapping (${socCode}) but no government job-feed evidence (O*NET, CareerOneStop, USAJobs, BLS). Publish through publishGovernedCourse so the job feed is attached first.`,
+    });
+  }
+  return issues;
+}
+
 export function runGovernmentProcurementGate(
   template: ProgramBuilderTemplate,
 ): ProcurementGateResult {
   const issues: ProcurementIssue[] = [];
   const add = (severity: 'error' | 'warning', code: string, path: string, message: string) =>
     issues.push({ severity, code, path, message });
+
+  // Government job-feed evidence: a credentialed course whose occupation has
+  // a SOC mapping must carry feed evidence (O*NET, CareerOneStop, USAJobs,
+  // BLS) stored on the course — attachJobFeedEvidence() loads it at
+  // publication time. A course with no SOC mapping at all only warns: the
+  // feed cannot be keyed, but that is a mapping gap, not a failed build.
+  issues.push(...checkWorkforceEvidence(template));
 
   const modules = template.modules ?? [];
   const lessons = modules.flatMap((m) => m.lessons ?? []);

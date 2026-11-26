@@ -11,7 +11,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { sendWorkOneSurveyEmail, sendWorkOneSurveyBatch } from '@/lib/notifications/workone-survey-email';
-import { WORKONE_SURVEY } from '@/lib/surveys/workone-survey';
+import { WORKONE_ACCESS_START_ISO } from '@/lib/workone/access-scope';
 
 export const runtime = 'nodejs';
 
@@ -56,8 +56,9 @@ export async function POST(request: NextRequest) {
 
     // Or send to all eligible applicants
     if (sendToAll) {
-      // Send to all applicants who have submitted (not drafts)
-      query = query.not('submitted_at', 'is', null);
+      // Send to all applicants who have submitted (not drafts).
+      // WorkOne scope: NEW applicants only — never email the pre-access backlog from this dashboard.
+      query = query.not('submitted_at', 'is', null).gte('created_at', WORKONE_ACCESS_START_ISO);
     }
 
     const { data: applications, error } = await query;
@@ -74,36 +75,97 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // Send emails in batches of 10 to avoid rate limits
-    const BATCH_SIZE = 10;
+    // Record the send against each applicant's WorkOne row BEFORE emailing.
+    //
+    // workone_survey_responses has a unique index on application_id ALONE
+    // (workone_survey_application_unique): there is exactly one row per
+    // applicant, normally created earlier by the WorkOne handoff
+    // (lib/workone/handoff.ts). The old code inserted a fresh row per
+    // applicant, so every send to an applicant with a handoff row died on
+    // that unique index — and the insert error was never checked, so the
+    // send silently no-opped while the emails went out anyway.
+    //
+    // Now the send marks the applicant's existing row (sent_at); a row is
+    // created only for an applicant who has none. Any recording failure
+    // aborts the whole send with a 500 the dashboard surfaces — never
+    // email a survey whose send was not recorded.
+    const sentAt = new Date().toISOString();
     const recipients = [];
 
     for (const app of applications) {
+      const applicantName = `${app.first_name} ${app.last_name}`.trim();
+
+      const { data: existingRow, error: lookupError } = await supabase
+        .from('workone_survey_responses')
+        .select('id')
+        .eq('application_id', app.id)
+        .maybeSingle();
+
+      if (lookupError) {
+        console.error('Error looking up WorkOne survey row:', lookupError);
+        return NextResponse.json(
+          { error: 'Failed to record survey sends' },
+          { status: 500 }
+        );
+      }
+
+      if (existingRow) {
+        const { error: updateError } = await supabase
+          .from('workone_survey_responses')
+          .update({
+            applicant_email: app.email,
+            applicant_name: applicantName,
+            sent_at: sentAt,
+            updated_at: sentAt,
+          })
+          .eq('id', existingRow.id);
+
+        if (updateError) {
+          console.error('Error recording survey send:', updateError);
+          return NextResponse.json(
+            { error: 'Failed to record survey sends' },
+            { status: 500 }
+          );
+        }
+      } else {
+        // No handoff row yet (e.g. the applicant never went through the
+        // WorkOne handoff). Create the applicant's one row with the
+        // canonical label the responses dashboard reads
+        // ('workone-funding-progress' — see /api/surveys/workone/responses).
+        // submitted_at stays NULL until the applicant actually submits.
+        const { error: insertError } = await supabase
+          .from('workone_survey_responses')
+          .insert({
+            application_id: app.id,
+            applicant_email: app.email,
+            applicant_name: applicantName,
+            survey_label: 'workone-funding-progress',
+            sent_at: sentAt,
+            submitted_at: null,
+          });
+
+        if (insertError) {
+          console.error('Error recording survey send:', insertError);
+          return NextResponse.json(
+            { error: 'Failed to record survey sends' },
+            { status: 500 }
+          );
+        }
+      }
+
       // Generate a unique survey token (base64url encoded)
       const token = Buffer.from(`${app.id}:${Date.now()}`).toString('base64url');
       
       recipients.push({
         email: app.email,
-        name: `${app.first_name} ${app.last_name}`.trim(),
+        name: applicantName,
         applicationId: app.id,
         surveyToken: token,
       });
-
-      // Record that survey was sent
-      await supabase
-        .from('workone_survey_responses')
-        .insert({
-          application_id: app.id,
-          applicant_email: app.email,
-          applicant_name: `${app.first_name} ${app.last_name}`.trim(),
-          survey_label: WORKONE_SURVEY.label,
-          sent_at: new Date().toISOString(),
-        })
-        .select('id')
-        .single();
     }
 
-    // Send emails in batches
+    // Send emails in batches of 10 to avoid rate limits
+    const BATCH_SIZE = 10;
     const results = { total: 0, successful: 0, failed: 0 };
     
     for (let i = 0; i < recipients.length; i += BATCH_SIZE) {
@@ -193,6 +255,9 @@ export async function GET() {
 
   } catch (error) {
     console.error('Error fetching survey stats:', error);
-    return NextResponse.json({ error: 'Failed to fetch stats' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Failed to fetch stats' },
+      { status: 500 }
+    );
   }
 }

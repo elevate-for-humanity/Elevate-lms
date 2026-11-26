@@ -51,6 +51,45 @@ export function isWithinSchedule(
   return current >= window[0] && current < window[1];
 }
 
+export type PhoneWebrtcDeviceState = {
+  registration_state?: string | null;
+  connection_state?: string | null;
+  last_seen_at?: string | null;
+};
+
+export type PhoneDevicePresence = {
+  registrationState: 'registered' | 'unregistered';
+  connectionState: 'connected' | 'disconnected';
+  live: boolean;
+};
+
+/**
+ * Derive a PWA device's effective presence from last-seen freshness.
+ *
+ * The stored registration_state / connection_state columns are only written
+ * on heartbeat or an explicit disconnect; a handset that simply vanishes
+ * (browser closed, phone off, network lost) leaves them claiming
+ * 'registered' / 'connected' forever. Never trust the stored claim on its
+ * own: a device is live only while its PBX-verified last_seen_at is inside
+ * the same 120-second window every phone query uses. Anything older — or
+ * never seen — displays as unregistered / disconnected.
+ */
+export function derivePhoneDevicePresence(
+  device: PhoneWebrtcDeviceState,
+  now = new Date(),
+): PhoneDevicePresence {
+  const lastSeen = device.last_seen_at ? Date.parse(device.last_seen_at) : NaN;
+  const age = now.getTime() - lastSeen;
+  const fresh = Number.isFinite(age) && age >= -5_000 && age <= 120_000;
+  const live =
+    fresh &&
+    device.registration_state === 'registered' &&
+    device.connection_state === 'connected';
+  return live
+    ? { registrationState: 'registered', connectionState: 'connected', live: true }
+    : { registrationState: 'unregistered', connectionState: 'disconnected', live: false };
+}
+
 export function isExtensionReachable(
   extension: PhoneExtensionAvailability,
   timeZone: string,

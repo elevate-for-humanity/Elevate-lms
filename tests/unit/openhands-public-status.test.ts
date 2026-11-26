@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import type { OpenHandsLifecycle } from '@/lib/devstudio/openhands/client';
 import { publicOpenHandsEvidence, publicOpenHandsLifecycle } from '@/lib/devstudio/openhands/public-lifecycle';
 
@@ -20,72 +20,18 @@ vi.mock('@/lib/devstudio/openhands/task-access', () => ({ findOwnedOpenHandsTask
 vi.mock('@/lib/devstudio/openhands/runtime', () => ({ refreshOpenHandsTask: mocks.refresh, dispatchOpenHandsTask: mocks.dispatch }));
 vi.mock('@/lib/supabase/admin', () => ({ requireAdminClient: mocks.db }));
 
-import { GET as agentGet, POST as agentPost } from '../../apps/admin/app/api/admin/dev-studio/openhands/agent/route';
-import { GET as chatGet, POST as chatPost } from '../../apps/admin/app/api/admin/dev-studio/openhands/chat/route';
 import { GET as taskGet } from '../../apps/admin/app/api/admin/dev-studio/tasks/[id]/route';
 
 beforeEach(() => {
   vi.resetAllMocks();
+  // The legacy opt-in env value is inert after the OpenHands removal.
+  vi.stubEnv('PARIS_REPAIR_ENGINE', 'openhands');
   mocks.limit.mockResolvedValue(null);
   mocks.auth.mockResolvedValue({ userId: 'owner', effectiveRoles: ['admin'] });
   mocks.permission.mockReturnValue(true);
   mocks.owned.mockResolvedValue({ taskId: 'owned-task', startTaskId: 'original-start', conversationId: 'conversation-1' });
 });
 afterEach(() => { vi.unstubAllGlobals(); vi.unstubAllEnvs(); });
-
-for (const [name, get] of [['agent', agentGet], ['chat', chatGet]] as const) {
-  it(`${name} returns only safe lifecycle fields without mutating server evidence`, async () => {
-    const marker = 'DO_NOT_PUBLISH_PROVIDER_SESSION';
-    const lifecycle = Object.freeze({
-      status: 'completed' as const, startTaskId: 'original-start', conversationId: 'conversation-1',
-      sandboxStatus: 'RUNNING', executionStatus: 'finished', repository: 'elevate-for-humanity/Elevate-lms',
-      branch: 'studio/original-branch', prNumbers: [42], error: null,
-      raw: Object.freeze({ session_api_key: marker, nested: { access_token: marker } }),
-      unexpectedProviderField: marker,
-    });
-    mocks.refresh.mockResolvedValue(lifecycle);
-    const response = await get(new NextRequest('https://admin.example.test/status?taskId=owned-task'));
-    const body = await response.json();
-    expect(response.status).toBe(200);
-    expect(response.headers.get('cache-control')).toBe('no-store');
-    expect(body.lifecycle).toEqual({
-      status: 'completed', startTaskId: 'original-start', conversationId: 'conversation-1',
-      sandboxStatus: 'RUNNING', executionStatus: 'finished', repository: 'elevate-for-humanity/Elevate-lms',
-      branch: 'studio/original-branch', prNumbers: [42], error: null,
-    });
-    expect(JSON.stringify(body)).not.toContain(marker);
-    expect(lifecycle.raw.session_api_key).toBe(marker);
-    expect(mocks.dispatch).not.toHaveBeenCalled();
-  });
-
-  it(`${name} does not echo provider errors and requires the existing owner and role`, async () => {
-    mocks.refresh.mockRejectedValue(new Error('DO_NOT_PUBLISH_PROVIDER_ERROR'));
-    const request = () => new NextRequest('https://admin.example.test/status?taskId=owned-task');
-    const failed = await get(request());
-    expect(failed.status).toBe(502);
-    expect(await failed.text()).not.toContain('DO_NOT_PUBLISH');
-    mocks.refresh.mockClear();
-    mocks.owned.mockResolvedValue(null);
-    expect((await get(request())).status).toBe(404);
-    expect(mocks.refresh).not.toHaveBeenCalled();
-    mocks.permission.mockReturnValue(false);
-    expect((await get(request())).status).toBe(403);
-    mocks.auth.mockResolvedValue({ error: NextResponse.json({ error: 'Unauthorized' }, { status: 401 }) });
-    expect((await get(request())).status).toBe(401);
-  });
-}
-
-for (const [name, post, field] of [['agent', agentPost, 'task'], ['chat', chatPost, 'message']] as const) {
-  it(`${name} start errors never echo upstream response contents`, async () => {
-    mocks.dispatch.mockRejectedValue(new Error('DO_NOT_PUBLISH_PROVIDER_ERROR'));
-    const response = await post(new NextRequest('https://admin.example.test/agent', {
-      method: 'POST', headers: { 'content-type': 'application/json', 'idempotency-key': 'isolated-test' },
-      body: JSON.stringify({ [field]: 'Isolated test' }),
-    }));
-    expect(response.status).toBe(502);
-    expect(await response.text()).not.toContain('DO_NOT_PUBLISH');
-  });
-}
 
 it('rejects unexpected scalar shapes and never publishes provider error details', () => {
   const result = publicOpenHandsLifecycle({

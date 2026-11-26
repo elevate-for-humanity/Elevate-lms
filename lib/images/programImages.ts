@@ -268,6 +268,11 @@ export const PROGRAM_IMAGES: Record<string, ProgramImageEntry> = {
     hero: '/images/pages/culinary-apprenticeship-hero.webp',
     alt: 'Chef demonstrating cooking techniques in a professional kitchen',
   },
+  'ai-engineering': {
+    card: `${P}/admin-ai-studio-hero.webp`,
+    hero: `${P}/admin-ai-studio-hero.webp`,
+    alt: 'Developer working at a multi-screen workstation',
+  },
   'it-help-desk': {
     card: '/images/refresh-20261014/technology.webp',
     hero: '/images/refresh-20261014/technology.webp',
@@ -417,6 +422,11 @@ export const PROGRAM_IMAGES: Record<string, ProgramImageEntry> = {
     card: '/images/building-maintenance.webp',
     hero: '/images/programs/building-maintenance-hero.svg',
     alt: 'Building maintenance technician working on facility systems',
+  },
+  'commercial-cleaning': {
+    card: '/images/refresh-20261014/trades.webp',
+    hero: '/images/refresh-20261014/trades.webp',
+    alt: 'Skilled-trades learner in hands-on training for the Commercial Cleaning Certification Program',
   },
 };
 

@@ -244,6 +244,9 @@ export default function LoginPage() {
           </div>
         ) : null}
 
+        {/* Keep the name attributes: E2E login flows and password managers
+            address these inputs by name, and an input with only an id is
+            invisible to input[name="email"] selectors. */}
         <form onSubmit={handleSubmit} className="space-y-5" aria-busy={!hydrated || loading}>
           <div>
             <label htmlFor="email" className="mb-2 block text-sm font-semibold text-slate-900">
@@ -251,6 +254,7 @@ export default function LoginPage() {
             </label>
             <input
               id="email"
+              name="email"
               type="email"
               autoComplete="email"
               required
@@ -267,6 +271,7 @@ export default function LoginPage() {
             </label>
             <input
               id="password"
+              name="password"
               type="password"
               autoComplete="current-password"
               required

@@ -47,7 +47,8 @@ export type ActivityType =
   | 'discussion'
   | 'lab'
   | 'checkpoint'
-  | 'practice';
+  | 'practice'
+  | 'simulation';
 export type RequiredArtifact =
   | 'text'
   | 'video'
@@ -219,7 +220,17 @@ export interface BuilderLesson {
   practicalRequired?: boolean;
   requiredArtifacts?: RequiredArtifact[];
   unlockRule?: UnlockRule;
-  activities?: Array<{ type: ActivityType; label: string; config?: Record<string, unknown> }>;
+  activities?: Array<{
+    type: ActivityType;
+    label: string;
+    /** Author-marked required work: drives the publish checklist and no-skip gating. */
+    required?: boolean;
+    /** For type 'simulation': the lib/simulations/registry module id. */
+    simulationId?: string | null;
+    config?: Record<string, unknown>;
+  }>;
+  /** Assignments authored on this lesson. Required ones persist to the assignments table at publish and gate lesson completion. */
+  assignments?: BuilderAssignment[];
   isRequired?: boolean;
   aiGenerated?: boolean;
   approved?: boolean;
@@ -278,6 +289,139 @@ export interface ProgramBuilderTemplate {
   modules: BuilderModule[];
   status?: 'draft' | 'published';
   regulatory: RegulatoryMetadata;
+  /**
+   * O*NET-SOC code for the occupation this course trains for (e.g. '39-5011.00'
+   * for barbers). Resolved from lib/onet/soc-map.ts when not set explicitly.
+   * The government job feed is keyed off this code.
+   */
+  socCode?: string | null;
+  /**
+   * CIP code (Classification of Instructional Programs) for the program of
+   * study, e.g. '47.0201' for Heating, Air Conditioning, Ventilation and
+   * Refrigeration Maintenance. Persisted alongside socCode, following the
+   * existing convention (programs.cip_code + courses.metadata.cipCode).
+   */
+  cipCode?: string | null;
+  /** Funding / program types this course is eligible for. */
+  funding?: CourseFunding;
+  /** Tuition and credential exam fee. Persisted to courses.tuition_cost (numeric dollars). */
+  tuition?: CourseTuition | null;
+  /** Workbook that ships with this course (a digital_workbooks row, linked through the program). */
+  workbook?: CourseWorkbookRef | null;
+  /**
+   * True when the trade involves machine/equipment work. The publish
+   * checklist then requires at least one simulation activity on a lesson.
+   */
+  handsOnTrade?: boolean;
+  /**
+   * Government job-feed evidence (O*NET, CareerOneStop, USAJobs, BLS),
+   * fetched at build time and stored on the course — not prompt-only.
+   * Null until the feed has been attached by attachJobFeedEvidence().
+   */
+  workforceEvidence?: JobFeedEvidence | null;
+}
+
+/**
+ * Funding / program types a course is eligible for. These mirror the
+ * funding flags on ProgramSchema (lib/programs/program-schema.ts).
+ *
+ * JAG is Jobs for America's Graduates, listed as a funding source in
+ * public/docs/PROGRAM_HOLDER_ONBOARDING_PACKET.md alongside WIOA, WRG,
+ * Apprenticeship, Employer-Sponsored and Private Pay. It is a funding /
+ * program type only — there is no JAG API or feed in the repo, so nothing
+ * here fetches JAG data.
+ */
+export interface CourseFunding {
+  wioaEligible?: boolean;
+  wrgEligible?: boolean;
+  wexEligible?: boolean;
+  etplApproved?: boolean;
+  /** Jobs for America's Graduates. Funding/program type only, not a feed. */
+  jagEligible?: boolean;
+  fundingNotes?: string;
+}
+
+/**
+ * An assignment authored on a lesson in the builder. At publish, required
+ * assignments are written to the assignments table (lesson_id-linked) and
+ * the LMS no-skip gate requires a learner submission before the lesson can
+ * be marked complete. Optional assignments travel with the lesson content.
+ */
+export interface BuilderAssignment {
+  title: string;
+  instructions?: string;
+  /** Required assignments gate lesson completion (no-skip). */
+  required: boolean;
+  maxPoints?: number | null;
+  submissionType?: 'text' | 'file' | 'link' | 'mixed';
+}
+
+/** Tuition / fee alignment for a course. Amounts are dollars (courses.tuition_cost is numeric). */
+export interface CourseTuition {
+  /** Full tuition in dollars. */
+  costDollars?: number | null;
+  /** Credential exam fee in dollars, when one applies. */
+  examFeeDollars?: number | null;
+  /** Explicitly free — satisfies the publish tuition requirement at $0. */
+  isFree?: boolean;
+  notes?: string;
+}
+
+/** Reference to the workbook (digital_workbooks) that ships with a course. */
+export interface CourseWorkbookRef {
+  /** digital_workbooks.id */
+  workbookId: string;
+  /** digital_workbooks.slug, kept for display and lookup resilience. */
+  slug?: string | null;
+  title?: string | null;
+}
+
+/**
+ * Government JOB FEED evidence stored on a course. This is the job feed:
+ * O*NET occupations, CareerOneStop job postings (/v1/jobsearch), USAJobs
+ * federal listings, and BLS wages/projections — all keyed by SOC code.
+ * Built by lib/course-builder/workforce-evidence.ts from the live feeds
+ * (via loadIndustryStandards + fetchUsaJobs + buildCourseEvidenceContext)
+ * and persisted on the course; it is never prompt-only text.
+ */
+export interface JobFeedEvidence {
+  socCode: string;
+  occupationTitle: string;
+  onet: {
+    description: string;
+    tasks: string[];
+    skills: string[];
+    knowledge: string[];
+    technologySkills: string[];
+  } | null;
+  careerOneStop: {
+    jobPostingsCount: number | null;
+    location: string | null;
+    certifications: Array<{ name: string; organization: string }>;
+  } | null;
+  usaJobs: {
+    count: number;
+    listings: Array<{
+      title: string;
+      organization: string | null;
+      location: string | null;
+      salaryRange: string | null;
+      applicationUrl: string | null;
+    }>;
+  };
+  bls: {
+    medianAnnualWage: number | null;
+    entryWage: number | null;
+    experiencedWage: number | null;
+    projectedGrowthPct: number | null;
+    projectedGrowthCat: string | null;
+    projectedOpenings: number | null;
+    typicalEducation: string | null;
+  } | null;
+  /** Feed sources that actually returned data, e.g. 'US-DOL-O*NET'. */
+  sources: string[];
+  fetchedAt: string;
+  warnings: string[];
 }
 
 // Legacy aliases — pipeline.ts / compiler.ts / validate.ts import these names.

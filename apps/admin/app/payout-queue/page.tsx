@@ -13,6 +13,7 @@ import {
   ExternalLink,
 } from 'lucide-react';
 import ApprovePayButton from './ApprovePayButton';
+import VoidPayoutButton from './VoidPayoutButton';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 60;
@@ -105,6 +106,7 @@ export default async function PayoutQueuePage({
     `,
     )
     .neq('payout_status', 'not_triggered')
+    .neq('payout_status', 'voided')
     .order('payout_due_date', { ascending: true, nullsFirst: false });
 
   if (filterStatus !== 'all') {
@@ -393,6 +395,12 @@ export default async function PayoutQueuePage({
                               <span className="inline-flex items-center gap-1 text-xs text-emerald-600 font-medium">
                                 <CheckCircle className="w-3.5 h-3.5" /> Paid
                               </span>
+                            )}
+                            {['pending', 'due', 'overdue'].includes(row.payout_status) && (
+                              <VoidPayoutButton
+                                enrollmentId={row.id}
+                                holderName={partner?.organization_name || partner?.name}
+                              />
                             )}
                             <Link
                               href={`/students/${row.user_id}`}

@@ -50,40 +50,44 @@ it('a readiness exception or a lost queue claim never acknowledges dispatch',asy
  h.verified=true;h.claimWon=false;
  expect(await tickParisCodeRepairs({workflowOwnedDispatch:true})).toEqual({enabled:true,dispatched:0});
 });
-it('explicit OpenHands opt-in admits one fenced claim while the local model is unavailable',async()=>{
+it('the removed OpenHands opt-in is inert: an unavailable owned model admits nothing even with the legacy env value set',async()=>{
  vi.stubEnv('PARIS_REPAIR_ENGINE','openhands');h.candidate=null;
- expect(await tickParisCodeRepairs({workflowOwnedDispatch:true})).toMatchObject({dispatchRequired:true,repairId:'pending'});
- expect(h.probe).not.toHaveBeenCalled();expect(h.openhands).toHaveBeenCalledOnce();
- expect(h.updates).toHaveLength(1);
- expect(h.updates[0]).toMatchObject({values:{status:'dispatched',attempt_count:1}});
- expect(h.updates[0].filters).toEqual(expect.arrayContaining([['id','pending'],['status','queued'],['attempt_count',0]]));
+ expect(await tickParisCodeRepairs({workflowOwnedDispatch:true})).toMatchObject({dispatched:0,awaitingProvider:true,reason:'OWNED_MODEL_READINESS_UNVERIFIED'});
+ expect(h.openhands).not.toHaveBeenCalled();expect(h.probe).toHaveBeenCalledOnce();expect(h.updates).toEqual([]);
  expect(vi.mocked(fetch).mock.calls.some(([,options])=>(options as any)?.method==='POST')).toBe(false);
 });
-it('unconfigured explicitly selected OpenHands falls back to the internal engine, which still requires a ready owned model',async()=>{
+it('no OpenHands configuration state can change admission: the owned model alone gates it',async()=>{
  vi.stubEnv('PARIS_REPAIR_ENGINE','openhands');h.candidate=null;
- for(const config of [{apiKeyResolved:false,repositoryMatches:true},
-  {apiKeyResolved:true,repositoryMatches:false}]){
-  h.openhands.mockResolvedValue({...config,verified:false,status:'not_configured'});
-  expect(await tickParisCodeRepairs({workflowOwnedDispatch:true})).toMatchObject({dispatched:0,awaitingProvider:true,reason:'OWNED_MODEL_READINESS_UNVERIFIED'});
- }
- expect(h.updates).toEqual([]);expect(h.probe).toHaveBeenCalledTimes(2);
+ h.openhands.mockResolvedValue({verified:false,status:'not_configured'});
+ expect(await tickParisCodeRepairs({workflowOwnedDispatch:true})).toMatchObject({dispatched:0,awaitingProvider:true,reason:'OWNED_MODEL_READINESS_UNVERIFIED'});
+ expect(h.updates).toEqual([]);expect(h.probe).toHaveBeenCalledOnce();expect(h.openhands).not.toHaveBeenCalled();
 });
-it.each(['authorization_failed','provider_request_failed','configuration_unavailable','origin_not_verified','invalid_provider_response'])('OpenHands %s does not block: a ready owned model admits one fenced claim',async status=>{
+it.each(['authorization_failed','provider_request_failed','configuration_unavailable','origin_not_verified','invalid_provider_response'])('a stale OpenHands readiness state (%s) is never consulted: a ready owned model admits one fenced claim',async status=>{
  vi.stubEnv('PARIS_REPAIR_ENGINE','openhands');h.candidate=null;h.verified=true;h.openhands.mockResolvedValueOnce({verified:false,status});
  expect(await tickParisCodeRepairs({workflowOwnedDispatch:true})).toMatchObject({dispatchRequired:true,repairId:'pending'});
- expect(h.probe).toHaveBeenCalledOnce();expect(h.updates).toHaveLength(1);
+ expect(h.probe).toHaveBeenCalledOnce();expect(h.openhands).not.toHaveBeenCalled();expect(h.updates).toHaveLength(1);
  expect(h.updates[0]).toMatchObject({values:{status:'dispatched',attempt_count:1}});
  expect(h.updates[0].filters).toEqual(expect.arrayContaining([['id','pending'],['status','queued'],['attempt_count',0]]));
 });
-it('an accepted OpenHands checkpoint still waits for OpenHands instead of switching engines',async()=>{
- h.candidate={kind:'openhands-checkpoint'};h.verified=true;h.openhands.mockResolvedValueOnce({verified:false,status:'provider_request_failed'});
- expect(await tickParisCodeRepairs({workflowOwnedDispatch:true})).toMatchObject({dispatched:0,awaitingProvider:true,reason:'OPENHANDS_READINESS_UNVERIFIED'});
- expect(h.updates).toEqual([]);expect(h.probe).not.toHaveBeenCalled();
+it('an OpenHands checkpoint without the opt-in runs on the owned internal engine',async()=>{
+ h.candidate={kind:'openhands-checkpoint'};h.verified=true;
+ expect(await tickParisCodeRepairs({workflowOwnedDispatch:true})).toMatchObject({dispatchRequired:true,repairId:'pending'});
+ expect(h.openhands).not.toHaveBeenCalled();expect(h.probe).toHaveBeenCalledOnce();
+ expect(h.updates).toHaveLength(1);
+ expect(h.updates[0]).toMatchObject({values:{status:'dispatched',attempt_count:1}});
 });
-it('a lost OpenHands admission claim is never reported as a dispatch',async()=>{
- vi.stubEnv('PARIS_REPAIR_ENGINE','openhands');h.candidate=null;h.claimWon=false;
+it('a historical OpenHands checkpoint is admitted on the owned internal engine even with the legacy env value set',async()=>{
+ vi.stubEnv('PARIS_REPAIR_ENGINE','openhands');
+ h.candidate={kind:'openhands-checkpoint'};h.verified=true;
+ expect(await tickParisCodeRepairs({workflowOwnedDispatch:true})).toMatchObject({dispatchRequired:true,repairId:'pending'});
+ expect(h.openhands).not.toHaveBeenCalled();expect(h.probe).toHaveBeenCalledOnce();
+ expect(h.updates).toHaveLength(1);
+ expect(h.updates[0]).toMatchObject({values:{status:'dispatched',attempt_count:1}});
+});
+it('a lost admission claim is never reported as a dispatch',async()=>{
+ vi.stubEnv('PARIS_REPAIR_ENGINE','openhands');h.candidate=null;h.verified=true;h.claimWon=false;
  expect(await tickParisCodeRepairs({workflowOwnedDispatch:true})).toEqual({enabled:true,dispatched:0});
- expect(h.probe).not.toHaveBeenCalled();
+ expect(h.openhands).not.toHaveBeenCalled();
 });
 it('defaults new repairs to internal engine without an OpenHands dependency',async()=>{
  h.candidate=null;h.verified=true;vi.stubEnv('PARIS_REPAIR_ENGINE','');

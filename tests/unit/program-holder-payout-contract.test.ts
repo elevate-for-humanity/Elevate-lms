@@ -68,3 +68,56 @@ describe('Program Holder payout contract', () => {
     expect(migration).toContain('program_holder_payout_transactions_provider_transfer_key');
   });
 });
+
+describe('Payout void action', () => {
+  const voidRoute = read('apps/admin/app/api/admin/enrollments/void-payout/route.ts');
+  const migration = read(
+    'supabase/migrations/20261124130000_allow_voided_payout_status.sql',
+  );
+  const queuePage = read('apps/admin/app/payout-queue/page.tsx');
+  const queueApiRoute = read('apps/admin/app/api/admin/enrollments/payout-queue/route.ts');
+  const voidButton = read('apps/admin/app/payout-queue/VoidPayoutButton.tsx');
+  const paymentRoute = read('apps/admin/app/api/admin/enrollments/mark-payout-paid/route.ts');
+
+  it('is admin-only and requires a reason', () => {
+    expect(voidRoute).toContain('apiRequireAdmin');
+    expect(voidRoute).toContain("['admin']");
+    expect(voidRoute).toContain('A reason is required to void a payout');
+  });
+
+  it('voids the payout, holds the schedule, and audits the change', () => {
+    expect(voidRoute).toContain("payout_status: 'voided'");
+    expect(voidRoute).toContain("increment_1_status: 'held'");
+    expect(voidRoute).toContain('enrollment_voucher_audit');
+    expect(voidRoute).toContain("field_name: 'payout_status'");
+    expect(voidRoute).toContain("new_value: 'voided'");
+    expect(voidRoute).not.toContain('releaseProgramHolderPayment');
+  });
+
+  it('refuses to void payouts that are already paid or voided', () => {
+    expect(voidRoute).toContain('already paid and cannot be voided');
+    expect(voidRoute).toContain('already voided');
+  });
+
+  it('widens the payout_status CHECK so voided can be stored', () => {
+    expect(migration).toContain('program_enrollments_payout_status_check');
+    expect(migration).toContain("'voided'");
+  });
+
+  it('excludes voided rows from the queue page and queue API', () => {
+    expect(queuePage).toContain(".neq('payout_status', 'voided')");
+    expect(queueApiRoute).toContain(".neq('payout_status', 'voided')");
+  });
+
+  it('offers a Void button next to the pay button for unpaid rows', () => {
+    expect(queuePage).toContain('VoidPayoutButton');
+    expect(voidButton).toContain('/api/admin/enrollments/void-payout');
+    expect(voidButton).toContain('reason');
+  });
+
+  it('does not change the mark-payout-paid route', () => {
+    expect(paymentRoute).not.toContain('voided');
+    expect(paymentRoute).not.toContain('void-payout');
+  });
+});
+

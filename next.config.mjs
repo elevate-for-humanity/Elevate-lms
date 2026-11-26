@@ -233,8 +233,6 @@ const nextConfig = {
     ignoreDuringBuilds: true,
   },
   outputFileTracingExcludes: {
-    '/api/devstudio/files': ['**/*'],
-    '/api/devstudio/shell': ['**/*'],
     '/api/accreditation/report': ['**/*'],
     '*': [...sharedStandaloneTraceExcludes, ...lmsOnlyStandaloneTraceExcludes],
   },

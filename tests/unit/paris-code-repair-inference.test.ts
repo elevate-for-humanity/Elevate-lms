@@ -3,7 +3,7 @@ const h=vi.hoisted(()=>({decision:'budget_exceeded',inferences:0,role:'admin' as
 vi.mock('server-only',()=>({}));
 vi.mock('@/lib/logger',()=>({logger:{error:vi.fn(),warn:vi.fn(),info:vi.fn()}}));
 vi.mock('@/lib/secrets',()=>({hydrateProcessEnv:async()=>{}}));
-vi.mock('@/lib/devstudio/github-token',()=>({getGitHubHeaders:async()=>({Authorization:'Bearer test-only'})}));
+vi.mock('@/lib/devstudio/github-token',()=>({getGitHubHeaders:async()=>({Authorization:'Bearer test-only'}),getGitHubToken:async()=>'fixture-token',verifyGitHubBranchAuthority:async()=>{}}));
 vi.mock('@/lib/supabase/admin',()=>({requireAdminClient:async()=>({from:()=>{const q:any={select:()=>q,eq:()=>q,maybeSingle:async()=>({data:h.role?{role:h.role}:null,error:h.ownerError})};return q;},rpc:async(name:string)=>({data:name==='reserve_paid_inference_v1'?[{decision:h.decision,request_id:'00000000-0000-4000-8000-000000000001'}]:true,error:null})})}));
 vi.mock('@/lib/ai/ai-service',()=>({aiChat:vi.fn(async()=>{const {requirePaidInferenceContext}=await import('@/lib/ai/paid-inference-context');expect(requirePaidInferenceContext('test')).toBe('00000000-0000-4000-8000-000000000001');h.inferences++;return {content:'{"type":"complete","summary":"No edit was necessary."}',provider:'openai'};})}));
 import {stageParisCodeRepair} from '@/lib/devstudio/paris-code-engineer';

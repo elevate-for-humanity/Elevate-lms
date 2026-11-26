@@ -7,6 +7,11 @@ import { eligibleForEnrollmentCertificate, enrollmentCertificateCampaign } from 
 
 const fields = 'id,user_id,student_id,full_name,email,program_slug,status,payment_status,amount_paid_cents,amount_paid,revoked_at,refunded_at,enrollment_confirmed_at,enrolled_at,host_shop_id';
 const cleanEmail = (value: unknown) => String(value || '').trim().toLowerCase();
+// Kept local on purpose: this module is loaded standalone by the native test
+// harness, so it must not depend on imports beyond the ones it already has.
+// Mirrors deriveCertificateRoleLabel in host-shop-student-records.ts.
+const certificateRoleLabel = (program: string) => (/Apprenticeship$/i.test(program) ? program.replace(/Apprenticeship$/i, 'Apprentice') : null);
+const CERTIFICATE_SPONSOR_LEGAL_NAME = '2Exclusive LLC-S';
 
 async function resolveEnrollment(db: SupabaseClient, id: string) {
   const { data: e, error } = await db.from('program_enrollments').select(fields).eq('id', id).maybeSingle();
@@ -24,12 +29,19 @@ async function resolveEnrollment(db: SupabaseClient, id: string) {
   // Do not guess a shop when current placement records conflict.
   if (shopIds.length > 1) throw new Error('Conflicting host placements require reconciliation');
   const shopId = shopIds[0] || e.host_shop_id;
-  let shop: { id: string; name: string; email: string | null; owner_email: string | null } | null = null;
+  let shop: { id: string; name: string; email: string | null; owner_email: string | null; city: string | null; state: string | null } | null = null;
   if (shopId) {
-    const result = await db.from('host_shops').select('id,name,email,owner_email').eq('id', shopId).maybeSingle();
+    const result = await db.from('host_shops').select('id,name,email,owner_email,city,state').eq('id', shopId).maybeSingle();
     if (result.error || !result.data) throw new Error('Assigned host shop unavailable');
     shop = result.data;
   }
+  // Program facts feed the certification statement (title, hours). A missing
+  // or unreadable program row must not block issuance: fall back to the
+  // slug-derived label and no hours segment.
+  const programResult = await db.from('programs').select('name,duration_hours').eq('slug', e.program_slug).maybeSingle();
+  const programInfo = programResult.error ? null : programResult.data;
+  const programLabel = programInfo?.name || e.program_slug.replace(/[-_]/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+  const programHours = Number(programInfo?.duration_hours) > 0 ? Number(programInfo?.duration_hours) : null;
   const recipients = new Set<string>();
   const studentEmail = cleanEmail(profile.data?.email || e.email);
   if (studentEmail) recipients.add(studentEmail);
@@ -42,11 +54,15 @@ async function resolveEnrollment(db: SupabaseClient, id: string) {
     reference: placement ? `EFH-HS-${placement.id.toUpperCase()}` : `EFH-ENR-${e.id.toUpperCase()}`,
     studentName: name.trim(), studentId: userId, shopId: shop?.id || '',
     shopName: shop?.name || 'Elevate for Humanity',
-    program: e.program_slug.replace(/[-_]/g, ' ').replace(/\b\w/g, c => c.toUpperCase()),
+    program: programLabel,
     title: 'Certificate of Enrollment', status: 'enrolled',
     recordDate: e.enrollment_confirmed_at || e.enrolled_at,
+    roleLabel: certificateRoleLabel(programLabel),
+    programHours,
+    sponsorLegalName: CERTIFICATE_SPONSOR_LEGAL_NAME,
+    shopCity: shop?.city || null, shopState: shop?.state || null,
   };
-  return { record, recipients: [...recipients], userId };
+  return { record, recipients: [...recipients], userId, hostEmail: hostEmail || null };
 }
 
 /** Run by the existing interoffice-mail scheduler, independent of payment provider. */
@@ -67,16 +83,39 @@ export async function queuePaidEnrollmentCertificates(db: SupabaseClient) {
       const existing = await db.from('communication_email_outbox').select('recipient_email').eq('campaign_key', campaign);
       if (existing.error) throw new Error('Certificate delivery history unavailable');
       const known = new Set((existing.data || []).map(r => cleanEmail(r.recipient_email)));
-      const rows = resolved.recipients.filter(email => !known.has(email)).map(email => ({
+      const rowFor = (email: string) => ({
         campaign_key: campaign, user_id: resolved.userId, recipient_email: email,
         mailbox_id: mailboxId,
         subject: `Enrollment certificate: ${resolved.record.studentName} — ${resolved.record.program}`,
         body: `Attached is the current Elevate enrollment certificate for ${resolved.record.studentName}, ${resolved.record.program}.\n\nThis version includes 2Exclusive LLC-S, DOL Apprenticeship Sponsor, the Elevate seal and Elizabeth Greene's authorized signature. Please replace any earlier enrollment certificate for this student with this version.\n\nThis confirms enrollment only; completion credentials are issued separately after verified completion.\n\nElizabeth Greene\nElevate for Humanity`,
-      }));
-      if (!rows.length) continue;
-      const saved = await db.from('communication_email_outbox').upsert(rows, { onConflict: 'campaign_key,recipient_email', ignoreDuplicates: true });
-      if (saved.error) throw new Error('Certificate delivery could not be queued');
-      queued += rows.length;
+      });
+      const fresh = resolved.recipients.filter(email => !known.has(email));
+      const standardRows = fresh.filter(email => email !== resolved.hostEmail).map(rowFor);
+      if (standardRows.length) {
+        const saved = await db.from('communication_email_outbox').upsert(standardRows, { onConflict: 'campaign_key,recipient_email', ignoreDuplicates: true });
+        if (saved.error) throw new Error('Certificate delivery could not be queued');
+        queued += standardRows.length;
+      }
+      if (resolved.hostEmail) {
+        // The outbox review trigger (private.review_paris_outbox) silently
+        // diverts a 'pending' insert addressed to a partner or program-holder
+        // contact into owner review, returning NULL so the row never lands —
+        // and a host shop's email is always such a contact, so the shop's
+        // certificate copy was dropped on every run while the student's went
+        // out. The certificate is a transactional document the shop is owed,
+        // not outreach, so stage its copy in the non-intercepted 'processing'
+        // state and immediately release it to 'pending' with an update
+        // (updates are not intercepted). The release also frees a shop copy
+        // stranded in 'processing' by an interrupted earlier run.
+        if (fresh.includes(resolved.hostEmail)) {
+          const staged = await db.from('communication_email_outbox').upsert([{ ...rowFor(resolved.hostEmail), status: 'processing' }], { onConflict: 'campaign_key,recipient_email', ignoreDuplicates: true });
+          if (staged.error) throw new Error('Certificate host copy could not be queued');
+          queued += 1;
+        }
+        const released = await db.from('communication_email_outbox').update({ status: 'pending' })
+          .eq('campaign_key', campaign).eq('recipient_email', resolved.hostEmail).eq('status', 'processing');
+        if (released.error) throw new Error('Certificate host copy could not be released for delivery');
+      }
     }
     if ((page.data || []).length < 500) break;
   }

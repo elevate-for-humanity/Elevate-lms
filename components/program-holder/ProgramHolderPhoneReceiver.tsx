@@ -8,6 +8,7 @@ import {
   type PhoneClient,
 } from '@/lib/phone/browser-client';
 import { installAudioUnlock } from '@/lib/notifications/audio-unlock';
+import { claimPhoneContext } from '@/lib/phone/context-lock';
 import { Mic, MicOff, Phone, PhoneCall, PhoneOff } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -58,9 +59,22 @@ export function ProgramHolderPhoneReceiver({ phoneHref = '/program-holder/phone'
     let reconnecting = false;
     let client: PhoneClient | null = null;
     let ready = false;
+    let healConsumed = false;
+    let healFailures = 0;
+    let isLeader = false;
     // Separate the receiver lease from the full phone page: delayed cleanup
     // during navigation must never disconnect the newly opened dial pad.
     const id = `${currentDeviceId()}_receiver`;
+    // The same one-context rule as the dial pad, for this receiver
+    // identity: a second live context defers instead of evicting the first
+    // one's registration, and takes over if the leader goes away.
+    const claim = claimPhoneContext(id);
+    claim.onTakeover(() => {
+      isLeader = true;
+      if (active && !ready && !starting && !reconnecting) {
+        void start().catch(() => scheduleReconnect());
+      }
+    });
 
     async function ping() {
       if (!ready) return;
@@ -73,7 +87,32 @@ export function ProgramHolderPhoneReceiver({ phoneHref = '/program-holder/phone'
           inCall: Boolean(callRef.current),
         }),
       }).catch(() => undefined);
-      if (active && ready) setOnline(Boolean(response?.ok));
+      const ok = Boolean(response?.ok);
+      if (active && ready) setOnline(ok);
+      if (ok) {
+        healConsumed = false;
+        healFailures = 0;
+        return;
+      }
+      // A failed heartbeat used to be display-only: once the server-side
+      // evidence flipped (frozen page, expired contact or lease) the
+      // receiver stayed dead until reload. Recover instead — at most once
+      // per registration, with a bounded backoff, so a dead server cannot
+      // spin a reconnect loop. A device_not_provisioned reply means the
+      // lease is gone and only a full re-provision can bring the device
+      // back; recover() re-runs start(), including the token request.
+      if (!active || !ready || callRef.current) return;
+      const failureBody = response ? await response.json().catch(() => ({})) : {};
+      if (!active || !ready || callRef.current) return;
+      const leaseGone =
+        (failureBody as { code?: string } | null)?.code === 'device_not_provisioned';
+      if (leaseGone || !healConsumed) {
+        healConsumed = true;
+        healFailures += 1;
+        scheduleReconnect(
+          leaseGone ? 1_000 : Math.min(5_000 * 3 ** (healFailures - 1), 30_000),
+        );
+      }
     }
 
     async function start() {
@@ -107,6 +146,7 @@ export function ProgramHolderPhoneReceiver({ phoneHref = '/program-holder/phone'
       client.on('ready', () => {
         if (active) {
           ready = true;
+          healConsumed = false;
           void ping();
         }
       });
@@ -156,12 +196,12 @@ export function ProgramHolderPhoneReceiver({ phoneHref = '/program-holder/phone'
       } finally { starting = false; }
     }
 
-    function scheduleReconnect() {
+    function scheduleReconnect(delayMs = 30_000) {
       if (!active || retry || callRef.current) return;
       retry = setTimeout(() => {
         retry = null;
         void recover();
-      }, 30_000);
+      }, delayMs);
     }
 
     async function recover() {
@@ -187,11 +227,41 @@ export function ProgramHolderPhoneReceiver({ phoneHref = '/program-holder/phone'
       reconnecting = false;
       if (active) void start().catch(() => scheduleReconnect());
     }
-    void start().catch(recover);
+    // A page that was frozen or backgrounded may never see a SIP event for
+    // the registration it lost. Re-check on return to the foreground and
+    // on network recovery, mirroring the dial pad's visibility heal:
+    // verify with a heartbeat when we believe we are registered, and
+    // reconnect when we know we are not.
+    const healFromLifecycle = () => {
+      if (!active || !isLeader) return;
+      if (ready) {
+        void ping();
+        return;
+      }
+      if (retry) {
+        clearTimeout(retry);
+        retry = null;
+      }
+      if (!starting && !reconnecting) void start().catch(() => scheduleReconnect());
+    };
+    const onVisibilityChange = () => {
+      if (document.visibilityState === 'visible') healFromLifecycle();
+    };
+    document.addEventListener('visibilitychange', onVisibilityChange);
+    window.addEventListener('online', healFromLifecycle);
+    // Only the leading context connects; a follower stays quiet until it
+    // takes over (see the claim above).
+    void claim.acquired.then((leader) => {
+      isLeader = leader;
+      if (active && leader) void start().catch(recover);
+    });
     return () => {
       active = false;
       ready = false;
       controller.abort();
+      document.removeEventListener('visibilitychange', onVisibilityChange);
+      window.removeEventListener('online', healFromLifecycle);
+      claim.release();
       if (heartbeat) clearInterval(heartbeat);
       if (retry) clearTimeout(retry);
       void client?.disconnect();

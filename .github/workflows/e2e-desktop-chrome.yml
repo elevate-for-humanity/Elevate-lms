@@ -95,10 +95,7 @@ jobs:
         run: node scripts/qa/provision-remaining-portal-e2e.mjs provision
       - name: Provision disposable Learner and Program Holder QA identities
         run: node scripts/qa/provision-learner-program-holder-e2e.mjs provision
-      # Each shard needs its own admitted apprentice and assigned Host Shop.
-      # The provisioner exports both dedicated role credentials through
-      # GITHUB_ENV, replacing static identities before any browser suite runs.
-      - name: Provision disposable Host Shop and Apprentice QA identities
+      - name: Provision disposable Apprentice and Host Shop QA identities
         run: node scripts/qa/provision-apprenticeship-e2e.mjs provision
       - name: Verify preinstalled Playwright browsers
         run: node scripts/verify-playwright-runtime.mjs chromium
@@ -156,9 +153,9 @@ jobs:
         run: |
           echo "Focused exhaustive browser regression failed; all shard evidence was retained."
           exit 1
-      - name: Clean up disposable Host Shop and Apprentice QA identities
+      - name: Clean up disposable Apprentice and Host Shop QA identities
         if: always()
-        run: node scripts/qa/provision-apprenticeship-e2e.mjs cleanup
+        run: node scripts/qa/provision-apprenticeship-e2e.mjs cleanup  
       - name: Clean up disposable Learner and Program Holder QA identities
         if: always()
         run: node scripts/qa/provision-learner-program-holder-e2e.mjs cleanup
@@ -183,7 +180,7 @@ jobs:
     name: E2E desktop-chrome
     runs-on: ubuntu-24.04
     needs: [desktop-chrome-shard]
-    if: ${{ !cancelled() }}
+    if: ${{ always() }}
     steps:
       - name: Require successful desktop results from the full matrix
         env:

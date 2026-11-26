@@ -107,7 +107,7 @@ async function provision() {
       user_id: apprentice.id, student_id: apprentice.id, email: apprentice.email,
       full_name: '[QA E2E] Barber Apprentice', program_id: anchor.id,
       program_slug: 'barber-apprenticeship', status: 'active', enrollment_state: 'active',
-      payment_status: 'paid', approved_at: new Date().toISOString(), approved_by: approvalAdmin.id,
+      payment_status: paymentStatus, approved_at: new Date().toISOString(), approved_by: approvalAdmin.id,
       access_granted_at: new Date().toISOString(), access_status: 'active',
       funding_source: 'qa-e2e', funding_status: 'unfunded_self_continuing',
       funding_verified: false, amount_paid_cents: 0, source: 'qa-e2e', tenant_id: anchor.tenant_id,
@@ -246,6 +246,20 @@ async function cleanup() {
     await deleteDerived(db.from('platform_events').delete()
       .eq('event_type', 'enrollment.confirmed').eq('subject_type', 'program_enrollment')
       .eq('subject_id', enrollmentId), 'delete enrollment platform event');
+    // Fixture alerts must never outlive teardown (Blocker A, 2026-11-26):
+    // the RAPIDS queue + staff alert and the program-holder 'New Student
+    // Assigned' notification are trigger-derived from the enrollment row.
+    // The triggers also skip qa-e2e fixtures at the source (migration
+    // 20261126173000); these deletes are the backstop for rows created
+    // before that migration or by any other derived path.
+    await deleteDerived(db.from('rapids_action_queue').delete()
+      .eq('entity_type', 'apprentice').eq('entity_id', enrollmentId)
+      .eq('action_type', 'register_apprentice'), 'delete RAPIDS queue entry');
+    await deleteDerived(db.from('staff_notifications').delete()
+      .eq('type', 'apprentice_ready_for_rapids')
+      .eq('metadata->>enrollment_id', enrollmentId), 'delete RAPIDS staff notification');
+    await deleteDerived(db.from('notifications').delete()
+      .eq('metadata->>enrollment_id', enrollmentId), 'delete holder enrollment notification');
   };
   const assertEnrollmentDerivedGone = async (enrollmentId, label) => {
     await assertDerivedGone(db.from('program_holder_students')
@@ -256,6 +270,11 @@ async function cleanup() {
     await assertDerivedGone(db.from('platform_events')
       .select('id').eq('event_type', 'enrollment.confirmed')
       .eq('subject_type', 'program_enrollment').eq('subject_id', enrollmentId).limit(1), label + ' enrollment platform event');
+    await assertDerivedGone(db.from('staff_notifications')
+      .select('id').eq('type', 'apprentice_ready_for_rapids')
+      .eq('metadata->>enrollment_id', enrollmentId).limit(1), label + ' RAPIDS staff notification');
+    await assertDerivedGone(db.from('notifications')
+      .select('id').eq('metadata->>enrollment_id', enrollmentId).limit(1), label + ' holder enrollment notification');
   };
   if (state.learner?.id) {
     // Remove only this run's disposable HVAC simulation evidence; real learner
@@ -310,10 +329,12 @@ async function cleanup() {
   if (state.apprenticeEnrollmentId) {
     await must(db.from('program_enrollments').delete().eq('id', state.apprenticeEnrollmentId).eq('user_id', state.apprentice.id), 'remove isolated apprentice enrollment');
     await must(db.from('course_enrollments').delete().eq('student_id', state.apprentice.id), 'remove isolated apprentice course enrollments');
+    await deleteEnrollmentDerived(state.apprenticeEnrollmentId);
   }
   if (state.apprenticeEnrollmentId) {
     await must(db.from('program_enrollments').delete().eq('id', state.apprenticeEnrollmentId).eq('user_id', state.apprentice.id), 'remove isolated apprentice enrollment');
     await must(db.from('course_enrollments').delete().eq('student_id', state.apprentice.id), 'remove isolated apprentice course enrollments');
+    await deleteEnrollmentDerived(state.apprenticeEnrollmentId);
   }
   if (state.holderEnrollmentId && state.holderStudent?.id) {
     await deleteDerived(db.from('program_holder_students').delete()
@@ -351,6 +372,7 @@ async function cleanup() {
     .select('id').eq('student_id', state.holderStudent.id).limit(1), 'holder-student course enrollments');
   if (state.hvacEnrollmentId) await assertEnrollmentDerivedGone(state.hvacEnrollmentId, 'HVAC');
   if (state.holderEnrollmentId) await assertEnrollmentDerivedGone(state.holderEnrollmentId, 'holder-student');
+  if (state.apprenticeEnrollmentId) await assertEnrollmentDerivedGone(state.apprenticeEnrollmentId, 'apprentice');
   console.log(JSON.stringify({ ok: true, cleanedRunId: state.runId }));
 }
 

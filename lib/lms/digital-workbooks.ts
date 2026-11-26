@@ -11,6 +11,10 @@ export type Workbook = {
   title: string;
   program_id: string;
   cover_image: string;
+  // The stored illustrated book itself. Sections carry prompts + a pdf_page
+  // mapping into this document; the viewer must render its pages, never a
+  // prompts-only skeleton (REAL, NOT SKELETON rule, 2026-11-26).
+  pdf_storage_path?: string | null;
 };
 export type WorkbookSection = {
   id: string;
@@ -86,7 +90,7 @@ export async function loadMyDigitalWorkbooks() {
   }
   let query = reader
     .from('digital_workbooks')
-    .select('id,slug,title,program_id,cover_image')
+    .select('id,slug,title,program_id,cover_image,pdf_storage_path')
     .eq('is_active', true);
   if (subject.previewing) query = query.in('program_id', programIds);
   const { data, error } = await query.order('title');
@@ -148,11 +152,23 @@ export async function loadMyDigitalWorkbook(slug: string) {
     ? { data: false, error: null }
     : await db.rpc('can_edit_digital_workbook', { p_workbook_id: workbook.id });
   if (access.error) throw new Error('Workbook access could not be verified.');
+  // Hand the viewer a short-lived signed URL for the real book so its pages
+  // render in place beside the section prompts. Fail safe: no URL simply
+  // leaves the curated-visual presentation in place.
+  let pdfUrl: string | null = null;
+  if (workbook.pdf_storage_path) {
+    const admin = await requireAdminClient();
+    const signed = await admin.storage
+      .from('documents')
+      .createSignedUrl(workbook.pdf_storage_path, 60 * 60);
+    if (!signed.error) pdfUrl = signed.data?.signedUrl ?? null;
+  }
   return {
     workbook,
     sections: typedSections,
     responses,
     readOnly: access.data !== true,
     accountId: user.id,
+    pdfUrl,
   };
 }

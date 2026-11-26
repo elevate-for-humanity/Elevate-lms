@@ -54,6 +54,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const entry = network.find((shop) => shop.slug === slug || shop.id === approvedRecord?.id);
   const approved = approvedRecord && entry ? {
     ...approvedRecord,
+    // The network entry resolves the independently sourced curated public
+    // number (featured partner) when the approved record itself carries no
+    // database-sourced public phone. The database number stays primary;
+    // application contact data never reaches this merge.
+    phone: approvedRecord.phone || entry.phone || '',
     description: entry.description,
     mediaGallery: entry.gallery,
     videoUrl: entry.videoUrl,
@@ -120,6 +125,11 @@ export default async function HostShopProfilePage({ params }: PageProps) {
   const entry = network.find((shop) => shop.slug === slug || shop.id === approvedRecord?.id);
   const approved = approvedRecord && entry ? {
     ...approvedRecord,
+    // The network entry resolves the independently sourced curated public
+    // number (featured partner) when the approved record itself carries no
+    // database-sourced public phone. The database number stays primary;
+    // application contact data never reaches this merge.
+    phone: approvedRecord.phone || entry.phone || '',
     description: entry.description,
     mediaGallery: entry.gallery,
     videoUrl: entry.videoUrl,

@@ -15,22 +15,29 @@ import {
 // and caches that belong to no known Elevate application; each application
 // still retires its own previous versions through its worker's activate
 // handler and the update flow below.
-const KNOWN_WORKER_PATHS = new Set(
-  Object.values(PWA_APPLICATIONS).map((app) => app.workerPath),
-);
-const KNOWN_CACHE_PREFIXES = Object.values(PWA_APPLICATIONS).map(
-  (app) => app.cachePrefix,
-);
+// The sibling sets are derived lazily, never at module scope: they are
+// only needed inside a real browser registration pass with the registry
+// loaded, and module-scope derivation breaks VM-based test harnesses that
+// evaluate this file with a stubbed registry.
+function knownWorkerPaths(): Set<string> {
+  return new Set(Object.values(PWA_APPLICATIONS).map((app) => app.workerPath));
+}
+
+function knownCachePrefixes(): string[] {
+  return Object.values(PWA_APPLICATIONS).map((app) => app.cachePrefix);
+}
 
 function isKnownWorker(scriptURL: string): boolean {
   try {
-    return KNOWN_WORKER_PATHS.has(new URL(scriptURL).pathname);
+    return knownWorkerPaths().has(new URL(scriptURL).pathname);
   } catch {
     return false;
   }
 }
 
 async function removeStaleWorkers(workerPath: string, cachePrefix: string) {
+  const KNOWN_WORKER_PATHS = knownWorkerPaths();
+  const KNOWN_CACHE_PREFIXES = knownCachePrefixes();
   const registrations = await navigator.serviceWorker.getRegistrations();
   await Promise.all(registrations.map(async (registration) => {
     const worker = registration.active ?? registration.waiting ?? registration.installing;
@@ -63,6 +70,7 @@ async function removeStaleWorkers(workerPath: string, cachePrefix: string) {
 }
 
 async function purgeBrokenPwaState(workerPath: string, cachePrefix: string) {
+  const KNOWN_CACHE_PREFIXES = knownCachePrefixes();
   const registrations = await navigator.serviceWorker.getRegistrations();
   await Promise.all(registrations.map(async (registration) => {
     const worker = registration.active ?? registration.waiting ?? registration.installing;

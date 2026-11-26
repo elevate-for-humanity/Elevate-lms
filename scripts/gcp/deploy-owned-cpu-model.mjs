@@ -16,10 +16,17 @@ const fail=code=>{throw Error('PRIVATE_CPU_RELEASE_'+code);};
 
 export function privateCpuDeploymentArguments(digest) {
   if(!/^sha256:[a-f0-9]{64}$/.test(digest))fail('IMMUTABLE_IMAGE_REQUIRED');
+  // PARIS chat is user-facing: one instance stays warm. Scale-to-zero made the
+  // first turn after any idle period fail — a cold 7B CPU model takes minutes
+  // to load, while the live chat route gives up after 45s and the health probe
+  // after 15s, so the apps reported the model "unavailable" even though it was
+  // healthy (verified live 2026-11-23: workflow run #6 green, homepage/Admin
+  // chat both falling back). One warm instance is an always-on 4 CPU / 8 GiB
+  // cost; that is the price of a live PARIS, not a free default.
   return ['run','deploy',CPU_SERVICE,'--project',PROJECT,'--region',CPU_REGION,
     '--image',`us-central1-docker.pkg.dev/${PROJECT}/elevate/owned-cpu-llm@${digest}`,
     '--service-account',MODEL_IDENTITY,'--port','8080','--cpu','4','--memory','8Gi',
-    '--min','0','--min-instances','0','--max-instances','2','--concurrency','1','--timeout','300s','--cpu-boost',
+    '--min','1','--min-instances','1','--max-instances','2','--concurrency','1','--timeout','300s','--cpu-boost',
     '--update-env-vars='+Object.entries(CPU_CACHE_ENV).map(([key,value])=>key+'='+value).join(','),
     '--startup-probe','httpGet.path=/health,httpGet.port=8080,periodSeconds=10,timeoutSeconds=5,failureThreshold=24',
     '--set-secrets',`LLM_WORKER_SECRET=${SECRET}:latest`,'--quiet'];

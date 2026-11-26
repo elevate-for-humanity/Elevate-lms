@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { courseBuilderJsonHeaders } from '@/components/admin/course-builder/request';
-import { Bot, Loader2, Mic2, PlayCircle, RefreshCw, Sparkles } from 'lucide-react';
+import { Bot, Clapperboard, Loader2, Mic2, PlayCircle, RefreshCw, Sparkles } from 'lucide-react';
 import LicensedMediaLibrary from '@/components/admin/course-builder/LicensedMediaLibrary';
 import CloudBrowserWorkspace from '@/components/studio/CloudBrowserWorkspace';
 
@@ -45,6 +45,28 @@ export default function CourseInstructorMediaPanel({ courseId }: { courseId: str
   useEffect(() => {
     void load();
   }, [courseId]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  async function compileAuthored() {
+    if (!courseId) return;
+    setLoading(true);
+    setMessage('Compiling saved lessons and queueing their videos…');
+    try {
+      const response = await fetch('/api/admin/course-builder', {
+        method: 'POST',
+        headers: courseBuilderJsonHeaders('compile-authored'),
+        body: JSON.stringify({ action: 'compile-authored', courseId }),
+      });
+      const data = await response.json();
+      if (!response.ok || !data.ok) throw new Error(data.error || 'Unable to compile lessons');
+      setMessage(
+        `Compiled ${data.compiledLessons} of ${data.lessonCount} lessons and queued ${data.videosQueued} lesson videos. Videos render automatically in the media queue; each lesson can publish once its video passes review.`,
+      );
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : 'Unable to compile lessons');
+    } finally {
+      setLoading(false);
+    }
+  }
 
   async function queueVideos() {
     setLoading(true);
@@ -168,6 +190,19 @@ export default function CourseInstructorMediaPanel({ courseId }: { courseId: str
               </div>
             </div>
             <div className="mt-5 flex flex-wrap gap-3">
+              <button
+                type="button"
+                onClick={compileAuthored}
+                disabled={loading}
+                className="inline-flex items-center gap-2 rounded-xl bg-violet-400 px-5 py-3 font-black text-slate-950 hover:bg-violet-300 disabled:opacity-60"
+              >
+                {loading ? (
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                ) : (
+                  <Clapperboard className="h-5 w-5" />
+                )}
+                Compile lessons &amp; queue videos
+              </button>
               <button
                 type="button"
                 onClick={queueVideos}

@@ -19,11 +19,11 @@ import {infrastructureRepairPath,openInfrastructureRepair,infrastructureMergeEvi
 import {verifyProtectedParisMerge} from '@/lib/devstudio/openhands/paris-protected-merge.mjs';
 import {currentWorkflowGitHubToken} from '@/lib/devstudio/workflow-github-context';
 import {readRecentRepairEvents} from './repair-events';
-import {REPAIR_REPOSITORY,REPAIR_WORKFLOW,REPAIR_DEPLOYMENTS,eligibleRepairEvents,repairFingerprint,repairIncidentFingerprint,validationPassed,repairDeploymentState,canRetryRepair,canRetryHealthyProviderRepair,canRetryVerifiedGithubAppRepair,canResumeLegacyCpuEdit,canResumeContextBudgetRepair,canResumePlannerInspectionRepair,canResumeZeroWritePlannerRepair,nextRepairDeployment,unobservedRepairDeployment,courseDefectDisposition,canDispatchParisRepairAttempt,isParisAttemptConstraintMismatch,inFlightRepairTimedOut,repairRunsSettled,IN_FLIGHT_REPAIR_TIMEOUT_MINUTES} from './code-repair-policy.mjs';
-
-// Default new repairs to the owned internal engine; OpenHands requires an explicit opt-in.
-// Historical OpenHands checkpoints retain their original provider and approval gates.
-const internalEngineForced=()=>(process.env.PARIS_REPAIR_ENGINE??'internal').trim().toLowerCase()!=='openhands';
+import {REPAIR_REPOSITORY,REPAIR_WORKFLOW,REPAIR_DEPLOYMENTS,eligibleRepairEvents,repairFingerprint,repairIncidentFingerprint,validationPassed,repairDeploymentState,canRetryRepair,canRetryHealthyProviderRepair,canRetryVerifiedGithubAppRepair,isGithubAppBranchFailure,canResumeLegacyCpuEdit,canResumeContextBudgetRepair,canResumePlannerInspectionRepair,canResumeZeroWritePlannerRepair,nextRepairDeployment,unobservedRepairDeployment,courseDefectDisposition,canDispatchParisRepairAttempt,isParisAttemptConstraintMismatch,inFlightRepairTimedOut,repairRunsSettled,IN_FLIGHT_REPAIR_TIMEOUT_MINUTES} from './code-repair-policy.mjs';
+// OpenHands has been removed: the owned internal engine is the only repair
+// engine. A historical OpenHands checkpoint is restaged on the owned engine
+// instead of waiting for the removed provider; no environment variable can
+// select OpenHands.
 
 /**
  * Read-only, cron-authenticated credential preflight. Returns only safe status
@@ -151,7 +151,7 @@ export async function prepareParisRepair(id:string,runId:number){
  if(!claimed)throw Error('REPAIR_ALREADY_CLAIMED');
  try{
   // Queue admission is historical evidence, not continuing write authority.
-  // Check before either engine, including forced internal and continuations.
+  // Check before the engine runs, including continuations.
   const owner=await db.from('profiles').select('role').eq('id',claimed.actor_id).maybeSingle();
   if(owner.error||!claimed.actor_id||!['admin','super_admin'].includes(owner.data?.role??''))
    throw Error('PARIS_AUTOPILOT_OWNER_AUTHORITY_REQUIRED');
@@ -173,32 +173,15 @@ export async function prepareParisRepair(id:string,runId:number){
    if(!archived.data)throw Error('PARIS_REPAIR_CHECKPOINT_OWNERSHIP_LOST');
    candidate=null;
   }
-  let openHandsAvailable=candidate?.kind==='openhands-checkpoint';
-  if(!candidate && !internalEngineForced()){
-   const {probeOpenHandsReadiness}=await import('@/lib/devstudio/paris-openhands-readiness');
-   openHandsAvailable=(await probeOpenHandsReadiness().catch(()=>({verified:false}))).verified===true;
-  }
-  if(openHandsAvailable) {
-   const {stageParisOpenHandsRepair}=await import('@/lib/devstudio/paris-openhands-adapter');
-   candidate=await stageParisOpenHandsRepair({repairId:id,actorId:claimed.actor_id,
-    attempt:claimed.attempt_count,runId,goal:claimed.goal,
-    checkpoint:candidate?.kind==='openhands-checkpoint'?candidate.checkpoint:undefined,
-    save:async (checkpoint,expectedSequence)=>{
-     const save=db.from('paris_code_repairs').update({candidate:{kind:'openhands-checkpoint',checkpoint},updated_at:new Date().toISOString()})
-      .eq('id',id).eq('workflow_run_id',runId).eq('status','patching');
-     // Signed requests may overlap after transport ambiguity. Only one may
-     // advance this checkpoint or record intent to start the external task.
-     const saved=await (expectedSequence===null?save.is('candidate',null):
-      save.eq('candidate->checkpoint->>sequence',String(expectedSequence))).select('id').maybeSingle();
-     if(saved.error)throw saved.error;
-     if(!saved.data)throw Error('PARIS_REPAIR_CHECKPOINT_OWNERSHIP_LOST');
-    },
-   });
-   if(candidate.pending===true)return candidate;
-  }
-  // Preserve historical provider checkpoints and their committed source. New
-  // repairs use the owned internal engine unless explicitly opted into OpenHands.
-  if(!candidate || candidate.kind==='planner-checkpoint') {
+  // OpenHands has been removed: there is no provider staging branch. A
+  // historical OpenHands checkpoint is restaged on the owned internal
+  // engine below rather than waiting for the removed provider.
+  // Preserve historical provider checkpoints and their committed source
+  // evidence in attempt history. New repairs and planner checkpoints use
+  // the owned internal engine, and a historical OpenHands checkpoint is
+  // restaged on the owned engine rather than waiting.
+  if(!candidate || candidate.kind==='planner-checkpoint' ||
+   candidate.kind==='openhands-checkpoint') {
    let sourceEvidence;
    if(claimed.source_job_id){
     const source=await db.from('ultimate_build_jobs').select('id,build_id,job_type,last_error,payload,monitor').eq('id',claimed.source_job_id).single();
@@ -470,6 +453,7 @@ async function runParisCodeRepairTick({workflowOwnedDispatch=false}:{workflowOwn
  let ownedProviderReadiness: {verified:boolean;status?:string} | undefined;
  let recoveredAppThisTick=false;
  let githubAppRecoveryHealth: boolean | undefined;
+ let githubAppWriteHealth: boolean | undefined;
  const ownedTier=resolveOwnedModelConnection().tier;
  for(const repair of blocked.data??[]){
   // The observation may have updated this row since the blocked snapshot.
@@ -541,8 +525,10 @@ async function runParisCodeRepairTick({workflowOwnedDispatch=false}:{workflowOwn
    continue;
   }
   // Only a fresh, verified GitHub App identity may revive one historical
-  // source-free auth failure. Do not retry a source-linked job, exhausted
-  // attempt, or a repair that already has a release candidate.
+  // credential failure. Do not retry an exhausted attempt or a repair that
+  // already has a release candidate. The branch-creation class may be
+  // source-linked — the queue scan revalidates its source before a claim —
+  // but it revives only on proven Contents write authority, below.
   if(!recoveredAppThisTick && canRetryVerifiedGithubAppRepair(repair)){
    if(githubAppRecoveryHealth===undefined){
     const token=await getGitHubAppToken().catch(()=>null);
@@ -551,8 +537,15 @@ async function runParisCodeRepairTick({workflowOwnedDispatch=false}:{workflowOwn
     }).catch(()=>null):null;
     githubAppRecoveryHealth=Boolean(token && diagnostic?.repository?.ok &&
      diagnostic?.contents?.ok && diagnostic?.workflow?.ok);
+    // A branch-creation refusal is cured only by proven write authority:
+    // the read preflight above would requeue that class into the same 403.
+    // The diagnostic reports the freshly minted App token's own contents
+    // permission, so require it explicitly for that failure class.
+    githubAppWriteHealth=githubAppRecoveryHealth &&
+     diagnostic?.repository?.permissions?.contentsWrite===true;
    }
-   if(githubAppRecoveryHealth){
+   const branchFailure=isGithubAppBranchFailure(repair);
+   if(branchFailure?githubAppWriteHealth:githubAppRecoveryHealth){
     const updated=await db.from('paris_code_repairs').update({
      status:'queued',error_code:null,
      attempt_history:[...(repair.attempt_history??[]),{
@@ -561,6 +554,7 @@ async function runParisCodeRepairTick({workflowOwnedDispatch=false}:{workflowOwn
      }],
      verification:{...repair.verification,credentialRecoveryPreflight:{
       githubAppVerified:true,repositoryRead:true,workflowEnabled:true,
+      ...(branchFailure?{contentsWrite:true}:{}),
       checkedAt:new Date().toISOString()
      }},
      updated_at:new Date().toISOString(),
@@ -959,27 +953,11 @@ async function runParisCodeRepairTick({workflowOwnedDispatch=false}:{workflowOwn
   queueScan.courseEvidenceRejected++;
  }
  if(!pending)return {enabled:true,dispatched:0,reason:awaitingCurrentWorkflowEvidence?'CURRENT_WORKFLOW_EVIDENCE_PENDING':'NO_ELIGIBLE_REPAIR_IN_SCANNED_QUEUE',awaitingCurrentWorkflowEvidence,queueScan};
- // New repairs use the owned internal engine by default. Explicit OpenHands
- // opt-in still requires read-only provider authorization before admission;
- // readiness alone never proves successful execution or a completed repair.
- // Old planner checkpoints retain
- // their original engine and its readiness check.
- // OpenHands is optional: a new repair with no OpenHands checkpoint falls back
- // to the internal engine when OpenHands is unavailable, instead of waiting.
- let useInternalEngine=parisRepairEngine(pending.candidate)==='internal' ||
-  (!pending.candidate && internalEngineForced());
- if(!useInternalEngine){
-  const {probeOpenHandsReadiness}=await import('@/lib/devstudio/paris-openhands-readiness');
-  const readiness=await probeOpenHandsReadiness();
-  if(!readiness.verified){
-   if(pending.candidate)return {
-    enabled:true,dispatched:0,awaitingProvider:true,
-    reason:readiness.status==='not_configured'?'OPENHANDS_CONFIGURATION_REQUIRED':'OPENHANDS_READINESS_UNVERIFIED',
-    providerStatus:readiness.status,readiness};
-   useInternalEngine=true;
-  }
- }
- if(useInternalEngine && (process.env.AI_PROVIDER??'elevate').trim().toLowerCase()==='elevate'){
+ // OpenHands has been removed: every repair — new, planner checkpoint or
+ // historical OpenHands checkpoint — is admitted on the owned internal
+ // engine. No OpenHands readiness probe gates admission; the only
+ // provider gate left is the owned model's own readiness, checked below.
+ if((process.env.AI_PROVIDER??'elevate').trim().toLowerCase()==='elevate'){
   const {probeOwnedModel}=await import('@/lib/ai/providers/owned-model-health.mjs');
   const health=ownedProviderReadiness??await probeOwnedModel({timeoutMs:REPAIR_MODEL_PROBE_TIMEOUT_MS}).catch(()=>({verified:false,status:'request_failed'}));
   if(!health.verified)return {enabled:true,dispatched:0,awaitingProvider:true,

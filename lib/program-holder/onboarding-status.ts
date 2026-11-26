@@ -9,6 +9,22 @@ import { isApprovedDocument } from './document-review';
 import { siteUrls } from '@/lib/utils/site-urls';
 import { createClient } from '@/lib/supabase/server';
 
+/**
+ * Approved program-holder statuses. `approved_pending_mou` means the application
+ * is approved and only the MOU signature is outstanding — the holder IS approved.
+ * Use this everywhere a holder's approval is checked, so an approved holder never
+ * shows as still awaiting approval. (Previously the Compliance item in
+ * components/program-holder/ProgramHolderWorkspaceView.tsx only accepted
+ * `active`/`approved`, so an approved holder awaiting MOU signature showed
+ * "Program-holder approval" as outstanding.)
+ */
+export function isApprovedProgramHolderStatus(status: unknown, approvedAt: unknown): boolean {
+  return (
+    ['approved', 'active', 'approved_pending_mou'].includes(String(status || '')) &&
+    Boolean(approvedAt)
+  );
+}
+
 export interface ProgramHolderOnboardingStatus {
   // Authentication
   isAuthenticated: boolean;
@@ -125,7 +141,7 @@ export async function getProgramHolderOnboardingStatus(
     .eq(profile?.program_holder_id ? 'id' : 'user_id', profile?.program_holder_id || currentUserId)
     .maybeSingle();
 
-  const isApproved = ['approved','active','approved_pending_mou'].includes(String(programHolder?.status)) && !!programHolder?.approved_at;
+  const isApproved = isApprovedProgramHolderStatus(programHolder?.status, programHolder?.approved_at);
 
   if (!isApproved) {
     return {

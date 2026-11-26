@@ -20,7 +20,13 @@ fi
 DOMAIN="elevateforhumanity.org"
 SUBDOMAIN="portal"
 FULL_DOMAIN="${SUBDOMAIN}.${DOMAIN}"
-TARGET="elevateforhumanityfix2.netlify.app"
+TARGET="${DNS_TARGET:-}"
+if [ -z "$TARGET" ]; then
+    echo "❌ Error: DNS_TARGET not set (the Netlify fix2 target was retired 2026-11-23)."
+    echo "   Set DNS_TARGET to the current Northflank / Cloud Run host, e.g.:"
+    echo "   export DNS_TARGET=<northflank-or-cloud-run-host>"
+    exit 1
+fi
 
 echo "📋 Configuration:"
 echo "   Domain: $DOMAIN"
@@ -92,7 +98,7 @@ else
         \"content\": \"$TARGET\",
         \"ttl\": 3600,
         \"proxied\": false,
-        \"comment\": \"Netlify portal subdomain - added by autopilot\"
+        \"comment\": \"Portal subdomain - added by autopilot\"
       }")
     
     SUCCESS=$(echo $CREATE_RESPONSE | grep -o '"success":true')
@@ -122,8 +128,8 @@ echo "   - Check status: https://dnschecker.org/#CNAME/$FULL_DOMAIN"
 echo ""
 echo "🔗 Next Steps:"
 echo "   1. Wait for DNS to propagate (5-30 minutes)"
-echo "   2. Add custom domain in Netlify dashboard"
-echo "   3. Add environment variables in Netlify"
+echo "   2. Add custom domain in the Northflank / Cloud Run dashboard (NOT Netlify)"
+echo "   3. Add environment variables in Northflank / Cloud Run"
 echo "   4. Trigger new deployment"
 echo ""
 echo "✅ Your portal will be live at: https://$FULL_DOMAIN"

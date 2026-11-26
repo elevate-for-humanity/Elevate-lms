@@ -121,12 +121,25 @@ export async function createEnrollment(input: CreateEnrollmentInput) {
       throw new Error(`Student already has an active enrollment in this program`);
     }
     // 5. Create enrollment
+    // funding_source is set from the funding program code (wrg, wioa, jri,
+    // employindy, dol) so the row can pass the funding half of the
+    // approved-paid login gate once funding is verified
+    // (funding_verified + eligibility eligible) and an admin grants access
+    // via the grant-access route. Previously funding_source was left null,
+    // so the row could NEVER pass hasAdmissionPaymentOrFunding even after
+    // funding was verified. Deliberately NO access fields here: grant-access
+    // is the approval step and 409s if access is already granted, so
+    // pre-stamping access would bypass funding verification.
+    const fundingSource = String(fundingOption.funding_program?.code ?? '')
+      .trim()
+      .toLowerCase();
     const { data: enrollment, error: enrollmentError } = await db
       .from('program_enrollments')
       .insert({
         student_id: input.student_id,
         program_id: input.program_id,
         funding_program_id: input.funding_program_id,
+        funding_source: fundingSource || null,
         employer_of_record: input.employer_of_record || 'efh',
         employer_name: input.employer_name,
         employer_contact_email: input.employer_contact_email,

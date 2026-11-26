@@ -17,8 +17,14 @@ test('legacy paid enrollment requires approval and active access',()=>{
   for (const field of ['revoked_at','cancelled_at','suspended_at','refunded_at']) {
     assert.equal(isApprovedPaidEnrollment({...valid,[field]:'2026-11-18T02:00:00Z'}),false,field);
   }
-  for (const payment_status of [null,'pending','failed','waived','qa_test','funded']) {
+  for (const payment_status of [null,'pending','failed','qa_test','funded']) {
     assert.equal(isApprovedPaidEnrollment({...valid,payment_status}),false,String(payment_status));
+  }
+  // An active payment plan and a waived (free) course both mean payment is
+  // settled or arranged, so they pass the payment prong; approval is still
+  // required (see the approved_at/approved_by checks above).
+  for (const payment_status of ['active','waived']) {
+    assert.equal(isApprovedPaidEnrollment({...valid,payment_status}),true,String(payment_status));
   }
   for (const status of ['pending','unassigned','suspended','withdrawn','revoked']) {
     assert.equal(isApprovedPaidEnrollment({...valid,status}),false,status);
@@ -26,10 +32,49 @@ test('legacy paid enrollment requires approval and active access',()=>{
   assert.equal(isApprovedPaidEnrollment({...valid,access_status:null}),false);
 });
 
+// Minimal Supabase-style chain mock: program rows come from the
+// program_enrollments table, direct rows from course_enrollments.
+function mockDb(programRows, directRows = [], programError = null) {
+  // Chain mock that actually applies the .in(status) and .is(revoked_at, null)
+  // filters PostgREST would apply, so tests exercise the query as written.
+  const chain = (rows, error) => {
+    const state = { statuses: null, revokedNull: false };
+    const c = { select: () => c, or: () => c, eq: () => c,
+      is: (_col, value) => { if (value === null) state.revokedNull = true; return c; },
+      in: (_col, values) => { state.statuses = new Set(values); return c; },
+      limit: async () => ({ data: rows.filter((r) =>
+        (!state.statuses || state.statuses.has(r.status)) &&
+        (!state.revokedNull || r.revoked_at === null)), error }) };
+    return c;
+  };
+  return { from: (table) => table === 'course_enrollments'
+    ? chain(directRows, null)
+    : chain(programRows, programError) };
+}
+
 test('checks the authenticated subject on both enrollment identity columns',async()=>{
-  const db={from:()=>({select:()=>({or:()=>({limit:async()=>({data:[{...valid,user_id:'other',student_id:'student-1'}],error:null})})})})};
+  const db=mockDb([{...valid,user_id:'other',student_id:'student-1'}]);
   assert.equal(await hasApprovedPaidLearnerEnrollment(db,'student-1'),true);
   assert.equal(await hasApprovedPaidLearnerEnrollment(db,'student-2'),false);
+});
+
+// Direct course enrollment (e.g. verified paid store fulfillment, which
+// creates ONLY a course_enrollments row) admits a learner with no program
+// enrollment row at all — previously the workspace layout bounced them to
+// /lms/access-pending even though their course was listed.
+test('direct course enrollment admits a learner with no program enrollment',async()=>{
+  const direct = [{ id: 'ce-1', status: 'active', revoked_at: null }];
+  assert.equal(await hasApprovedPaidLearnerEnrollment(mockDb([], direct), 'student-1'), true);
+  assert.equal(await hasApprovedPaidLearnerEnrollment(mockDb([], [{ ...direct[0], status: 'pending' }]), 'student-1'), false);
+  assert.equal(await hasApprovedPaidLearnerEnrollment(mockDb([], [{ ...direct[0], revoked_at: '2026-11-18T02:00:00Z' }]), 'student-1'), false);
+  assert.equal(await hasApprovedPaidLearnerEnrollment(mockDb([], []), 'student-1'), false);
+});
+
+test('program gate still governs when a program enrollment exists',async()=>{
+  const unapproved = { ...valid, approved_at: null, approved_by: null };
+  const direct = [{ id: 'ce-1', status: 'active', revoked_at: null }];
+  // Mirrored direct rows must not bypass the approved-paid check.
+  assert.equal(await hasApprovedPaidLearnerEnrollment(mockDb([unapproved], direct), 'student-1'), false);
 });
 
 test('fails closed on read errors and does not mutate enrollment records',async()=>{
@@ -57,7 +102,22 @@ test('verified self-pay and manually approved state funding grant access indepen
     const paidFunded = { ...stateFunded, funding_source, payment_status: 'paid' };
     assert.equal(hasAdmissionPaymentOrFunding(paidFunded), true);
     assert.equal(hasAdmissionPaymentOrFunding({ ...paidFunded, funding_verified: false }), false);
-    assert.equal(hasAdmissionPaymentOrFunding({ ...paidFunded, eligibility_status: null }), false);
+    // program_enrollments.eligibility_status is never populated (the
+    // eligibility review writes to the applications table), so a missing
+    // value does not block verified funding — only an explicitly recorded
+    // non-'eligible' value does.
+    assert.equal(hasAdmissionPaymentOrFunding({ ...paidFunded, eligibility_status: null }), true);
+    assert.equal(hasAdmissionPaymentOrFunding({ ...paidFunded, eligibility_status: 'ineligible' }), false);
   }
   assert.equal(isApprovedPaidEnrollment({ ...stateFunded, funding_verified: false, payment_status: 'paid' }), false);
+});
+
+test('state funding matches recorded funding-source spellings', () => {
+  for (const funding_source of ['WIOA ITA', 'WIOA_ITA', 'wioa ita', 'WIOA', 'wrg']) {
+    const row = { ...valid, funding_source, funding_verified: true, eligibility_status: null, payment_status: 'pending' };
+    assert.equal(hasAdmissionPaymentOrFunding(row), true, funding_source);
+    assert.equal(isApprovedPaidEnrollment(row), true, funding_source);
+  }
+  assert.equal(hasAdmissionPaymentOrFunding({ ...valid, funding_source: 'WIOA ITA', funding_verified: false, payment_status: 'pending' }), false);
+  assert.equal(hasAdmissionPaymentOrFunding({ ...valid, funding_source: 'SELF_PAY', funding_verified: true, payment_status: 'pending' }), false);
 });

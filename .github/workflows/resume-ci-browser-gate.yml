@@ -6,7 +6,7 @@ on:
     types: [completed]
 
 concurrency:
-  group: browser-ci-receipt-${{ github.event.workflow_run.head_repository.full_name }}-${{ github.event.workflow_run.head_branch }}-${{ github.event.workflow_run.head_sha }}
+  group: browser-ci-receipt-${{ github.repository }}-${{ github.ref }}
   cancel-in-progress: false
 
 permissions:

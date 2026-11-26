@@ -25,7 +25,7 @@ export async function verifyCourseAccess(courseId: string): Promise<CourseAccess
   }
 
   // Check enrollment
-  const { data: enrollment, error: enrollError } = await supabase
+  const { data: enrollmentRow, error: enrollError } = await supabase
     .from('program_enrollments')
     .select(
       `
@@ -37,11 +37,74 @@ export async function verifyCourseAccess(courseId: string): Promise<CourseAccess
     .eq('course_id', courseId)
     .maybeSingle();
 
+  let enrollment = enrollmentRow;
   if (enrollError || !enrollment) {
-    return {
-      hasAccess: false,
-      reason: 'not_enrolled',
-    };
+    // Direct course enrollments are a canonical enrollment source too:
+    // loadLearnerCourseIds lists them, and verified paid store fulfillment
+    // (lib/store/fulfill-hvac-course.ts) creates ONLY a course_enrollments
+    // row. Previously this boundary consulted program_enrollments alone,
+    // so a directly-enrolled learner was reported as not enrolled and
+    // bounced to the enroll page. Direct rows exist only from verified
+    // paid fulfillment or the active-program sync trigger, and revoked
+    // rows are excluded, so no payment check is bypassed here.
+    const { data: direct, error: directError } = await supabase
+      .from('course_enrollments')
+      .select('id, status, revoked_at')
+      .eq('student_id', user.id)
+      .eq('course_id', courseId)
+      .is('revoked_at', null)
+      .in('status', ['active', 'enrolled', 'in_progress', 'confirmed', 'completed'])
+      .limit(1)
+      .maybeSingle();
+    if (directError || !direct) {
+      // Program-linked enrollment: an active program_enrollments row whose
+      // program_id is linked to this course in program_courses, even when
+      // course_id is null on the row. Resolve that row and let the
+      // approved-paid check below govern it.
+      const { data: programRows } = await supabase
+        .from('program_enrollments')
+        .select('*')
+        .eq('user_id', user.id)
+        .is('revoked_at', null)
+        .in('status', ['active', 'enrolled', 'in_progress', 'confirmed', 'completed'])
+        .not('program_id', 'is', null);
+      const programIds = [...new Set((programRows ?? []).map((row) => row.program_id).filter(Boolean))];
+      if (programIds.length) {
+        const { data: link } = await supabase
+          .from('program_courses')
+          .select('program_id')
+          .in('program_id', programIds)
+          .eq('course_id', courseId)
+          .limit(1)
+          .maybeSingle();
+        const linked = link
+          ? (programRows ?? []).find((row) => row.program_id === link.program_id)
+          : undefined;
+        if (linked) {
+          enrollment = linked;
+        } else {
+          return {
+            hasAccess: false,
+            reason: 'not_enrolled',
+          };
+        }
+      } else {
+        return {
+          hasAccess: false,
+          reason: 'not_enrolled',
+        };
+      }
+    }
+    // A resolved program link must fall through to the approved-paid check.
+    // Only an actual, successfully read direct row can take this branch.
+    // (Direct course_enrollments rows carry no end_date column — verified
+    // paid fulfillment creates them with student_id/course_id/status only —
+    // so there is no expiry to enforce here. Selecting a nonexistent
+    // end_date made PostgREST error and the direct path never admitted
+    // anyone; it also failed the schema-drift gate.)
+    if (!directError && direct) {
+      return { hasAccess: true, enrollment: direct };
+    }
   }
 
   // Enforce program-level approval and verified payment at the content

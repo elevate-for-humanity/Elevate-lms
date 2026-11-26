@@ -38,7 +38,10 @@ export interface VideoPlaybackEvent {
   session_id?: string;
 }
 
-const R2 = 'https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos';
+// These files are packaged from public/videos and served by the production
+// Marketing origin. Keep the canonical registry absolute so JSON-LD,
+// prerendered clients, and release validators resolve the same public media.
+const R2 = 'https://www.elevateforhumanity.org/videos';
 const BASE_DATE = '2026-08-11T00:00:00Z';
 
 export const VIDEO_REGISTRY: Record<string, VideoRecord> = {

@@ -427,7 +427,8 @@ export default async function StudentDetailPage({ params }: { params: Promise<{ 
                     | 'pending'
                     | 'due'
                     | 'overdue'
-                    | 'paid') || 'not_triggered',
+                    | 'paid'
+                    | 'voided') || 'not_triggered',
                 payout_paid_date: enrollment.payout_paid_date,
                 payout_paid_by_name: null,
                 payout_notes: enrollment.payout_notes,

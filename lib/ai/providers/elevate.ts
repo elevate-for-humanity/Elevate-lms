@@ -10,7 +10,9 @@ const DEFAULT_TIMEOUT_MS = 210_000;
 const DEFAULT_CONTEXT_TOKENS = 8192;
 const COMPLETION_SAFETY_TOKENS = 512;
 
-function requestTimeoutMs(): number {
+// Exported for PR2 (#2515) tests: the 210s default, 270s clamp and 30s
+// floor are the timeout budget the turn estimator plans against.
+export function elevateRequestTimeoutMs(): number {
   const configured = Number.parseInt(process.env.ELEVATE_LLM_TIMEOUT_MS ?? '', 10);
   if (!Number.isFinite(configured)) return DEFAULT_TIMEOUT_MS;
   // Cloud Run terminates owned CPU HTTP requests at 300s. Leave a 30s
@@ -108,8 +110,8 @@ export class ElevateProvider implements AIProvider {
         ...(requestsJson(options) ? { response_format: { type: 'json_object' } } : {}),
       }),
       signal: options.signal
-        ? AbortSignal.any([options.signal, AbortSignal.timeout(requestTimeoutMs())])
-        : AbortSignal.timeout(requestTimeoutMs()),
+        ? AbortSignal.any([options.signal, AbortSignal.timeout(elevateRequestTimeoutMs())])
+        : AbortSignal.timeout(elevateRequestTimeoutMs()),
     });
     if (!response.ok) {
       await response.body?.cancel();
@@ -171,8 +173,8 @@ export class ElevateProvider implements AIProvider {
         ...(requestsJson(options) ? { response_format: { type: 'json_object' } } : {}),
       }),
       signal: options.signal
-        ? AbortSignal.any([options.signal, AbortSignal.timeout(requestTimeoutMs())])
-        : AbortSignal.timeout(requestTimeoutMs()),
+        ? AbortSignal.any([options.signal, AbortSignal.timeout(elevateRequestTimeoutMs())])
+        : AbortSignal.timeout(elevateRequestTimeoutMs()),
     });
 
     const payload = (await response.json().catch(() => ({}))) as OpenAIChatResponse;

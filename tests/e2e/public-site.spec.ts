@@ -50,19 +50,127 @@ function isInternalHref(href: string | null): href is string {
   );
 }
 
+// One slow route must not consume the whole test timeout while every later
+// link waits behind it (run 45237452466: GET /funding/wrg was still in flight
+// when the 60s test timeout expired, and the dev server was resetting
+// connections under load). Fetch in parallel with a bounded pool and a
+// per-request timeout so a single stalled route fails fast on its own.
+//
+// Run 45254389225 proved the bounded pool was not enough: the same link test
+// failed again with 19 links down on Retry #2 (23 on the attempt before),
+// mostly DIFFERENT routes each time, no 404/500 anywhere, and two links that
+// returned 200 OK and then aborted mid-response. That is not a broken link
+// list — it is the Next.js dev server restarting mid-test. In dev only, after
+// every request Next checks `v8.getHeapStatistics().used_heap_size > 0.8 *
+// heap_size_limit` and, once crossed, logs "Server is approaching the used
+// memory threshold, restarting..." and exits with code 77; the `next dev`
+// CLI restarts it, which drops every in-flight request (ECONNRESET) and
+// leaves all routes cold. The heap grows monotonically here because the dev
+// server compiles each visited route on demand and retains it, so the restart
+// lands late in the shard — exactly when this test runs. A restart is
+// therefore treated below as a transient, self-healing event, not a link
+// failure: a pass that leaves failures behind waits until the server answers
+// again and retries only the failed links once. A link that fails twice —
+// once warm, once after a restart — is a real failure.
+const LINK_REQUEST_TIMEOUT_MS = 15_000;
+// After a restart every route is cold and must recompile, so the retry pass
+// gets a longer per-request timeout and fewer concurrent compilations.
+const LINK_RETRY_REQUEST_TIMEOUT_MS = 30_000;
+const LINK_CHECK_CONCURRENCY = 5;
+const LINK_RETRY_CONCURRENCY = 2;
+// A `next dev` restart cycle (exit 77, CLI relaunch, first route compile)
+// takes tens of seconds; poll until the server answers again.
+const SERVER_READY_TIMEOUT_MS = 120_000;
+const SERVER_READY_POLL_MS = 2_000;
+
+type LinkFailure = { href: string; message: string };
+
 async function assertSuccessfulResponse(
   request: APIRequestContext,
   href: string,
   context: string,
+  timeoutMs: number = LINK_REQUEST_TIMEOUT_MS,
 ) {
-  const response = await request.get(href, { maxRedirects: 10 });
+  const response = await request.get(href, { maxRedirects: 10, timeout: timeoutMs });
   expect(response.status(), `${context}: ${href} returned ${response.status()}`).toBeLessThan(400);
 }
 
-async function collectInternalLinks(page: Page, selector: string) {
-  const hrefs = await page.locator(selector).evaluateAll((links) =>
-    links.map((link) => link.getAttribute('href')),
+async function checkLinks(
+  request: APIRequestContext,
+  hrefs: string[],
+  context: string,
+  options: { timeoutMs: number; concurrency: number },
+): Promise<LinkFailure[]> {
+  const failures: LinkFailure[] = [];
+  let next = 0;
+  async function worker() {
+    while (next < hrefs.length) {
+      const href = hrefs[next++];
+      try {
+        await assertSuccessfulResponse(request, href, context, options.timeoutMs);
+      } catch (error) {
+        failures.push({
+          href,
+          message: error instanceof Error ? error.message : String(error),
+        });
+      }
+    }
+  }
+  await Promise.all(
+    Array.from({ length: Math.min(options.concurrency, hrefs.length) }, () => worker()),
   );
+  return failures;
+}
+
+async function waitForServerReady(request: APIRequestContext): Promise<boolean> {
+  const deadline = Date.now() + SERVER_READY_TIMEOUT_MS;
+  while (Date.now() < deadline) {
+    try {
+      const response = await request.get('/', { maxRedirects: 5, timeout: 5_000 });
+      if (response.status() < 400) return true;
+    } catch {
+      // Server is down or still restarting; keep polling until the deadline.
+    }
+    await new Promise((resolve) => setTimeout(resolve, SERVER_READY_POLL_MS));
+  }
+  return false;
+}
+
+async function assertAllLinksResolve(
+  request: APIRequestContext,
+  hrefs: string[],
+  context: string,
+) {
+  let failures = await checkLinks(request, hrefs, context, {
+    timeoutMs: LINK_REQUEST_TIMEOUT_MS,
+    concurrency: LINK_CHECK_CONCURRENCY,
+  });
+  if (failures.length > 0) {
+    // Do not report restart-aborted requests as broken links: the dev server
+    // may have restarted under the first pass. Wait for it to answer again,
+    // then retry only the links that failed.
+    const ready = await waitForServerReady(request);
+    if (ready) {
+      failures = await checkLinks(
+        request,
+        failures.map((failure) => failure.href),
+        context,
+        { timeoutMs: LINK_RETRY_REQUEST_TIMEOUT_MS, concurrency: LINK_RETRY_CONCURRENCY },
+      );
+    }
+  }
+  expect(
+    failures,
+    `${context}: ${failures.length} link(s) failed to resolve:\n${failures
+      .map((failure) => `${failure.href}: ${failure.message}`)
+      .join('\n')}`,
+  ).toEqual([]);
+}
+
+async function collectInternalLinks(page: Page, selector: string): Promise<string[]> {
+  const hrefs = (await page.locator(selector).evaluateAll((links) =>
+    links.map((link) => link.getAttribute('href')),
+  )) as (string | null)[];
   return [...new Set(hrefs.filter(isInternalHref))].sort();
 }
 
@@ -115,29 +223,35 @@ async function assertNoRuntimeFailure(page: Page, route: string) {
 test.describe.configure({ mode: 'serial' });
 
 test.describe('page-by-page public production audit', () => {
+  // The link checks run FIRST, while the dev server's heap is still low (only
+  // `/` compiled). The 25 page renders below each compile a route on demand
+  // and retain it, pushing the heap toward Next's 80%-of-limit dev restart
+  // threshold; run 45254389225 showed the restart landing exactly on the link
+  // test when it ran last. The page tests each have their own retries, so an
+  // occasional restart there costs a retry, not the shard.
+  test('every homepage header and footer internal link resolves', async ({ page, request }) => {
+    // Headroom above the 60s global test timeout for a cold / under-load dev
+    // server, plus a full restart cycle (see assertAllLinksResolve).
+    test.setTimeout(300_000);
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
+    const links = await collectInternalLinks(page, 'header a[href], footer a[href]');
+    expect(links.length, 'No internal header or footer links were discovered').toBeGreaterThan(5);
+    await assertAllLinksResolve(request, links, 'navigation integrity');
+  });
+
+  test('program directory links resolve', async ({ page, request }) => {
+    test.setTimeout(300_000);
+    await page.goto('/programs', { waitUntil: 'domcontentloaded' });
+    const links = await collectInternalLinks(page, 'main a[href^="/programs/"]');
+    expect(links.length, 'No program links were discovered').toBeGreaterThan(0);
+    await assertAllLinksResolve(request, links, 'program route');
+  });
+
   for (const route of [...CRITICAL_PUBLIC_ROUTES, ...CRITICAL_PROGRAM_ROUTES]) {
     test(`${route} renders without runtime failure`, async ({ page }) => {
       await assertNoRuntimeFailure(page, route);
     });
   }
-
-  test('every homepage header and footer internal link resolves', async ({ page, request }) => {
-    await page.goto('/', { waitUntil: 'domcontentloaded' });
-    const links = await collectInternalLinks(page, 'header a[href], footer a[href]');
-    expect(links.length, 'No internal header or footer links were discovered').toBeGreaterThan(5);
-    for (const href of links) {
-      await assertSuccessfulResponse(request, href, 'navigation integrity');
-    }
-  });
-
-  test('program directory links resolve', async ({ page, request }) => {
-    await page.goto('/programs', { waitUntil: 'domcontentloaded' });
-    const links = await collectInternalLinks(page, 'main a[href^="/programs/"]');
-    expect(links.length, 'No program links were discovered').toBeGreaterThan(0);
-    for (const href of links) {
-      await assertSuccessfulResponse(request, href, 'program route');
-    }
-  });
 });
 
 test.describe('responsive navigation acceptance', () => {
@@ -160,7 +274,12 @@ test.describe('responsive navigation acceptance', () => {
     await expect(menuButton).toBeVisible();
     await menuButton.click();
 
-    const mobileNav = page.getByRole('navigation', { name: /mobile navigation/i });
+    // The mobile drawer nav is deliberately named "Site navigation" — the same
+    // name the public navigation audit (tests/e2e/helpers/public-navigation-audit.ts)
+    // and the other responsive specs assert. There is no navigation named
+    // "Mobile navigation" anywhere in the app; the old name here failed on
+    // every attempt in run 45266295624.
+    const mobileNav = page.getByRole('navigation', { name: 'Site navigation', exact: true });
     await expect(mobileNav).toBeVisible();
   });
 });

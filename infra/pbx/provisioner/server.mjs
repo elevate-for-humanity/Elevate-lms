@@ -14,6 +14,19 @@ const EXTENSION = /^(0|[1-9][0-9]{2})$/;
 const DEVICE = /^[A-Za-z0-9_-]{8,128}$/;
 const SECRET_VERSION = /^projects\/(elegant-racer-299721|484736877039)\/secrets\/[A-Za-z0-9_-]+\/versions\/([0-9]+|latest)$/;
 const LEASE_MS = 10 * 60 * 1000;
+const CALL_ALERT_URL = 'https://admin.elevateforhumanity.org/api/internal/phone/call-alert';
+// Ring window for a routed call whose extension has no registered device:
+// the subroutine fires the call-wake hook once, then re-scans for a contact
+// every WAKE_WAIT_SECONDS. 20 tries x 2s keeps the caller ringing for ~40s
+// (inside the call-alert endpoint's 60s freshness window) before the call
+// falls through to the existing unavailable/voicemail path.
+const WAKE_WAIT_SECONDS = 2;
+const WAKE_MAX_TRIES = 20;
+// The wake hook embeds the provisioning token in a generated config file
+// (0640, alongside the SIP credentials it already holds). Only a token free
+// of shell- and dialplan-significant characters may be embedded; anything
+// else renders the legacy subroutine instead of an injectable hook line.
+const CALL_ALERT_TOKEN = /^[^\s'"\\$`]{32,}$/;
 const DAYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
 const TIME = /^(?:[01][0-9]|2[0-3]):[0-5][0-9]$/;
 
@@ -22,7 +35,7 @@ class ProvisioningError extends Error {
 }
 
 // Only fixed vocabulary crosses the journal boundary; never reflect exceptions.
-const FAILURE_CODES = new Set('asterisk_command_failed asterisk_endpoint_unverified asterisk_aor_unverified asterisk_dialplan_unverified asterisk_revocation_unverified asterisk_reload_failed asterisk_configuration_rejected asterisk_rollback_failed provisioner_quarantined provisioner_unavailable ownership_unavailable device_authorization_unavailable phone_system_configuration_invalid invalid_stored_record invalid_generation invalid_stored_state unknown'.split(' '));
+const FAILURE_CODES = new Set('asterisk_command_failed asterisk_endpoint_unverified asterisk_aor_unverified asterisk_dialplan_unverified asterisk_revocation_unverified asterisk_reload_failed asterisk_configuration_rejected asterisk_rollback_failed provisioner_quarantined provisioner_unavailable ownership_unavailable device_authorization_unavailable phone_system_configuration_invalid invalid_stored_record invalid_generation invalid_stored_state duplicate_extension unknown'.split(' '));
 export function reportFailure(operation, phase, error, write = line => process.stderr.write(line)) {
   const code = error instanceof ProvisioningError && FAILURE_CODES.has(error.code) ? error.code : 'unknown';
   if (!['provision', 'status', 'revoke', 'expiry', 'reconciliation'].includes(operation) ||
@@ -56,8 +69,10 @@ function validateRecord(record) {
   return record;
 }
 
-export function renderConfiguration(records) {
+export function renderConfiguration(records, options = {}) {
   records.forEach(validateRecord);
+  const callAlertToken = typeof options.callAlertToken === 'string' && CALL_ALERT_TOKEN.test(options.callAlertToken)
+    ? options.callAlertToken : null;
   const extensionOwners = new Map();
   for (const record of records) {
     const owner = extensionOwners.get(record.extension);
@@ -107,14 +122,47 @@ export function renderConfiguration(records) {
       dialplan.push(' same => n,Goto(unavailable)');
     }
     dialplan.push(' same => n(available),NoOp(Authenticated internal device ring group)');
+    if (callAlertToken) {
+      // Ring window: scan once exactly as the legacy path; only an empty
+      // scan enters the wake block below, so a call with a live contact
+      // reaches Dial with no added step that can wait or fail.
+      dialplan.push(' same => n,Set(WAKE_TRIES=0)', ' same => n(scan),Set(PWA_CONTACTS=)');
+    }
     for (const record of devices) {
       dialplan.push(' same => n,Set(PWA_DEVICE_CONTACTS=)',
         ` same => n,ExecIf($[\${EPOCH}<${Math.floor(record.expiresAt / 1000)}]?Set(PWA_DEVICE_CONTACTS=\${PJSIP_DIAL_CONTACTS(${record.endpointId})}))`,
         ' same => n,ExecIf($[${LEN(${PWA_DEVICE_CONTACTS})}>0]?Set(PWA_CONTACTS=${PWA_CONTACTS}${IF($[${LEN(${PWA_CONTACTS})}>0]?&:)}${PWA_DEVICE_CONTACTS}))');
     }
+    if (!callAlertToken) {
+      dialplan.push(
+        ' same => n,GotoIf($[${LEN(${PWA_CONTACTS})}=0]?unavailable)',
+        ` same => n,Dial(\${PWA_CONTACTS},${devices[0].ringSeconds})`,
+        ' same => n,Return()', ' same => n(unavailable),Set(DIALSTATUS=CHANUNAVAIL)', ' same => n,Return()');
+      continue;
+    }
+    // Wake block, reached only when the scan found no contact. The hook is
+    // backgrounded with a 2s transport cap and its output discarded: it can
+    // never delay or fail the call. The caller id is normalized to the
+    // call-alert endpoint's accepted shapes (or 'unknown') before it is
+    // embedded in the shell command, so trunk-controlled input cannot break
+    // out of the quoted payload. Ringing() gives the caller the same
+    // ringback treatment Dial gives while the window waits for a device to
+    // register; a contact appearing mid-window joins the very next scan.
+    const wakePayload = `'{"id":"'$(cat /proc/sys/kernel/random/uuid)'","extension":"\${EXTEN}","caller":"\${WAKE_CALLER}","createdAt":"\${STRFTIME(\${EPOCH},UTC,%Y-%m-%dT%H:%M:%SZ)}"}'`;
     dialplan.push(
-      ' same => n,GotoIf($[${LEN(${PWA_CONTACTS})}=0]?unavailable)',
-      ` same => n,Dial(\${PWA_CONTACTS},${devices[0].ringSeconds})`,
+      ' same => n,GotoIf($[${LEN(${PWA_CONTACTS})}>0]?dial)',
+      ' same => n,GotoIf($[${WAKE_TRIES}>0]?wakewait)',
+      ' same => n,Set(WAKE_CALLER=${CALLERID(num)})',
+      ' same => n,ExecIf($[${REGEX("^1[0-9]+$" ${WAKE_CALLER})} = 1 & ${LEN(${WAKE_CALLER})} = 11]?Set(WAKE_CALLER=+${WAKE_CALLER}))',
+      ' same => n,ExecIf($[${REGEX("^[0-9]+$" ${WAKE_CALLER})} = 1 & ${LEN(${WAKE_CALLER})} = 10]?Set(WAKE_CALLER=+1${WAKE_CALLER}))',
+      ' same => n,ExecIf($[${REGEX("^\\+[1-9][0-9]+$" ${WAKE_CALLER})} != 1 & ${REGEX("^[0-9]+$" ${WAKE_CALLER})} != 1]?Set(WAKE_CALLER=unknown))',
+      ` same => n,System((curl -s -m 2 -o /dev/null -X POST -H 'Authorization: Bearer ${callAlertToken}' -H 'Content-Type: application/json' -d ${wakePayload} ${CALL_ALERT_URL} || wget -q -O /dev/null --header='Authorization: Bearer ${callAlertToken}' --header='Content-Type: application/json' --post-data=${wakePayload} ${CALL_ALERT_URL}) >/dev/null 2>&1 &)`,
+      ' same => n,Ringing()',
+      ` same => n(wakewait),Wait(${WAKE_WAIT_SECONDS})`,
+      ' same => n,Set(WAKE_TRIES=$[${WAKE_TRIES}+1])',
+      ` same => n,GotoIf($[\${WAKE_TRIES}<${WAKE_MAX_TRIES}]?scan)`,
+      ' same => n,Goto(unavailable)',
+      ` same => n(dial),Dial(\${PWA_CONTACTS},${devices[0].ringSeconds})`,
       ' same => n,Return()', ' same => n(unavailable),Set(DIALSTATUS=CHANUNAVAIL)', ' same => n,Return()');
   }
   if (records.length && !extensionOwners.has('0')) {
@@ -295,7 +343,7 @@ export function createProvisioner(config, dependencies = {}) {
   }
 
   async function apply(next, operation) {
-    const rendered = renderConfiguration(next);
+    const rendered = renderConfiguration(next, { callAlertToken: config.token });
     const current = path.join(config.generatedRoot, 'current');
     let previous;
     try { previous = await readlink(current); } catch (error) { if (error.code !== 'ENOENT') throw error; }
@@ -321,7 +369,19 @@ export function createProvisioner(config, dependencies = {}) {
       try {
         if (previous) { await symlink(previous, link); await rename(link, current); }
         else await rm(current);
-        await reloadAndVerify(records, next.filter(record => !records.some(candidate => candidate.endpointId === record.endpointId)));
+        const removed = next.filter(record => !records.some(candidate => candidate.endpointId === record.endpointId));
+        try {
+          await reloadAndVerify(records, removed);
+        } catch {
+          // One bounded retry before the latch: the rollback reuses the same
+          // docker-exec channel seconds after the apply failure, so a
+          // transient Asterisk/docker disturbance spanning both attempts
+          // must not quarantine the service by itself. A genuinely broken
+          // rollback fails twice and latches exactly as before; the failure
+          // is journaled once, for the final attempt only.
+          await wait(250);
+          await reloadAndVerify(records, removed);
+        }
       } catch (rollbackError) {
         failure(operation, 'rollback', rollbackError);
         quarantined = true;
@@ -334,9 +394,11 @@ export function createProvisioner(config, dependencies = {}) {
     }
     // Retain only the active and previous generations for rollback. These are
     // service-owned files; production call records and voicemail are untouched.
-    for (const name of await readdir(config.generatedRoot)) {
+    // Cleanup cannot turn an applied credential into a failed API response:
+    // listing the directory is part of cleanup, so its failure is isolated too.
+    const generations = await readdir(config.generatedRoot).catch(() => []);
+    for (const name of generations) {
       if (/^generation-[0-9a-f]{24}$/.test(name) && name !== generation && name !== previous) {
-        // Cleanup cannot turn an applied credential into a failed API response.
         await rm(path.join(config.generatedRoot, name), { recursive: true, force: true }).catch(() => {});
       }
     }
@@ -463,7 +525,12 @@ export function createProvisioner(config, dependencies = {}) {
         { error: error instanceof ProvisioningError ? error.code : 'provisioner_unavailable' });
     }
   });
-  server.requestTimeout = 15000;
+  // A verified apply can legitimately outlast 15s: reload settling retries in
+  // reloadAndVerify, doubled by a rollback, are many sequential Asterisk
+  // readbacks. Match the 60s the HTTPS proxy in front of this service already
+  // allows so a slow success is never cut off at the socket and misreported
+  // to the caller as a provisioning failure.
+  server.requestTimeout = 60000;
   server.headersTimeout = 10000;
   return { server, initialize, reconcile, pruneExpired };
 }

@@ -1,7 +1,12 @@
 export const PWA_APPLICATIONS = {
-  admin: { workerPath: '/sw-admin.js', cachePrefix: 'elevate-admin-', manifestPath: '/manifest-admin.json' },
-  lms: { workerPath: '/sw-lms.js', cachePrefix: 'elevate-lms-', manifestPath: '/manifest-lms.json' },
-  marketing: { workerPath: '/sw-marketing.js', cachePrefix: 'elevate-marketing-', manifestPath: '/manifest-marketing.json' },
+  admin: { workerPath: '/sw-admin.js', cachePrefix: 'elevate-admin-', manifestPath: '/manifest-admin.json', scope: '/' },
+  lms: { workerPath: '/sw-lms.js', cachePrefix: 'elevate-lms-', manifestPath: '/manifest-lms.json', scope: '/' },
+  marketing: { workerPath: '/sw-marketing.js', cachePrefix: 'elevate-marketing-', manifestPath: '/manifest-marketing.json', scope: '/' },
+  // The phone system is its own application on the Admin origin: its worker
+  // is scoped to /phone/ so Admin deploys (which restamp sw-admin.js on
+  // every release) can never churn the registration that owns the phone's
+  // call-wake push subscription.
+  phone: { workerPath: '/sw-phone.js', cachePrefix: 'elevate-phone-', manifestPath: '/manifest-phone.json', scope: '/phone/' },
 } as const;
 
 export type PwaApplication = keyof typeof PWA_APPLICATIONS;

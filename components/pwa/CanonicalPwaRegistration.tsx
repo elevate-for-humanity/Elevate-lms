@@ -8,6 +8,28 @@ import {
   clearPwaInstallPrompt,
 } from '@/lib/pwa/install-prompt';
 
+// Sibling applications on the same origin own their registrations. The
+// phone app (scope /phone/) is the case that matters: unregistering its
+// worker from an Admin page would delete the push subscription that wakes
+// the phone for an incoming call. Cleanup therefore only removes workers
+// and caches that belong to no known Elevate application; each application
+// still retires its own previous versions through its worker's activate
+// handler and the update flow below.
+const KNOWN_WORKER_PATHS = new Set(
+  Object.values(PWA_APPLICATIONS).map((app) => app.workerPath),
+);
+const KNOWN_CACHE_PREFIXES = Object.values(PWA_APPLICATIONS).map(
+  (app) => app.cachePrefix,
+);
+
+function isKnownWorker(scriptURL: string): boolean {
+  try {
+    return KNOWN_WORKER_PATHS.has(new URL(scriptURL).pathname);
+  } catch {
+    return false;
+  }
+}
+
 async function removeStaleWorkers(workerPath: string, cachePrefix: string) {
   const registrations = await navigator.serviceWorker.getRegistrations();
   await Promise.all(registrations.map(async (registration) => {
@@ -17,7 +39,11 @@ async function removeStaleWorkers(workerPath: string, cachePrefix: string) {
       return;
     }
     const script = new URL(worker.scriptURL);
-    if (script.origin !== window.location.origin || script.pathname !== workerPath) {
+    if (script.origin !== window.location.origin) {
+      await registration.unregister();
+      return;
+    }
+    if (!KNOWN_WORKER_PATHS.has(script.pathname)) {
       await registration.unregister();
     }
   }));
@@ -26,19 +52,40 @@ async function removeStaleWorkers(workerPath: string, cachePrefix: string) {
     const names = await caches.keys();
     await Promise.all(
       names
-        .filter((name) => name.startsWith('elevate-') && !name.startsWith(cachePrefix))
+        .filter(
+          (name) =>
+            name.startsWith('elevate-') &&
+            !KNOWN_CACHE_PREFIXES.some((prefix) => name.startsWith(prefix)),
+        )
         .map((name) => caches.delete(name)),
     );
   }
 }
 
-async function purgeBrokenPwaState() {
+async function purgeBrokenPwaState(workerPath: string, cachePrefix: string) {
   const registrations = await navigator.serviceWorker.getRegistrations();
-  await Promise.all(registrations.map((registration) => registration.unregister()));
+  await Promise.all(registrations.map(async (registration) => {
+    const worker = registration.active ?? registration.waiting ?? registration.installing;
+    // Reset only this application's state (plus ownerless legacy workers);
+    // a sibling application's registration and push subscription survive.
+    if (!worker || !isKnownWorker(worker.scriptURL) ||
+        new URL(worker.scriptURL).pathname === workerPath) {
+      await registration.unregister();
+    }
+  }));
 
   if ('caches' in window) {
     const names = await caches.keys();
-    await Promise.all(names.filter((name) => name.startsWith('elevate-')).map((name) => caches.delete(name)));
+    await Promise.all(
+      names
+        .filter(
+          (name) =>
+            name.startsWith(cachePrefix) ||
+            (name.startsWith('elevate-') &&
+              !KNOWN_CACHE_PREFIXES.some((prefix) => name.startsWith(prefix))),
+        )
+        .map((name) => caches.delete(name)),
+    );
   }
 }
 
@@ -77,7 +124,7 @@ export function CanonicalPwaRegistration({ application }: { application: PwaAppl
         // Extra page probes and an immediate update duplicate that work and can
         // race navigation in WebKit on every dashboard mount.
         const registration = await navigator.serviceWorker.register(config.workerPath, {
-          scope: '/',
+          scope: config.scope,
           updateViaCache: 'none',
         });
 
@@ -122,7 +169,7 @@ export function CanonicalPwaRegistration({ application }: { application: PwaAppl
         // A registration exception must not leave an obsolete worker controlling
         // the installed app. Reset PWA state so the next navigation uses network.
         try {
-          await purgeBrokenPwaState();
+          await purgeBrokenPwaState(config.workerPath, config.cachePrefix);
         } catch {
           // Browser cleanup is best-effort; never block the application shell.
         }

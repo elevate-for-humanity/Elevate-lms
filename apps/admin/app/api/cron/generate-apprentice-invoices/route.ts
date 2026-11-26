@@ -95,6 +95,84 @@ async function claimEmailDelivery(
   return { eventId: claimed.data.id, alreadySent: false };
 }
 
+async function advanceScheduleAfterInvoice(
+  db: any,
+  schedule: BillingSchedule,
+  today: string,
+): Promise<void> {
+  const remaining =
+    schedule.remaining_invoices == null ? null : Math.max(0, schedule.remaining_invoices - 1);
+  const nextDate = nextWeeklyInvoiceDateAfter(schedule.next_invoice_date, today);
+  const advanced = await db
+    .from('billing_schedules')
+    .update({
+      remaining_invoices: remaining,
+      status: remaining === 0 ? 'completed' : 'paused',
+      next_invoice_date: nextDate,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', schedule.id)
+    .eq('next_invoice_date', schedule.next_invoice_date);
+  if (advanced.error) throw new Error(advanced.error.message);
+}
+
+/**
+ * Send (or retry) the invoice email for a fallback invoice and then advance
+ * the schedule. Shared by the create path and by reruns that find a
+ * fallback invoice whose email failed: the retry is claimed through the same
+ * idempotent event row, so a failed email is retried instead of being
+ * swallowed by the duplicate short-circuit. Throws when the email is not
+ * accepted, so the schedule is not advanced on a failed send.
+ */
+async function deliverInvoiceEmailAndAdvance(
+  db: any,
+  schedule: BillingSchedule,
+  invoice: { providerInvoiceId: string; invoiceNumber?: string | null; paymentUrl?: string | null },
+  today: string,
+): Promise<boolean> {
+  const delivery = await claimEmailDelivery(db, invoice.providerInvoiceId, schedule);
+  let emailed = delivery.alreadySent;
+  if (!delivery.alreadySent && delivery.eventId) {
+    const userId = schedule.customer_external_key.replace(/^user:/, '');
+    const billingAccess = await getApprenticeBillingAccess(db, userId, today);
+    const content = apprenticeInvoiceEmail({
+      customerName: schedule.customer_name,
+      productName: schedule.product_name,
+      invoiceNumber: invoice.invoiceNumber || undefined,
+      amountCents: Number(schedule.amount_cents),
+      dueDate: today,
+      paymentUrl: invoice.paymentUrl || undefined,
+      openInvoices: billingAccess.openInvoices,
+    });
+    const sent = await sendEmail({
+      to: schedule.customer_email,
+      subject: content.subject,
+      html: content.html,
+      text: content.text,
+      replyTo: 'billing@elevateforhumanity.org',
+    });
+    await db
+      .from('billing_provider_events')
+      .update({
+        status: sent.success ? 'completed' : 'failed',
+        error_message: sent.error || null,
+        processed_at: sent.success ? new Date().toISOString() : null,
+        updated_at: new Date().toISOString(),
+        payload: {
+          billingScheduleId: schedule.id,
+          recipient: schedule.customer_email,
+          emailProvider: sent.data?.provider || 'sendgrid',
+          messageId: sent.data?.messageId || null,
+        },
+      })
+      .eq('id', delivery.eventId);
+    if (!sent.success) throw new Error(sent.error || 'Invoice email was not accepted.');
+    emailed = true;
+  }
+  await advanceScheduleAfterInvoice(db, schedule, today);
+  return emailed;
+}
+
 export async function POST(request: NextRequest) {
   const secret = process.env.CRON_SECRET;
   if (!secret || request.headers.get('authorization') !== `Bearer ${secret}`) {
@@ -147,6 +225,41 @@ export async function POST(request: NextRequest) {
         weekStart,
       });
       if (existingInvoice) {
+        if (existingInvoice.status === 'paid') {
+          // The week is settled; nothing to email. The schedule may still
+          // need its advance if the run that created the invoice failed
+          // after emailing, so attempt the guarded advance.
+          await advanceScheduleAfterInvoice(db, schedule, today);
+          results.push({
+            scheduleId: schedule.id,
+            ok: true,
+            skipped: 'duplicate-invoice',
+            invoiceNumber: existingInvoice.invoice_number || undefined,
+          });
+          continue;
+        }
+        if (
+          existingInvoice.provider_invoice_id &&
+          (existingInvoice.idempotency_key || '').startsWith('apprentice-fallback:')
+        ) {
+          // This job owns the invoice: a previous run created it but the
+          // email failed, and the duplicate short-circuit used to swallow
+          // the retry forever — the email was never retried, the invoice
+          // was never counted as billed, and the schedule never advanced.
+          // Resume the email path and the advance instead of skipping.
+          const emailed = await deliverInvoiceEmailAndAdvance(db, schedule, {
+            providerInvoiceId: existingInvoice.provider_invoice_id,
+            invoiceNumber: existingInvoice.invoice_number,
+            paymentUrl: undefined,
+          }, today);
+          results.push({
+            scheduleId: schedule.id,
+            ok: true,
+            invoiceNumber: existingInvoice.invoice_number || undefined,
+            emailed,
+          });
+          continue;
+        }
         results.push({
           scheduleId: schedule.id,
           ok: true,
@@ -204,60 +317,11 @@ export async function POST(request: NextRequest) {
         ],
       });
 
-      const delivery = await claimEmailDelivery(db, invoice.providerInvoiceId, schedule);
-      let emailed = delivery.alreadySent;
-      if (!delivery.alreadySent && delivery.eventId) {
-        const userId = schedule.customer_external_key.replace(/^user:/, '');
-        const billingAccess = await getApprenticeBillingAccess(db, userId, today);
-        const content = apprenticeInvoiceEmail({
-          customerName: schedule.customer_name,
-          productName: schedule.product_name,
-          invoiceNumber: invoice.invoiceNumber,
-          amountCents: Number(schedule.amount_cents),
-          dueDate: today,
-          paymentUrl: invoice.paymentUrl,
-          openInvoices: billingAccess.openInvoices,
-        });
-        const sent = await sendEmail({
-          to: schedule.customer_email,
-          subject: content.subject,
-          html: content.html,
-          text: content.text,
-          replyTo: 'billing@elevateforhumanity.org',
-        });
-        await db
-          .from('billing_provider_events')
-          .update({
-            status: sent.success ? 'completed' : 'failed',
-            error_message: sent.error || null,
-            processed_at: sent.success ? new Date().toISOString() : null,
-            updated_at: new Date().toISOString(),
-            payload: {
-              billingScheduleId: schedule.id,
-              recipient: schedule.customer_email,
-              emailProvider: sent.data?.provider || 'sendgrid',
-              messageId: sent.data?.messageId || null,
-            },
-          })
-          .eq('id', delivery.eventId);
-        if (!sent.success) throw new Error(sent.error || 'Invoice email was not accepted.');
-        emailed = true;
-      }
-
-      const remaining =
-        schedule.remaining_invoices == null ? null : Math.max(0, schedule.remaining_invoices - 1);
-      const nextDate = nextWeeklyInvoiceDateAfter(schedule.next_invoice_date, today);
-      const advanced = await db
-        .from('billing_schedules')
-        .update({
-          remaining_invoices: remaining,
-          status: remaining === 0 ? 'completed' : 'paused',
-          next_invoice_date: nextDate,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', schedule.id)
-        .eq('next_invoice_date', schedule.next_invoice_date);
-      if (advanced.error) throw new Error(advanced.error.message);
+      const emailed = await deliverInvoiceEmailAndAdvance(db, schedule, {
+        providerInvoiceId: invoice.providerInvoiceId,
+        invoiceNumber: invoice.invoiceNumber,
+        paymentUrl: invoice.paymentUrl,
+      }, today);
 
       results.push({
         scheduleId: schedule.id,

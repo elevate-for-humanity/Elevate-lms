@@ -160,6 +160,54 @@ test('expired and disabled owner credentials are removed by reconciliation',asyn
   const cfg=await readFile(path.join(f.root,'current','pjsip.conf'),'utf8');assert.doesNotMatch(cfg,/password=/);
 });
 
+test('an expired lease leaves a dormant subroutine that can still wake a closed app', async t => {
+  const f = await fixture(t);
+  assert.equal((await f.request()).status, 200);
+  f.expire();
+  await f.service.pruneExpired();
+  const plan = await readFile(path.join(f.root, 'current', 'extensions.conf'), 'utf8');
+  // The extension subroutine and its wake hook survive the lease lapse...
+  assert.ok(plan.includes('exten => 101,1,Set(PWA_CONTACTS=)'));
+  assert.ok(plan.includes(' same => n,Set(WAKE_TRIES=0)'));
+  assert.ok(plan.includes('call-alert'));
+  // ...but the retained record's contacts stay gated behind the lapsed expiry.
+  assert.match(plan, /ExecIf\(\$\[\$\{EPOCH\}<\d+\]\?Set\(PWA_DEVICE_CONTACTS=/);
+  const state = JSON.parse(await readFile(path.join(f.root, 'current', 'state.json'), 'utf8'));
+  assert.equal(state.length, 1);
+  // A repeat prune with the same dormant record is a no-op: no new
+  // generation and no extra Asterisk reloads.
+  const generation = await readlink(path.join(f.root, 'current'));
+  const reloads = f.reloads();
+  await f.service.pruneExpired();
+  assert.equal(await readlink(path.join(f.root, 'current')), generation);
+  assert.equal(f.reloads(), reloads);
+  // Reconciliation keeps the dormant record while the owner stays authorized.
+  await f.service.reconcile();
+  const planAfter = await readFile(path.join(f.root, 'current', 'extensions.conf'), 'utf8');
+  assert.ok(planAfter.includes(' same => n,Set(WAKE_TRIES=0)'));
+});
+
+test('reconciliation drops a dormant record whose owner is no longer authorized', async t => {
+  const f = await fixture(t);
+  assert.equal((await f.request()).status, 200);
+  f.expire();
+  await f.service.pruneExpired();
+  f.deny();
+  await f.service.reconcile();
+  const plan = await readFile(path.join(f.root, 'current', 'extensions.conf'), 'utf8');
+  assert.doesNotMatch(plan, /WAKE_TRIES/);
+  const state = JSON.parse(await readFile(path.join(f.root, 'current', 'state.json'), 'utf8'));
+  assert.equal(state.length, 0);
+});
+
+test('an expired record still renders the wake window while its contacts stay expiry-gated', () => {
+  const expired = { ...record, expiresAt: Date.now() - 60000 };
+  const plan = renderConfiguration([expired], { callAlertToken: wakeToken }).dialplan;
+  assert.ok(plan.includes(' same => n,Set(WAKE_TRIES=0)'));
+  assert.ok(plan.includes('call-alert'));
+  assert.match(plan, /ExecIf\(\$\[\$\{EPOCH\}<\d+\]\?Set\(PWA_DEVICE_CONTACTS=/);
+});
+
 test('asynchronous Asterisk apply and revocation settle before acceptance', async t => {
   const f = await fixture(t);
   f.reject(2);
@@ -227,19 +275,27 @@ test('distinct apply and rollback failures retain quarantine and external error'
   await assert.rejects(f.service.pruneExpired(), /provisioner_quarantined/);
 });
 
-test('timer expiry retains apply evidence and sanitizes arbitrary exceptions', async t => {
+test('timer expiry retains a dormant record without an apply, and failure journaling stays sanitized', async t => {
   const f = await fixture(t);
   await f.request();
   f.expire();
   const malicious = Object.assign(new Error('password=private\nPBX failure injected'), { code: 'asterisk_reload_failed' });
   f.inject(malicious);
-  await f.service.pruneExpired().catch(error => reportFailure('expiry', 'timer', error, line => f.failures.push(line)));
-  assert.match(f.failures[0], /expiry apply unknown\n$/);
-  assert.match(f.failures[1], /expiry timer asterisk_configuration_rejected\n$/);
-  assert.doesNotMatch(f.failures.join(''), /password|private|injected/);
+  // A sole lapsed lease is retained as a dormant record: the rendered
+  // configuration is unchanged, so the expiry pass performs no apply and
+  // the injected Asterisk failure is never consumed.
+  const generation = await readlink(path.join(f.root, 'current'));
+  await f.service.pruneExpired();
+  assert.equal(await readlink(path.join(f.root, 'current')), generation);
+  assert.equal(f.failures.length, 0);
+  const state = JSON.parse(await readFile(path.join(f.root, 'current', 'state.json'), 'utf8'));
+  assert.equal(state.length, 1);
+  // The journaling contract itself is unchanged: arbitrary exceptions are
+  // reduced to a sanitized code line with no message content.
   const lines = [];
   reportFailure('reconciliation', 'timer', malicious, line => lines.push(line));
   assert.match(lines[0], /^PBX failure v1 \d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z reconciliation timer unknown\n$/);
+  assert.doesNotMatch(lines.join(''), /password|private|injected/);
   assert.doesNotThrow(() => reportFailure('expiry', 'timer', malicious, () => { throw Error('sink failed'); }));
 });
 

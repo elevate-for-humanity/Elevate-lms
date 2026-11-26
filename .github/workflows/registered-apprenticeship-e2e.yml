@@ -1,4 +1,7 @@
 name: Registered Apprenticeship E2E
+concurrency:
+group: ${{ github.workflow }}-${{ github.ref }}
+cancel-in-progress: true
 
 on:
   pull_request:
@@ -204,6 +207,7 @@ jobs:
       PLAYWRIGHT_BASE_URL: https://app.elevateforhumanity.org
       NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
       SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      QA_E2E_ALLOW_PRODUCTION_DISPOSABLES: 1
     steps:
       - uses: actions/checkout@v4
         with:

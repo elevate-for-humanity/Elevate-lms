@@ -126,6 +126,7 @@ export async function runCosmetologyPostPayment(
           enrollmentId = existing.id;
           steps['create_enrollment'] = 'skipped';
         } else {
+          const now = new Date().toISOString();
           const { data: newEnrollment, error: enrollErr } = await db
             .from('program_enrollments')
             .insert({
@@ -138,7 +139,13 @@ export async function runCosmetologyPostPayment(
               full_name: studentName,
               phone: app.phone ?? null,
               // Verified payment is the enrollment gate. Staff review may audit
-              // records later, but it does not block learner access.
+              // records later, but it does not block learner access. The
+              // approved-paid admission check
+              // (lib/learner/approved-paid-admission.mjs) requires the
+              // access fields below: without them a paid student signs in
+              // and is bounced to /lms/access-pending — experienced as
+              // "cannot log in". Mirrors activatePaidApplication in
+              // lib/enrollment/paid-application.ts.
               status: 'active',
               enrollment_state: 'enrolled',
               payment_status: 'paid',
@@ -146,7 +153,11 @@ export async function runCosmetologyPostPayment(
               amount_paid_cents: amountPaidCents,
               stripe_checkout_session_id: stripeSessionId,
               stripe_payment_intent_id: stripePaymentIntentId ?? null,
-              enrolled_at: new Date().toISOString(),
+              access_status: 'active',
+              access_granted_at: now,
+              self_pay_application_verified_at: now,
+              payment_reference: stripeSessionId,
+              enrolled_at: now,
             })
             .select('id')
             .maybeSingle();
@@ -175,6 +186,7 @@ export async function runCosmetologyPostPayment(
       }
     }
   } else {
+    const now = new Date().toISOString();
     const { error: updateEnrollmentErr } = await db
       .from('program_enrollments')
       .update({
@@ -187,7 +199,13 @@ export async function runCosmetologyPostPayment(
         amount_paid_cents: amountPaidCents,
         stripe_checkout_session_id: stripeSessionId,
         stripe_payment_intent_id: stripePaymentIntentId ?? null,
-        updated_at: new Date().toISOString(),
+        // Same approved-paid fields as the insert path above: a verified
+        // Stripe payment is the enrollment gate, not staff review.
+        access_status: 'active',
+        access_granted_at: now,
+        self_pay_application_verified_at: now,
+        payment_reference: stripeSessionId,
+        updated_at: now,
       })
       .eq('id', enrollmentId);
     steps['create_enrollment'] = updateEnrollmentErr ? 'failed' : 'skipped';

@@ -15,7 +15,7 @@ const editor = read('components/studio/CodeEditor.tsx');
 if (!editor.includes("detectDevStudioLanguage")) fail('CodeEditor is not wired to the canonical language registry.');
 else pass('CodeEditor uses the canonical language registry.');
 
-for (const path of ['northflank_marketing.json', 'northflank_admin.json', 'northflank_config.json']) {
+for (const path of ['google_marketing.json', 'google_admin.json', 'google_config.json']) {
   const config = JSON.parse(read(path));
   const deployment = config.deployment ?? {};
   const readiness = deployment.readinessProbe ?? deployment.healthCheck ?? null;

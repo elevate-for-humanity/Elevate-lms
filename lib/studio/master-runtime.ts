@@ -15,7 +15,13 @@ const SPECIALIST_RULES: Array<{ specialist: MasterStudioSpecialist; pattern: Reg
 ];
 
 export function selectMasterStudioSpecialist(command: string): MasterStudioSpecialist {
-  return SPECIALIST_RULES.find((rule) => rule.pattern.test(command))?.specialist ?? 'ROUTER';
+  // The OPENHANDS specialist label is retained for historical plan records
+  // only — no executor maps it to OpenHands, and OpenHands has been
+  // removed. Code work always falls through to ROUTER (the owned engine),
+  // never to OpenHands.
+  const matched = SPECIALIST_RULES.find((rule) => rule.pattern.test(command))?.specialist ?? 'ROUTER';
+  if (matched === 'OPENHANDS') return 'ROUTER';
+  return matched;
 }
 
 export function prepareMasterStudioPlan(goal: string, params: Record<string, string> = {}): Plan {

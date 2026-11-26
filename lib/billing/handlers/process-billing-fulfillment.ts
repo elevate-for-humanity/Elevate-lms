@@ -5,23 +5,33 @@ import { recordStoreSubscriptionPayment } from '@/lib/store/subscription-ledger'
 import { logger } from '@/lib/logger';
 import { requireAdminClient } from '@/lib/supabase/admin';
 
-export async function POST(request: NextRequest) {
-  const secret = process.env.CRON_SECRET;
-  if (!secret || request.headers.get('authorization') !== `Bearer ${secret}`)
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  const db = await requireAdminClient();
+export interface BillingFulfillmentProcessingResult {
+  processed: number;
+  completed: number;
+  failed: number;
+  skipped: number;
+  error?: string;
+}
+
+/**
+ * Drain the billing fulfillment outbox. This is the only code that advances
+ * a paid invoice into its enrollment/subscription effects, so every path
+ * that confirms a payment (QuickBooks webhook, learner payment refresh)
+ * calls it inline right after queueing; the cron route remains as the
+ * retry sweeper for anything that still fails here.
+ */
+export async function processBillingFulfillmentJobs(
+  db: Awaited<ReturnType<typeof requireAdminClient>>,
+  limit = 100,
+): Promise<BillingFulfillmentProcessingResult> {
   const { data: jobs, error } = await db
     .from('billing_fulfillment_jobs')
     .select('id,billing_invoice_id,fulfillment_type,payload,attempts')
     .in('status', ['pending', 'failed'])
     .lt('attempts', 5)
     .order('created_at')
-    .limit(100);
-  if (error)
-    return NextResponse.json(
-      { error: 'Could not load billing fulfillment jobs.' },
-      { status: 500 },
-    );
+    .limit(limit);
+  if (error) return { processed: 0, completed: 0, failed: 0, skipped: 0, error: 'Could not load billing fulfillment jobs.' };
   let completed = 0;
   let failed = 0;
   let skipped = 0;
@@ -91,12 +101,27 @@ export async function POST(request: NextRequest) {
         .eq('id', job.id);
     }
   }
+  return { processed: (jobs || []).length, completed, failed, skipped };
+}
+
+export async function POST(request: NextRequest) {
+  const secret = process.env.CRON_SECRET;
+  if (!secret || request.headers.get('authorization') !== `Bearer ${secret}`)
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const db = await requireAdminClient();
+  const result = await processBillingFulfillmentJobs(db);
+  if (result.error)
+    return NextResponse.json(
+      { error: result.error },
+      { status: 500 },
+    );
+  const { processed, completed, failed, skipped } = result;
   let cleaningNotifications: { sent: number; held: number } | null = null;
   let cleaningNotificationError: string | null = null;
   try { cleaningNotifications = await processCleaningOutbox(db); } catch { cleaningNotificationError = 'Cleaning notification processing needs review.'; }
   // Notification failure is reported separately; unrelated paid deliveries retain their own result.
   return NextResponse.json(
-    { cleaningNotifications, cleaningNotificationError, ok: failed === 0 && !cleaningNotificationError, processed: (jobs || []).length, completed, failed, skipped },
+    { cleaningNotifications, cleaningNotificationError, ok: failed === 0 && !cleaningNotificationError, processed, completed, failed, skipped },
     { status: failed || cleaningNotificationError ? 207 : 200 },
   );
 }

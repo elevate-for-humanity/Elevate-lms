@@ -2,9 +2,12 @@ import { NextRequest, NextResponse } from 'next/server';
 import {
   apprenticeInvoiceEmail,
   apprenticeInvoiceIdempotencyKey,
+  billingWeekStart,
+  findInvoiceForScheduleWeek,
   getApprenticeBillingAccess,
   nextWeeklyInvoiceDateAfter,
 } from '@/lib/billing/apprentice-invoice-batch';
+import { hasCompletedPayPalPaymentForWeek } from '@/lib/billing/paypal-payment-sync';
 import { createQuickBooksBillingProvider } from '@/lib/billing/providers/quickbooks';
 import { sendEmail } from '@/lib/email';
 import { logger } from '@/lib/logger';
@@ -24,6 +27,7 @@ type BillingSchedule = {
   amount_cents: number;
   next_invoice_date: string;
   remaining_invoices: number | null;
+  provider_subscription_id: string | null;
 };
 
 async function claimEmailDelivery(
@@ -103,7 +107,7 @@ export async function POST(request: NextRequest) {
   const { data, error } = await db
     .from('billing_schedules')
     .select(
-      'id,customer_external_key,customer_name,customer_email,canonical_product_key,product_name,product_description,amount_cents,next_invoice_date,remaining_invoices',
+      'id,customer_external_key,customer_name,customer_email,canonical_product_key,product_name,product_description,amount_cents,next_invoice_date,remaining_invoices,provider_subscription_id',
     )
     .eq('provider', 'quickbooks')
     .eq('cadence', 'weekly')
@@ -122,6 +126,8 @@ export async function POST(request: NextRequest) {
     ok: boolean;
     invoiceNumber?: string;
     emailed?: boolean;
+    /** Why no new invoice was created (duplicate already billed, or PayPal already collected). */
+    skipped?: 'duplicate-invoice' | 'paypal-payment-found';
     error?: string;
   }> = [];
 
@@ -129,8 +135,55 @@ export async function POST(request: NextRequest) {
     const schedule = rawSchedule as BillingSchedule;
     const idempotencyKey = apprenticeInvoiceIdempotencyKey(schedule.id, runAt);
     try {
+      // Reconcile is the single writer. Never create a second invoice for a
+      // week that already has one (same schedule + amount + week), and never
+      // create a fallback invoice for a week PayPal already collected — the
+      // two writers previously used different idempotency keys and could not
+      // see each other's invoices, which charged students twice.
+      const weekStart = billingWeekStart(runAt);
+      const existingInvoice = await findInvoiceForScheduleWeek(db, {
+        scheduleId: schedule.id,
+        amountCents: Number(schedule.amount_cents),
+        weekStart,
+      });
+      if (existingInvoice) {
+        results.push({
+          scheduleId: schedule.id,
+          ok: true,
+          skipped: 'duplicate-invoice',
+          invoiceNumber: existingInvoice.invoice_number || undefined,
+        });
+        continue;
+      }
+      if (schedule.provider_subscription_id) {
+        let paypalPaid = false;
+        try {
+          paypalPaid = await hasCompletedPayPalPaymentForWeek(
+            schedule.provider_subscription_id,
+            Number(schedule.amount_cents),
+            weekStart,
+          );
+        } catch (cause) {
+          // Fail open: a PayPal outage must not block the fallback invoice.
+          // When reconcile syncs, it applies the payment to this invoice
+          // (same schedule + amount + week) instead of creating a second
+          // one, so no duplicate results from proceeding here.
+          logger.warn(
+            '[apprentice-invoice-batch] PayPal pre-check failed; creating fallback invoice',
+            {
+              scheduleId: schedule.id,
+              error: cause instanceof Error ? cause.message : String(cause),
+            },
+          );
+        }
+        if (paypalPaid) {
+          results.push({ scheduleId: schedule.id, ok: true, skipped: 'paypal-payment-found' });
+          continue;
+        }
+      }
       const invoice = await provider.createManualInvoice({
         idempotencyKey,
+        billingScheduleId: schedule.id,
         customer: {
           externalKey: schedule.customer_external_key,
           displayName: schedule.customer_name,

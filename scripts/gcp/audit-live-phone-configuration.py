@@ -55,7 +55,8 @@ def process_environment(unit):
 
 
 def compare_configuration(system, extensions, turn, gateway, menu=None):
-    expected = sorted(row['extension'] for row in extensions if row['extension'] != '0')
+    admin_extension = system.get('admin_extension')
+    expected = sorted(row['extension'] for row in extensions if row['extension'] != admin_extension)
     turn_routes = sorted(set(filter(None, turn.get('PARIS_ALLOWED_EXTENSIONS', '').split(','))))
     gateway_routes = sorted(set(filter(None, gateway.get('PARIS_ALLOWED_EXTENSIONS', '').split(','))))
     expected_menu = []
@@ -146,7 +147,7 @@ def mulaw_payload(wav):
     return audio + b'\xff' * ((-len(audio)) % 160)
 
 
-def voice_probe(token, google_token, send=request, menu=None):
+def voice_probe(token, google_token, send=request, menu=None, operator_extension='0'):
     headers = {'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json'}
     base = {'sessionId': secrets.token_hex(12), 'callId': 'synthetic-phone-readiness-' + secrets.token_hex(8),
             'encoding': 'PCMU', 'sampleRate': 8000, 'sequence': 0}
@@ -182,7 +183,7 @@ def voice_probe(token, google_token, send=request, menu=None):
     status, reply = send(url, headers, {**base, 'sequence': 1 if report['greetingAudioReturned'] else 0,
                                       'audioBase64': base64.b64encode(audio).decode()})
     report.update({'operatorSpeechHttpStatus': status,
-                   'operatorSpeechRouteVerified': status == 200 and reply.get('requestedRoute') == {'type': 'operator', 'extension': '0'},
+                   'operatorSpeechRouteVerified': status == 200 and reply.get('requestedRoute') == {'type': 'operator', 'extension': operator_extension},
                    'operatorReplyAudioReturned': status == 200 and audible(reply)})
     return report
 
@@ -218,7 +219,7 @@ def main():
         return base64.b64decode(body['payload']['data']).decode().strip()
     key = secret(config.get('SUPABASE_SERVICE_ROLE_KEY_SECRET', ''))
     headers = {'apikey': key, 'Authorization': 'Bearer ' + key}
-    status, systems = request(DATABASE + '/rest/v1/phone_systems?select=status,timezone,greeting,ai_instructions,ai_enabled,ai_voice,voicemail_enabled,voicemail_transcription_enabled&id=eq.' + SYSTEM, headers)
+    status, systems = request(DATABASE + '/rest/v1/phone_systems?select=status,timezone,greeting,ai_instructions,ai_enabled,ai_voice,voicemail_enabled,voicemail_transcription_enabled,admin_extension&id=eq.' + SYSTEM, headers)
     if status != 200 or len(systems) != 1:
         raise ValueError('phone_system_unverified')
     status, extensions = request(DATABASE + '/rest/v1/communication_extensions?select=extension,enabled,ring_mode,availability_source,availability_schedule,destination_id,webrtc_provider,voicemail_greeting,communication_workspaces!inner(phone_system_id)&communication_workspaces.phone_system_id=eq.' + SYSTEM, headers)
@@ -230,13 +231,14 @@ def main():
     if status != 200 or not isinstance(menu, list):
         raise ValueError('phone_menu_unverified')
     enabled_extensions = [row for row in extensions if row.get('enabled') is True]
+    admin_extension = systems[0].get('admin_extension')
     comparison = compare_configuration(systems[0], enabled_extensions, turn, gateway, menu)
     cli = lambda value: run(['docker', 'exec', 'pbx_asterisk_1', 'asterisk', '-rx', value])
     routes = []
     observed_at = datetime.now(timezone.utc)
     for row in sorted(extensions, key=lambda value: int(value['extension'])):
         extension = row['extension']
-        context = 'elevate-pwa-extensions' if extension == '0' else 'elevate-paris-directory'
+        context = 'elevate-pwa-extensions' if extension == admin_extension else 'elevate-paris-directory'
         plan = cli('dialplan show ' + extension + '@' + context)
         routes.append(extension_inventory(row, plan, systems[0].get('timezone'), observed_at))
     report = {'configuration': comparison, 'extensions': routes,
@@ -251,7 +253,7 @@ def main():
     # Emit configuration evidence even if a speech provider is unavailable.
     print(json.dumps({'livePhoneConfiguration': report}), flush=True)
     token=secret(paris.get('PARIS_TURN_TOKEN_SECRET', ''))
-    report['speech'] = voice_probe(token, identity['access_token'], menu=menu)
+    report['speech'] = voice_probe(token, identity['access_token'], menu=menu, operator_extension=admin_extension)
     report['privateGatewayGreeting']=private_gateway_probe(token)
     report['result'] = 'PASS' if enabled_extensions and report['privateGatewayGreeting'].get('audioReturned') is True and all(comparison.values()) and all(row['generatedRoutePresent'] for row in routes if row['enabled']) and all(report['speech'].get(k) is True for k in ['greetingAudioReturned', 'spokenMenuDigitsVerified', 'operatorSpeechRouteVerified', 'operatorReplyAudioReturned']) else 'FAIL'
     return report

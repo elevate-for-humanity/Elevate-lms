@@ -50,5 +50,28 @@ class ExerciseTests(unittest.TestCase):
         self.assertEqual(probe.summarize(503, {'error': 'secret-value'})['code'], 'unclassified_response')
 
 
+class OperatorExtensionTests(unittest.TestCase):
+    def resolve(self, responses):
+        self.urls = []
+        def send(url, headers, body=None):
+            self.urls.append(url)
+            return responses.pop(0)
+        return probe.operator_extension(send, 'https://db.example', 'system-id', {})
+
+    def test_resolves_configured_admin_extension(self):
+        self.assertEqual(self.resolve([(200, [{'admin_extension': '100'}])]), '100')
+        self.assertIn('phone_systems?select=admin_extension&id=eq.system-id', self.urls[0])
+
+    def test_legacy_zero_still_resolves(self):
+        self.assertEqual(self.resolve([(200, [{'admin_extension': '0'}])]), '0')
+
+    def test_unverified_system_record_is_rejected(self):
+        for response in [(503, {}), (200, []), (200, [{'admin_extension': '100'}, {'admin_extension': '101'}]),
+                         (200, [{'admin_extension': '00'}]), (200, [{'admin_extension': '1234'}]),
+                         (200, [{'admin_extension': None}]), (200, [{}])]:
+            with self.assertRaisesRegex(ValueError, 'operator_assignment_unverified'):
+                self.resolve([response])
+
+
 if __name__ == '__main__':
     unittest.main()

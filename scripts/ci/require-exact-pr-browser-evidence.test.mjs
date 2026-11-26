@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { inspectExactPrBrowserEvidence, verifyExactPrBrowserEvidence } from './require-exact-pr-browser-evidence.mjs';
+import { inspectExactPrBrowserEvidence, verifyExactPrBrowserEvidence, evidenceTimeoutFromEnv, DEFAULT_EVIDENCE_TIMEOUT_MS, MAX_EVIDENCE_TIMEOUT_MS } from './require-exact-pr-browser-evidence.mjs';
 
 const sha = 'a'.repeat(40);
 const repository = 'elevate-for-humanity/Elevate-lms';
@@ -145,4 +145,61 @@ test('the default gate checks once and never occupies a runner waiting for brows
   await assert.rejects(verifyExactPrBrowserEvidence({ repository, event: event(), token: 'test-token', request,
     sleep: async () => { sleeps++; } }), /E2E_EXACT_HEAD_PENDING/);
   assert.equal(sleeps, 0);
+});
+
+test('gate wait budget defaults, parses, clamps and fails closed on garbage', () => {
+  assert.equal(evidenceTimeoutFromEnv({}), DEFAULT_EVIDENCE_TIMEOUT_MS);
+  assert.equal(evidenceTimeoutFromEnv({ E2E_EVIDENCE_TIMEOUT_MS: '' }), DEFAULT_EVIDENCE_TIMEOUT_MS);
+  assert.equal(evidenceTimeoutFromEnv({ E2E_EVIDENCE_TIMEOUT_MS: '0' }), 0);
+  assert.equal(evidenceTimeoutFromEnv({ E2E_EVIDENCE_TIMEOUT_MS: '5000' }), 5000);
+  assert.equal(evidenceTimeoutFromEnv({ E2E_EVIDENCE_TIMEOUT_MS: '999999999999' }), MAX_EVIDENCE_TIMEOUT_MS);
+  for (const bad of ['abc', '-5', '1.5', ' 100', '100 '])
+    assert.throws(() => evidenceTimeoutFromEnv({ E2E_EVIDENCE_TIMEOUT_MS: bad }), /E2E_EVIDENCE_TIMEOUT_INVALID/);
+});
+
+function sequencingApi(runStates) {
+  let runReads = 0;
+  const request = async url => {
+    const path = new URL(url).pathname;
+    const data = path.endsWith('/pulls/123') ? pr()
+      : path.endsWith('/actions/runs/123/jobs') ? { jobs, total_count: jobs.length }
+      : { workflow_runs: [runStates[Math.min(runReads++, runStates.length - 1)]] };
+    return { ok: true, json: async () => data };
+  };
+  return { request, runReads: () => runReads };
+}
+
+test('ordering: a browser run still pending on early polls is waited on, then verified when it completes', async () => {
+  const { request, runReads } = sequencingApi([
+    { ...run, status: 'queued', conclusion: null },
+    { ...run, status: 'in_progress', conclusion: null },
+    run,
+  ]);
+  const result = await verifyExactPrBrowserEvidence({
+    repository, event: event(), token: 'test-token', request,
+    timeoutMs: evidenceTimeoutFromEnv({}), pollMs: 1, sleep: async () => {},
+  });
+  assert.equal(result.state, 'verified');
+  assert.equal(result.runId, 123);
+  assert.equal(runReads(), 3);
+});
+
+test('ordering: a browser run that never completes fails as TIMEOUT once the wait budget expires, not as a first-read PENDING', async () => {
+  const { request } = sequencingApi([{ ...run, status: 'queued', conclusion: null }]);
+  await assert.rejects(verifyExactPrBrowserEvidence({
+    repository, event: event(), token: 'test-token', request,
+    timeoutMs: 30, pollMs: 1, sleep: async () => {},
+  }), /E2E_EXACT_HEAD_TIMEOUT/);
+});
+
+test('ordering: a browser run that fails during the wait fails the gate immediately, without burning the budget', async () => {
+  const { request, runReads } = sequencingApi([
+    { ...run, status: 'in_progress', conclusion: null },
+    { ...run, conclusion: 'failure' },
+  ]);
+  await assert.rejects(verifyExactPrBrowserEvidence({
+    repository, event: event(), token: 'test-token', request,
+    timeoutMs: evidenceTimeoutFromEnv({}), pollMs: 1, sleep: async () => {},
+  }), /E2E_EXACT_HEAD_FAILED:123/);
+  assert.equal(runReads(), 2);
 });

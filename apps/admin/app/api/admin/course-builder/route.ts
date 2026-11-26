@@ -23,6 +23,10 @@ import {
   normalizeGeneratedCourseForGovernance,
 } from '@/lib/course-builder/orchestrator';
 import {
+  AuthoredCompileError,
+  upgradePersistedAuthoredCourse,
+} from '@/lib/course-factory/persisted-authored-upgrade';
+import {
   saveCourseModule,
   saveCourseLesson,
   patchCourseLesson,
@@ -96,6 +100,7 @@ type CourseBuilderAction =
   | 'publish'
   | 'publish-persisted'
   | 'repair'
+  | 'compile-authored'
   | 'generate-missing'
   | 'start-existing';
 
@@ -301,7 +306,15 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const rateLimited = await applyRateLimit(req, 'strict');
+  // This route is the Course Builder console's single multi-action surface
+  // behind admin auth: one working session legitimately fires many POSTs in
+  // a row (save several lessons, compile several courses, review, publish).
+  // The 'strict' tier (3 requests / 5 minutes per IP) is sized for
+  // single-shot sensitive actions and made ordinary console use fail with
+  // 429s — including compiling six courses back to back. The 'api' tier
+  // governs here; heavy actions keep their own controls (generation pause,
+  // credit metering, per-action validation).
+  const rateLimited = await applyRateLimit(req, 'api');
   if (rateLimited) return rateLimited;
   const auth = await apiRequireAdmin(req);
   if (auth.error) return auth.error;
@@ -346,6 +359,64 @@ export async function POST(req: NextRequest) {
     } catch (error) {
       logger.error('[course-builder] Canonical generation failed', error);
       return NextResponse.json({ ok: false, error: 'Course Builder could not start. Check its connection and source configuration.' }, { status: 503 });
+    }
+  }
+
+  if (action === 'compile-authored') {
+    // Self-serve authored-course compile: the same canonical compile the
+    // upgrade-authored-course operations workflow runs (compile each
+    // persisted lesson, lock its narration contract, create its video job),
+    // available for ANY course straight from the Course Builder. Identity
+    // comes from the course record itself — there is no slug allowlist.
+    const courseId = typeof body.courseId === 'string' ? body.courseId.trim() : '';
+    if (!courseId) {
+      return NextResponse.json({ ok: false, error: 'courseId is required' }, { status: 400 });
+    }
+    const lessonIds = Array.isArray(body.lessonIds)
+      ? body.lessonIds.filter(
+          (id: unknown): id is string => typeof id === 'string' && id.trim().length > 0,
+        )
+      : undefined;
+    try {
+      const db = await requireAdminClient();
+      await assertCourseBuilderGenerationEnabled(db, courseId);
+      const result = await upgradePersistedAuthoredCourse(
+        courseId,
+        db,
+        lessonIds?.length ? { lessonIds } : undefined,
+      );
+      return NextResponse.json({
+        ok: true,
+        courseId: result.courseId,
+        courseSlug: result.courseSlug,
+        lessonCount: result.lessonCount,
+        compiledLessons: result.repairedLessonCount,
+        // The upgrade creates or refreshes exactly one canonical video job
+        // per compiled lesson; the queue worker renders them automatically.
+        videosQueued: result.repairedLessonCount,
+        // Lessons that could not compile are named with their exact reason
+        // so the operator can fix the authored source instead of guessing.
+        failures: result.failures,
+      });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : '';
+      if (/PAUSED/.test(message)) {
+        return NextResponse.json({ ok: false, error: message }, { status: 409 });
+      }
+      if (error instanceof AuthoredCompileError) {
+        return NextResponse.json(
+          { ok: false, error: error.message, failures: error.failures },
+          { status: 422 },
+        );
+      }
+      // A compile that cannot complete must say exactly why: the underlying
+      // error (validation, persistence, or queue) is returned to the admin
+      // verbatim instead of a generic failure label.
+      logger.error('[course-builder] Authored compile failed', error);
+      return NextResponse.json(
+        { ok: false, error: message || 'Authored course compile failed' },
+        { status: 422 },
+      );
     }
   }
 
@@ -530,7 +601,10 @@ export async function POST(req: NextRequest) {
 
   if (action === 'publish') {
     try {
-      const result = await publishGovernedCourse((body.template ?? body) as any);
+      const result = await publishGovernedCourse((body.template ?? body) as any, undefined, {
+        actorId: auth.id,
+        publishOverride: body.publishOverride ?? null,
+      });
       return NextResponse.json(result, { status: result.ok ? 202 : 422 });
     } catch (error) {
       logger.error('[course-builder] Governed publication failed', error);

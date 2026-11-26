@@ -1,14 +1,12 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {readFileSync} from 'node:fs';
+import {existsSync, readFileSync} from 'node:fs';
 
 function source(path) {
   return readFileSync(new URL('../../' + path, import.meta.url), 'utf8');
 }
 
 const access = source('lib/devstudio/openhands/task-access.ts');
-const chat = source('apps/admin/app/api/admin/dev-studio/openhands/chat/route.ts');
-const agent = source('apps/admin/app/api/admin/dev-studio/openhands/agent/route.ts');
 
 test('provider conversation IDs cannot authorize themselves', () => {
   assert.match(access, /\.eq\('id', input\.taskId\)/);
@@ -18,35 +16,24 @@ test('provider conversation IDs cannot authorize themselves', () => {
   assert.match(access, /external\.start_task_id !== input\.startTaskId/);
 });
 
-test('follow-up requires same owner and privileged dev-tool role before Cloud message', () => {
-  assert.match(chat, /canAccessDevTools\(auth\.effectiveRoles\)/);
-  const fromContinuation = chat.slice(chat.indexOf('if (conversationId) {'), chat.indexOf('if (taskId) {'));
-  assert.ok(fromContinuation.indexOf('findOwnedOpenHandsTask(') >= 0);
-  assert.ok(fromContinuation.indexOf('findOwnedOpenHandsTask(') < fromContinuation.indexOf('sendOpenHandsMessage('));
-  assert.match(fromContinuation, /\['running', 'queued'\]\.includes\(task\.status\)/);
-  assert.match(fromContinuation, /task\.approvalStatus === 'approved'/);
-  assert.match(fromContinuation, /task\.requiresApproval === false && task\.approvalStatus === 'not_required'/);
-  assert.ok(fromContinuation.indexOf('continuationAuthorized') < fromContinuation.indexOf('sendOpenHandsMessage('));
-  assert.match(fromContinuation, /status: 404/);
-  assert.match(fromContinuation, /status: 409/);
+test('OpenHands HTTP routes are deleted: no chat or agent route file exists', () => {
+  assert.equal(
+    existsSync(new URL('../../apps/admin/app/api/admin/dev-studio/openhands/chat/route.ts', import.meta.url)),
+    false,
+  );
+  assert.equal(
+    existsSync(new URL('../../apps/admin/app/api/admin/dev-studio/openhands/agent/route.ts', import.meta.url)),
+    false,
+  );
 });
 
-test('new chat uses tracked dispatcher rather than unowned direct Cloud start', () => {
-  assert.match(chat, /dispatchOpenHandsTask\(/);
-  assert.doesNotMatch(chat, /startOpenHandsTask\(/);
-  assert.match(chat, /taskId: dispatched\.taskId/);
-});
-
-test('all chat lifecycle reads require task ownership, not arbitrary external IDs', () => {
-  const get = chat.slice(chat.indexOf('export async function GET('));
-  assert.match(get, /findOwnedOpenHandsTask\(/);
-  assert.ok(get.indexOf('findOwnedOpenHandsTask(') < get.indexOf('refreshOpenHandsTask('));
-  assert.match(get, /taskId: owned\.taskId/);
-});
-
-test('Admin agent status verifies ownership before mutating task reconciliation', () => {
-  const get = agent.slice(agent.indexOf('export async function GET('));
-  assert.ok(get.indexOf('findOwnedOpenHandsTask(') < get.indexOf('refreshOpenHandsTask('));
-  assert.match(get, /Use the owned taskId to query OpenHands status/);
-  assert.doesNotMatch(get, /getOpenHandsLifecycle\(\{ startTaskId, conversationId \}\)/);
+test('no AI tool surface can dispatch to the deleted routes', () => {
+  const executor = source('lib/ai/tools/executor.ts');
+  const registry = source('lib/ai/tools/registry.ts');
+  const planner = source('lib/ai/tools/planner.ts');
+  assert.doesNotMatch(executor, /dev-studio\/openhands/);
+  assert.doesNotMatch(registry, /dev-studio\/openhands/);
+  assert.doesNotMatch(registry, /openhands\.execute/);
+  assert.doesNotMatch(registry, /openhands\.status/);
+  assert.doesNotMatch(planner, /name: 'openhands\.status'/);
 });

@@ -119,7 +119,7 @@ export default async function IndianaApprenticeships({
           <p className="mt-3 max-w-2xl text-slate-300">An approved shop may be able to host apprentices. Ask Elevate to confirm openings, supervision, and program eligibility.</p>
           <div className="relative mt-8 aspect-[16/7] max-w-3xl overflow-hidden rounded-2xl">
             <Image
-              src="/images/pages/apprenticeships-hero.webp"
+              src="/images/pages/partner-page-6.jpg"
               alt="Apprentices learning skilled occupations through supervised workplace training"
               fill
               priority

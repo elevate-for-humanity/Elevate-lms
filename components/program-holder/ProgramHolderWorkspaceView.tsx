@@ -39,7 +39,7 @@ import {
   MessageSquare,
 } from 'lucide-react';
 import { formatUsPhone } from '@/lib/phone/config';
-import { getProgramHolderWorkspace, programTitle } from '@/lib/program-holder/workspace';
+import { getProgramHolderWorkspace, getProgramHolderWorkspaceWithOnlineStudy, programTitle } from '@/lib/program-holder/workspace';
 import { ProgramHolderDocumentUpload } from './ProgramHolderDocumentUpload';
 import { ProgramHolderTrainingLogForm } from './ProgramHolderTrainingLogForm';
 import { ProgramHolderStudentCloseoutForm } from './ProgramHolderStudentCloseoutForm';
@@ -86,7 +86,7 @@ export async function ProgramHolderWorkspaceView({
   reportEnrollmentId?: string;
 }) {
   const data =
-    workspace || (await getProgramHolderWorkspace({ includeOnlineStudy: section === 'hours' }));
+    workspace || (await (section === 'hours' ? getProgramHolderWorkspaceWithOnlineStudy() : getProgramHolderWorkspace()));
   const coordinatorRole =
     data.mode === 'holder'
       ? String(

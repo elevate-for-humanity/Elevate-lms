@@ -23,6 +23,10 @@ function settled<T>(promise: Promise<T>): Promise<Settled<T>> {
     (error): Settled<T> => ({ ok: false, error }),
   );
 }
+function unwrapSettled<T>(outcome: Settled<T>): T {
+  if (!outcome.ok) throw outcome.error;
+  return outcome.value;
+}
 
 
 export type ProgramHolderWorkspace = {
@@ -104,10 +108,21 @@ function getGaryRegionalCityCenter(city: unknown): RegionalLocation | null {
 }
 
 /** Canonical, holder-scoped data contract shared by every Program Holder page. */
-export async function getProgramHolderWorkspace({
-  includeOnlineStudy = false,
-}: { includeOnlineStudy?: boolean } = {}): Promise<ProgramHolderWorkspace> {
+export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspace> {
   const ctx = await requireProgramHolder();
+  return buildProgramHolderWorkspace(ctx, false);
+}
+
+/** Hours-page variant: also loads the hands-on training clocks (online study). */
+export async function getProgramHolderWorkspaceWithOnlineStudy(): Promise<ProgramHolderWorkspace> {
+  const ctx = await requireProgramHolder();
+  return buildProgramHolderWorkspace(ctx, true);
+}
+
+async function buildProgramHolderWorkspace(
+  ctx: Awaited<ReturnType<typeof requireProgramHolder>>,
+  includeOnlineStudy: boolean,
+): Promise<ProgramHolderWorkspace> {
   if (ctx.mode === 'holder') {
     const holderId = ctx.holderId;
     after(async () => {
@@ -588,9 +603,7 @@ export async function getProgramHolderWorkspace({
       `Program Holder roster profiles could not load: ${rosterProfilesError.message}`,
     );
   if (credentialError) throw new Error('Program Holder certification status could not load.');
-  const onlineStudyOutcome = await onlineStudyPromise;
-  if (!onlineStudyOutcome.ok) throw onlineStudyOutcome.error;
-  const onlineStudySessions = onlineStudyOutcome.value;
+  const onlineStudySessions = unwrapSettled(await onlineStudyPromise);
 
   let phoneLine = phoneLineRes.data ?? null;
   const extension = extensionRes.data?.extension ?? phoneLine?.extension ?? null;
@@ -755,12 +768,9 @@ export async function getProgramHolderWorkspace({
     );
   });
 
-  const schoolApplicantsOutcome = await schoolApplicantsPromise;
-  if (!schoolApplicantsOutcome.ok) throw schoolApplicantsOutcome.error;
-  const schoolApplicants = schoolApplicantsOutcome.value;
+  const schoolApplicants = unwrapSettled(await schoolApplicantsPromise);
 
-  const exitReportsOutcome = await exitReportsPromise;
-  if (!exitReportsOutcome.ok) throw exitReportsOutcome.error;
+  const exitReports = unwrapSettled(await exitReportsPromise);
 
   return {
     mode: 'holder',
@@ -798,7 +808,7 @@ export async function getProgramHolderWorkspace({
     onlineStudySessions,
     documents: documentsRes.data ?? [],
     reports: reportsRes.data ?? [],
-    testingReports: exitReportsOutcome.value,
+    testingReports: exitReports,
     courseAssignments: currentAssignments,
     learningMaterials,
     payoutProfile: payoutRes.data ?? null,

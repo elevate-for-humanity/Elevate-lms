@@ -58,7 +58,7 @@ describe('program-holder dashboard hero', () => {
 
   it('loads hands-on training clocks only for the Hours page', () => {
     expect(workspace).toContain(
-      "getProgramHolderWorkspace({ includeOnlineStudy: section === 'hours' })",
+      "section === 'hours' ? getProgramHolderWorkspaceWithOnlineStudy() : getProgramHolderWorkspace()",
     );
     expect(holderData).toMatch(
       /includeOnlineStudy\s*\? await loadHolderOnlineStudy\(db, enrolledRoster\)\s*: \[\]/,

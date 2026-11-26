@@ -127,11 +127,9 @@ export async function POST(request: Request) {
         : {}),
     });
   } catch (error) {
-    const reason =
-      error instanceof Error && SAFE_CALL_WAKE_FAILURES.has(error.message)
-        ? error.message
-        : 'unexpected_failure';
-    console.error('phone_call_wake_failed', { reason });
+    const msg = error instanceof Error ? error.message : '';
+    const reason = SAFE_CALL_WAKE_FAILURES.has(msg) ? msg : 'unexpected_failure';
+    console.error('phone_call_wake_failed', { reason, error: msg });
     return NextResponse.json(
       { error: 'Call wake is unavailable.', code: 'call_wake_unavailable' },
       { status: 503 },

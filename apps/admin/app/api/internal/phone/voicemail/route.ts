@@ -59,7 +59,8 @@ export async function POST(request:Request){
     // A validation probe exists to surface Speech failures; ingestion must not depend on Speech.
     if(body.validateOnly===true)throw error;
     // Persist the voicemail anyway; the inbox transcript panel retries transcription later.
-    const reason=error instanceof Error && /^(speech_http_[0-9]{3}|voice_identity_unavailable)$/.test(error.message)?error.message:error instanceof Error && error.name==='TimeoutError'?'speech_timeout':'speech_unavailable';
+    const msg = error instanceof Error ? error.message : '';
+    const reason=/^(speech_http_[0-9]{3}|voice_identity_unavailable)$/.test(msg)?msg:error instanceof Error && error.name==='TimeoutError'?'speech_timeout':'speech_unavailable';
     console.error('phone_voicemail_transcription_deferred',{reason});
     transcript='';
     awaitingTranscript=true;
@@ -87,8 +88,9 @@ export async function POST(request:Request){
   await notifyAssignee(db,{profileId:extension.profile_id,taskId:body.id,caller,extension:body.extension,urgency:'normal',source:'voicemail',awaitingTranscript,transcript:transcript||undefined,summary:transcript?undefined:summary},system);
   return NextResponse.json({saved:true,transcriptAvailable:Boolean(transcript)});
  }catch(error){
-  const code=error instanceof Error && /^speech_http_[0-9]{3}$/.test(error.message)?error.message:'voicemail_processing_unavailable';
-  const reason=error instanceof Error && SAFE_VOICEMAIL_FAILURES.has(error.message)?error.message:code==='voicemail_processing_unavailable'?'unexpected_failure':code;
+  const msg = error instanceof Error ? error.message : '';
+  const code=/^speech_http_[0-9]{3}$/.test(msg)?msg:'voicemail_processing_unavailable';
+  const reason=SAFE_VOICEMAIL_FAILURES.has(msg)?msg:code==='voicemail_processing_unavailable'?'unexpected_failure':code;
   console.error('phone_voicemail_processing_failed',{reason});
   return NextResponse.json({error:'Voicemail processing is unavailable; retry without discarding the original recording.',code},{status:503});
  }

@@ -174,10 +174,10 @@ export async function POST(request: NextRequest) {
         },
         { onConflict: 'provider,customer_external_key,canonical_product_key' },
       );
-      if (schedule.error)
-        throw new Error(
-          `Invoice created but installment schedule failed: ${schedule.error.message}`,
-        );
+      if (schedule.error) {
+        logger.error('[implementation/checkout] installment schedule failed', { error: schedule.error.message });
+        throw new Error('Invoice created but installment schedule failed');
+      }
     }
     return NextResponse.json({
       checkoutUrl: invoice.paymentUrl,

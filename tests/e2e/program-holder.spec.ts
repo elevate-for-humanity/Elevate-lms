@@ -1,4 +1,5 @@
 import { test, expect, type Page } from '@playwright/test';
+import { peerOrigin } from './helpers/app-origins';
 
 /**
  * E2E Tests for Program Holder Portal (LMS app, :3002)
@@ -21,8 +22,11 @@ import { test, expect, type Page } from '@playwright/test';
  *   name="password" to apps/lms/app/login/page.tsx.
  * - The old "Application Flow" block tested /program-holder/apply, which
  *   does not exist in the LMS app. The real application lives on the
- *   marketing app at /apply/program-holder and is covered by
- *   tests/e2e/program-holder-apply.spec.ts instead.
+ *   marketing app at /apply/program-holder. Its field-level validation is
+ *   covered by tests/e2e/program-holder-apply.spec.ts; the "Program
+ *   Holder application" block below covers the same form with the API
+ *   mocked, so it certifies the submission contract without a database
+ *   write.
  * - The old dashboard/navigation/report/settings assertions named labels
  *   that do not exist in the UI ("Active Students", "Manage Students",
  *   "Settings saved", ...). They are rewritten to the real labels here.
@@ -39,9 +43,65 @@ async function loginAsProgramHolder(page: Page) {
   await page.waitForURL(/.*dashboard/);
 }
 
+const MARKETING_BASE = peerOrigin('marketing');
+
 test.describe('Program Holder Portal', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/');
+  });
+
+  test.describe('Program Holder application', () => {
+    test('submits the current application contract without a database write', async ({ page }) => {
+      const email = `program-holder-${Date.now()}@example.com`;
+      let submittedBody: Record<string, unknown> | null = null;
+
+      await page.route('**/api/program-holder/apply', async (route) => {
+        submittedBody = route.request().postDataJSON() as Record<string, unknown>;
+        await route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({ ok: true, referenceNumber: 'PH-QA-001' }),
+        });
+      });
+
+      await page.goto(`${MARKETING_BASE}/apply/program-holder`, { waitUntil: 'domcontentloaded' });
+      await page.locator('input[name="orgName"]').fill('QA Training Center');
+      await page.locator('input[name="contactName"]').fill('QA Program Holder');
+      await page.locator('input[name="email"]').fill(email);
+      await page.locator('select[name="requestedProgram"]').selectOption({ index: 1 });
+      await page.getByRole('checkbox').first().check();
+      await page.getByRole('checkbox', { name: /I certify that I am authorized/i }).check();
+      await page.getByRole('button', { name: 'Submit Program Holder Application' }).click();
+
+      await expect(page.getByRole('heading', { name: 'Application Received' })).toBeVisible();
+      await expect(page.getByText('Reference: PH-QA-001')).toBeVisible();
+      expect(submittedBody).toMatchObject({
+        organizationName: 'QA Training Center',
+        contactName: 'QA Program Holder',
+        email,
+      });
+      expect(submittedBody?.requestedProgramSlugs).toEqual([expect.any(String)]);
+      expect(submittedBody?.programTypes).toEqual([expect.any(String)]);
+    });
+
+    test('enforces required identity, program, category, and certification fields', async ({
+      page,
+    }) => {
+      await page.goto(`${MARKETING_BASE}/apply/program-holder`, { waitUntil: 'domcontentloaded' });
+      const organization = page.locator('input[name="orgName"]');
+      await page.getByRole('button', { name: 'Submit Program Holder Application' }).click();
+      expect(
+        await organization.evaluate((input: HTMLInputElement) => input.validity.valueMissing),
+      ).toBe(true);
+
+      await organization.fill('QA Training Center');
+      await page.locator('input[name="contactName"]').fill('QA Program Holder');
+      await page.locator('input[name="email"]').fill('qa-holder@example.com');
+      await page.locator('select[name="requestedProgram"]').selectOption({ index: 1 });
+      await page.getByRole('checkbox', { name: /I certify that I am authorized/i }).check();
+      await page.getByRole('button', { name: 'Submit Program Holder Application' }).click();
+      await expect(page.getByText('Select at least one program or service type.')).toBeVisible();
+    });
   });
 
   test.describe('Authentication', () => {

@@ -662,7 +662,9 @@ export default function ParisApplicationWorkspace({
         </aside>
       </div>
     </div>
-    <ApplicationDocumentsPanel key={session.projectId} locale={locale} />
+    {answers.program ? (
+      <ApplicationDocumentsPanel key={session.projectId} locale={locale} />
+    ) : null}
     </>
   );
 }

@@ -158,7 +158,7 @@ jobs:
             --build-arg "BUILD_TIMESTAMP=$(date -u +%FT%TZ)" \
             --build-arg NEXT_PUBLIC_SUPABASE_URL --build-arg NEXT_PUBLIC_SUPABASE_ANON_KEY .
       - name: Test actual Store container identity and health routing
-        timeout-minutes: 7
+        timeout-minutes: 5
         run: |
           node --test scripts/gcp/store-smoke-import-boundary.test.mjs
           node scripts/gcp/smoke-marketing-container.mjs

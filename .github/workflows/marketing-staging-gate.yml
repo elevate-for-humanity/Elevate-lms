@@ -69,7 +69,7 @@ jobs:
         run: |
           docker build \
             --file Dockerfile.marketing \
-            --tag "elevate-marketing:$GITHUB_SHA" \
+            --tag elevate-marketing:staging-gate \
             --build-arg NF_GIT_SHA=${{ github.sha }} \
             --build-arg GITHUB_SHA=${{ github.sha }} \
             --build-arg GIT_SHA=${{ github.sha }} \
@@ -79,8 +79,10 @@ jobs:
             .
 
       - name: Smoke Marketing container
-        timeout-minutes: 7
         env:
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || secrets.SUPABASE_URL }}
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY || secrets.SUPABASE_ANON_KEY }}
-        run: node scripts/gcp/smoke-marketing-container.mjs
+          HEALTH_PATH: /api/ready
+        run: |
+          chmod +x scripts/smoke-test-container.sh
+          HEALTH_PATH=/api/ready scripts/smoke-test-container.sh elevate-marketing:staging-gate marketing-staging-smoke 3100

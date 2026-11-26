@@ -6,11 +6,10 @@ on:
     branches: [main]
     paths:
       - 'scripts/gcp/production-acceptance.*'
-      - '.github/workflows/registered-apprenticeship-e2e.yml'
-      - 'scripts/qa/require-portal-e2e-identities.mjs'
       - 'scripts/build-memory-policy.*'
       - 'scripts/check-build-memory-policy.mjs'
       - 'scripts/run-bounded-build.*'
+      - 'scripts/migrate/**'
       - 'scripts/build-next-app.*'
       - 'scripts/container-build-policy.mjs'
       - 'components/**'
@@ -24,6 +23,7 @@ on:
       - '.dockerignore'
       - 'workers/admin-speech-cache.mjs'
       - 'apps/admin/**'
+      - 'data/**'
       - 'lib/**'
       - 'remotion-src/**'
       - 'packages/**'
@@ -156,7 +156,7 @@ jobs:
           skip_install: true
       - name: Verify Google SDK
         run: node scripts/gcp/verify-sdk.mjs
-      - name: Verify project billing and empty registry upload admission
+      - name: Verify project billing and empty upload admission before building
         run: node scripts/gcp/preflight-billing.mjs
       - name: Upload tested Admin image
         id: upload

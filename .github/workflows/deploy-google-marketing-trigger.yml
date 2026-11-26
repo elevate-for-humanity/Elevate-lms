@@ -9,13 +9,12 @@ on:
     branches: [main]
     paths:
       - 'scripts/gcp/production-acceptance.*'
-      - '.github/workflows/registered-apprenticeship-e2e.yml'
-      - 'scripts/qa/require-portal-e2e-identities.mjs'
       - 'scripts/gcp/verify-public-entry.*'
       - 'scripts/gcp/apprenticeship-payment-contract.*'
       - 'scripts/build-memory-policy.*'
       - 'scripts/check-build-memory-policy.mjs'
       - 'scripts/run-bounded-build.*'
+      - 'scripts/migrate/**'
       - 'scripts/build-next-app.*'
       - 'scripts/build-marketing-css.*'
       - 'scripts/marketing-tailwind-content.*'
@@ -33,6 +32,7 @@ on:
       - 'scripts/stamp-sw.mjs'
       - 'scripts/verify-portal-production-contracts.mjs'
       - 'apps/marketing/**'
+      - 'data/**'
       - 'components/**'
       - 'styles/**'
       - 'lib/marketing/**'

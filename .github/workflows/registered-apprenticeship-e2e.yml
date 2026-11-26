@@ -1,4 +1,7 @@
 name: Registered Apprenticeship E2E
+concurrency:
+group: ${{ github.workflow }}-${{ github.ref }}
+cancel-in-progress: true
 
 on:
   pull_request:
@@ -70,12 +73,41 @@ permissions:
   actions: read
 
 jobs:
-  # Employer regression is dispatched once by deploy-admin.yml acceptance,
-  # after a successful attested Admin deployment. Do not duplicate the
-  # workflow on main pushes or the completed-deployment notification.
+  request-employer-regression:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      actions: write
+    steps:
+      - name: Request current employer tests against a verified live Admin release
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const response = await fetch('https://admin.elevateforhumanity.org/api/health', {
+              cache: 'no-store', signal: AbortSignal.timeout(20000),
+            });
+            const health = await response.json();
+            if (!response.ok || health.service !== 'admin' || !health.ready || !health.healthy ||
+                !health.dependencies?.supabase?.ok || !/^[a-f0-9]{40}$/.test(health.commit || '')) {
+              throw new Error('Live Admin must be healthy before employer regression');
+            }
+            const runs = await github.rest.actions.listWorkflowRuns({
+              owner: context.repo.owner, repo: context.repo.repo,
+              workflow_id: 'deploy-admin.yml', event: 'workflow_dispatch', status: 'completed', per_page: 100,
+            });
+            const source = runs.data.workflow_runs.find(run => run.conclusion === 'success' &&
+              run.head_branch === 'main' && run.head_sha === health.commit);
+            if (!source) throw new Error('A successful deployment must attest the live Admin version');
+            await github.rest.actions.createWorkflowDispatch({
+              owner: context.repo.owner, repo: context.repo.repo,
+              workflow_id: 'registered-apprenticeship-e2e.yml', ref: 'main',
+              inputs: { employer_only: 'true', deployed_sha: health.commit,
+                deployment_run_id: String(source.id), component: 'admin' },
+            });
 
   hvac-public-playback:
-    if: (inputs.employer_only != true) && (github.event_name == 'pull_request' || (github.ref == 'refs/heads/main' && ((github.event_name == 'workflow_run' && github.event.workflow_run.path == '.github/workflows/deploy-google-marketing-trigger.yml' && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'workflow_dispatch' && github.event.workflow_run.head_branch == 'main') || (github.event_name == 'workflow_dispatch' && inputs.component == 'marketing'))))
+    if: (inputs.employer_only != true) && (github.event_name == 'pull_request' || (github.ref == 'refs/heads/main' && ((github.event_name == 'workflow_run' && github.event.workflow_run.name == 'Deploy Google Marketing on trigger' && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'workflow_dispatch' && github.event.workflow_run.head_branch == 'main') || (github.event_name == 'workflow_dispatch' && inputs.component == 'marketing'))))
     strategy:
       fail-fast: false
       matrix:
@@ -157,11 +189,15 @@ jobs:
             playwright-report/
           retention-days: 14
   production-authenticated-e2e:
-    # Authenticated live checks require the explicit release receipt. The desktop
-    # browser workflow exercises disposable identities against isolated QA.
-    if: github.ref == 'refs/heads/main' && github.event_name == 'workflow_dispatch' && inputs.deployment_run_id != '' && inputs.deployed_sha != '' && inputs.component != ''
+    # Dispatch-only success proves the deployment ran, not just that it was queued.
+    if: github.ref == 'refs/heads/main' && (!inputs.employer_only || (github.event_name == 'workflow_dispatch' && inputs.deployment_run_id != '' && inputs.deployed_sha != '' && inputs.component != '')) && (github.event_name != 'workflow_run' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'workflow_dispatch' && github.event.workflow_run.head_branch == 'main'))
+    # Acquire concurrency only after this job is admitted. Workflow-level locks
+    # let skipped push-dispatch notifications cancel real production acceptance.
+    # Keep source regression and exact deployed-SHA certification independent.
     concurrency:
-      group: registered-apprenticeship-e2e-deployment
+      group: registered-apprenticeship-e2e-${{ inputs.employer_only && 'employer' || (github.event_name == 'workflow_run' || inputs.deployment_run_id != '') && 'deployment' || 'source' }}
+      # Retain pending handoffs while the active run finishes tests and cleanup.
+      # Every deployment still attests its live revision before and after testing.
       queue: max
     name: Full portal authenticated persistence and responsive design
     runs-on: ubuntu-24.04
@@ -170,24 +206,8 @@ jobs:
     env:
       PLAYWRIGHT_BASE_URL: https://app.elevateforhumanity.org
       NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-      E2E_APPRENTICE_EMAIL: ${{ secrets.PRODUCTION_E2E_APPRENTICE_EMAIL }}
-      E2E_APPRENTICE_PASSWORD: ${{ secrets.PRODUCTION_E2E_APPRENTICE_PASSWORD }}
-      E2E_HOST_SHOP_EMAIL: ${{ secrets.PRODUCTION_E2E_HOST_SHOP_EMAIL }}
-      E2E_HOST_SHOP_PASSWORD: ${{ secrets.PRODUCTION_E2E_HOST_SHOP_PASSWORD }}
-      E2E_LEARNER_EMAIL: ${{ secrets.PRODUCTION_E2E_LEARNER_EMAIL }}
-      E2E_LEARNER_PASSWORD: ${{ secrets.PRODUCTION_E2E_LEARNER_PASSWORD }}
-      E2E_PROGRAM_HOLDER_EMAIL: ${{ secrets.PRODUCTION_E2E_PROGRAM_HOLDER_EMAIL }}
-      E2E_PROGRAM_HOLDER_PASSWORD: ${{ secrets.PRODUCTION_E2E_PROGRAM_HOLDER_PASSWORD }}
-      E2E_EMPLOYER_EMAIL: ${{ secrets.PRODUCTION_E2E_EMPLOYER_EMAIL }}
-      E2E_EMPLOYER_PASSWORD: ${{ secrets.PRODUCTION_E2E_EMPLOYER_PASSWORD }}
-      E2E_INSTRUCTOR_EMAIL: ${{ secrets.PRODUCTION_E2E_INSTRUCTOR_EMAIL }}
-      E2E_INSTRUCTOR_PASSWORD: ${{ secrets.PRODUCTION_E2E_INSTRUCTOR_PASSWORD }}
-      E2E_STAFF_EMAIL: ${{ secrets.PRODUCTION_E2E_STAFF_EMAIL }}
-      E2E_STAFF_PASSWORD: ${{ secrets.PRODUCTION_E2E_STAFF_PASSWORD }}
-      E2E_CASE_MANAGER_EMAIL: ${{ secrets.PRODUCTION_E2E_CASE_MANAGER_EMAIL }}
-      E2E_CASE_MANAGER_PASSWORD: ${{ secrets.PRODUCTION_E2E_CASE_MANAGER_PASSWORD }}
-      E2E_ADMIN_EMAIL: ${{ secrets.PRODUCTION_E2E_ADMIN_EMAIL }}
-      E2E_ADMIN_PASSWORD: ${{ secrets.PRODUCTION_E2E_ADMIN_PASSWORD }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      QA_E2E_ALLOW_PRODUCTION_DISPOSABLES: 1
     steps:
       - uses: actions/checkout@v4
         with:
@@ -198,6 +218,7 @@ jobs:
       - name: Verify skipped notifications cannot cancel production acceptance
         run: node --test scripts/qa/portal-acceptance-concurrency.test.mjs
       - name: Verify explicit deployment handoff before checking out its tested commit
+        if: inputs.deployment_run_id != '' || inputs.deployed_sha != '' || inputs.component != ''
         env:
           GH_TOKEN: ${{ github.token }}
           ACCEPTANCE_COMPONENT: ${{ inputs.component }}
@@ -211,7 +232,7 @@ jobs:
           persist-credentials: false
           # Focused black-box regressions use current trusted tests and attest
           # the deployed application separately. Full certification remains pinned.
-          ref: ${{ (inputs.employer_only && github.sha) || inputs.deployed_sha }}
+          ref: ${{ (inputs.employer_only && github.sha) || inputs.deployed_sha || (github.event_name == 'workflow_run' && github.event.workflow_run.head_sha) || github.sha }}
       - uses: pnpm/action-setup@v4
         with:
           version: 10.28.2
@@ -220,13 +241,6 @@ jobs:
           node-version: '22'
           cache: pnpm
           cache-dependency-path: pnpm-lock.yaml
-      - name: Require dedicated live acceptance identities
-        env:
-          EMPLOYER_ONLY: ${{ inputs.employer_only }}
-          PORTAL_E2E_SECRET_SCOPE: production
-        run: |
-          node --test scripts/qa/require-portal-e2e-identities.test.mjs
-          node scripts/qa/require-portal-e2e-identities.mjs
       - name: Verify runtime Studio browser URL precedence
         run: node --test scripts/test-studio-browser-configuration.mjs
       - name: Verify production LMS is ready
@@ -247,22 +261,39 @@ jobs:
         run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
       - name: Install Chromium and WebKit
         run: pnpm exec playwright install chromium webkit --with-deps
+      - name: Require Supabase QA provisioning authority
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "${NEXT_PUBLIC_SUPABASE_URL:-}" || { echo '::error::NEXT_PUBLIC_SUPABASE_URL is not configured'; exit 1; }
+          test -n "${SUPABASE_SERVICE_ROLE_KEY:-}" || { echo '::error::SUPABASE_SERVICE_ROLE_KEY is not configured'; exit 1; }
+      # The learner fixture requires the per-run isolated QA admin identity as
+      # its recorded enrollment approver. Create it before the learner fixture.
+      # The remaining-persona provisioner also rejects non-QA Supabase hosts.
+      - name: Provision Employer + Instructor + Staff + Case Manager + Admin identities
+        run: node scripts/qa/provision-remaining-portal-e2e.mjs provision
+      - name: Provision isolated Learner + Program Holder identities
+        run: node scripts/qa/provision-learner-program-holder-e2e.mjs provision
+      - name: Provision disposable Host Shop + Apprentice identities
+        run: node scripts/qa/provision-apprenticeship-e2e.mjs provision
+      - name: Require all nine roles so authenticated tests cannot silently skip
+        run: |
+          node --test scripts/qa/require-portal-e2e-identities.test.mjs scripts/qa/write-private-state.test.mjs
+          node scripts/qa/require-portal-e2e-identities.mjs
       # LMS lesson media and public Marketing films are different acceptance
       # surfaces. The marketing-only hvac-public-playback matrix is deliberately
       # skipped on LMS releases; this independent test certifies REAL authenticated
       # playback of the published LMS video and learner full-screen layout.
-      # Dedicated production test credentials are mandatory.
-      # Never capture HTTP request-body traces while persistent production QA
-      # identities are in scope; screenshots, assertions and HTML reports remain.
+      # Provisioned QA credentials are mandatory: missing data FAILS, never skips.
       - name: Verify authenticated HVAC course video playback and full-screen layout on devices
-        if: ${{ success() && !inputs.employer_only && inputs.component == 'lms' }}
+        if: ${{ !cancelled() && !inputs.employer_only && ((github.event_name == 'workflow_dispatch' && inputs.component == 'lms' && inputs.deployed_sha != '' && inputs.deployment_run_id != '') || (github.event_name == 'workflow_run' && github.event.workflow_run.name == 'Deploy LMS automatically on Google' && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'workflow_dispatch' && github.event.workflow_run.head_branch == 'main')) }}
         env:
           PLAYWRIGHT_BASE_URL: https://lms.elevateforhumanity.org
-          EXPECTED_LMS_SHA: ${{ inputs.deployed_sha }}
+          EXPECTED_LMS_SHA: ${{ inputs.deployed_sha || github.event.workflow_run.head_sha }}
           PLAYWRIGHT_HTML_OUTPUT_DIR: playwright-report/hvac-lms-playback
-        run: pnpm exec playwright test tests/e2e/hvac-live-lesson-playback.spec.ts --reporter=line,html --config playwright.config.ts --output=test-results/hvac-lms-playback --project=desktop-chrome --project=laptop-chrome --project=tablet-chrome --project=iphone-webkit --project=android-chrome --trace off
+        run: pnpm exec playwright test tests/e2e/hvac-live-lesson-playback.spec.ts --reporter=line,html --config playwright.config.ts --output=test-results/hvac-lms-playback --trace retain-on-failure --project=desktop-chrome --project=laptop-chrome --project=tablet-chrome --project=iphone-webkit --project=android-chrome
       - name: Preserve authenticated LMS playback and full-screen acceptance evidence
-        if: ${{ always() && !inputs.employer_only && inputs.component == 'lms' }}
+        if: ${{ always() && !inputs.employer_only && ((github.event_name == 'workflow_dispatch' && inputs.component == 'lms') || (github.event_name == 'workflow_run' && github.event.workflow_run.name == 'Deploy LMS automatically on Google')) }}
         uses: actions/upload-artifact@v7
         with:
           name: hvac-authenticated-lms-playback-evidence
@@ -272,12 +303,13 @@ jobs:
           retention-days: 14
           if-no-files-found: ignore
       - name: Verify employer onboarding persistence and private documents after deployment
+        if: github.event_name == 'workflow_run' || inputs.deployment_run_id != ''
         env:
           PLAYWRIGHT_BASE_URL: https://lms.elevateforhumanity.org
           PLAYWRIGHT_HTML_OUTPUT_DIR: playwright-report/employer-onboarding
-        run: pnpm exec playwright test tests/e2e/employer-onboarding.spec.ts --reporter=html,github --config playwright.config.ts --output=test-results/employer-onboarding --project=desktop-chrome --project=iphone-webkit --trace off
+        run: pnpm exec playwright test tests/e2e/employer-onboarding.spec.ts --reporter=html,github --config playwright.config.ts --output=test-results/employer-onboarding --trace retain-on-failure --project=desktop-chrome --project=iphone-webkit
       - name: Upload employer onboarding evidence immediately
-        if: always()
+        if: ${{ always() && (github.event_name == 'workflow_run' || inputs.deployment_run_id != '') }}
         uses: actions/upload-artifact@v7
         with:
           name: employer-onboarding-e2e-results
@@ -291,25 +323,25 @@ jobs:
       # The complete HVAC film runs in hvac-public-playback, where the iPhone
       # profile uses macOS media codecs. Keep portal and hydration checks here.
       - name: Verify public hydration, startup stability and audible-media exclusivity
-        if: ${{ success() && !inputs.employer_only }}
+        if: ${{ !cancelled() && !inputs.employer_only }}
         env:
           PLAYWRIGHT_HTML_OUTPUT_DIR: playwright-report/public-runtime
-        run: pnpm exec playwright test tests/e2e/public-runtime-acceptance.spec.ts --config playwright.config.ts --output=test-results/public-runtime --project=desktop-chrome --project=tablet-chrome --project=iphone-webkit --project=android-chrome --trace off
+        run: pnpm exec playwright test tests/e2e/public-runtime-acceptance.spec.ts --config playwright.config.ts --output=test-results/public-runtime --project=desktop-chrome --project=tablet-chrome --project=iphone-webkit --project=android-chrome
       - name: Certify Studio sign-in and fonts on all devices
-        if: ${{ success() && !inputs.employer_only }}
+        if: ${{ !cancelled() && !inputs.employer_only }}
         env:
           PLAYWRIGHT_HTML_OUTPUT_DIR: playwright-report/studio
-        run: pnpm exec playwright test tests/e2e/portal-responsive-design.spec.ts --grep "Admin session opens Studio and optional external browser tools remain usable on the active device" --config playwright.config.ts --output=test-results/studio --project=desktop-chrome --project=laptop-chrome --project=tablet-chrome --project=iphone-webkit --project=android-chrome --trace off
+        run: pnpm exec playwright test tests/e2e/portal-responsive-design.spec.ts --grep "Admin session opens Studio and optional external browser tools remain usable on the active device" --config playwright.config.ts --output=test-results/studio --trace retain-on-failure --project=desktop-chrome --project=laptop-chrome --project=tablet-chrome --project=iphone-webkit --project=android-chrome
       - name: Run authenticated production functional E2E
-        if: ${{ success() && !inputs.employer_only }}
+        if: ${{ !cancelled() && !inputs.employer_only }}
         env:
           PLAYWRIGHT_HTML_OUTPUT_DIR: playwright-report/functional
-        run: pnpm exec playwright test tests/e2e/registered-apprenticeship-authenticated.spec.ts --config playwright.config.ts --output=test-results/functional --project=desktop-chrome --trace off
+        run: pnpm exec playwright test tests/e2e/registered-apprenticeship-authenticated.spec.ts --config playwright.config.ts --output=test-results/functional --project=desktop-chrome
       - name: Run authenticated cross-device responsive design certification
-        if: ${{ success() && !inputs.employer_only }}
+        if: ${{ !cancelled() && !inputs.employer_only }}
         env:
           PLAYWRIGHT_HTML_OUTPUT_DIR: playwright-report/responsive
-        run: pnpm exec playwright test tests/e2e/portal-responsive-design.spec.ts --config playwright.config.ts --output=test-results/responsive --project=desktop-chrome --project=laptop-chrome --project=tablet-chrome --project=iphone-webkit --project=android-chrome --trace off
+        run: pnpm exec playwright test tests/e2e/portal-responsive-design.spec.ts --config playwright.config.ts --output=test-results/responsive --project=desktop-chrome --project=laptop-chrome --project=tablet-chrome --project=iphone-webkit --project=android-chrome
       - name: Require the attested release to remain live through acceptance
         if: ${{ !cancelled() && inputs.deployment_run_id != '' }}
         env:
@@ -318,6 +350,16 @@ jobs:
           ACCEPTANCE_SHA: ${{ inputs.deployed_sha }}
           ACCEPTANCE_RUN_ID: ${{ inputs.deployment_run_id }}
         run: node scripts/gcp/production-acceptance.mjs verify
+      - name: Clean disposable Host Shop + Apprentice identities
+        if: ${{ always() && steps.install-dependencies.outcome == 'success' }}
+        run: node scripts/qa/provision-apprenticeship-e2e.mjs cleanup
+      - name: Clean isolated Learner + Program Holder identities
+        if: ${{ always() && steps.install-dependencies.outcome == 'success' }}
+        run: node scripts/qa/provision-learner-program-holder-e2e.mjs cleanup
+      # Remove the QA approver last to keep the learner approval's FK valid.
+      - name: Clean Employer + Instructor + Staff + Case Manager + Admin identities
+        if: ${{ always() && steps.install-dependencies.outcome == 'success' }}
+        run: node scripts/qa/provision-remaining-portal-e2e.mjs cleanup
       - name: Upload QA evidence
         if: always()
         uses: actions/upload-artifact@v7
@@ -332,8 +374,8 @@ jobs:
         if: always()
         env:
           QA_STATUS: ${{ job.status }}
-          QA_SHA: ${{ (inputs.employer_only && github.sha) || inputs.deployed_sha }}
-          QA_DEPLOYED_SHA: ${{ inputs.deployed_sha }}
+          QA_SHA: ${{ (inputs.employer_only && github.sha) || inputs.deployed_sha || (github.event_name == 'workflow_run' && github.event.workflow_run.head_sha) || github.sha }}
+          QA_DEPLOYED_SHA: ${{ inputs.deployed_sha || (github.event_name == 'workflow_run' && github.event.workflow_run.head_sha) || '' }}
         run: |
           python3 - <<'PYTHON'
           import os

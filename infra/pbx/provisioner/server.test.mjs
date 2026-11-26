@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdir, mkdtemp, readFile, readlink, rm, symlink, writeFile } from 'node:fs/promises';
+import { chmod, mkdir, mkdtemp, readFile, readlink, rm, symlink, writeFile } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import { reportFailure, createProvisioner, endpointFor, parseContacts, renderConfiguration, validateIdentity } from './server.mjs';
@@ -241,4 +241,102 @@ test('timer expiry retains apply evidence and sanitizes arbitrary exceptions', a
   reportFailure('reconciliation', 'timer', malicious, line => lines.push(line));
   assert.match(lines[0], /^PBX failure v1 \d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z reconciliation timer unknown\n$/);
   assert.doesNotThrow(() => reportFailure('expiry', 'timer', malicious, () => { throw Error('sink failed'); }));
+});
+
+test('duplicate extension failures are journaled under their own code', () => {
+  const second = { ...record, profileId: '33333333-3333-4333-8333-333333333333', extensionId: '44444444-4444-4444-8444-444444444444' };
+  second.endpointId = endpointFor(second);
+  let caught;
+  try { renderConfiguration([record, second]); } catch (error) { caught = error; }
+  const lines = [];
+  reportFailure('provision', 'apply', caught, line => lines.push(line));
+  assert.match(lines[0], /provision apply duplicate_extension\n$/);
+});
+
+test('post-apply generation cleanup cannot fail a successful provision', async t => {
+  const f = await fixture(t);
+  // Directory listing starts failing while traversal still works. Generation
+  // cleanup runs only after the credential is applied and verified, so the
+  // provision must still succeed and return the credential.
+  await chmod(f.root, 0o311);
+  try {
+    const provision = await f.request();
+    assert.equal(provision.status, 200);
+    assert.match(provision.body.sipPassword, /^[A-Za-z0-9_-]{43}$/);
+  } finally {
+    await chmod(f.root, 0o755);
+  }
+});
+
+test('control-plane request timeout covers the verification settling budget', async t => {
+  const f = await fixture(t);
+  assert.equal(f.service.server.requestTimeout, 60000);
+});
+
+const wakeToken = 'fixture-wake-token-'.repeat(3);
+
+test('rendering without a wake token keeps the legacy subroutine byte shape', () => {
+  const config = renderConfiguration([record]);
+  assert.doesNotMatch(config.dialplan, /call-alert|WAKE_|Ringing\(\)|Wait\(2\)|System\(/);
+  assert.ok(config.dialplan.includes(' same => n,Dial(${PWA_CONTACTS},20)'));
+  assert.ok(config.dialplan.includes(' same => n,GotoIf($[${LEN(${PWA_CONTACTS})}=0]?unavailable)'));
+});
+
+test('wake rendering hooks only the empty-contact path and waits bounded for a registration', () => {
+  const config = renderConfiguration([record], { callAlertToken: wakeToken });
+  const plan = config.dialplan;
+  assert.ok(plan.includes('exten => 0,1,Gosub(elevate-pwa-extensions,101,1)'), 'operator stub still routes to the subroutine');
+  assert.ok(plan.includes(' same => n,Set(WAKE_TRIES=0)'));
+  assert.ok(plan.includes(' same => n(scan),Set(PWA_CONTACTS=)'));
+  assert.equal(plan.split('System(').length - 1, 1, 'exactly one wake hook per extension subroutine');
+  assert.ok(plan.includes(`Authorization: Bearer ${wakeToken}`));
+  assert.ok(plan.includes('https://admin.elevateforhumanity.org/api/internal/phone/call-alert'));
+  assert.ok(plan.includes('"extension":"${EXTEN}"'));
+  assert.ok(plan.includes('"caller":"${WAKE_CALLER}"'));
+  assert.ok(plan.includes('-m 2'), 'hook transport is capped at 2s');
+  assert.ok(plan.includes(' same => n,Ringing()'));
+  assert.ok(plan.includes(' same => n(wakewait),Wait(2)'));
+  assert.ok(plan.includes(' same => n,GotoIf($[${WAKE_TRIES}<20]?scan)'), 'window is bounded at 20 tries x 2s');
+  assert.ok(plan.includes(' same => n(dial),Dial(${PWA_CONTACTS},20)'));
+  const dialBranch = plan.indexOf('GotoIf($[${LEN(${PWA_CONTACTS})}>0]?dial)');
+  const hook = plan.indexOf('call-alert');
+  const wait = plan.indexOf('(wakewait),Wait(2)');
+  const dial = plan.indexOf('(dial),Dial(');
+  assert.ok(dialBranch > -1 && dialBranch < hook, 'a first-scan contact skips the wake block entirely');
+  assert.ok(hook < wait && wait < dial, 'hook fires before the wait; Dial only after a scan finds a contact');
+  assert.ok(plan.indexOf(' same => n,Goto(unavailable)') > wait, 'window expiry falls through to unavailable');
+});
+
+test('an unembeddable wake token renders the legacy subroutine instead of an injectable hook', () => {
+  for (const bad of ["tok'en-".repeat(8), 'short', 'has space '.repeat(5), 'dollar$ign'.repeat(5)]) {
+    const config = renderConfiguration([record], { callAlertToken: bad });
+    assert.doesNotMatch(config.dialplan, /call-alert|WAKE_|System\(/);
+    assert.ok(config.dialplan.includes(' same => n,Dial(${PWA_CONTACTS},20)'));
+  }
+});
+
+test('wake rendering never enters muted modes, a closed schedule, or the empty-fleet stub', () => {
+  const dnd = renderConfiguration([{ ...record, ringMode: 'do_not_disturb' }], { callAlertToken: wakeToken }).dialplan;
+  assert.doesNotMatch(dnd, /call-alert|WAKE_|PJSIP_DIAL_CONTACTS/);
+  const scheduled = renderConfiguration([{ ...record, availabilitySource: 'schedule', availabilitySchedule: {} }], { callAlertToken: wakeToken }).dialplan;
+  assert.ok(scheduled.includes(' same => n,Goto(unavailable)'), 'closed schedule still exits before the ring group');
+  assert.ok(scheduled.indexOf('Goto(unavailable)') < scheduled.indexOf('(available)'), 'schedule exit precedes the wake block');
+  const empty = renderConfiguration([], { callAlertToken: wakeToken }).dialplan;
+  assert.doesNotMatch(empty, /call-alert|WAKE_/);
+  assert.ok(empty.includes('exten => 0,1,Set(PWA_CONTACTS=)'));
+});
+
+test('a rollback whose first reload fails transiently recovers without quarantining', async t => {
+  const f = await fixture(t);
+  assert.equal((await f.request()).status, 200);
+  f.advance(301000);
+  // Forward apply exhausts its reload retries; the rollback's first reload
+  // hits a one-off docker exec failure. The bounded rollback retry must
+  // absorb it: original error preserved, no rollback journal, no latch.
+  f.inject('Unable to reload', 'Unable to reload', 'Unable to reload', new Error('docker exec unavailable'));
+  const status = await f.request('/status');
+  assert.equal(status.body.error, 'asterisk_reload_failed');
+  assert.match(f.failures[0], /status apply asterisk_reload_failed\n$/);
+  assert.equal(f.failures.some(line => / rollback /.test(line)), false, 'a recovered rollback is not journaled as a rollback failure');
+  assert.equal((await f.request('/status')).status, 200, 'provisioning is not quarantined after a recovered rollback');
 });

@@ -31,8 +31,79 @@ export function carrierRecordingUrl(value: string): URL {
   return url;
 }
 
+/**
+ * Parse a single HTTP byte range. Returns null when the header is absent or
+ * not a single byte range (serve the full body), 'unsatisfiable' when the
+ * range cannot overlap the audio at all.
+ */
+export function parseByteRange(
+  range: string | null | undefined,
+  length: number,
+): { start: number; end: number } | 'unsatisfiable' | null {
+  if (!range) return null;
+  const match = /^bytes=(\d*)-(\d*)$/.exec(range.trim());
+  if (!match || (match[1] === '' && match[2] === '')) return null;
+  if (length === 0) return 'unsatisfiable';
+  if (match[1] === '') {
+    const suffix = Number(match[2]);
+    if (!Number.isFinite(suffix) || suffix <= 0) return 'unsatisfiable';
+    return { start: Math.max(0, length - suffix), end: length - 1 };
+  }
+  const start = Number(match[1]);
+  const end = match[2] === '' ? length - 1 : Math.min(Number(match[2]), length - 1);
+  if (!Number.isFinite(start) || start >= length || start > end) return 'unsatisfiable';
+  return { start, end };
+}
+
+/**
+ * Build the audio response. Media elements (Safari/WebKit in particular)
+ * require Accept-Ranges and 206 responses to load duration metadata and to
+ * play at all; without them the player sits at 0:00 on a real recording.
+ */
+function audioResponse(
+  audio: Uint8Array<ArrayBuffer>,
+  contentType: string,
+  range?: string | null,
+): Response {
+  const headers: Record<string, string> = {
+    'Content-Type': contentType,
+    'Cache-Control': 'private, no-store, max-age=0',
+    'Content-Disposition': 'inline',
+    'X-Content-Type-Options': 'nosniff',
+    'Accept-Ranges': 'bytes',
+  };
+  const parsed = parseByteRange(range, audio.length);
+  if (parsed === 'unsatisfiable') {
+    return new Response(null, {
+      status: 416,
+      headers: {
+        ...headers,
+        'Content-Range': `bytes */${audio.length}`,
+        'Content-Length': '0',
+      },
+    });
+  }
+  if (parsed) {
+    const body = audio.subarray(parsed.start, parsed.end + 1);
+    return new Response(body, {
+      status: 206,
+      headers: {
+        ...headers,
+        'Content-Range': `bytes ${parsed.start}-${parsed.end}/${audio.length}`,
+        'Content-Length': String(body.length),
+      },
+    });
+  }
+  return new Response(audio, {
+    headers: { ...headers, 'Content-Length': String(audio.length) },
+  });
+}
+
 /** Call only after verifying the requesting user owns the associated inbox row. */
-async function loadCarrierRecording(location: string): Promise<Response> {
+async function loadCarrierRecording(
+  location: string,
+  range?: string | null,
+): Promise<Response> {
   const url = carrierRecordingUrl(location);
   const source = await fetch(url, {
     cache: 'no-store',
@@ -75,32 +146,27 @@ async function loadCarrierRecording(location: string): Promise<Response> {
     audio.set(chunk, offset);
     offset += chunk.byteLength;
   }
-  return new Response(audio, {
-    headers: {
-      'Content-Type':
-        mime === 'application/octet-stream'
-          ? Buffer.from(audio).toString('ascii', 0, 4) === 'RIFF'
-            ? 'audio/wav'
-            : Buffer.from(audio).toString('ascii', 0, 4) === 'OggS'
-              ? 'audio/ogg'
-              : 'audio/mpeg'
-          : mime,
-      'Content-Length': String(bytes),
-      'Cache-Control': 'private, no-store, max-age=0',
-      'Content-Disposition': 'inline',
-      'X-Content-Type-Options': 'nosniff',
-    },
-  });
+  const contentType =
+    mime === 'application/octet-stream'
+      ? Buffer.from(audio).toString('ascii', 0, 4) === 'RIFF'
+        ? 'audio/wav'
+        : Buffer.from(audio).toString('ascii', 0, 4) === 'OggS'
+          ? 'audio/ogg'
+          : 'audio/mpeg'
+      : mime;
+  return audioResponse(audio, contentType, range);
 }
 
 /** The caller must first authorize the recording row and its associated call. */
 export async function loadPhoneRecording(
   location: string,
-  context?: { db: any; callId: string },
+  context?: { db?: any; callId?: string; range?: string | null },
 ): Promise<Response> {
   if (location.startsWith('supabase://')) {
     if (
       !context ||
+      !context.db ||
+      typeof context.callId !== 'string' ||
       !/^[0-9a-f-]{36}$/i.test(context.callId) ||
       location !== 'supabase://phone-voicemails/' + context.callId + '.wav'
     )
@@ -116,15 +182,7 @@ export async function loadPhoneRecording(
       Buffer.from(audio).toString('ascii', 8, 12) !== 'WAVE'
     )
       throw Error('Private recording is not WAV audio');
-    return new Response(audio, {
-      headers: {
-        'Content-Type': 'audio/wav',
-        'Content-Length': String(audio.length),
-        'Cache-Control': 'private, no-store, max-age=0',
-        'Content-Disposition': 'inline',
-        'X-Content-Type-Options': 'nosniff',
-      },
-    });
+    return audioResponse(audio, 'audio/wav', context.range);
   }
-  return loadCarrierRecording(location);
+  return loadCarrierRecording(location, context?.range);
 }

@@ -33,7 +33,7 @@ export default function OpenHandsRepairPanel(){
  return <section className="mt-4 rounded-md border border-[#3c3c3c] bg-[#252526] p-4 text-sm text-white" aria-label="Code repairs and releases">
   <div className="flex flex-wrap items-center justify-between gap-3"><h3 className="font-semibold">Code repairs &amp; releases</h3>
    <button type="button" className="min-h-11 rounded border border-gray-500 px-3" onClick={()=>{setError('');void refresh();}}>Refresh status</button></div>
-  <p className="my-3 text-gray-300">Send website, Studio, or Course Builder code repairs from Admin. Repairs run on the owned engine; PARIS validates the commits and opens a protected pull request before the Google release. OpenHands is opt-in only (PARIS_REPAIR_ENGINE=openhands) and unproven — it is not used by default.</p>
+  <p className="my-3 text-gray-300">Send website, Studio, or Course Builder code repairs from Admin. Repairs run on the owned engine; PARIS validates the commits and opens a protected pull request before the Google release. OpenHands has been removed — it is never used.</p>
   <label className="block" htmlFor="openhands-repair-goal">What needs repair?</label>
   <textarea id="openhands-repair-goal" className="mt-2 min-h-24 w-full rounded border border-gray-500 bg-[#1e1e1e] p-3 text-base" maxLength={12000} value={goal} onChange={e=>setGoal(e.target.value)} disabled={sending}/>
   <button type="button" className="mt-3 min-h-11 rounded bg-blue-600 px-4 font-semibold disabled:opacity-50" disabled={sending||!goal.trim()} onClick={()=>void submit()}>{sending?'Saving repair…':'Send repair'}</button>

@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+import { readFileSync, statSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 const read = (file: string) => readFileSync(file, 'utf8');
@@ -53,5 +53,6 @@ describe('program and apprenticeship experience regressions', () => {
     );
     expect(source).not.toContain('src="/videos/barber-lessons/barber-apprenticeship-intro.mp4"');
     expect(source).toContain('src="/videos/barber-hero-final.mp4"');
+    expect(statSync('public/videos/barber-hero-final.mp4').size).toBeGreaterThan(0);
   });
 });

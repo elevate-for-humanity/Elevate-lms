@@ -1,4 +1,6 @@
 import { Metadata } from 'next';
+// Branch refreshed to pick up main (a11d77d8): CI Preflight test fixes for the worker-start dispatcher/resume changes.
+// Branch refreshed to pick up main (e8b0e402): fresh CI after E2E shard 3/4 environment failure on the fcad399b base.
 import Link from 'next/link';
 import { ArrowRight, Check, Code, Shield } from 'lucide-react';
 import { STORE_PRODUCTS, CLONE_LICENSES } from '@/lib/data/store-products';
@@ -9,7 +11,7 @@ export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: `Platform Licenses | ${PLATFORM_DEFAULTS.orgName} Store`,
-  description: `Review managed ${PLATFORM_DEFAULTS.orgName} platform license options and contact sales for implementation scope.`,
+  description: `Compare ${PLATFORM_DEFAULTS.orgName} platform license options — buy self-host licenses instantly, or contact sales for managed implementation scope.`,
   alternates: { canonical: 'https://store.elevateforhumanity.org/store/licenses' },
 };
 
@@ -27,8 +29,8 @@ export default function LicensesPage() {
         image="/images/pages/admin-licensing-hero.webp"
         alt="Workforce training platform licensing and administration"
         eyebrow="Managed Platform Licensing"
-        title="License the Elevate Platform with implementation scoped to your organization"
-        description="Platform and source-use licenses require sales review, implementation scope and deployment terms before purchase. Self-service SaaS plans remain available through Store plans."
+        title="License the Elevate Platform — buy self-host licenses instantly or scope a managed deployment"
+        description="Developer and self-host licenses are available for instant purchase below. Managed platform licenses include implementation scoping with our team, and self-service SaaS plans remain available through Store plans."
         actions={(
           <>
             <Link href="#pricing" className="inline-flex items-center rounded-xl bg-brand-red-600 px-8 py-4 font-bold text-white hover:bg-brand-red-700">View License Options</Link>
@@ -41,7 +43,7 @@ export default function LicensesPage() {
         <div className="mx-auto max-w-7xl">
           <div className="mb-12 text-center">
             <h2 className="text-3xl font-black text-slate-950 md:text-4xl">Managed Platform License Options</h2>
-            <p className="mx-auto mt-3 max-w-2xl text-slate-700">Catalog amounts are starting points. Final scope, hosting, support, implementation and contract terms are confirmed before an invoice or payment link is issued.</p>
+            <p className="mx-auto mt-3 max-w-2xl text-slate-700">Managed platform amounts are starting points — final scope, hosting, support, implementation and contract terms are confirmed before an invoice or payment link is issued. The School license is available for instant purchase at the listed price.</p>
           </div>
 
           <div className="grid gap-7 md:grid-cols-2 xl:grid-cols-4">
@@ -60,7 +62,14 @@ export default function LicensesPage() {
                   ))}
                 </div>
 
-                <Link href={`/contact?topic=platform-licensing&product=${encodeURIComponent(product.slug)}`} className="mt-7 inline-flex items-center justify-center rounded-xl bg-slate-950 px-6 py-3 font-bold text-white hover:bg-slate-800">Request License Scope <ArrowRight className="ml-2 h-4 w-4" /></Link>
+                {product.slug === 'school-license' ? (
+                  <>
+                    <Link href="/store/cart?add=school-license" className="mt-7 inline-flex items-center justify-center rounded-xl bg-brand-red-600 px-6 py-3 font-bold text-white hover:bg-brand-red-700">Purchase Now <ArrowRight className="ml-2 h-4 w-4" /></Link>
+                    <Link href={`/contact?topic=platform-licensing&product=${encodeURIComponent(product.slug)}`} className="mt-3 inline-flex items-center justify-center text-sm font-bold text-slate-600 hover:text-slate-900">or request a scoped quote <ArrowRight className="ml-1 h-3.5 w-3.5" /></Link>
+                  </>
+                ) : (
+                  <Link href={`/contact?topic=platform-licensing&product=${encodeURIComponent(product.slug)}`} className="mt-7 inline-flex items-center justify-center rounded-xl bg-slate-950 px-6 py-3 font-bold text-white hover:bg-slate-800">Request License Scope <ArrowRight className="ml-2 h-4 w-4" /></Link>
+                )}
               </article>
             ))}
           </div>
@@ -73,12 +82,12 @@ export default function LicensesPage() {
             <div className="mb-12 text-center">
               <Code className="mx-auto mb-4 h-9 w-9 text-purple-700" />
               <h2 className="text-3xl font-black text-slate-950">Developer / Self-Host Licenses</h2>
-              <p className="mx-auto mt-3 max-w-2xl text-slate-700">Source-use and self-host arrangements require license terms, deployment scope and security responsibilities to be agreed before purchase.</p>
+              <p className="mx-auto mt-3 max-w-2xl text-slate-700">Buy a self-host license instantly and deploy it yourself. Source-use arrangements are scoped separately — talk to sales if you need one.</p>
             </div>
             <div className="grid gap-7 md:grid-cols-3">
               {CLONE_LICENSES.map((license) => (
                 <article key={license.id} className="rounded-2xl border border-slate-200 bg-white p-7">
-                  <div className="mb-3 inline-flex rounded-full bg-purple-50 px-3 py-1 text-xs font-black uppercase tracking-wide text-purple-800">Contact Sales</div>
+                  <div className="mb-3 inline-flex rounded-full bg-purple-50 px-3 py-1 text-xs font-black uppercase tracking-wide text-purple-800">Instant Purchase</div>
                   <h3 className="text-xl font-black text-slate-950">{license.name}</h3>
                   <p className="mt-3 text-sm leading-6 text-slate-700">{license.description}</p>
                   <p className="mt-5 text-3xl font-black text-purple-700">{priceLabel(license.price, license.billingType)}</p>
@@ -87,7 +96,8 @@ export default function LicensesPage() {
                       <p key={feature} className="flex items-start gap-2 text-sm text-slate-800"><Check className="mt-0.5 h-4 w-4 shrink-0 text-brand-green-700" /> {feature}</p>
                     ))}
                   </div>
-                  <Link href={`/contact?topic=source-license&product=${encodeURIComponent(license.slug)}`} className="mt-7 inline-flex w-full items-center justify-center rounded-xl bg-purple-700 px-6 py-3 font-bold text-white hover:bg-purple-800">Request License Scope</Link>
+                  <Link href={`/store/cart?add=${license.slug}`} className="mt-7 inline-flex w-full items-center justify-center rounded-xl bg-purple-700 px-6 py-3 font-bold text-white hover:bg-purple-800">Purchase Now <ArrowRight className="ml-2 h-4 w-4" /></Link>
+                  <Link href={`/contact?topic=source-license&product=${encodeURIComponent(license.slug)}`} className="mt-3 inline-flex w-full items-center justify-center text-sm font-bold text-slate-600 hover:text-slate-900">Questions? Talk to Sales</Link>
                 </article>
               ))}
             </div>
@@ -101,8 +111,8 @@ export default function LicensesPage() {
             <div className="flex items-start gap-4">
               <Shield className="mt-1 h-8 w-8 shrink-0 text-brand-blue-700" />
               <div>
-                <h2 className="text-2xl font-black text-slate-950">Why these licenses are managed</h2>
-                <p className="mt-3 leading-7 text-slate-700">Enterprise deployment, source access, security responsibilities, hosting, integrations, support and service commitments must be defined in an agreement. The Store does not treat those obligations as an instant self-service checkout.</p>
+                <h2 className="text-2xl font-black text-slate-950">Why managed platform licenses are scoped</h2>
+                <p className="mt-3 leading-7 text-slate-700">Managed platform deployments — hosting, integrations, support and service commitments — are defined in an agreement before purchase. Self-host licenses, by contrast, are available for instant purchase above.</p>
               </div>
             </div>
           </div>

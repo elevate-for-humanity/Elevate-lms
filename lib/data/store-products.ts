@@ -329,7 +329,7 @@ export const COMMUNITY_ADDONS: StoreProduct[] = [
     description: 'Add community marketplace features to your platform.',
     longDescription:
       'Enable your program owners to create and sell courses, build communities, and engage students. Perfect for training providers who want to offer additional programs.',
-    price: 9900, // $99/month
+    price: 99, // $99/month
     billingType: 'subscription',
     licenseType: 'single',
     appsIncluded: ['creator-dashboard', 'community-marketplace'],
@@ -353,7 +353,7 @@ export const COMMUNITY_ADDONS: StoreProduct[] = [
     description: 'Full community platform with multiple program owners.',
     longDescription:
       'Complete community solution for training providers with multiple programs. Includes creator marketplace, shop features, and advanced moderation tools.',
-    price: 19900, // $199/month
+    price: 199, // $199/month
     billingType: 'subscription',
     licenseType: 'school',
     appsIncluded: [
@@ -384,7 +384,7 @@ export const COMMUNITY_ADDONS: StoreProduct[] = [
     description: 'Unlimited community features for large organizations.',
     longDescription:
       'Enterprise-grade community platform with unlimited program owners, members, and advanced features. Includes white-label branding and dedicated support.',
-    price: 29900, // $299/month
+    price: 299, // $299/month
     billingType: 'subscription',
     licenseType: 'enterprise',
     appsIncluded: [

@@ -24,10 +24,9 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ checked: true, serviceAlerts: services.value });
   } catch (error) {
     // Emit only our error code, never provider payloads or identity tokens.
-    const code =
-      error instanceof Error && /^CLOUD_BUDGET_[A-Z_0-9]+$/.test(error.message)
-        ? error.message
-        : 'CLOUD_BUDGET_UNAVAILABLE';
+    const msg = error instanceof Error ? error.message : '';
+    const code = /^CLOUD_BUDGET_[A-Z_0-9]+$/.test(msg) ? msg : 'CLOUD_BUDGET_UNAVAILABLE';
+    console.error('cloud_budget_check_failed', { code, error: msg });
     return NextResponse.json({ error: code }, { status: 503 });
   }
 }

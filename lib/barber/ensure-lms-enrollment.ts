@@ -2,6 +2,7 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import { BARBER_COURSE_ID, BARBER_PROGRAM_SLUG } from '@/lib/barber/constants';
 import { PRESTIGE_ELEVATION_BARBER_CURRICULUM } from '@/lib/barber/branding';
 import { logger } from '@/lib/logger';
+import { paidAccessGrantFields } from '@/lib/enrollment/paid-access.mjs';
 
 export async function ensureBarberLmsEnrollment(
   db: SupabaseClient,
@@ -27,9 +28,30 @@ export async function ensureBarberLmsEnrollment(
     updated_at: now,
   };
   if (options?.grantAccess) {
-    patch.access_granted_at = now;
-    patch.enrollment_state = 'active';
-    patch.status = 'active';
+    // Stamp the access fields only when the row would then pass the
+    // approved-paid gate (verified self-pay payment, or an already-approved
+    // row). The previous code set access_granted_at without access_status
+    // at all, so a "granted" barber learner still bounced to
+    // /lms/access-pending — and a half-granted row (access_granted_at set,
+    // gate still failing) can never be repaired by the manual grant-access
+    // route, which 409s once access_granted_at is set.
+    const { data: enrollmentRow } = await db
+      .from('program_enrollments')
+      .select('status,payment_status,payment_reference,funding_source,funding_verified,eligibility_status,self_pay_application_verified_at,approved_at,approved_by,access_granted_at,access_status,revoked_at,cancelled_at,suspended_at,refunded_at')
+      .eq('user_id', userId)
+      .eq('program_slug', BARBER_PROGRAM_SLUG)
+      .maybeSingle();
+    const accessPatch = enrollmentRow
+      ? paidAccessGrantFields({ ...enrollmentRow, status: 'active' }, now)
+      : null;
+    if (accessPatch) {
+      Object.assign(patch, accessPatch, {
+        enrollment_state: 'active',
+        status: 'active',
+      });
+    } else {
+      logger.warn('[ensureBarberLmsEnrollment] grantAccess skipped: enrollment does not qualify for approved-paid access', { userId });
+    }
   }
 
   const { error: peError } = await db

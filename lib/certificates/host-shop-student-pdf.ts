@@ -2,7 +2,7 @@ import { PDFDocument, PDFName, PDFRawStream, StandardFonts, rgb } from 'pdf-lib'
 import fontkit from '@pdf-lib/fontkit';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
-import type { HostStudentCertificate } from './host-shop-student-records';
+import { enrollmentCertificationContinuation, type HostStudentCertificate } from './host-shop-student-records';
 
 export async function hostStudentCertificatePdf(record: HostStudentCertificate) {
   const pdf = await PDFDocument.create();
@@ -37,17 +37,43 @@ export async function hostStudentCertificatePdf(record: HostStudentCertificate) 
   center('CAREER & TECHNICAL INSTITUTE', 517, 11);
   page.drawLine({ start: { x: 280, y: 496 }, end: { x: 512, y: 496 }, color: red, thickness: 3 });
   center(record.title, 452, 34, bold, red);
-  center(record.completion ? 'This certifies successful course completion by' : record.status === 'application' ? 'This acknowledges the application of' : 'This certifies the current student record for', 410, 14, sans, gray);
-  center(record.studentName, 357, 34, bold);
-  center(record.program, 318, 19, bold);
-  center(record.completion ? 'CREDENTIAL EARNED' : 'HOST TRAINING SITE', 272, 10, sans, gray);
-  center(record.shopName, 245, 23, bold);
-  const status = record.status === 'enrolled' ? 'Enrollment recorded with Elevate for Humanity' : record.status === 'application' ? 'Application received - enrollment and training authorization pending' : 'Host-site placement recorded - enrollment not confirmed';
-  const completionDate = (value: string) => new Date(value + 'T12:00:00Z').toLocaleDateString('en-US', { timeZone: 'America/New_York', year: 'numeric', month: 'long', day: 'numeric' });
-  center(record.completion ? `Started: ${completionDate(record.completion.startDate)} | Completed: ${completionDate(record.completion.completionDate)}` : status, 202, 12, sans, gray);
   const dateValue = record.recordDate && /^\d{4}-\d{2}-\d{2}$/.test(record.recordDate) ? `${record.recordDate}T12:00:00Z` : record.recordDate;
   const date = dateValue ? new Date(dateValue).toLocaleDateString('en-US', { timeZone: 'America/New_York', year: 'numeric', month: 'long', day: 'numeric' }) : 'Not recorded';
-  center(`${record.completion ? 'Issued date' : 'Record date'}: ${date}`, 178, 11, sans, gray);
+  if (record.status === 'enrolled' && !record.completion) {
+    // Enrollment certificates carry the full certification statement: who is
+    // enrolled, in what role and program, under which sponsor, and where the
+    // hands-on training happens — all from the record, wrapped to fit.
+    center('This certifies that', 416, 14, sans, gray);
+    center(record.studentName, 366, 34, bold);
+    const statement = enrollmentCertificationContinuation(record);
+    const wrapStatement = (size: number) => {
+      const lines: string[] = [];
+      let line = '';
+      for (const word of statement.split(/\s+/).filter(Boolean)) {
+        const next = line ? `${line} ${word}` : word;
+        if (line && sans.widthOfTextAtSize(next, size) > 640) { lines.push(line); line = word; } else line = next;
+      }
+      if (line) lines.push(line);
+      return lines;
+    };
+    let statementSize = 12;
+    let statementLines = wrapStatement(statementSize);
+    if (statementLines.length > 4) { statementSize = 11; statementLines = wrapStatement(statementSize); }
+    statementLines.forEach((text, index) => center(text, 326 - index * (statementSize + 5), statementSize, sans, navy));
+    center('HOST TRAINING SITE', 238, 10, sans, gray);
+    center(record.shopName, 212, 23, bold);
+    center(`Record date: ${date}`, 182, 11, sans, gray);
+  } else {
+    center(record.completion ? 'This certifies successful course completion by' : record.status === 'application' ? 'This acknowledges the application of' : 'This certifies the current student record for', 410, 14, sans, gray);
+    center(record.studentName, 357, 34, bold);
+    center(record.program, 318, 19, bold);
+    center(record.completion ? 'CREDENTIAL EARNED' : 'HOST TRAINING SITE', 272, 10, sans, gray);
+    center(record.shopName, 245, 23, bold);
+    const status = record.status === 'enrolled' ? 'Enrollment recorded with Elevate for Humanity' : record.status === 'application' ? 'Application received - enrollment and training authorization pending' : 'Host-site placement recorded - enrollment not confirmed';
+    const completionDate = (value: string) => new Date(value + 'T12:00:00Z').toLocaleDateString('en-US', { timeZone: 'America/New_York', year: 'numeric', month: 'long', day: 'numeric' });
+    center(record.completion ? `Started: ${completionDate(record.completion.startDate)} | Completed: ${completionDate(record.completion.completionDate)}` : status, 202, 12, sans, gray);
+    center(`${record.completion ? 'Issued date' : 'Record date'}: ${date}`, 178, 11, sans, gray);
+  }
   if (record.status === 'enrolled') {
     center('2Exclusive LLC-S', 158, 12, bold);
     center('DOL Apprenticeship Sponsor', 142, 10);

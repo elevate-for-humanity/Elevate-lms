@@ -48,7 +48,7 @@ function slugify(value: string): string {
     .slice(0, 90);
 }
 
-function canonicalLessonSlug(lesson: BuilderLesson): string {
+export function canonicalLessonSlug(lesson: BuilderLesson): string {
   const base = slugify(lesson.slug || lesson.title);
   const suffix =
     lesson.lessonType === 'checkpoint' ? 'checkpoint' :
@@ -100,6 +100,7 @@ export function adaptProgramTemplateToBlueprint(template: ProgramBuilderTemplate
       const content = JSON.stringify({
         ...lesson.content,
         compliance,
+        builderAssignments: lesson.assignments ?? [],
         renderedHtml: lesson.renderedHtml ?? null,
       });
 
@@ -242,6 +243,16 @@ export function adaptProgramTemplateToBlueprint(template: ProgramBuilderTemplate
     regulatory: template.regulatory,
     credentialTarget: template.credentialTarget,
     minimumHours: template.minimumHours,
+    // Single builder: the government job-feed evidence and SOC code travel
+    // with the blueprint into generation (CredentialBlueprint carries them
+    // via its index signature; see lib/curriculum/blueprints/types.ts).
+    socCode: template.socCode ?? null,
+    cipCode: template.cipCode ?? null,
+    tuition: template.tuition ?? null,
+    funding: template.funding ?? null,
+    workbook: template.workbook ?? null,
+    handsOnTrade: template.handsOnTrade ?? false,
+    workforceEvidence: (template.workforceEvidence ?? null) as unknown as Record<string, unknown> | null,
   };
 }
 

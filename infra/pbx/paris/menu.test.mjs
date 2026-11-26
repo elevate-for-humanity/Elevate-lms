@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {menuOptions,menuRoute,openingText} from './menu.mjs';
-import {handleDtmf} from './ari-media.mjs';
+import {menuOptions,menuRoute,openingText,operatorExtension} from './menu.mjs';
+import {handleDtmf,routeOperator} from './ari-media.mjs';
 import {makeTurnHandler,callerRouteIntent} from './turn-adapter.mjs';
 
 const entries=Array.from({length:8},(_,digit)=>({digit:String(digit),label:digit===0?'Administration':`Approved program ${digit}`,extension:digit===0?'0':String(100+digit)}));
@@ -88,4 +88,66 @@ test('failed menu transfer returns the caller to the existing voicemail fallback
     menu,allowedExtensions,routeExtension:async()=>{throw Error('ARI error');},finish:async(...args)=>calls.push(args),
   });
   assert.deepEqual(calls,[[session,'continue']]);
+});
+
+// The operator destination behind digit 0 is the phone system's configured
+// admin extension (phone_systems.admin_extension), not a literal '0' row.
+const operatorEntries=Array.from({length:8},(_,digit)=>({digit:String(digit),label:digit===0?'Administration':`Approved program ${digit}`,extension:digit===0?'100':String(100+digit)}));
+const operatorMenu=JSON.stringify(operatorEntries);
+
+test('menu contract resolves the operator digit to the configured admin extension',()=>{
+  const options=menuOptions(operatorMenu,allowedExtensions,'100');
+  assert.deepEqual(menuRoute('0',options,'100'),{type:'operator',extension:'100'});
+  assert.deepEqual(menuRoute('5',options,'100'),{type:'extension',extension:'105'});
+  assert.ok(openingText('Welcome.',options).includes('For Administration, press 0.'));
+  const direct=menuOptions(JSON.stringify([{digit:'5',label:'Front desk',extension:'100'}]),allowedExtensions,'100');
+  assert.deepEqual(menuRoute('5',direct,'100'),{type:'operator',extension:'100'});
+});
+
+test('menu validation ties digit 0 to the configured operator target, not a literal 0',()=>{
+  for(const invalid of [
+    [{...operatorEntries[0],extension:'0'}],
+    [{...operatorEntries[0],extension:'101'}],
+  ])assert.throws(()=>menuOptions(JSON.stringify(invalid),allowedExtensions,'100'),/PARIS_MENU_INVALID/);
+  // A stale menu still pointing digit 0 at extension '0' is rejected once the target moves.
+  assert.throws(()=>menuOptions(menu,allowedExtensions,'100'),/PARIS_MENU_INVALID/);
+  assert.throws(()=>operatorExtension('1234'),/PARIS_MENU_INVALID/);
+  assert.equal(operatorExtension(' 100 '),'100');
+  assert.equal(operatorExtension('0'),'0');
+});
+
+test('operator target defaults to the legacy extension when unconfigured',()=>{
+  const options=menuOptions(menu,allowedExtensions);
+  assert.deepEqual(menuRoute('0',options),{type:'operator',extension:'0'});
+});
+
+test('operator target can arrive through the service environment',()=>{
+  process.env.PARIS_OPERATOR_EXTENSION='100';
+  try{
+    const options=menuOptions(operatorMenu,allowedExtensions);
+    assert.deepEqual(menuRoute('0',options),{type:'operator',extension:'100'});
+  }finally{delete process.env.PARIS_OPERATOR_EXTENSION;}
+});
+
+test('spoken operator requests resolve to the configured target',()=>{
+  assert.deepEqual(callerRouteIntent('Please transfer me to the operator.',{menu:operatorMenu,allowedExtensions,operatorExtension:'100'}),{type:'operator',extension:'100'});
+  assert.deepEqual(callerRouteIntent('Option 0 please.',{menu:operatorMenu,allowedExtensions,operatorExtension:'100'}),{type:'operator',extension:'100'});
+});
+
+test('keypad 0 hands off with the configured operator target',async()=>{
+  const session={callId:'owned-caller',playing:true,busy:true,frames:[]};
+  const calls=[];
+  const deps={menu:operatorMenu,allowedExtensions,operatorExtension:'100',route:async(...args)=>calls.push(args),routeExtension:async(...args)=>calls.push(args),finish:async(...args)=>calls.push(args)};
+  await handleDtmf({type:'ChannelDtmfReceived',digit:'0',channel:{id:session.callId}},new Map([[session.callId,session]]),deps);
+  assert.deepEqual(calls,[[session.callId,{type:'operator',extension:'100'}],[session]]);
+  assert.equal(session.transferring,true);
+});
+
+test('operator handoff accepts only the configured target and enters the dialplan operator entry',async()=>{
+  const calls=[];
+  const request=async(path,method,data)=>{calls.push([path,method,data]);return path.startsWith('/applications')?{channel_ids:[]}:{};};
+  await routeOperator('owned-caller',{type:'operator',extension:'100'},request,async()=>{},'100');
+  assert.deepEqual(calls[0],['/channels/owned-caller/continue','POST',{context:'internal',extension:'0',priority:1}]);
+  await assert.rejects(()=>routeOperator('owned-caller',{type:'operator',extension:'0'},request,async()=>{},'100'),/ROUTE_NOT_ALLOWED/);
+  await assert.rejects(()=>routeOperator('owned-caller',{type:'operator',extension:'100'},request,async()=>{},'0'),/ROUTE_NOT_ALLOWED/);
 });

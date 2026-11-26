@@ -160,7 +160,7 @@ export default function InstitutionalGovernancePage() {
                 <div>
                   <dt className="text-slate-500 text-xs uppercase tracking-wider">Location</dt>
                   <dd className="font-semibold text-slate-900 mt-0.5">
-                    6331 N Keystone Ave, Suite D, Indianapolis, IN 46220 (Marion County)
+                    120 East Market Street, Suite 930, Indianapolis, IN 46204 (Marion County)
                   </dd>
                 </div>
               </dl>

@@ -9,10 +9,10 @@ type FormState = Record<string, string>;
 const DEFAULTS: FormState = {
   legal_name: PLATFORM_DEFAULTS.orgLegalName,
   org_type: '2Exclusive LLC-S (DBA)',
-  address: '8888 Keystone Crossing, Suite 1300',
+  address: '120 East Market Street, Suite 930, Indianapolis, IN 46204',
   city: 'Indianapolis',
   state: 'IN',
-  zip: '46240',
+  zip: '46204',
   ein: '85-3832840',
   uei: 'VX2GK5S8SZH8',
   rep_name: 'Elizabeth Greene',

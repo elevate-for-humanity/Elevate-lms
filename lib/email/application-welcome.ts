@@ -429,7 +429,7 @@ ${buildNextStepsHtml(p)}
 
 </div>
 <div style="padding:20px;text-align:center;color:#6b7280;font-size:13px;margin-top:16px">
-<p>2Exclusive LLC-S d/b/a Elevate for Humanity Career &amp; Technical Institute<br>8888 Keystone Crossing Suite 1300, Indianapolis, IN 46240</p>
+<p>2Exclusive LLC-S d/b/a Elevate for Humanity Career &amp; Technical Institute<br>120 East Market Street, Suite 930, Indianapolis, IN 46204</p>
 </div>
 </div>
 </body></html>`;

@@ -105,7 +105,7 @@ export async function generateTppOverviewPdf(): Promise<Uint8Array> {
   };
   const runFtr = (pg: PDFPage) => {
     pg.drawLine({ start: { x: ML, y: MB + 14 }, end: { x: W - MR, y: MB + 14 }, thickness: 0.4, color: RULE });
-    pg.drawText(`${PLATFORM_DEFAULTS.orgLegalName}  ·  8888 Keystone Crossing, Suite 1300, Indianapolis, IN 46240  ·  ${PLATFORM_DEFAULTS.supportPhone}`, { x: ML, y: MB + 4, size: 6.5, font: reg, color: LGRAY });
+    pg.drawText(`${PLATFORM_DEFAULTS.orgLegalName}  ·  120 East Market Street, Suite 930, Indianapolis, IN 46204  ·  ${PLATFORM_DEFAULTS.supportPhone}`, { x: ML, y: MB + 4, size: 6.5, font: reg, color: LGRAY });
   };
 
   // ══════════════════════════════════════════════════════════════════
@@ -115,7 +115,7 @@ export async function generateTppOverviewPdf(): Promise<Uint8Array> {
   if (logo) { const lh = 62, lw = (logo.width / logo.height) * lh; page.drawImage(logo, { x: ML, y: H - 76, width: lw, height: lh }); }
   const hx0 = logo ? ML + (logo.width / logo.height) * 62 + 14 : ML;
   t(PLATFORM_DEFAULTS.orgLegalName, hx0, H - 30, bold, 11, HTXT);
-  t('8888 Keystone Crossing, Suite 1300  ·  Indianapolis, IN 46240', hx0, H - 44, reg, 8, rgb(0.75, 0.85, 1));
+  t('120 East Market Street, Suite 930  ·  Indianapolis, IN 46204', hx0, H - 44, reg, 8, rgb(0.75, 0.85, 1));
   t(`${PLATFORM_DEFAULTS.supportPhone}  ·  elevate4humanityedu@gmail.com  ·  ${PLATFORM_DEFAULTS.canonicalDomain}`, hx0, H - 57, reg, 8, rgb(0.75, 0.85, 1));
   t('EIN: 85-3832840  ·  UEI: VX2GK5S8SZH8  ·  CAGE: 0Q856  ·  RAPIDS: 2025-IN-132301', hx0, H - 70, reg, 7.5, rgb(0.65, 0.78, 1));
   y = H - 104; y -= 20;

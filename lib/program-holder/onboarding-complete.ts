@@ -153,7 +153,7 @@ async function sendWelcomeEmail(opts: {
         </td></tr>
         <tr><td style="background:#f8fafc;padding:20px 32px;text-align:center;border-top:1px solid #e2e8f0">
           <p style="color:#94a3b8;font-size:12px;margin:0">Elevate for Humanity Career &amp; Technical Institute</p>
-          <p style="color:#94a3b8;font-size:12px;margin:4px 0">8888 Keystone Crossing Suite 1300, Indianapolis, IN 46240</p>
+          <p style="color:#94a3b8;font-size:12px;margin:4px 0">120 East Market Street, Suite 930, Indianapolis, IN 46204</p>
           <p style="color:#94a3b8;font-size:12px;margin:4px 0">${PLATFORM_DEFAULTS.supportPhone}</p>
         </td></tr>
       </table>

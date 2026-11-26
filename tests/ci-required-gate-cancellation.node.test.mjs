@@ -33,3 +33,11 @@ test('pending exact-head browser evidence exits normally before the CI job timeo
   assert.match(step, /^\s+E2E_EVIDENCE_TIMEOUT_MS:\s*'0'\s*$/m, 'Use a single evidence check; the trusted completion finalizer handles pending browsers');
   assert.match(step, /^\s+run: node scripts\/ci\/require-exact-pr-browser-evidence\.mjs\s*$/m);
 });
+
+test('browser completion reconciliation is isolated by source repository, branch and exact head', () => {
+  const finalizer = readFileSync(new URL('../.github/workflows/resume-ci-browser-gate.yml', import.meta.url), 'utf8');
+  const group = finalizer.match(/^  group: (.+)$/m)?.[1];
+  assert.equal(group, 'browser-ci-receipt-${{ github.repository }}-${{ github.event.workflow_run.head_repository.id }}-${{ github.event.workflow_run.head_branch }}-${{ github.event.workflow_run.head_sha }}');
+  assert.match(finalizer, /^  cancel-in-progress: false$/m);
+  assert.match(finalizer, /ref: \$\{\{ github\.sha \}\}/, 'Privileged finalizer must keep executing trusted main');
+});

@@ -1,9 +1,12 @@
+// Branch refreshed to pick up main (71e31a22): /apply/student E2E fix + Dockerfile.google-lms.
 import HeroPicture from '@/components/marketing/HeroPicture';
 import { siteConfig } from '@/lib/config/site';
 import { Metadata } from 'next';
 import { Phone, Mail, MapPin, Clock, MessageSquare, Users, Building2 } from 'lucide-react';
 import Link from 'next/link';
 import { ContactRequestForm } from '@/components/forms/ContactRequestForm';
+import { HOST_SHOP_REGIONS } from '@/lib/marketing/host-shop-regions';
+import { PROGRAM_LABELS } from '@/lib/programs/host-shop-programs';
 import { COURSE_BUILDER_REQUESTS } from '@/lib/course-builder/offer';
 
 export const metadata: Metadata = {
@@ -29,10 +32,17 @@ export default async function ContactPage({ searchParams }: ContactPageProps) {
   const courseBuilderMessage = Object.hasOwn(COURSE_BUILDER_REQUESTS, product)
     ? COURSE_BUILDER_REQUESTS[product as keyof typeof COURSE_BUILDER_REQUESTS]
     : null;
-  const defaultSubject = courseBuilderMessage ? 'course-builder' : course ? 'enrollment' : requestedItem ? 'other' : '';
-  const defaultMessage = courseBuilderMessage ?? (requestedItem
-    ? `I would like current availability, delivery details, access terms, and final pricing for ${titleFromSlug(requestedItem)}.`
-    : '');
+  const apprenticeship = typeof params.apprenticeship === 'string' ? params.apprenticeship : '';
+  const isApprenticeshipInquiry = apprenticeship === 'general' || Object.hasOwn(PROGRAM_LABELS, apprenticeship);
+  const region = HOST_SHOP_REGIONS.find((entry) => entry.slug === params.region);
+  const community = typeof params.community === 'string' ? params.community.trim().slice(0, 80) : '';
+  const location = [community, region?.city].filter(Boolean).join(', ');
+  const defaultSubject = courseBuilderMessage ? 'course-builder' : isApprenticeshipInquiry ? 'apprenticeship' : course ? 'enrollment' : requestedItem ? 'other' : '';
+  const defaultMessage = courseBuilderMessage ?? (isApprenticeshipInquiry
+    ? `I would like information about ${PROGRAM_LABELS[apprenticeship] ?? 'apprenticeship opportunities'}${location ? ` near ${location}` : ' in Indiana'}.`
+    : requestedItem
+      ? `I would like current availability, delivery details, access terms, and final pricing for ${titleFromSlug(requestedItem)}.`
+      : '');
 
   return (
     <main id="main-content" className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">

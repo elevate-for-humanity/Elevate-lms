@@ -38,9 +38,16 @@ export async function GET(req: Request) {
   }
 
   const escalated = typeof data === 'number' ? data : 0;
+  // webhook_health_log.endpoint_status is NOT NULL and open_flags is text:
+  // without provider/endpoint_status (and with a numeric open_flags) this
+  // insert failed on every run and the failure was swallowed below as a
+  // non-fatal warning, which is why the log went stale on 2026-09-07 even
+  // though this cron kept running daily.
   const { error: healthLogError } = await db.from('webhook_health_log').insert({
+    provider: 'funding-escalation',
+    endpoint_status: escalated > 0 ? 'degraded' : 'ok',
     checked_at: timestamp,
-    open_flags: escalated,
+    open_flags: String(escalated),
     notes: `funding-escalation cron: ${escalated} enrollment(s) escalated`,
   });
   if (healthLogError) {
@@ -64,3 +71,4 @@ export async function GET(req: Request) {
 
   return NextResponse.json({ ok: true, escalated, timestamp });
 }
+

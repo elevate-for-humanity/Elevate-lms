@@ -151,6 +151,35 @@ self.addEventListener('push', (event) => {
     data = { title: 'Elevate Admin', body: event.data.text() };
   }
 
+  // Call-wake pushes (lib/phone/call-wake.ts) carry data.type 'incoming_call'.
+  // They are not ordinary notifications: the phone must buzz hard, the alert
+  // must stay on screen until tapped, and the click must land on the phone
+  // page in wake mode so the call can be answered.
+  const payload = data && typeof data.data === 'object' && data.data ? data.data : {};
+  const isCallWake = payload.type === 'incoming_call' || data.type === 'incoming_call';
+
+  if (isCallWake) {
+    const callId = typeof payload.callId === 'string' ? payload.callId : '';
+    const options = {
+      body: data.body || 'Tap to open your phone and answer.',
+      icon: '/icon-192.png',
+      badge: '/icon-96.png',
+      vibrate: data.vibrate || [400, 200, 400, 200, 400, 200, 400],
+      tag: data.tag || (callId ? `incoming-call-${callId}` : 'incoming-call'),
+      renotify: true,
+      requireInteraction: true,
+      data: {
+        url: data.url || '/phone/dial-pad?wake=1',
+        type: 'incoming_call',
+        callId,
+        extension: typeof payload.extension === 'string' ? payload.extension : '',
+        caller: typeof payload.caller === 'string' ? payload.caller : '',
+      },
+    };
+    event.waitUntil(self.registration.showNotification(data.title || 'Incoming call', options));
+    return;
+  }
+
   const options = {
     body: data.body || 'You have a new notification',
     silent: data.silent === true,
@@ -169,8 +198,33 @@ self.addEventListener('push', (event) => {
 
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
-  const url = event.notification.data?.url || '/';
-  event.waitUntil(clients.openWindow(url));
+  const target = event.notification.data?.url || '/';
+  event.waitUntil(
+    (async () => {
+      // Fastest path to the call: focus an app window that is already open
+      // and navigate it straight to the target (for a call wake, the phone
+      // page in wake mode) instead of cold-opening a new window.
+      const targetUrl = new URL(target, self.location.origin);
+      const windowClients = await clients.matchAll({ type: 'window', includeUncontrolled: true });
+      for (const client of windowClients) {
+        if (new URL(client.url).origin !== targetUrl.origin) continue;
+        try {
+          await client.focus();
+        } catch {
+          continue;
+        }
+        if ('navigate' in client) {
+          try {
+            await client.navigate(targetUrl.href);
+          } catch {
+            // The focused window is already usable; navigation is a shortcut.
+          }
+        }
+        return;
+      }
+      await clients.openWindow(targetUrl.href);
+    })(),
+  );
 });
 
 self.addEventListener('message', (event) => {

@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { logger } from '@/lib/logger';
 import { resolveCourseEnrollment } from '@/lib/enrollment/resolve-course-enrollment';
 
 export const runtime = 'nodejs';
@@ -151,7 +152,9 @@ async function _POST(req: NextRequest) {
 
       issued++;
     } catch (error) {
-      errors.push({ row, err: error instanceof Error ? error.message : 'Unknown error' });
+      const msg = error instanceof Error ? error.message : 'Unknown error';
+      logger.error('Bulk certificate issue failed for a row', { row, error: msg });
+      errors.push({ row, err: 'Certificate could not be issued for this row.' });
     }
   }
 

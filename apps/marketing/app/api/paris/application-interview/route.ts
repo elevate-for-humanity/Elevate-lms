@@ -11,6 +11,7 @@ import {
   updateAgenticProjectMetadata,
 } from '@/lib/agentic/project-service';
 import { createClient } from '@/lib/supabase/server';
+import { parseApplicationSessionCookie } from '@/lib/paris/admissions/application-session-cookie';
 import {
   applyInterviewAnswer,
   applicationInterviewReadyForSubmission,
@@ -40,14 +41,7 @@ const requestSchema = z.object({
 });
 
 function readSessionCookie(request: NextRequest): { projectId: string; resumeToken: string } | null {
-  const raw = request.cookies.get(COOKIE_NAME)?.value;
-  if (!raw) return null;
-  const separator = raw.indexOf('.');
-  if (separator <= 0) return null;
-  const projectId = raw.slice(0, separator);
-  const resumeToken = raw.slice(separator + 1);
-  if (!projectId || !resumeToken) return null;
-  return { projectId, resumeToken };
+  return parseApplicationSessionCookie(request.cookies.get(COOKIE_NAME)?.value);
 }
 
 function stateFromMetadata(metadata: Record<string, unknown>, locale: ApplicationInterviewLocale): ApplicationInterviewState {

@@ -1,5 +1,6 @@
 import type { TradesProgramData } from '@/components/programs/TradesProgramPage';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { FORKLIFT_MANUFACTURING as forkliftPlan } from '@/lib/programs/forklift-manufacturing';
 
 const SHARED = {
   cohortMin: 15,
@@ -422,86 +423,41 @@ export const PLUMBING_DATA: TradesProgramData = {
 };
 
 export const FORKLIFT_DATA: TradesProgramData = {
+  ...SHARED,
   slug: 'forklift',
-  name: 'Forklift Operator Certification',
-  tagline:
-    'OSHA-compliant powered industrial truck certification. Classroom instruction, hands-on evaluation, and written test in one day.',
-  heroImage: '/images/hvac-training-vibrant-2026.webp',
+  name: forkliftPlan.title,
+  tagline: forkliftPlan.subtitle,
+  heroImage: '/images/refresh-20261014/forklift.webp',
   secondaryImage: '/images/pages/training-classroom.webp',
-  careerImage: '/images/hvac-training-vibrant-2026.webp',
-  duration: '1 day (8 hours)',
-  totalHours: '8 hours',
-  rtiHours: '4 hours (classroom)',
-  ojtHours: '4 hours (hands-on driving evaluation)',
-  modality: 'In-person — classroom instruction + hands-on driving evaluation and written test',
-  credentials: [
-    {
-      name: 'OSHA-Compliant Forklift Operator Certification',
-      issuingBody: 'OSHA / Employer-Verified (29 CFR 1910.178)',
-    },
-  ],
-  curriculum: [
-    {
-      week: 'Morning',
-      title: 'OSHA Regulations & Safety',
-      topics: [
-        'OSHA 29 CFR 1910.178 requirements',
-        'Employer and operator responsibilities',
-        'Accident prevention and reporting',
-        'PPE requirements',
-      ],
-      image: '/images/pages/training-classroom.webp',
-    },
-    {
-      week: 'Morning',
-      title: 'Pre-Operation & Operating Principles',
-      topics: [
-        'Daily inspection checklist',
-        'Stability triangle and load capacity',
-        'Center of gravity and turning radius',
-        'Speed control and braking',
-      ],
-      image: '/images/hvac-training-vibrant-2026.webp',
-    },
-    {
-      week: 'Afternoon',
-      title: 'Load Handling & Hazard Recognition',
-      topics: [
-        'Proper load engagement and stacking',
-        'Dock operations and ramp travel',
-        'Pedestrian safety and blind spots',
-        'Confined space operation',
-      ],
-    },
-    {
-      week: 'Afternoon',
-      title: 'Practical Evaluation',
-      topics: [
-        'Forward and reverse travel',
-        'Turning and maneuvering',
-        'Stacking and unstacking',
-        'Written test and certification',
-      ],
-    },
-  ],
+  careerImage: '/images/refresh-20261014/forklift.webp',
+  duration: forkliftPlan.duration,
+  totalHours: '48 planned online hours; actual supervised practical hours recorded separately',
+  rtiHours: '48 hours (8 forklift + 16 assembly + 24 quality inspection)',
+  ojtHours: 'Planning estimate: 2–4 weeks; qualified partner, actual hours and schedule pending',
+  modality: 'Hybrid: online lessons, simulations and workbooks; a qualified practical partner is being arranged',
+  credentials: [],
+  curriculum: forkliftPlan.blocks.map(block => ({ week: `${block.hours} online hours`, title: block.title, topics: [...block.topics], project: 'Complete the matching workbook assignments and scenario practice.' })),
   admissionsRequirements: [
     '18 years or older',
     'Valid photo ID',
-    'Physical ability to operate powered industrial truck',
-    'No active restrictions on operating heavy equipment',
+    'Practical partner or employer, site, equipment, instructor, hours and total costs confirmed before enrollment',
+    'Access to an internet-connected computer or tablet',
   ],
   materialsIncluded: [
-    'All training materials',
-    'PPE (safety vest, hard hat)',
-    'Certification card',
-    'Exam fee',
+    'Online curriculum and interactive scenarios',
+    'Student workbook',
+    'Employer practical guide and evaluation forms',
   ],
-  workBasedLearning: 'Hands-on forklift operation during training — warehouse and dock simulation',
+  workBasedLearning: `${forkliftPlan.partnerReadiness} ${forkliftPlan.practicalDisclosure} ${forkliftPlan.credentialDisclosure}`,
   careers: [
-    { title: 'Forklift Operator', salaryRange: '$32K–$42K' },
-    { title: 'Warehouse Associate', salaryRange: '$30K–$40K' },
-    { title: 'Shipping/Receiving Lead', salaryRange: '$38K–$48K' },
-    { title: 'Warehouse Supervisor', salaryRange: '$45K–$60K' },
+    { title: 'Industrial Truck and Tractor Operator', salaryRange: 'Employer-set' },
+    { title: 'Team Assembler', salaryRange: 'Employer-set' },
+    { title: 'Quality Inspection Assistant', salaryRange: 'Employer-set' },
   ],
-  ...SHARED,
+  costPerParticipant: 'Confirm tuition with admissions',
+  examFeesIncluded: false,
+  nextLevelJobsEligible: false,
+  schedule: forkliftPlan.schedule,
+  attendanceTracking: 'Record actual online participation and supervised practical hours separately; planned hours do not automatically award attendance credit.',
+  paymentTerms: 'Confirm tuition, practical training costs and any employer sponsorship in writing before enrollment.',
 };

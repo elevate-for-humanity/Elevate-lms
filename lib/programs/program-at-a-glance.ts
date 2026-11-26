@@ -59,14 +59,14 @@ function fundingSummary(program: ProgramSchema): string {
 /** Six-row summary for program detail pages (workforce reviewer checklist). */
 export function buildProgramAtAGlance(program: ProgramSchema): ProgramAtAGlanceRow[] {
   const weeks = program.durationWeeks;
-  const duration =
+  const duration = program.durationDisplay || (
     weeks <= 0
       ? program.programType === 'apprenticeship'
         ? 'Competency-based — completion depends on verified requirements'
         : 'Duration confirmed during enrollment'
       : weeks >= 52
         ? `${weeks} weeks (${program.schedule})`
-        : `${weeks} ${weeks === 1 ? 'week' : 'weeks'} · ${program.hoursPerWeekMin}–${program.hoursPerWeekMax} hrs/week`;
+        : `${weeks} ${weeks === 1 ? 'week' : 'weeks'} · ${program.hoursPerWeekMin}–${program.hoursPerWeekMax} hrs/week`);
 
   const costDetail = program.regularPrice || program.salePrice
     ? [

@@ -1,4 +1,5 @@
 import { getProgramCardImage, getProgramHeroImage } from '@/lib/images/programImages';
+import { FORKLIFT_MANUFACTURING as forkliftPlan } from '@/lib/programs/forklift-manufacturing';
 /**
  * Program data - Single source of truth
  * Update this file to change program information across the site
@@ -192,13 +193,13 @@ export const PROGRAMS: ProgramData[] = [
   },
   {
     slug: 'forklift',
-    name: 'Forklift Operator Certification',
-    blurb:
-      'OSHA-compliant forklift operator certification in 1-2 weeks. Covers powered industrial truck operation, safety standards, load handling, warehouse operations, and practical driving evaluation at employer partner site. 3-star Indiana Top Jobs demand rating. Immediate employability at distribution centers.',
-    funding: 'WIOA • Workforce Grants',
-    duration: '1–2 Weeks • 40 Hours',
+    name: forkliftPlan.title,
+    blurb: forkliftPlan.subtitle,
+    funding: 'Tuition and employer sponsorship subject to confirmation; not currently ETPL approved',
+    duration: forkliftPlan.duration,
     image: getProgramCardImage('forklift'),
-    etplApproved: true,
+    etplApproved: false,
+    syllabusUrl: '/docs/forklift-manufacturing/Program_Syllabus.pdf',
   },
   {
     slug: 'pharmacy-tech',
@@ -430,39 +431,35 @@ export const LOC_PROGRAM_SPECS: Record<string, LOCProgramSpec> = {
   },
 
   forklift: {
+    ...SHARED_LOC_FIELDS,
     slug: 'forklift',
-    name: 'Forklift Operator Certification',
-    totalWeeks: '1 day',
-    totalHours: 8,
-    rtiHours: '4 (classroom instruction)',
-    ojtHours: '4 (hands-on driving evaluation)',
-    credentials: [
-      {
-        name: 'OSHA-Compliant Forklift Operator Certification',
-        issuingBody: 'OSHA / Employer-Verified',
-        examFeeIncluded: true,
-      },
-    ],
+    name: forkliftPlan.title,
+    totalWeeks: '4–6 week planning example; partner schedule and actual practical hours pending',
+    totalHours: '48 online hours, plus actual supervised practical hours recorded separately',
+    rtiHours: '48 (8 forklift + 16 assembly + 24 quality inspection)',
+    ojtHours: 'Planning estimate: 2–4 weeks; qualified partner, actual hours and schedule pending',
+    credentials: [],
     admissionsRequirements: [
       '18 years or older',
       'Valid photo ID',
-      'Physical ability to operate powered industrial truck',
-      'No active restrictions on operating heavy equipment',
+      'Practical partner or employer, site, equipment, instructor, hours and total costs confirmed before enrollment',
+      'Access to an internet-connected computer or tablet',
     ],
-    modality: 'In-person — Classroom instruction + hands-on driving evaluation and written test',
+    modality: 'Hybrid: online instruction, simulations and workbooks; a qualified practical partner is being arranged',
     equipmentIncluded: [
-      'PPE (safety vest, hard hat)',
-      'Training forklift provided',
-      'Study materials',
-      'Written and practical exam',
+      'Online lessons and interactive practice',
+      'Student workbook and employer practical evaluation forms',
+      'Actual equipment, site access and required PPE must be confirmed with the practical partner or employer',
     ],
-    workBasedLearning:
-      'Hands-on forklift operation during training — warehouse and dock simulation',
+    workBasedLearning: `${forkliftPlan.partnerReadiness} ${forkliftPlan.practicalDisclosure} ${forkliftPlan.credentialDisclosure}`,
     employerPartners: [],
-    placementRate:
-      'Immediate employability — certification valid for 3 years per OSHA 29 CFR 1910.178',
-    materialsIncluded: ['All training materials', 'PPE', 'Certification card', 'Exam fee'],
-    ...SHARED_LOC_FIELDS,
-    costPerParticipant: 2700,
+    placementRate: 'Employment is subject to employer hiring requirements and verified job-specific competence.',
+    materialsIncluded: ['Online curriculum', 'Interactive scenarios', 'Student workbook', 'Employer practical guide'],
+    costPerParticipant: 'Confirm tuition with admissions',
+    examFeesIncluded: false,
+    nextLevelJobsEligible: false,
+    cohortSchedule: forkliftPlan.schedule,
+    attendanceTracking: 'Record actual online participation and supervised practical hours separately; planned hours are not automatic attendance credit.',
+    paymentTerms: 'Confirm tuition, practical training costs and any employer sponsorship in writing before enrollment.',
   },
 };

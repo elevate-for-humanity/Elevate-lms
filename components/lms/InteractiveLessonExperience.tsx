@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import TextToSpeech from '@/components/TextToSpeech';
 import CommercialLessonExperience from '@/components/lms/CommercialLessonExperience';
+import ManufacturingSimulation from '@/components/lms/ManufacturingSimulation';
 import ManifoldGaugeSimulator from '@/components/lms/ManifoldGaugeSimulator';
 import { MANIFOLD_GAUGE_SIMULATOR_KEY } from '@/lib/lms/manifold-gauge-simulation';
 import ForkliftSimulator from '@/components/lms/ForkliftSimulator';
@@ -163,6 +164,17 @@ export default function InteractiveLessonExperience({
       {flashcards.length && !payload?.experience ? <Flashcards cards={flashcards} /> : null}
 
       {interactions.map((interaction) => {
+        if (interaction.type === 'manufacturing-simulation')
+          return (
+            <ManufacturingSimulation
+              key={`${lessonId}-${interaction.id}`}
+              simulation={interaction.data}
+              courseId={courseId}
+              lessonId={lessonId}
+              interactionId={interaction.id}
+              initialAttempt={interaction.data.initialAttempt}
+            />
+          );
         if (interaction.type === 'knowledge-check')
           return (
             <KnowledgeCheck

@@ -149,6 +149,8 @@ export interface ProgramSchema {
   deliveryMode: 'online' | 'hybrid' | 'in-person';
   deliveredBy?: 'Elevate' | 'Partner' | 'Elevate or Partner';
   durationWeeks: number;
+  /** Explicit phase-aware duration when weekly arithmetic covers only online learning. */
+  durationDisplay?: string;
   hoursPerWeekMin: number;
   hoursPerWeekMax: number;
   hoursBreakdown: HoursBreakdown;
@@ -194,6 +196,8 @@ export interface ProgramSchema {
   };
 
   credentials: ProgramCredential[];
+  /** Plain completion disclosure when no external credential is listed. */
+  completionDisclosure?: string;
   outcomes: ProgramOutcome[];
   careerPathway: CareerPathwayStep[];
   weeklySchedule: WeeklyScheduleEntry[];

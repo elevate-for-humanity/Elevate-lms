@@ -50,7 +50,6 @@ const SUPPRESSED = new Set([
   'cpr-cert',
   'health-safety',
   'forklift-operator',
-  'forklift',
   'plumbing',
   'tax-prep',
   'it-support',
@@ -118,11 +117,12 @@ function fromProgramSchema(program: ProgramSchema, fallbackTuition: number | nul
     category: verified?.category ?? SECTOR_TO_CATEGORY[normalized.sector] ?? 'other',
     duration:
       verified?.duration ??
+      normalized.durationDisplay ??
       (normalized.durationWeeks
         ? `${normalized.durationWeeks} ${normalized.durationWeeks === 1 ? 'week' : 'weeks'}`
         : (normalized.schedule ?? null)),
     credential:
-      verified?.credential ?? normalized.credentials?.[0]?.name ?? normalized.badge ?? null,
+      verified?.credential ?? normalized.credentials?.[0]?.name ?? (normalized.completionDisclosure?.trim() || null),
     ...fundingFields(verified?.slug ?? normalized.slug),
     tuition,
     price_label: getPriceLabel(tuition),

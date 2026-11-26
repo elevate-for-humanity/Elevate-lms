@@ -1080,8 +1080,44 @@ export function UltimateBuildPanel({
     }
   }
 
+  async function prepareBuild() {
+    if (latest || busy || statusLoading || !statusLoaded || statusError) return;
+    setBusy(true);
+    setError('');
+    setNotice('');
+    try {
+      const response = await fetch('/api/admin/ultimate-course-builder', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'create',
+          courseId: course.id,
+          programSlug,
+          ...(googleModel.trim() ? {
+            instructionalAuthoring: {
+              provider: 'google',
+              model: googleModel.trim(),
+              location: googleLocation,
+            },
+          } : {}),
+        }),
+      });
+      const result = await readJson(response);
+      if (!response.ok || result.ok !== true || !result.buildId)
+        throw new Error(result.error || 'Could not prepare the Ultimate build');
+      setNotice(result.reused
+        ? 'The existing build is loaded. Review its status before attaching sources.'
+        : 'Build prepared for source review. Attach your instructional sources, then select Start Ultimate build.');
+      await refresh();
+    } catch (reason) {
+      setError(reason instanceof Error ? reason.message : 'Could not prepare the Ultimate build');
+    } finally {
+      setBusy(false);
+    }
+  }
+
   async function attachSyllabus() {
-    if (!latest || !syllabusText.trim() || !syllabusConfirmed) return;
+    if (!latest || busy || !syllabusText.trim() || !syllabusConfirmed) return;
     setSyllabusBusy(true);
     setError('');
     try {
@@ -1399,7 +1435,7 @@ export function UltimateBuildPanel({
                 ? 'Unavailable'
                 : latest
                   ? 'Lesson checkpoints preserved'
-                  : 'Saved when started'}
+                  : 'Prepare a build to save instructional sources'}
           </p>
         </div>
       </div>
@@ -1418,7 +1454,7 @@ export function UltimateBuildPanel({
         </div>
       )}
 
-      {latest && <ParallelLessonAutopilots jobs={jobs} busy={busy || statusLoading} onStart={()=>void startParallelAutopilots()} />}
+      {latest && <ParallelLessonAutopilots jobs={jobs} busy={busy || syllabusBusy || statusLoading} onStart={()=>void startParallelAutopilots()} />}
       {latest && workerJob && (
         <section
           aria-label="PARIS course autopilot"
@@ -1533,7 +1569,7 @@ export function UltimateBuildPanel({
           <button
             type="button"
             onClick={() => void startAcceptanceBuild()}
-            disabled={busy || !googleModel.trim() || execution.active}
+            disabled={busy || syllabusBusy || !googleModel.trim() || execution.active}
             className="rounded-lg bg-indigo-600 px-4 py-2 font-bold text-white disabled:opacity-50"
           >
             Start source-grounded acceptance build
@@ -1543,7 +1579,7 @@ export function UltimateBuildPanel({
           type="button"
           onClick={() => void startBuild()}
           disabled={
-            busy || statusLoading || !statusLoaded || Boolean(statusError) || execution.active || latest?.status === 'published'
+            busy || syllabusBusy || statusLoading || !statusLoaded || Boolean(statusError) || execution.active || latest?.status === 'published'
           }
           className="inline-flex items-center gap-2 rounded-lg bg-cyan-500 px-4 py-2 font-black text-slate-950 disabled:opacity-50"
         >
@@ -1562,7 +1598,7 @@ export function UltimateBuildPanel({
                 ? 'Start Google worker'
                 : execution.active
                   ? 'Ultimate build running'
-                  : latest
+                  : latest && (workerJob || latest.status !== 'initializing')
                     ? 'Resume Ultimate build'
                     : 'Start Ultimate build'}
         </button>
@@ -1661,6 +1697,22 @@ export function UltimateBuildPanel({
           Extract PDF, DOCX, or TXT material and review the complete text before attaching it to the
           selected Ultimate build. This does not publish or replace lessons.
         </p>
+        {!latest && (
+          <div className="mt-3 rounded-lg border border-slate-700 p-3">
+            <p className="text-sm text-slate-300">
+              Prepare the existing course for source review. Its saved lessons stay in place;
+              production begins when you select Start Ultimate build.
+            </p>
+            <button
+              type="button"
+              onClick={() => void prepareBuild()}
+              disabled={busy || syllabusBusy || statusLoading || !statusLoaded || Boolean(statusError)}
+              className="mt-3 rounded-lg bg-cyan-500 px-4 py-2 font-bold text-slate-950 disabled:opacity-50"
+            >
+              {busy ? 'Preparing build…' : 'Prepare Ultimate build'}
+            </button>
+          </div>
+        )}
         <label className="mt-3 block text-sm font-semibold" htmlFor={`syllabus-${course.id}`}>
           Syllabus document (10 MB maximum)
         </label>
@@ -1702,6 +1754,9 @@ export function UltimateBuildPanel({
               disabled={
                 !latest ||
                 latest.status === 'running' ||
+                busy ||
+                statusLoading ||
+                Boolean(statusError) ||
                 syllabusBusy ||
                 !syllabusConfirmed ||
                 !syllabusText.trim()
@@ -1713,7 +1768,7 @@ export function UltimateBuildPanel({
             </button>
             {!latest && (
               <p className="mt-2 text-sm text-amber-200">
-                Create a saved Ultimate build before attaching syllabus sources.
+                Select Prepare Ultimate build before attaching syllabus sources.
               </p>
             )}
           </>

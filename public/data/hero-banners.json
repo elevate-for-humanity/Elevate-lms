@@ -509,15 +509,15 @@
   },
   "forklift": {
     "pageKey": "forklift",
-    "microLabel": "OSHA Forklift Cert",
-    "credentialLabel": "OSHA 29 CFR 1910.178",
-    "durationLabel": "1 week",
+    "microLabel": "Forklift + manufacturing",
+    "credentialLabel": "Online learning record; employer evaluation separate",
+    "durationLabel": "48 online hours + 2–4 weeks employer practice",
     "salaryExempt": true,
-    "salaryNote": "Short standalone cert; wage outcome depends entirely on employer and role — not attributable to this cert alone.",
-    "belowHeroHeadline": "Forklift Operator Certification in 1 week.",
-    "belowHeroSubheadline": "OSHA 29 CFR 1910.178 compliant. Hands-on training on sit-down, stand-up, and reach truck forklifts. Certification valid 3 years. WIOA funding available.",
+    "salaryNote": "Hiring and pay depend on the role, employer and demonstrated workplace competence.",
+    "belowHeroHeadline": "Forklift and Manufacturing Operations",
+    "belowHeroSubheadline": "8 hours of forklift foundations, 16 hours of assembly and 24 hours of quality inspection, including virtual practice and workbook activities. Actual employer training and evaluation follow.",
     "primaryCta": {
-      "label": "Apply Now",
+      "label": "Request program information",
       "href": "/apply?program=forklift"
     },
     "secondaryCta": {
@@ -526,13 +526,14 @@
       "variant": "secondary"
     },
     "trustIndicators": [
-      "OSHA 29 CFR 1910.178 compliant",
-      "Sit-down, stand-up, reach truck",
-      "Cert valid 3 years",
-      "WIOA funding available"
+      "48 planned online hours",
+      "Interactive scenario practice",
+      "Employer practical training required",
+      "Program funding requires separate confirmation"
     ],
-    "transcript": "Earn OSHA 29 CFR 1910.178 compliant Forklift Operator Certification in 1 week at Elevate for Humanity. Training covers sit-down, stand-up, and reach truck forklifts. Certification is valid for 3 years and accepted by warehousing, logistics, and manufacturing employers. Self-pay is $500. WIOA funding available.",
+    "transcript": "Forklift and Manufacturing Operations: 48 online hours + 2–4 weeks employer practice. Online learning record; employer evaluation separate. Study forklift foundations, assembly and quality through lessons, scenarios and workbooks. Actual equipment training and workplace evaluation are required.",
     "analyticsName": "forklift",
+    "posterImage": "/images/refresh-20261014/forklift.webp",
     "videoSrcDesktop": "/videos/hvac-hero-final.mp4",
     "videoSrcMobile": "/videos/hvac-hero-final.mp4",
     "_pexelsVideoId": 32838797

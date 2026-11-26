@@ -51,6 +51,9 @@ export interface UltimateCredentialProfile {
   canonicalLessonIds?: Record<string, string>;
   sceneAssignments?: Record<string, Array<{ sceneId: string; assetId: string; relevanceReason: string }>>;
   instructionalSources?: Array<{ id: string; text: string }>;
+  /** Source review is required before enriching an imported authored lesson. */
+  authoredLessonRequirements?: Record<string, { lessonId: string; authoredLessonId: string }>;
+  authoredLessonPreservation?: Record<string, import('../instructional/authored-experience').AuthoredLessonPreservation>;
   lessonBlueprints?: Record<string, import('../instructional/lesson-blueprint').LessonBlueprint>;
   competencies: UltimateCompetency[];
   socCodes?: string[];

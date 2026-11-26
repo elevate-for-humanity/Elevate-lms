@@ -2,20 +2,21 @@ import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {stripTypeScriptTypes} from 'node:module';
+import {assertManufacturingLessonSpecs} from '../../lib/lms/manufacturing-simulation-reference.mjs';
 
 // Transport fault injection exercises the actual service. Contract validation
 // has its own suite; SQL atomicity is tested in the rollback-only DB regression.
 const source=readFileSync(new URL('../../lib/ultimate-course-builder/release/release-service.ts',import.meta.url),'utf8');
 const compiled=stripTypeScriptTypes(source.replace(/^import .*;\r?\n/gm,'').replace('export class ','class '),{mode:'transform'});
-const ReleaseService=new Function('prepareUltimatePublication',compiled+'\nreturn UltimateReleaseService;')((p,actor)=>{
+const ReleaseService=new Function('prepareUltimatePublication','assertManufacturingLessonSpecs',compiled+'\nreturn UltimateReleaseService;')((p,actor)=>{
  if(p.invalid)throw Error('ULTIMATE_RELEASE_CONTRACT_REQUIRED');
- return [{prepared:true,actor}];
-});
+ return [{prepared:true,actor,row:{content_json:{}}}];
+},assertManufacturingLessonSpecs);
 function scenario({rpcError=null,data=[{id:'release',version:8,status:'released',released_by:'actor'}],readError=null}={}){
  const calls=[];
  const db={rpc:async(name,args)=>{calls.push({name,args});return {data,error:rpcError};},from(table){
   assert.equal(table,'ultimate_release_versions');
-  const q={select(){return q;},eq(){return q;},single:async()=>({data:{id:'previous',build_id:'build',package:{courseId:'course'}},error:readError})};
+  const q={select(){return q;},eq(){return q;},single:async()=>({data:{id:'previous',build_id:'build',package:{courseId:'course',lessons:[{}]}},error:readError})};
   return q;
  }};
  const service=new ReleaseService(db);service.derive=async()=>({courseId:'course',buildId:'build',lessons:[{}]});

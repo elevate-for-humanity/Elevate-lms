@@ -112,6 +112,18 @@ function transferHours(value: string | undefined) {
   return Number.isFinite(parsed) ? Math.max(0, parsed) : 0;
 }
 
+async function requestInterview(body: Record<string, unknown>): Promise<InterviewResponse> {
+  const response = await fetch('/api/paris/application-interview', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    cache: 'no-store',
+    body: JSON.stringify(body),
+  });
+  const data = (await response.json().catch(() => ({}))) as InterviewResponse;
+  if (!response.ok || !data.ok) throw new Error(data.error || 'PARIS could not continue the interview.');
+  return data;
+}
+
 export default function ParisApplicationWorkspace({
   programs,
   initialProgram,
@@ -183,14 +195,7 @@ export default function ParisApplicationWorkspace({
   );
 
   async function callInterview(body: Record<string, unknown>) {
-    const response = await fetch('/api/paris/application-interview', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      cache: 'no-store',
-      body: JSON.stringify(body),
-    });
-    const data = (await response.json().catch(() => ({}))) as InterviewResponse;
-    if (!response.ok || !data.ok) throw new Error(data.error || 'PARIS could not continue the interview.');
+    const data = await requestInterview(body);
     setSession(data);
     return data;
   }

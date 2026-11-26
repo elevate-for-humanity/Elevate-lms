@@ -182,14 +182,14 @@ const PROGRAMS: Record<string, ProgramInfo> = {
     etplApproved: true,
   },
   'forklift-operator': {
-    name: 'Forklift Operator Certification',
+    name: 'Forklift and Manufacturing Operations',
     description:
-      'OSHA-compliant forklift operation in warehouses, distribution centers, and manufacturing.',
-    credentials: 'OSHA Forklift Operator Certification',
-    careerOutlook: 'Starting: $16-$20/hour. Experienced: $20-$26/hour. Immediate placement.',
-    duration: '1-2 Weeks (40 Hours)',
-    funding: ['wioa', 'wrg'],
-    etplApproved: true,
+      '8 online hours of forklift foundations, 16 of assembly and 24 of quality inspection, followed by employer-led practical training.',
+    credentials: 'Elevate online learning completion record; employer practical training and evaluation documented separately',
+    careerOutlook: 'Employer hiring requirements and verified job-specific competence apply; placement is not guaranteed.',
+    duration: '48 online hours + an estimated 2–4 weeks of employer practice',
+    funding: [],
+    etplApproved: false,
   },
   'business-startup': {
     name: 'Business Start-up & Marketing',

@@ -569,17 +569,17 @@ export const PROGRAM_REGISTRY: ProgramRegistryEntry[] = [
   },
   {
     slug: 'forklift',
-    title: 'Forklift Operator Certification',
+    title: 'Forklift and Manufacturing Operations',
     category: 'trades',
     canonical_route: '/programs/forklift',
     apply_route: '/programs/forklift/apply',
     checkout_route: '/checkout/forklift',
     enrollment_api: '/api/enrollment/create',
     certificate_template: null,
-    has_dedicated_page: false,
-    has_lms_course: false,
+    has_dedicated_page: true,
+    has_lms_course: true,
     status: 'active',
-    funding: ['wioa', 'employer', 'self_pay'],
+    funding: ['employer', 'self_pay'],
   },
   // ── Apprenticeships ─────────────────────────────────────────────────────
   {

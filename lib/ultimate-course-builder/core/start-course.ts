@@ -1,4 +1,5 @@
 import { assertCourseBuilderGenerationEnabled } from './generation-control';
+import { reactivateArchivedCourseForStart } from './start-preconditions';
 import { NextResponse } from 'next/server';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { buildUltimateProfile } from './course-profile';
@@ -31,18 +32,7 @@ export async function startCanonicalCourse(db: SupabaseClient, body: StartCourse
     if (courseError) throw courseError;
     if (!course) return NextResponse.json({ error: 'Course not found' }, { status: 404 });
 
-    const reactivated = course.status === 'archived';
-    if (reactivated) {
-      const { error: reactivateError } = await db
-        .from('courses')
-        .update({
-          status: 'draft',
-          is_active: true,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', course.id);
-      if (reactivateError) throw reactivateError;
-    }
+    const reactivated = await reactivateArchivedCourseForStart(db, course);
 
     const programSlug = await resolveCourseProgramSlug(db, course, body.programSlug);
     if (!programSlug) {

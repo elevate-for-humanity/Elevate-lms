@@ -4,6 +4,8 @@ import { approvedDeliveryFailures, hasTextCardPhotographs } from '../instruction
 import { ULTIMATE_BUILD_STEPS, type UltimateBuildStep } from './types';
 import { renderMediaUrl, renderPlaybackUrl } from '../media/playback-source.mjs';
 import { isExternalCourseVideoReference } from '../../storage/course-video-policy.mjs';
+import { assertAuthoredExperienceArtifacts } from '../instructional/authored-experience';
+import { assertManufacturingRunthroughEvidence, authoredManufacturingSimulation } from '../quality/manufacturing-runthrough';
 
 /** Changing this version invalidates every checkpoint and release certificate. */
 export const ULTIMATE_LESSON_CONTRACT_VERSION = 'ultimate-lesson-2026-10-29.1';
@@ -233,6 +235,13 @@ export function validateStepOutput(step: UltimateBuildStep, a: Artifact): string
             nonempty(s.remediation),
         ) &&
         populated(a.assessment.reassessment), 'ASSESSMENT_SCORING_REMEDIATION_REQUIRED');
+      if (a.authoredPreservation) {
+        require(a.authoredPreservation.version === 'authored-experience-v1' &&
+          a.authoredPreservation.snapshotHash === contractHash(a.authoredPreservation.snapshot) &&
+          a.authoredPreservation.experienceHash === contractHash(a.authoredPreservation.experience) &&
+          a.authoredPreservation.learnerBlueprintHash === contractHash(a.authoredPreservation.learnerBlueprint),
+        'AUTHORED_EXPERIENCE_HASH_REQUIRED');
+      }
       break;
     case 'lesson_film_render':
       require(!hasTextCardPhotographs(a.render), 'PHOTOGRAPHIC_PRESENTATION_REQUIRES_REFRESH');
@@ -300,6 +309,10 @@ export function assertCompleteLesson(
   }
   const competencies = (profile as any)?.competencies ?? [];
   const competency = competencies.find((c: any) => c.id === competencyId) ?? (competencies.length === 1 ? competencies[0] : undefined);
+  if (profile && competency)
+    assertAuthoredExperienceArtifacts(artifacts, profile as any, competency.id);
+  if (artifacts.learner_runthrough)
+    assertManufacturingRunthroughEvidence(authoredManufacturingSimulation(artifacts), artifacts.learner_runthrough.learnerRuntimeEvidence?.evidence);
   if (practicalVisualFailures(artifacts, competency).length)
     throw new Error('ULTIMATE_PRACTICAL_DEMONSTRATION_VIDEO_REQUIRED');
   for (const step of ULTIMATE_BUILD_STEPS) {

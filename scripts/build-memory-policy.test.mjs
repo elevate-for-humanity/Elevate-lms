@@ -7,6 +7,7 @@ import { checkBuildMemoryPolicy } from './check-build-memory-policy.mjs';
 import { mkdtemp, mkdir, writeFile, readFile, rm, access } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
+import { pathToFileURL } from 'node:url';
 
 const original = process.env.ELEVATE_SEQUENTIAL_TYPECHECK;
 afterEach(() => {
@@ -172,6 +173,47 @@ test('an admitted workflow must still register a new image source', async () => 
     await mkdir(directory, { recursive: true });
     await writeFile(join(directory, 'future.yml'), 'steps:\n  - run: node scripts/check-build-memory-policy.mjs --source-only\n  - run: docker build -f Dockerfile.unreviewed .\n');
     await assert.rejects(checkBuildMemoryPolicy(root), /register Dockerfile.unreviewed/);
+  });
+});
+
+test('an admitted dynamic matrix cannot select a retired Dockerfile', async () => {
+  await policyFixture(async root => {
+    const directory = join(root, '.github/workflows');
+    await mkdir(directory, { recursive: true });
+    await writeFile(join(directory, 'future.yml'), [
+      'matrix:',
+      '  include:',
+      '    - dockerfile: Dockerfile.retired-lms',
+      'steps:',
+      '  - run: node scripts/check-build-memory-policy.mjs --source-only',
+      '  - run: docker build -f "${{ matrix.dockerfile }}" .',
+    ].join('\n'));
+    await assert.rejects(checkBuildMemoryPolicy(root), /dynamic Dockerfile selection needs the reviewed registry/);
+  });
+});
+
+test('the canonical compatibility workflow remains admitted after a registry Dockerfile rename', async () => {
+  await policyFixture(async root => {
+    const directory = join(root, '.github/workflows');
+    await mkdir(directory, { recursive: true });
+    await writeFile(join(directory, 'consolidation-docker-northflank.yml'),
+      await readFile(new URL('../.github/workflows/consolidation-docker-northflank.yml', import.meta.url)));
+    const renamedPolicy = {
+      ...containerBuildPolicy,
+      lms: { ...containerBuildPolicy.lms, dockerfile: 'Dockerfile.renamed-lms' },
+    };
+    await writeFile(join(root, renamedPolicy.lms.dockerfile),
+      await readFile(join(root, containerBuildPolicy.lms.dockerfile)));
+    await rm(join(root, containerBuildPolicy.lms.dockerfile));
+    const registryUrl = new URL('./container-build-policy.mjs', import.meta.url).href;
+    await writeFile(join(root, 'scripts/container-build-policy.mjs'),
+      `export { validateContainerProfiles } from ${JSON.stringify(registryUrl)};\n` +
+      `export const containerBuildPolicy = ${JSON.stringify(renamedPolicy)};\n`);
+    const checkerPath = join(root, 'scripts/check-build-memory-policy.mjs');
+    await writeFile(checkerPath, await readFile(new URL('./check-build-memory-policy.mjs', import.meta.url)));
+    const { checkBuildMemoryPolicy: checkRenamedPolicy } = await import(pathToFileURL(checkerPath).href);
+    const result = await checkRenamedPolicy(root, { sourceOnly: true });
+    assert.equal(result.buildWorkflows, 1);
   });
 });
 

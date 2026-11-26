@@ -119,6 +119,14 @@ export function prepareUltimatePublication(p: any, actorId: string) {
         published_by: actorId,
         updated_at: now,
       };
+    // This exact source-bound learner projection was part of the assessment
+    // artifact before media/browser QA; publication does not restore content
+    // after certification or relabel it as provider-authored output.
+    const authoredPreservation = l.contractArtifacts.assessment_alignment?.authoredPreservation;
+    if (authoredPreservation) {
+      row.content_json.experience = structuredClone(authoredPreservation.experience);
+      row.learning_objectives = [...authoredPreservation.snapshot.learningObjectives];
+    }
     const media = {
       course_id: p.courseId, lesson_id: l.canonicalLessonId, lesson_title: l.title,
       asset_kind: 'lesson', asset_key: null, status: 'complete',

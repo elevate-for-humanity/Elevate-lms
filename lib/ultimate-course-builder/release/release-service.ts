@@ -4,6 +4,7 @@ import { assertCompleteLesson, ULTIMATE_LESSON_CONTRACT_VERSION } from '../core/
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { recoveredSourcePublicationAllowed } from './recovered-source-policy.mjs';
 import { renderMediaUrl, renderPlaybackUrl } from '../media/playback-source.mjs';
+import { assertManufacturingLessonSpecs } from '../../lms/manufacturing-simulation-store';
 const slug = (v: string) =>
   v
     .toLowerCase()
@@ -12,6 +13,17 @@ const slug = (v: string) =>
     .slice(0, 120) || 'lesson';
 export class UltimateReleaseService {
   constructor(private db: SupabaseClient) {}
+  /** Validate the exact public grading references before any release transaction. */
+  private async verifySimulationReferences(p: any, rows: ReturnType<typeof prepareUltimatePublication>) {
+    await assertManufacturingLessonSpecs(this.db, p.courseId, rows.map((prepared: any) => {
+      const source = p.lessons.find((lesson: any) => lesson.sourceLessonBuildId === prepared.sourceLessonBuildId);
+      return {
+        id: prepared.canonicalLessonId,
+        content_json: prepared.row.content_json,
+        content: source?.contractArtifacts?.assessment_alignment?.authoredPreservation?.snapshot?.content,
+      };
+    }));
+  }
   async derive(buildId: string, lessonBuildId?: string) {
     const { data: b, error } = await this.db
       .from('ultimate_course_builds')
@@ -153,6 +165,7 @@ export class UltimateReleaseService {
     if (p.lessons?.length !== 1 || p.lessons[0].preservedPublished)
       throw new Error('ULTIMATE_RELEASE_SCOPE_INVALID');
     const rows = prepareUltimatePublication(p, actorId);
+    await this.verifySimulationReferences(p, rows);
     const { data, error } = await this.db.rpc('commit_ultimate_lesson_release', {
       p_package: p, p_rows: rows, p_actor: actorId, p_fence: fence,
     });
@@ -166,6 +179,7 @@ export class UltimateReleaseService {
   private async commitPackage(p: any, actorId: string, rolledBackFrom: string | null = null,
     fence: {jobId: string; workerId: string; generation: number} | null = null) {
     const rows = prepareUltimatePublication(p, actorId);
+    await this.verifySimulationReferences(p, rows);
     const {data, error} = await this.db.rpc('commit_ultimate_release', {
       p_package: p, p_rows: rows, p_actor: actorId,
       p_rolled_back_from: rolledBackFrom, p_fence: fence,

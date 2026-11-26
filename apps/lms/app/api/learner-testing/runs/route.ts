@@ -9,6 +9,8 @@ import {
 import { validTestCredential } from '@/lib/ultimate-course-builder/testing/learner-test-policy';
 import { logger } from '@/lib/logger';
 import { renderPlaybackUrl } from '@/lib/ultimate-course-builder/media/playback-source.mjs';
+import { learnerBlueprintFromArtifacts } from '@/lib/ultimate-course-builder/instructional/authored-experience';
+import { loadStagedManufacturingSimulation } from '@/lib/ultimate-course-builder/testing/staged-manufacturing-simulation';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -36,7 +38,6 @@ export async function POST(req: NextRequest) {
     const build: any = lesson.ultimate_course_builds;
     const a: any = lesson.artifacts;
     const render = a.lesson_film_render?.render;
-    const blueprint = a.learning_objectives?.blueprint;
     const competency = build.profile.competencies.find((c: any) => c.id === lesson.competency_id);
     if (
       build.course_id !== input.courseId ||
@@ -50,8 +51,24 @@ export async function POST(req: NextRequest) {
         { error: 'Lesson evidence changed; rerun with current artifacts' },
         { status: 409 },
       );
+    const blueprint = learnerBlueprintFromArtifacts(a, build.profile, lesson.competency_id);
     if (!blueprint?.assessment?.questions?.length || !render.captionsUrl)
       return NextResponse.json({ error: 'Authored lesson and captions required' }, { status: 409 });
+    const snapshot = {
+      qaOnly: true,
+      courseId: build.course_id,
+      lessonId: build.profile.canonicalLessonIds?.[lesson.competency_id] ?? lesson.competency_id,
+      practicalLesson: {
+        content_json: { competencyId: lesson.competency_id },
+        competency_checks: [{ key: lesson.competency_id, requiresInstructorSignoff: competency?.requiresPracticalEvidence === true }],
+      },
+      title: competency?.title ?? competency?.description ?? 'Lesson',
+      blueprint, render,
+      practicalRequired: competency?.requiresPracticalEvidence === true,
+    };
+    // Verify the captured immutable key and current canonical binding before
+    // creating a QA identity. The private grading spec is never saved in a snapshot.
+    await loadStagedManufacturingSimulation(db, snapshot);
     const id = randomUUID(),
       password = randomBytes(24).toString('base64url') + '!9aA';
     const email = `ultimate-test-${id}@qa.invalid`;
@@ -64,22 +81,6 @@ export async function POST(req: NextRequest) {
     });
     if (authError || !account.user) throw authError ?? new Error('Test account creation failed');
     createdUserId = account.user.id;
-    const snapshot = {
-      qaOnly: true,
-      practicalLesson: {
-        content_json: { competencyId: lesson.competency_id },
-        competency_checks: [
-          {
-            key: lesson.competency_id,
-            requiresInstructorSignoff: competency?.requiresPracticalEvidence === true,
-          },
-        ],
-      },
-      title: competency?.title ?? competency?.description ?? 'Lesson',
-      blueprint,
-      render,
-      practicalRequired: competency?.requiresPracticalEvidence === true,
-    };
     const { error: saveError } = await db
       .from('ultimate_learner_test_runs')
       .insert({

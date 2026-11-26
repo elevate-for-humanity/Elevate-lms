@@ -2,26 +2,32 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import {stripTypeScriptTypes} from 'node:module';
+import {reactivateArchivedCourseForStart} from '../lib/ultimate-course-builder/core/start-preconditions.ts';
+
+const controlSource=stripTypeScriptTypes(await readFile(new URL('../lib/ultimate-course-builder/core/generation-control.ts',import.meta.url),'utf8'))
+ .replace(/^import .*;\n/gm,'').replace(/export /g,'');
+const assertCourseBuilderGenerationEnabled=new Function(controlSource+'\nreturn assertCourseBuilderGenerationEnabled;')();
 
 const source=stripTypeScriptTypes(await readFile(new URL('../apps/admin/app/api/admin/ultimate-course-builder/run/route.ts',import.meta.url),'utf8'))
  .replace(/^import .*;\n/gm,'').replace(/export /g,'');
-function fixture({paused=true,status='blocked',conflict=false,running=false,denied=false,limited=false,attempts=0}={}){
+function fixture({paused=true,status='blocked',conflict=false,running=false,denied=false,limited=false,attempts=0,globalPaused=false,coursePaused=false,missingCourse=false}={}){
  const writes=[],limits=[];let launches=0;
  const profile={ownerPaused:paused,competencies:[{id:'lesson'}],presentationContract:{approvedReferenceVideo:{sha256:'approved-hash'}}};
- const build={id:'572cca43-6bd6-4a91-b385-a8b576209c4e',status,profile,updated_at:'2026-10-25T20:00:00.123456+00:00'};
+ const build={id:'572cca43-6bd6-4a91-b385-a8b576209c4e',course_id:'572cca43-6bd6-4a91-b385-a8b576209c4f',status,profile,updated_at:'2026-10-25T20:00:00.123456+00:00'};
  const db={from(table){let write,filters=[];const q={
   select(){return q;},eq(k,v){filters.push([k,v]);return q;},in(k,v){filters.push([k,v]);return q;},
-  update(value){write=value;return q;},async single(){return {data:build};},async maybeSingle(){return {data:null};},
+  update(value){write=value;return q;},async single(){return {data:build};},
+  async maybeSingle(){return {data:table==='system_settings'?{value:{paused:globalPaused}}:missingCourse?null:{id:build.course_id,status:'draft',generation_paused:coursePaused},error:null};},
   then(resolve,reject){if(write)writes.push({table,write,filters});return Promise.resolve({data:conflict?[]:[{id:build.id}]}).then(resolve,reject);}
  };return q;}};
  const job={id:'job',status:running?'running':'queued',attempts,max_attempts:5,payload:{},
   heartbeat_at:new Date().toISOString(),lease_expires_at:new Date(Date.now()+60000).toISOString(),lease_owner:running?'existing-worker':null};
- const POST=new Function('NextResponse','apiRequireAdmin','requireAdminClient','UltimateJobQueue','requestCourseWorker','applyRateLimit','safeInternalError','recordCourseDispatch',source+'\nreturn POST;')(
+ const POST=new Function('NextResponse','apiRequireAdmin','requireAdminClient','UltimateJobQueue','requestCourseWorker','applyRateLimit','safeInternalError','recordCourseDispatch','assertCourseBuilderGenerationEnabled','reactivateArchivedCourseForStart',source+'\nreturn POST;')(
   {json:(body,options={})=>({body,status:options.status??200})},
   async()=>denied?{error:{status:403}}:{id:'real-admin'},async()=>db,
   class {async enqueue(){build.status='queued';return job;}},
   async()=>{launches++;return {dispatched:true};},async(req,tier,scope)=>{limits.push({tier,scope});return limited?{status:429}:null;},
-  (error)=>{throw error;},async()=>true);
+  (error)=>{throw error;},async()=>true,assertCourseBuilderGenerationEnabled,reactivateArchivedCourseForStart);
  return {writes,limits,profile,launches:()=>launches,call:()=>POST({json:async()=>({buildId:build.id})})};
 }
 const buildRevision='2026-10-25T20:00:00.123456+00:00';
@@ -59,3 +65,9 @@ test('Resume quota uses authenticated actor scope and retains strict throttling'
 });
 
 test('exhausted attempts do not launch worker',async()=>{const f=fixture({paused:false,attempts:5}); const response=await f.call();assert.equal(response.status,409);assert.equal(f.writes.length,0);assert.equal(f.launches(),0);});
+
+for(const options of [{globalPaused:true},{coursePaused:true},{missingCourse:true}])test('canonical generation control prevents Resume: '+JSON.stringify(options),async()=>{
+ const f=fixture(options);const response=await f.call();assert.equal(response.status,409);
+ assert.match(response.body.code,/^COURSE_(BUILDER_)?GENERATION_PAUSED$/);
+ assert.equal(f.writes.length,0);assert.equal(f.launches(),0);assert.deepEqual(f.limits,[]);
+});

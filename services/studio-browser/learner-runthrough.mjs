@@ -3,6 +3,8 @@ import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import { createRequire } from 'node:module';
+import { runStagedManufacturingWorkflow } from './manufacturing-runthrough.mjs';
+export { runStagedManufacturingWorkflow };
 const require = createRequire(import.meta.url);
 export const CHECKS = [
   'desktop',
@@ -118,7 +120,7 @@ export async function runLearnerTest(
   const runId = crypto.randomUUID(),
     directory = path.join(evidenceRoot, runId);
   await fs.mkdir(directory, { recursive: true, mode: 0o700 });
-  let setup, context, page;
+  let setup, context, page, manufacturingWorkflow;
   const check = async (name, action, execute) => {
     try {
       const observed = await execute();
@@ -471,9 +473,15 @@ export async function runLearnerTest(
     );
     await check(
       'completion',
-      'Complete after playback and required activities; reload and verify persistence',
+      'Verify required manufacturing tasks and critical holds through the learner UI, then complete and reload',
       async () => {
-        return completeStagedLesson(page, state);
+        const simulation = await runStagedManufacturingWorkflow({ setup, input, page, state, base });
+        const result = await completeStagedLesson(page, state);
+        if (simulation) {
+          manufacturingWorkflow = { ...simulation, completionObserved: true };
+          return `${result}; ${simulation.taskCount} manufacturing tasks passed after missing-attempt and critical-hold denials; saved attempt ${simulation.attempts} survived reload`;
+        }
+        return result;
       },
     );
     await page.addScriptTag({ path: require.resolve('axe-core/axe.min.js') });
@@ -529,6 +537,7 @@ export async function runLearnerTest(
     const evidence = {
       ...input,
       practicalWorkflow,
+      manufacturingWorkflow,
       testRunId: runId,
       stagedLesson: true,
       courseLesson: false,

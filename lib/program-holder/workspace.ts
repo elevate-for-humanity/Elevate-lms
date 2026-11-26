@@ -12,7 +12,8 @@ import { hasActiveProgramEnrollment, learnerProgramKey } from './enrollment-iden
 import { holderCredentialStatus, holderTrainingRecord } from './student-training';
 import { studentContactProjection } from './contact-privacy';
 import { isLearnerRosterProfile } from './roster-eligibility';
-import { LEARNER_ROSTER_ROLES } from './roster-eligibility';
+import { isIsolatedQaHolderRosterProfile } from './roster-eligibility';
+import { resolveServerSupabaseRawEnv } from '@/lib/supabase/public-config';
 import { requireProgramHolder } from '@/lib/auth/require-program-holder';
 import { calculateDistanceMiles, geocodeAddress, isGeocodingResult } from '@/lib/geo/geocode';
 
@@ -196,6 +197,8 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
     notificationRes,
     phoneLineRes,
     extensionRes,
+    secondaryCourses,
+    assignedTeaching,
   ] = await Promise.all([
     programIds.length
       ? db
@@ -321,6 +324,11 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
       .eq('enabled', true)
       .limit(1)
       .maybeSingle(),
+    db.from('courses')
+      .select('id,metadata')
+      .contains('metadata', { assignment_kind: 'secondary', program_holder_id: holderId }),
+    db.from('instructor_assignments').select('course_id')
+      .eq('instructor_id', profile.id).eq('active', true),
   ]);
 
   // Surface database failures instead of showing an apparently empty dashboard.
@@ -349,9 +357,6 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
     if (error) throw new Error(`Program Holder ${name} could not load: ${error.message}`);
   }
 
-  const secondaryCourses = await db.from('courses')
-    .select('id,metadata')
-    .contains('metadata', { assignment_kind: 'secondary', program_holder_id: holderId });
   if (secondaryCourses.error) throw new Error('Secondary syllabus courses could not load.');
   coursesRes.data = [...(coursesRes.data ?? []), ...(secondaryCourses.data ?? []).map((course: any) => ({
     id: course.id, course_id: course.id, program_id: course.metadata.holder_program_id,
@@ -435,8 +440,6 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
   });
   const learningMaterials: NonNullable<ProgramHolderWorkspace['learningMaterials']> = { courses: [], workbooks: [] };
   try {
-    const assignedTeaching = await db.from('instructor_assignments').select('course_id')
-      .eq('instructor_id', profile.id).eq('active', true);
     if (assignedTeaching.error) throw new Error('Teaching material access could not be verified.');
     const teachingIds = new Set((assignedTeaching.data ?? []).map(row => row.course_id));
     const teachingCourses = currentAssignments.filter(row => row.published && teachingIds.has(row.course_id));
@@ -463,9 +466,9 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
         .filter((value: unknown): value is string => typeof value === 'string' && value.length > 0),
     ),
   );
-  const progressEntriesRes =
+  const [progressEntriesRes, rosterProfilesRes, credentialUploadsRes] = await Promise.all([
     rosterUserIds.length && programIds.length
-      ? await db
+      ? db
           .from('progress_entries')
           .select(
             'id,apprentice_id,program_id,hour_entry_id,hours_worked,work_date,clock_in_at,clock_out_at,status',
@@ -475,24 +478,26 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
           .eq('status', 'verified')
           .order('work_date', { ascending: false })
           .limit(5000)
-      : { data: [], error: null };
-  if (progressEntriesRes.error)
-    throw new Error('Program Holder verified training hours could not load.');
-  const { data: rosterProfiles, error: rosterProfilesError } = rosterUserIds.length
-    ? await db.from('profiles').select('id,role,email,phone,full_name').in('id', rosterUserIds)
-    : { data: [], error: null };
-  if (rosterProfilesError)
-    throw new Error(
-      `Program Holder roster profiles could not load: ${rosterProfilesError.message}`,
-    );
-  const { data: credentialUploads, error: credentialError } =
+      : Promise.resolve({ data: [], error: null }),
+    rosterUserIds.length
+      ? db.from('profiles').select('id,role,email,phone,full_name').in('id', rosterUserIds)
+      : Promise.resolve({ data: [], error: null }),
     rosterUserIds.length && programIds.length
-      ? await db
+      ? db
           .from('student_credential_uploads')
           .select('user_id,program_id,verification_status,credential_earned_date,verified_at')
           .in('user_id', rosterUserIds)
           .in('program_id', programIds)
-      : { data: [], error: null };
+      : Promise.resolve({ data: [], error: null }),
+  ]);
+  if (progressEntriesRes.error)
+    throw new Error('Program Holder verified training hours could not load.');
+  const { data: rosterProfiles, error: rosterProfilesError } = rosterProfilesRes;
+  if (rosterProfilesError)
+    throw new Error(
+      `Program Holder roster profiles could not load: ${rosterProfilesError.message}`,
+    );
+  const { data: credentialUploads, error: credentialError } = credentialUploadsRes;
   if (credentialError) throw new Error('Program Holder certification status could not load.');
   const emailByUserId = new Map<string, string>(
     (rosterProfiles ?? [])
@@ -518,23 +523,14 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
   const eligibleRosterUserIds = new Set(
     (rosterProfiles ?? []).filter(isLearnerRosterProfile).map((row: any) => row.id),
   );
-  // The production-roster safeguard above keeps test-marked profiles out of
-  // real holders' rosters. A QA fixture holder exists only to exercise this
-  // portal with its own fixture students, so when the viewing holder is
-  // itself a QA fixture, its own learner-role fixture profiles are eligible.
-  // Real holders (features.qa_e2e is not true) are unaffected.
-  if ((holderRes.data?.features as any)?.qa_e2e === true) {
-    for (const row of rosterProfiles ?? []) {
-      if (
-        typeof row?.id === 'string' &&
-        row.id &&
-        (LEARNER_ROSTER_ROLES as readonly string[]).includes(
-          String(row.role || '').toLowerCase(),
-        )
-      ) {
-        eligibleRosterUserIds.add(row.id);
-      }
-    }
+  // Production continues to exclude all test profiles. The isolated QA holder
+  // can exercise reports with only its explicitly marked, same-run student.
+  const qaRosterContext = {
+    supabaseUrl: resolveServerSupabaseRawEnv().url,
+    holderFeatures: holderRes.data?.features,
+  };
+  for (const row of rosterProfiles ?? []) {
+    if (isIsolatedQaHolderRosterProfile(row, qaRosterContext)) eligibleRosterUserIds.add(row.id);
   }
   const nameByUserId = new Map<string, string>(
     (rosterProfiles ?? [])

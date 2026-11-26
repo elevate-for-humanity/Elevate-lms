@@ -1,17 +1,24 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {readFile} from 'node:fs/promises';
-import {stripTypeScriptTypes} from 'node:module';
-const uri=value=>`data:text/javascript;base64,${Buffer.from(value).toString('base64')}`;
-const types=uri(stripTypeScriptTypes(await readFile(new URL('../lib/ultimate-course-builder/core/types.ts',import.meta.url),'utf8')));
-const {ULTIMATE_BUILD_STEPS}=await import(types);
-const source=stripTypeScriptTypes(await readFile(new URL('../lib/ultimate-course-builder/core/lesson-contract.ts',import.meta.url),'utf8'))
- .replace("'./types'",JSON.stringify(types))
- .replace("'../../video/render-checkpoint-contract.mjs'",JSON.stringify(new URL('../lib/video/render-checkpoint-contract.mjs',import.meta.url).href))
- .replace("'../instructional/approved-delivery.mjs'",JSON.stringify(new URL('../lib/ultimate-course-builder/instructional/approved-delivery.mjs',import.meta.url).href))
- .replace("'../media/playback-source.mjs'",JSON.stringify(new URL('../lib/ultimate-course-builder/media/playback-source.mjs',import.meta.url).href))
- .replace("'../../storage/course-video-policy.mjs'",JSON.stringify(new URL('../lib/storage/course-video-policy.mjs',import.meta.url).href));
-const {stepInputHash,stepInputHashes,contractHash,artifactPayload,currentEvidence,ULTIMATE_LESSON_CONTRACT_VERSION}=await import(uri(source));
+import {existsSync} from 'node:fs';
+import {registerHooks} from 'node:module';
+// Load the real cyclic contract/projection modules. A hand-rewritten data URL
+// cannot resolve newly added relative dependencies and would miss their guards.
+const hooks=registerHooks({resolve(specifier,context,nextResolve){
+ const candidate=specifier.startsWith('@/')?new URL('../'+specifier.slice(2),import.meta.url)
+  :specifier.startsWith('.')&&context.parentURL?.startsWith('file:')?new URL(specifier,context.parentURL):null;
+ if(candidate&&existsSync(candidate))return nextResolve(candidate.href,context);
+ if(candidate){
+  for(const extension of ['.ts','.mjs']){
+   const resolved=new URL(candidate.href+extension);
+   if(existsSync(resolved))return nextResolve(resolved.href,context);
+  }
+ }
+ return nextResolve(specifier,context);
+}});
+const {ULTIMATE_BUILD_STEPS}=await import('../lib/ultimate-course-builder/core/types.ts');
+const {stepInputHash,stepInputHashes,contractHash,artifactPayload,currentEvidence,ULTIMATE_LESSON_CONTRACT_VERSION}=await import('../lib/ultimate-course-builder/core/lesson-contract.ts');
+hooks.deregister();
 const profile={id:'course',competencies:[{id:'lesson'}]};
 const prior={standards_lock:{requirements:{version:'registered-standard'}}};
 const legacyHash=(step,dependencies)=>contractHash({version:ULTIMATE_LESSON_CONTRACT_VERSION,profile,step,dependencies});

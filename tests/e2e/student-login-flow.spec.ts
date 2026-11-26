@@ -49,8 +49,8 @@ test.describe('Public routes', () => {
     expect(res?.status()).toBeLessThan(500);
   });
 
-  test('/onboarding/learner redirects unauthenticated users to /login', async ({ page }) => {
-    await page.goto(`${BASE}/onboarding/learner`, { waitUntil: 'domcontentloaded' });
+  test('/lms/onboarding redirects unauthenticated users to /login', async ({ page }) => {
+    await page.goto(`${BASE}/lms/onboarding`, { waitUntil: 'domcontentloaded' });
     await expect(page).toHaveURL(/\/login/);
   });
 });
@@ -103,17 +103,14 @@ test.describe('Authenticated student flow', () => {
     expect(hasStudentContent, 'Dashboard body has no student content').toBe(true);
   });
 
-  test('profile_missing redirect goes to /onboarding/learner not /unauthorized', async ({ page }) => {
-    // Simulate the profile_missing path by checking the redirect target in requireRole
-    // We can't easily simulate a missing profile in E2E, but we can verify the
-    // /onboarding/learner?reason=profile_missing URL renders without error
-    await page.goto(`${BASE}/onboarding/learner?reason=profile_missing`, {
+  test('authenticated student can use the canonical onboarding checklist', async ({ page }) => {
+    const response = await page.goto(`${BASE}/lms/onboarding`, {
       waitUntil: 'domcontentloaded',
     });
-    // Should render the onboarding page, not redirect to /unauthorized
-    expect(page.url()).not.toContain('/unauthorized');
-    const status = await page.evaluate(() => document.readyState);
-    expect(status).toBe('complete');
+    expect(response?.status()).toBe(200);
+    await expect(page).toHaveURL(`${BASE}/lms/onboarding`);
+    await expect(page.getByRole('heading', { name: 'Complete your requirements', exact: true })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Onboarding checklist', exact: true })).toBeVisible();
   });
 });
 

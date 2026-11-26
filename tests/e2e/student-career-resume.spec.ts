@@ -18,7 +18,7 @@ test('student can access Career Services, save, reopen, preview and download res
   await password.fill(PASSWORD);
   await expect(submit).toBeEnabled();
   await Promise.all([
-    page.waitForURL(url => !url.pathname.includes('/login'), {timeout:30000}),
+    page.waitForURL(url => !url.pathname.includes('/login'), { timeout: 30000, waitUntil: 'domcontentloaded' }),
     submit.click(),
   ]);
   await page.goto(BASE + '/lms/career', { waitUntil: 'domcontentloaded' });
@@ -66,7 +66,7 @@ test('learner can launch Job Ready and reopen saved SCORM state', async ({ page 
   await page.locator('input[type="email"], input[name="email"]').first().fill(EMAIL);
   await page.locator('input[type="password"]').first().fill(PASSWORD);
   await Promise.all([
-    page.waitForURL(url => !url.pathname.includes('/login'), { timeout: 30000 }),
+    page.waitForURL(url => !url.pathname.includes('/login'), { timeout: 30000, waitUntil: 'domcontentloaded' }),
     page.locator('button[type="submit"]').first().click(),
   ]);
   await page.goto(BASE + '/lms/dashboard', { waitUntil: 'domcontentloaded' });

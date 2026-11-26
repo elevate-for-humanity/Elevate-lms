@@ -16,6 +16,7 @@ import { renderMediaUrl, renderPlaybackUrl } from '../media/playback-source.mjs'
 import { narrationSceneSeconds } from '../instructional/approved-presentation.mjs';
 import { approvedDeliveryFailures } from '../instructional/approved-delivery.mjs';
 import { requireChapterRecap } from '../instructional/new-course-contract.mjs';
+import { assertPreservationRecord, createAuthoredPreservation } from '../instructional/authored-experience';
 const comp = (ctx: any) =>
   ctx.profile.competencies.find((c: any) => String(ctx.buildId).endsWith(':' + c.id)) ??
   ctx.profile.competencies[0];
@@ -159,12 +160,16 @@ export function createProductionHandlers(runtime: UltimateRuntime): Record<strin
       };
     },
     learning_objectives: async (ctx) => {
+      const competencyId = comp(ctx).id;
+      const authoredSource = ctx.profile.authoredLessonPreservation?.[competencyId];
+      assertPreservationRecord(ctx.profile, competencyId, authoredSource);
       const generator: any = runtime.instructional;
       const blueprint = generator.blueprint ? await generator.blueprint(evidence(ctx)) : undefined;
       return {
         artifacts: {
           objectives: await generator.objectives(evidence(ctx)),
           ...(blueprint ? { blueprint } : {}),
+          ...(authoredSource ? { authoredSource: structuredClone(authoredSource) } : {}),
         },
       };
     },
@@ -286,7 +291,8 @@ export function createProductionHandlers(runtime: UltimateRuntime): Record<strin
       if ((ctx.profile as any).newCourseContract === 'owner-approved-lesson-v1') {
         requireChapterRecap(assessment, comp(ctx).id, 5);
       }
-      return { artifacts: { assessment } };
+      const authoredPreservation = createAuthoredPreservation(ctx.profile, comp(ctx).id, ctx.artifacts, assessment);
+      return { artifacts: { assessment, ...(authoredPreservation ? { authoredPreservation } : {}) } };
     },
     lesson_film_render: async (ctx) => {
       const sourceScript:any=(ctx.artifacts.instructor_script as any)?.script;

@@ -3,6 +3,7 @@ import { createHmac, timingSafeEqual } from 'node:crypto';
 import type { UltimateLearnerRuntimeEvidence, UltimateLearnerRuntimePort } from '../core/ports';
 import { ULTIMATE_LESSON_CONTRACT_VERSION, contractHash } from '../core/lesson-contract';
 import { LEARNER_RUNTHROUGH_CHECKS } from '../quality/learner-runthrough';
+import { assertManufacturingRunthroughEvidence, authoredManufacturingSimulation } from '../quality/manufacturing-runthrough';
 /** Browser worker must exercise the staged lesson in a test enrollment. Database
  * existence and a syntactically valid URL are never learner test evidence. */
 export class UltimatePlatformLearnerRuntime implements UltimateLearnerRuntimePort {
@@ -102,6 +103,7 @@ export class UltimatePlatformLearnerRuntime implements UltimateLearnerRuntimePor
       .from('ultimate_lesson_builds').select('artifacts').eq('id', lesson.id).single();
     if (currentError || !current || contractHash(current.artifacts) !== request.artifactHash)
       throw new Error('ULTIMATE_BROWSER_LESSON_CHANGED_DURING_TEST');
+    assertManufacturingRunthroughEvidence(authoredManufacturingSimulation(artifacts), evidence);
     const results = Object.fromEntries(
       LEARNER_RUNTHROUGH_CHECKS.map((check) => [
         check,

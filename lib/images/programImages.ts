@@ -269,9 +269,9 @@ export const PROGRAM_IMAGES: Record<string, ProgramImageEntry> = {
     alt: 'Chef demonstrating cooking techniques in a professional kitchen',
   },
   'ai-engineering': {
-    card: '/images/hero/hero-tech-careers.webp',
-    hero: '/images/hero/hero-tech-careers.webp',
-    alt: 'Technology learner building and testing software on a computer',
+    card: `${P}/admin-ai-studio-hero.webp`,
+    hero: `${P}/admin-ai-studio-hero.webp`,
+    alt: 'Developer working at a multi-screen workstation',
   },
   'it-help-desk': {
     card: '/images/refresh-20261014/technology.webp',

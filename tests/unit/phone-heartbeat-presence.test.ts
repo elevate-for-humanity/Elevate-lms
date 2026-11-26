@@ -146,3 +146,35 @@ it('still records provisioner evidence that a device is not registered', async (
     connection_state: 'disconnected',
   });
 });
+
+it('reports device_not_provisioned when the provisioner no longer holds the device', async () => {
+  mocks.deviceStatus.mockResolvedValue({
+    registered: false,
+    connectionState: 'disconnected',
+    observedAt: '2026-11-25T17:00:00.000Z',
+    provisioned: false,
+  });
+  const response = await PATCH(heartbeatRequest());
+  expect(response.status).toBe(409);
+  // The distinct code tells the client a heartbeat can never succeed again
+  // and it must re-provision; the evidence write itself is unchanged.
+  expect(await response.json()).toMatchObject({ code: 'device_not_provisioned' });
+  const updates = deviceUpdates();
+  expect(updates).toHaveLength(1);
+  expect(updates[0].patch).toMatchObject({
+    registration_state: 'unregistered',
+    connection_state: 'disconnected',
+  });
+});
+
+it('does not report device_not_provisioned while the provisioner still holds the lease', async () => {
+  mocks.deviceStatus.mockResolvedValue({
+    registered: false,
+    connectionState: 'disconnected',
+    observedAt: '2026-11-25T17:00:00.000Z',
+    provisioned: true,
+  });
+  const response = await PATCH(heartbeatRequest());
+  expect(response.status).toBe(409);
+  expect(await response.json()).not.toHaveProperty('code');
+});

@@ -294,6 +294,12 @@ function voicemailGreetingSaveError(error: { message: string }): PhoneActionStat
   return { ok: false, message: error.message };
 }
 
+function greetingValidationFailed(
+  validated: { ok: false; message: string } | { ok: true; text: string },
+): validated is { ok: false; message: string } {
+  return !validated.ok;
+}
+
 function validateVoicemailGreetingForm(
   greeting: VoicemailGreetingForm,
 ): { ok: false; message: string } | { ok: true; text: string } {
@@ -326,7 +332,7 @@ export async function saveVoicemailGreetingSettings(
     const { db, id } = await requireSystemId();
     const greeting = voicemailGreetingFromForm(formData);
     const validated = validateVoicemailGreetingForm(greeting);
-    if (!validated.ok) return validated;
+    if (greetingValidationFailed(validated)) return { ok: false, message: validated.message };
     const { error } = await db
       .from('phone_systems')
       .update({
@@ -368,7 +374,7 @@ export async function saveExtensionVoicemailGreetingSettings(
       return { ok: false, message: 'Choose a valid extension.' };
     const greeting = voicemailGreetingFromForm(formData);
     const validated = validateVoicemailGreetingForm(greeting);
-    if (!validated.ok) return validated;
+    if (greetingValidationFailed(validated)) return { ok: false, message: validated.message };
     const { data: updated, error } = await db
       .from('communication_extensions')
       .update({

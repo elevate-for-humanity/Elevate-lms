@@ -31,6 +31,7 @@ const PROTECTED_PREFIXES = [
   '/cosmetology-host-shop',
   '/employer',
   '/workforce',
+  '/portal-guide',
   '/program-holder',
   '/creator',
   '/account',

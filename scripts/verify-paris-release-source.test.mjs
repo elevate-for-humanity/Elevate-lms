@@ -36,7 +36,7 @@ test('reviewed tax-page revision adds only the Supersonic install manifest and r
 
 test('public PARIS loads canonical runtime credentials before checking AI availability', () => {
   const source = readFileSync(new URL('../apps/marketing/app/api/ai-chat/route.ts', import.meta.url), 'utf8');
-  const hydrate = source.indexOf('await hydrateProcessEnv();');
+  const hydrate = source.search(/await hydrateProcessEnv(?:Bounded)?\(\);/);
   const availability = source.indexOf('if (!isAIAvailable())', hydrate);
   assert.ok(hydrate > 0 && availability > hydrate, 'Marketing must hydrate first');
   assert.match(source, /mode: 'ai', liveAiAvailable: true/);

@@ -21,6 +21,12 @@ export type AsteriskRegistration = {
   contactCount: number;
   reachableContactCount: number;
   observedAt: string;
+  /**
+   * False when the provisioner holds no lease for the device at all (the
+   * lease expired and its record was removed). No heartbeat can succeed in
+   * that state — the device must re-provision before it can register.
+   */
+  provisioned: boolean;
 };
 
 export type PhoneConnectionFailureCode =
@@ -173,31 +179,57 @@ export async function provisionAsteriskDevice(db: any, identity: DeviceIdentity)
   )
     throw new Error('The independent phone service returned an invalid device credential.');
   const iceServers = deviceIceServers(credential.endpointId);
-  const { error } = await db.from('phone_webrtc_devices').upsert(
-    {
+  // A token is re-issued on every connect, reconnect and recovery attempt.
+  // Refreshing the credential binding must not erase a live device's
+  // verified presence before the replacement registration exists: for an
+  // existing row only the credential fields change here, and the heartbeat
+  // route writes presence once the new registration is actually verified.
+  // A reconnect that then fails leaves the row exactly as it was instead
+  // of strictly worse. Only a genuinely new device starts from the
+  // unverified/offline state.
+  const { data: existingRows, error: updateError } = await db
+    .from('phone_webrtc_devices')
+    .update({
       extension_id: identity.extensionId,
-      profile_id: identity.profileId,
-      device_id: identity.deviceId,
-      provider: 'asterisk',
       provider_credential_id: credential.endpointId,
       sip_username: credential.sipUsername,
       status: 'active',
-      registration_state: 'unregistered',
-      connection_state: 'disconnected',
-      last_seen_at: null,
-      registration_verified_at: null,
       updated_at: new Date().toISOString(),
-    },
-    { onConflict: 'profile_id,device_id' },
-  );
-  if (error) throw new Error('The independent phone device could not be saved.');
+    })
+    .eq('profile_id', identity.profileId)
+    .eq('device_id', identity.deviceId)
+    .select('id');
+  if (updateError) throw new Error('The independent phone device could not be saved.');
+  if (!existingRows || existingRows.length === 0) {
+    const { error } = await db.from('phone_webrtc_devices').upsert(
+      {
+        extension_id: identity.extensionId,
+        profile_id: identity.profileId,
+        device_id: identity.deviceId,
+        provider: 'asterisk',
+        provider_credential_id: credential.endpointId,
+        sip_username: credential.sipUsername,
+        status: 'active',
+        registration_state: 'unregistered',
+        connection_state: 'disconnected',
+        last_seen_at: null,
+        registration_verified_at: null,
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: 'profile_id,device_id' },
+    );
+    if (error) throw new Error('The independent phone device could not be saved.');
+  }
   return { ...credential, iceServers };
 }
 
 export async function asteriskDeviceStatus(
   identity: DeviceIdentity,
 ): Promise<AsteriskRegistration> {
-  const result = await controlRequest<AsteriskRegistration>('/status', identity);
+  const result = await controlRequest<AsteriskRegistration & { expiresAt?: string | null }>(
+    '/status',
+    identity,
+  );
   const age = Date.now() - Date.parse(result.observedAt);
   if (result.provider !== 'asterisk' || !Number.isFinite(age) || age < -5_000 || age > 30_000) {
     throw new Error('The independent phone registration evidence is not current.');
@@ -211,6 +243,10 @@ export async function asteriskDeviceStatus(
       result.connectionState === 'connected'
         ? 'connected'
         : 'disconnected',
+    // The provisioner reports the lease expiry for a device it still
+    // holds and null once the lease has expired and the record was
+    // removed. Only the second state is unrecoverable by heartbeat.
+    provisioned: typeof result.expiresAt === 'string' && result.expiresAt.length > 0,
   };
 }
 

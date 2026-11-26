@@ -24,7 +24,9 @@ function settled<T>(promise: Promise<T>): Promise<Settled<T>> {
   );
 }
 function unwrapSettled<T>(outcome: Settled<T>): T {
-  if (!outcome.ok) throw outcome.error;
+  // The repo typechecks with strict:false, where boolean-discriminant
+  // narrowing is inert — discriminate by property presence instead.
+  if ('error' in outcome) throw outcome.error;
   return outcome.value;
 }
 

@@ -130,6 +130,7 @@
     "openai": "6.42.0",
     "passport-google-oauth20": "2.0.0",
     "pdf-parse": "^2.4.5",
+    "pdfjs-dist": "5.4.296",
     "pdfkit": "^0.18.0",
     "postgres": "^3.4.9",
     "qrcode": "1.5.4",

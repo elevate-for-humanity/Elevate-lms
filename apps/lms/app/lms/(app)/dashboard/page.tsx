@@ -57,6 +57,7 @@ import { resolvePortalPreviewSubject } from '@/lib/admin/portal-preview';
 import { learnerCanSeeBilling } from '@/lib/billing/learner-payment-plan-visibility';
 import { loadLearnerBillingRequirement } from '@/lib/billing/learner-billing-requirement';
 import { MandatoryBillingSetup } from '@/components/learner/MandatoryBillingSetup';
+import TuitionRefundPolicyNotice from '@/components/apprenticeship/TuitionRefundPolicyNotice';
 import { loadEarnedCredentials, loadRecentQuizAttempts } from '@/lib/learner/dashboard-evidence';
 
 export const metadata: Metadata = generateInternalMetadata({
@@ -804,6 +805,7 @@ export default async function StudentDashboard() {
             <MandatoryBillingSetup requirement={billingRequirement} readOnly={subject.previewing} />
           </details>
         ) : null}
+        <TuitionRefundPolicyNotice />
         <details className="rounded-2xl border border-slate-200 bg-white p-4">
           <summary className="min-h-11 cursor-pointer font-bold text-slate-950">
             Training dates, documents, and hands-on attendance

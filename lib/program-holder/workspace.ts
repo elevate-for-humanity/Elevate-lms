@@ -16,6 +16,15 @@ import { LEARNER_ROSTER_ROLES } from './roster-eligibility';
 import { requireProgramHolder } from '@/lib/auth/require-program-holder';
 import { calculateDistanceMiles, geocodeAddress, isGeocodingResult } from '@/lib/geo/geocode';
 
+type Settled<T> = { ok: true; value: T } | { ok: false; error: unknown };
+function settled<T>(promise: Promise<T>): Promise<Settled<T>> {
+  return promise.then(
+    (value): Settled<T> => ({ ok: true, value }),
+    (error): Settled<T> => ({ ok: false, error }),
+  );
+}
+
+
 export type ProgramHolderWorkspace = {
   mode: 'admin' | 'holder';
   holder: any | null;
@@ -349,15 +358,143 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
     if (error) throw new Error(`Program Holder ${name} could not load: ${error.message}`);
   }
 
-  const secondaryCourses = await db.from('courses')
-    .select('id,metadata')
-    .contains('metadata', { assignment_kind: 'secondary', program_holder_id: holderId });
+  // Dashboard load performance: the roster, credential, teaching and
+  // secondary-course queries below depend only on the parallel blocks
+  // above (holder, profile, program ids, roster ids), not on each other,
+  // so they run in one parallel block instead of a serial chain. The
+  // school-applicant and exit-report loads start here too. Every error
+  // check stays at its original position below, so failure precedence
+  // and messages are unchanged.
+  const rosterUserIds: string[] = Array.from(
+    new Set(
+      [
+        ...(enrollmentsRes.data ?? []),
+        ...(upcomingRes.data ?? []),
+        ...(convertedStudentsRes.data ?? []),
+      ]
+        .map((row: any) => row.user_id)
+        .filter((value: unknown): value is string => typeof value === 'string' && value.length > 0),
+    ),
+  );
+  const schoolApplicantsPromise = settled(
+    loadApprovedSchoolApplicants(
+      db,
+      holderRes.data?.features,
+      programsRes.data || [],
+      contactAccessGranted,
+      true,
+    ),
+  );
+  const exitReportsPromise = settled(loadHolderExitReports(db, holderId));
+  const [secondaryCourses, progressEntriesRes, rosterProfilesOutcome, credentialOutcome, assignedTeaching] =
+    await Promise.all([
+      db.from('courses')
+        .select('id,metadata')
+        .contains('metadata', { assignment_kind: 'secondary', program_holder_id: holderId }),
+      rosterUserIds.length && programIds.length
+        ? db
+            .from('progress_entries')
+            .select(
+              'id,apprentice_id,program_id,hour_entry_id,hours_worked,work_date,clock_in_at,clock_out_at,status',
+            )
+            .in('apprentice_id', rosterUserIds)
+            .in('program_id', programIds)
+            .eq('status', 'verified')
+            .order('work_date', { ascending: false })
+            .limit(5000)
+        : { data: [], error: null },
+      rosterUserIds.length
+        ? db.from('profiles').select('id,role,email,phone,full_name').in('id', rosterUserIds)
+        : { data: [], error: null },
+      rosterUserIds.length && programIds.length
+        ? db
+            .from('student_credential_uploads')
+            .select('user_id,program_id,verification_status,credential_earned_date,verified_at')
+            .in('user_id', rosterUserIds)
+            .in('program_id', programIds)
+        : { data: [], error: null },
+      db.from('instructor_assignments').select('course_id')
+        .eq('instructor_id', profile.id).eq('active', true),
+    ]);
+  const rosterProfiles = rosterProfilesOutcome.data;
+  const rosterProfilesError = rosterProfilesOutcome.error;
+  const credentialUploads = credentialOutcome.data;
+  const credentialError = credentialOutcome.error;
   if (secondaryCourses.error) throw new Error('Secondary syllabus courses could not load.');
   coursesRes.data = [...(coursesRes.data ?? []), ...(secondaryCourses.data ?? []).map((course: any) => ({
     id: course.id, course_id: course.id, program_id: course.metadata.holder_program_id,
     custom_syllabus_path: course.metadata.syllabus_path, status: 'under_review',
     term_name: 'Secondary assignment',
   }))] as any;
+  const emailByUserId = new Map<string, string>(
+    (rosterProfiles ?? [])
+      .filter((row) => typeof row.email === 'string' && row.email.trim())
+      .map((row) => [row.id, String(row.email).trim()]),
+  );
+  const phoneByUserId = new Map<string, string>(
+    (rosterProfiles ?? [])
+      .filter((row) => typeof row.phone === 'string' && row.phone.trim())
+      .map((row) => [row.id, String(row.phone).trim()]),
+  );
+  const trainingRecord = (row: any) =>
+    holderTrainingRecord({
+      ...row,
+      ...(contactAccessGranted
+        ? {
+            email: row.email || emailByUserId.get(row.user_id || row.student_id),
+            phone: row.phone || phoneByUserId.get(row.user_id || row.student_id),
+          }
+        : {}),
+      ...holderCredentialStatus(row, credentialUploads ?? []),
+    });
+  const eligibleRosterUserIds = new Set(
+    (rosterProfiles ?? []).filter(isLearnerRosterProfile).map((row: any) => row.id),
+  );
+  // The production-roster safeguard above keeps test-marked profiles out of
+  // real holders' rosters. A QA fixture holder exists only to exercise this
+  // portal with its own fixture students, so when the viewing holder is
+  // itself a QA fixture, its own learner-role fixture profiles are eligible.
+  // Real holders (features.qa_e2e is not true) are unaffected.
+  if ((holderRes.data?.features as any)?.qa_e2e === true) {
+    for (const row of rosterProfiles ?? []) {
+      if (
+        typeof row?.id === 'string' &&
+        row.id &&
+        (LEARNER_ROSTER_ROLES as readonly string[]).includes(
+          String(row.role || '').toLowerCase(),
+        )
+      ) {
+        eligibleRosterUserIds.add(row.id);
+      }
+    }
+  }
+  const nameByUserId = new Map<string, string>(
+    (rosterProfiles ?? [])
+      .filter((row: any) => typeof row.full_name === 'string' && row.full_name.trim())
+      .map((row: any) => [row.id, row.full_name.trim()]),
+  );
+  const enrolledRoster = (enrollmentsRes.data ?? [])
+    .filter((row: any) => !row.user_id || eligibleRosterUserIds.has(row.user_id))
+    .map((row: any) => {
+      const verified = verifiedTrainingForEnrollment(
+        row,
+        hoursRes.data ?? [],
+        progressEntriesRes.data ?? [],
+      );
+      return {
+        ...row,
+        full_name: row.full_name?.trim() || nameByUserId.get(row.user_id) || 'Student',
+        total_hours_completed: Math.max(Number(row.total_hours_completed || 0), verified.total),
+        training_start_date: row.training_start_date || verified.firstDate || null,
+      };
+    });
+  const onlineStudyPromise = settled(loadHolderOnlineStudy(db, enrolledRoster));
+  const upcomingRoster = (upcomingRes.data ?? []).filter(
+    (row: any) => !row.user_id || eligibleRosterUserIds.has(row.user_id),
+  );
+  const convertedRoster = (convertedStudentsRes.data ?? []).filter(
+    (row: any) => !row.user_id || eligibleRosterUserIds.has(row.user_id),
+  );
   // Holder-specific course rows override the canonical program/course catalog.
   const canonicalCourseIds = [
     ...new Set(
@@ -435,8 +572,6 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
   });
   const learningMaterials: NonNullable<ProgramHolderWorkspace['learningMaterials']> = { courses: [], workbooks: [] };
   try {
-    const assignedTeaching = await db.from('instructor_assignments').select('course_id')
-      .eq('instructor_id', profile.id).eq('active', true);
     if (assignedTeaching.error) throw new Error('Teaching material access could not be verified.');
     const teachingIds = new Set((assignedTeaching.data ?? []).map(row => row.course_id));
     const teachingCourses = currentAssignments.filter(row => row.published && teachingIds.has(row.course_id));
@@ -452,117 +587,16 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
     logger.error('PROGRAM_HOLDER_LEARNING_MATERIALS_UNAVAILABLE');
     learningMaterials.error = 'Learning material links could not be loaded. Open My Courses or Workbooks to retry.';
   }
-  const rosterUserIds: string[] = Array.from(
-    new Set(
-      [
-        ...(enrollmentsRes.data ?? []),
-        ...(upcomingRes.data ?? []),
-        ...(convertedStudentsRes.data ?? []),
-      ]
-        .map((row: any) => row.user_id)
-        .filter((value: unknown): value is string => typeof value === 'string' && value.length > 0),
-    ),
-  );
-  const progressEntriesRes =
-    rosterUserIds.length && programIds.length
-      ? await db
-          .from('progress_entries')
-          .select(
-            'id,apprentice_id,program_id,hour_entry_id,hours_worked,work_date,clock_in_at,clock_out_at,status',
-          )
-          .in('apprentice_id', rosterUserIds)
-          .in('program_id', programIds)
-          .eq('status', 'verified')
-          .order('work_date', { ascending: false })
-          .limit(5000)
-      : { data: [], error: null };
   if (progressEntriesRes.error)
     throw new Error('Program Holder verified training hours could not load.');
-  const { data: rosterProfiles, error: rosterProfilesError } = rosterUserIds.length
-    ? await db.from('profiles').select('id,role,email,phone,full_name').in('id', rosterUserIds)
-    : { data: [], error: null };
   if (rosterProfilesError)
     throw new Error(
       `Program Holder roster profiles could not load: ${rosterProfilesError.message}`,
     );
-  const { data: credentialUploads, error: credentialError } =
-    rosterUserIds.length && programIds.length
-      ? await db
-          .from('student_credential_uploads')
-          .select('user_id,program_id,verification_status,credential_earned_date,verified_at')
-          .in('user_id', rosterUserIds)
-          .in('program_id', programIds)
-      : { data: [], error: null };
   if (credentialError) throw new Error('Program Holder certification status could not load.');
-  const emailByUserId = new Map<string, string>(
-    (rosterProfiles ?? [])
-      .filter((row) => typeof row.email === 'string' && row.email.trim())
-      .map((row) => [row.id, String(row.email).trim()]),
-  );
-  const phoneByUserId = new Map<string, string>(
-    (rosterProfiles ?? [])
-      .filter((row) => typeof row.phone === 'string' && row.phone.trim())
-      .map((row) => [row.id, String(row.phone).trim()]),
-  );
-  const trainingRecord = (row: any) =>
-    holderTrainingRecord({
-      ...row,
-      ...(contactAccessGranted
-        ? {
-            email: row.email || emailByUserId.get(row.user_id || row.student_id),
-            phone: row.phone || phoneByUserId.get(row.user_id || row.student_id),
-          }
-        : {}),
-      ...holderCredentialStatus(row, credentialUploads ?? []),
-    });
-  const eligibleRosterUserIds = new Set(
-    (rosterProfiles ?? []).filter(isLearnerRosterProfile).map((row: any) => row.id),
-  );
-  // The production-roster safeguard above keeps test-marked profiles out of
-  // real holders' rosters. A QA fixture holder exists only to exercise this
-  // portal with its own fixture students, so when the viewing holder is
-  // itself a QA fixture, its own learner-role fixture profiles are eligible.
-  // Real holders (features.qa_e2e is not true) are unaffected.
-  if ((holderRes.data?.features as any)?.qa_e2e === true) {
-    for (const row of rosterProfiles ?? []) {
-      if (
-        typeof row?.id === 'string' &&
-        row.id &&
-        (LEARNER_ROSTER_ROLES as readonly string[]).includes(
-          String(row.role || '').toLowerCase(),
-        )
-      ) {
-        eligibleRosterUserIds.add(row.id);
-      }
-    }
-  }
-  const nameByUserId = new Map<string, string>(
-    (rosterProfiles ?? [])
-      .filter((row: any) => typeof row.full_name === 'string' && row.full_name.trim())
-      .map((row: any) => [row.id, row.full_name.trim()]),
-  );
-  const enrolledRoster = (enrollmentsRes.data ?? [])
-    .filter((row: any) => !row.user_id || eligibleRosterUserIds.has(row.user_id))
-    .map((row: any) => {
-      const verified = verifiedTrainingForEnrollment(
-        row,
-        hoursRes.data ?? [],
-        progressEntriesRes.data ?? [],
-      );
-      return {
-        ...row,
-        full_name: row.full_name?.trim() || nameByUserId.get(row.user_id) || 'Student',
-        total_hours_completed: Math.max(Number(row.total_hours_completed || 0), verified.total),
-        training_start_date: row.training_start_date || verified.firstDate || null,
-      };
-    });
-  const onlineStudySessions = await loadHolderOnlineStudy(db, enrolledRoster);
-  const upcomingRoster = (upcomingRes.data ?? []).filter(
-    (row: any) => !row.user_id || eligibleRosterUserIds.has(row.user_id),
-  );
-  const convertedRoster = (convertedStudentsRes.data ?? []).filter(
-    (row: any) => !row.user_id || eligibleRosterUserIds.has(row.user_id),
-  );
+  const onlineStudyOutcome = await onlineStudyPromise;
+  if (!onlineStudyOutcome.ok) throw onlineStudyOutcome.error;
+  const onlineStudySessions = onlineStudyOutcome.value;
 
   let phoneLine = phoneLineRes.data ?? null;
   const extension = extensionRes.data?.extension ?? phoneLine?.extension ?? null;
@@ -727,13 +761,12 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
     );
   });
 
-  const schoolApplicants = await loadApprovedSchoolApplicants(
-    db,
-    holderRes.data?.features,
-    programsRes.data || [],
-    contactAccessGranted,
-    true,
-  );
+  const schoolApplicantsOutcome = await schoolApplicantsPromise;
+  if (!schoolApplicantsOutcome.ok) throw schoolApplicantsOutcome.error;
+  const schoolApplicants = schoolApplicantsOutcome.value;
+
+  const exitReportsOutcome = await exitReportsPromise;
+  if (!exitReportsOutcome.ok) throw exitReportsOutcome.error;
 
   return {
     mode: 'holder',
@@ -771,7 +804,7 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
     onlineStudySessions,
     documents: documentsRes.data ?? [],
     reports: reportsRes.data ?? [],
-    testingReports: await loadHolderExitReports(db, holderId),
+    testingReports: exitReportsOutcome.value,
     courseAssignments: currentAssignments,
     learningMaterials,
     payoutProfile: payoutRes.data ?? null,

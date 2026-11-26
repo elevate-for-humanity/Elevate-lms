@@ -161,9 +161,15 @@ export function parseSurveyAnswers(
 
   // Question 4: Put in other program
   if (answers.was_put_in_other_program) {
-    result.was_put_in_other_program = answers.was_put_in_other_program.includes('Yes') ||
-                                      answers.was_put_in_other_program.includes('encouraged');
-    result.other_program_details = answers.was_put_in_other_program.join('; ');
+    // The survey page sends radio answers as a plain string, not an
+    // array — normalize before inspecting so .join cannot throw on the
+    // real payload shape (a string answer crashed every submission).
+    const otherProgramText = Array.isArray(answers.was_put_in_other_program)
+      ? answers.was_put_in_other_program.join('; ')
+      : String(answers.was_put_in_other_program);
+    result.was_put_in_other_program = otherProgramText.includes('Yes') ||
+                                      otherProgramText.includes('encouraged');
+    result.other_program_details = otherProgramText;
   }
 
   // Question 5: Persuaded away

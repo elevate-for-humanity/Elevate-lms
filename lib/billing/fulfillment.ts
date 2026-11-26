@@ -440,27 +440,32 @@ export async function fulfillPaidBillingInvoice(
     const result = await db
       .from('program_enrollments')
       .update({
-        status: schoolOrder || needsApplication ? 'pending' : 'active',
+        status: schoolOrder ? 'pending' : 'active',
         payment_status: 'paid',
-        enrollment_state: schoolOrder || needsApplication ? 'onboarding' : 'active',
+        enrollment_state: schoolOrder ? 'onboarding' : 'active',
         next_required_action: schoolOrder ? 'SCHOOL_REGISTRATION' : needsApplication ? 'FULL_APPLICATION' : 'ONBOARDING',
         amount_paid_cents: payload.amount_cents,
         billing_provider: 'quickbooks',
         payment_provider: 'quickbooks',
         payment_reference: job.billing_invoice_id,
-        ...(schoolOrder || needsApplication ? {} : { access_granted_at: new Date().toISOString() }),
+        ...(schoolOrder ? {} : { access_granted_at: new Date().toISOString() }),
         updated_at: new Date().toISOString(),
       })
       .eq('id', payload.enrollment_id)
       .eq('payment_status', 'pending');
     if (result.error) throw new Error(result.error.message);
     await notifyAdminOfStudentPayment(db, job.billing_invoice_id, payload);
-    if (!schoolOrder && !needsApplication) {
-      // Verified QuickBooks payment on a self-pay enrollment: stamp the
-      // approved-paid gate fields so the learner is not bounced to
-      // /lms/access-pending. grantPaidEnrollmentAccess only grants when the
-      // row would then pass the gate (self-pay + paid + reference); school
-      // and full-application rows above stay pending for their own flows.
+    if (!schoolOrder) {
+      // Verified QuickBooks payment on a self-pay enrollment: the student is
+      // fully enrolled at payment. A still-outstanding full application is a
+      // follow-up (next_required_action above), never an enrollment blocker,
+      // so stamp the approved-paid gate fields here too — otherwise the
+      // learner is bounced to /lms/access-pending after paying.
+      // grantPaidEnrollmentAccess only grants when the row would then pass
+      // the gate (self-pay + paid + reference); school orders above stay
+      // pending for their own registration flow. When the student later
+      // submits the full application, activatePaidApplication links it and
+      // activates installments against this same enrollment + invoice.
       await grantPaidEnrollmentAccess(db, payload.enrollment_id);
       await queuePaidProgramWelcome(db, payload.enrollment_id);
     }
@@ -709,4 +714,5 @@ export async function fulfillPaidBillingInvoice(
 
   throw new Error(`Unsupported billing fulfillment type: ${job.fulfillment_type}`);
 }
+
 

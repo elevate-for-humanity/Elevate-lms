@@ -11,7 +11,7 @@
  */
 import { createServer } from 'node:net';
 import {pcm16ToUlaw} from './turn-adapter.mjs';
-import {menuOptions, menuRoute} from './menu.mjs';
+import {menuOptions, menuRoute, operatorExtension as resolveOperatorExtension} from './menu.mjs';
 import { randomBytes,randomUUID } from 'node:crypto';
 import { setTimeout as sleep } from 'node:timers/promises';
 import {privateTurn,privateTurnOptions} from './private-turn.mjs';
@@ -172,8 +172,14 @@ export async function waitForCallerExit(callId,request=ari,wait=sleep){
   }
   throw Error('CALL_HANDOFF_NOT_RELEASED');
 }
-export async function routeOperator(callId,route,request=ari,wait=sleep){
-  if(!UUIDISH.test(callId||'') || route?.type!=='operator' || route.extension!=='0')throw Error('ROUTE_NOT_ALLOWED');
+export async function routeOperator(callId,route,request=ari,wait=sleep,operator=resolveOperatorExtension()){
+  if(!UUIDISH.test(callId||'') || route?.type!=='operator' || route.extension!==operator)throw Error('ROUTE_NOT_ALLOWED');
+  // The route's extension is the configured operator target
+  // (phone_systems.admin_extension). The ARI continue still enters the
+  // reviewed dialplan at its operator entry — digit 0 in [internal] — whose
+  // provisioner-owned subroutine resolves to the admin extension's devices
+  // and voicemail box. That dialplan alias is not the menu target and does
+  // not change when the target does.
   await request('/channels/'+encode(callId)+'/continue','POST',{
     context:'internal',extension:'0',priority:1,
   });
@@ -187,11 +193,11 @@ export async function routeApprovedExtension(callId,route,request=ari,allowed=pr
   });
   await waitForCallerExit(callId,request,wait);
 }
-export async function handleDtmf(event,active=sessions,{route=routeOperator,routeExtension=routeApprovedExtension,finish=end,menu=process.env.PARIS_MENU_OPTIONS || '[]',allowedExtensions=process.env.PARIS_ALLOWED_EXTENSIONS || ''}={}){
+export async function handleDtmf(event,active=sessions,{route=routeOperator,routeExtension=routeApprovedExtension,finish=end,menu=process.env.PARIS_MENU_OPTIONS || '[]',allowedExtensions=process.env.PARIS_ALLOWED_EXTENSIONS || '',operatorExtension=resolveOperatorExtension()}={}){
   if(event?.type!=='ChannelDtmfReceived' || !/^[0-9]$/.test(event.digit))return;
   const session=active.get(event.channel?.id);
   if(!session || session.closed || session.transferring)return;
-  const requested=menuRoute(event.digit,menuOptions(menu,allowedExtensions));
+  const requested=menuRoute(event.digit,menuOptions(menu,allowedExtensions,operatorExtension),operatorExtension);
   if(!requested)return;
   // Only route this owned caller to a destination resolved from the saved menu.
   session.transferring=true;

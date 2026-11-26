@@ -84,7 +84,7 @@ function audioResponse(
     });
   }
   if (parsed) {
-    const body = audio.slice(parsed.start, parsed.end + 1);
+    const body = audio.subarray(parsed.start, parsed.end + 1);
     return new Response(body, {
       status: 206,
       headers: {

@@ -31,7 +31,16 @@ export async function POST(request: NextRequest) {
 
   const end = new Date();
   const start = new Date(end.getTime() - 35 * 24 * 60 * 60 * 1000);
-  const results: Array<{ scheduleId: string; ok: boolean; payments?: number; error?: string }> = [];
+  const results: Array<{
+    scheduleId: string;
+    ok: boolean;
+    payments?: number;
+    /** Payments applied to the week's existing invoice instead of creating a new one. */
+    appliedToExisting?: number;
+    /** Payments for weeks whose invoice was already paid (double payment — needs human refund review). */
+    duplicatesSkipped?: number;
+    error?: string;
+  }> = [];
   for (const schedule of schedules || []) {
     try {
       const subscription = await getPayPalSubscription(schedule.provider_subscription_id);
@@ -45,6 +54,8 @@ export async function POST(request: NextRequest) {
         end.toISOString(),
       );
       let payments = 0;
+      let appliedToExisting = 0;
+      let duplicatesSkipped = 0;
       for (const transaction of transactionResult.transactions || []) {
         if (transaction.status !== 'COMPLETED') continue;
         const gross = transaction.amount_with_breakdown?.gross_amount;
@@ -57,9 +68,18 @@ export async function POST(request: NextRequest) {
           amountCents,
           currency: gross.currency_code,
         });
-        if (!synced.alreadyProcessed) payments += 1;
+        if (synced.duplicateSkipped) {
+          duplicatesSkipped += 1;
+          logger.error('[apprentice-payment-reconciliation] duplicate PayPal payment skipped', {
+            scheduleId: schedule.id,
+            paymentId: transaction.id,
+          });
+        } else if (!synced.alreadyProcessed) {
+          payments += 1;
+          if (synced.appliedToInvoiceId) appliedToExisting += 1;
+        }
       }
-      results.push({ scheduleId: schedule.id, ok: true, payments });
+      results.push({ scheduleId: schedule.id, ok: true, payments, appliedToExisting, duplicatesSkipped });
     } catch (cause) {
       const message = cause instanceof Error ? cause.message : 'Unknown reconciliation error';
       logger.error('[apprentice-payment-reconciliation] failed', cause, { scheduleId: schedule.id });
@@ -68,7 +88,15 @@ export async function POST(request: NextRequest) {
   }
   const failed = results.filter((result) => !result.ok).length;
   return NextResponse.json(
-    { ok: failed === 0, processed: results.length, failed, results },
+    {
+      ok: failed === 0,
+      processed: results.length,
+      failed,
+      payments: results.reduce((sum, result) => sum + (result.payments || 0), 0),
+      appliedToExisting: results.reduce((sum, result) => sum + (result.appliedToExisting || 0), 0),
+      duplicatesSkipped: results.reduce((sum, result) => sum + (result.duplicatesSkipped || 0), 0),
+      results,
+    },
     { status: failed ? 207 : 200 },
   );
 }

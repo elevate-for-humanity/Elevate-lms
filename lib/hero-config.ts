@@ -14,7 +14,7 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 // Video hero sources - used across the site
 // Rules: No gradient overlays, text in solid container, calm motion only
 // Hero video sources may use verified legacy CDN media or canonical Supabase public previews.
-const R2 = 'https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos';
+const R2 = '/videos';
 export const VIDEO_HEROES = {
   // Main/Marketing
   homepage: `${R2}/hero-home-fast.mp4`,

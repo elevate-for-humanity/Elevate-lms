@@ -16,7 +16,7 @@ export const containerBuildPolicy = Object.freeze({
   marketing: { dockerfile: 'Dockerfile.marketing', ...web('marketing') },
   store: { dockerfile: 'Dockerfile.marketing', ...web('marketing') },
   admin: { dockerfile: 'Dockerfile.admin', ...web('admin') },
-  lms: { dockerfile: 'Dockerfile.northflank-lms', ...web('lms') },
+  lms: { dockerfile: 'Dockerfile.google-lms', ...web('lms') },
   'ultimate-worker': { dockerfile: 'Dockerfile.ultimate-worker', family: 'native-course-worker',
     memoryControl: 'scripts/gcp/regional-capacity.mjs',
     savingControl: 'lib/ultimate-course-builder/persistence/fenced-persistence.ts',

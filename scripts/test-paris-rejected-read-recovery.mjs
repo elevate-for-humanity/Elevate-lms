@@ -12,9 +12,18 @@ const helper=source.slice(start,source.indexOf('async function writeFile(',start
 // Execute the same guard body when it is shared as a module export. A dynamic
 // Function fixture cannot parse ESM export syntax; path restrictions stay real.
 const pathGuard=source.slice(source.indexOf('function normalizePath('),source.indexOf('async function githubHeaders(')).replace(/^export\s+/gm,'');
+// PR1 (#2070): rejectedReadFeedback now reports the typed reason via
+// blockedPathReason(normalizePath(path)). The isolated fixture evaluates the
+// helper body without module imports, so evaluate the same two pure function
+// bodies from the module under test alongside it.
+const normalizeStart = source.indexOf('function normalizePath(');
+const typedComment = source.indexOf('Typed blocked-path reasons', normalizeStart);
+const normalizeSrc = source.slice(normalizeStart, source.lastIndexOf('/**', typedComment));
+const reasonStart = source.indexOf('export function blockedPathReason(', normalizeStart);
+const reasonSrc = source.slice(reasonStart, source.indexOf('/** Broad application repairs', reasonStart)).replace(/^export\s+/gm, '');
 function fixture({protectedPath=false,results=[]}={}) {
  const calls=[];
- const feedback=new Function('blockedPath','listDirectory','rejectedSourceRead',helper+';return rejectedReadFeedback;')(
+ const feedback=new Function('blockedPath','listDirectory','rejectedSourceRead',normalizeSrc+'\n'+reasonSrc+'\n'+helper+';return rejectedReadFeedback;')(
   ()=>protectedPath,
   async(path,branch)=>{calls.push({path,branch});const result=results.shift();if(result instanceof Error)throw result;return result??[];},
   error=>/not a directory|Repository path is not allowed|GitHub API 404 for \/contents/.test(error.message),
@@ -87,7 +96,7 @@ test('real fallback keeps a refined diagnostic query ahead of broad task words a
   source.slice(start,end)+'}return {discoveredFiles,observations};})()');
  const result=await run(rankSourcePaths,rememberSourcePaths,action,
   'Repair Course Builder lesson quality and approved content. REPAIR_PRODUCER_UNCHANGED:synchronization. Add tests.',
-  async()=>({tree}),async()=>[],[noise]);
+  async()=>({tree}),async()=>({matches:[],searchFallback:'none'}),[noise]);
  const history=[...producers.map(path=>'read:'+path),'search:'+query.toLowerCase()];
  assert.deepEqual(recoverRepeatedInspection(history,action,[],result.discoveredFiles),{type:'read',path:aligned});
  assert.ok(!result.discoveredFiles.includes('lib/ai/.env.picture-alignment'));

@@ -216,8 +216,9 @@ export default function TestingCheckoutClient({
       <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7">
         <h2 className="text-2xl font-black text-slate-950">1. Select provider and exam</h2>
 
-        <label className="mt-5 block text-base font-bold text-slate-800">Testing provider</label>
+        <label htmlFor="testing-provider" className="mt-5 block text-base font-bold text-slate-800">Testing provider</label>
         <select
+          id="testing-provider"
           value={providerKey}
           onChange={(event) => changeProvider(event.target.value)}
           className="mt-2 w-full rounded-xl border border-slate-300 bg-white px-4 py-3.5 text-base"
@@ -301,8 +302,9 @@ export default function TestingCheckoutClient({
         </div>
 
         <div className="mt-7">
-          <label className="block text-base font-bold text-slate-800">Number of test takers</label>
+          <label htmlFor="testing-quantity" className="block text-base font-bold text-slate-800">Number of test takers</label>
           <input
+            id="testing-quantity"
             type="number"
             min={1}
             max={100}
@@ -350,6 +352,7 @@ export default function TestingCheckoutClient({
                 ) : null}
                 <label className="mt-4 flex cursor-pointer items-center gap-3 rounded-xl bg-white p-3 font-bold text-slate-900">
                   <input
+                    id="testing-add-on"
                     type="checkbox"
                     checked={addOn}
                     onChange={(event) => setAddOn(event.target.checked)}

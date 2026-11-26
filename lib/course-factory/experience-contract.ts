@@ -8,8 +8,11 @@ export const ExperienceOptionSchema = z.object({
 
 export const ExperienceKnowledgeCheckSchema = z.object({
   question: z.string().trim().min(1),
-  options: z.array(z.string().trim().min(1)).length(4),
-  correct: z.number().int().min(0).max(3),
+  // Authored checks are not uniformly four-option: Elevate's own authored
+  // courses include complete three-option questions. Accept the complete
+  // authored range; the compiler guarantees `correct` indexes a real option.
+  options: z.array(z.string().trim().min(1)).min(2).max(6),
+  correct: z.number().int().min(0).max(5),
   explanation: z.string().trim().min(1),
 });
 

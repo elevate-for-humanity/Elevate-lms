@@ -13,6 +13,12 @@ interface Props {
   onPublish: () => void;
   onPreview: () => void;
   onTitleChange: (title: string) => void;
+  /**
+   * True when the only missing items are build-standard items AND the owner
+   * has acknowledged them in the publish checklist — Publish stays enabled
+   * (owner override; the standard never dead-ends the owner).
+   */
+  canPublishWithOverride?: boolean;
 }
 
 const STATUS_STYLES: Record<string, string> = {
@@ -30,6 +36,7 @@ export default function CourseBuilderTopBar({
   onPublish,
   onPreview,
   onTitleChange,
+  canPublishWithOverride,
 }: Props) {
   const [editingTitle, setEditingTitle] = useState(false);
   const [titleDraft, setTitleDraft] = useState(state.title);
@@ -142,9 +149,13 @@ export default function CourseBuilderTopBar({
 
             <button
               onClick={onPublish}
-              disabled={!derived.canPublish || state.status === 'published'}
+              disabled={(!derived.canPublish && !canPublishWithOverride) || state.status === 'published'}
               title={
-                !derived.canPublish ? `Cannot publish: ${derived.missingRequired[0]}` : undefined
+                !derived.canPublish && !canPublishWithOverride
+                  ? `Cannot publish: ${derived.missingRequired[0]}`
+                  : canPublishWithOverride
+                    ? 'Publish with owner override — acknowledged build-standard gaps are audited and routed to PARIS'
+                    : undefined
               }
               className="rounded-lg bg-brand-blue-600 px-4 py-1.5 text-sm font-semibold text-white hover:bg-brand-blue-700 transition-colors disabled:cursor-not-allowed disabled:opacity-40"
             >

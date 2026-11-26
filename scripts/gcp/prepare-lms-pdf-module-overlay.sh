@@ -1,6 +1,6 @@
 #!/bin/sh
 # Replace only the four traced PDF module entries that conflict with the
-# complete PDF export copied immediately afterward in Dockerfile.northflank-lms.
+# complete PDF export copied immediately afterward in Dockerfile.google-lms.
 set -eu
 modules="${1:?node_modules directory required}"
 if [ ! -d "$modules" ] || [ -L "$modules" ] || [ "${modules##*/}" != "node_modules" ]; then

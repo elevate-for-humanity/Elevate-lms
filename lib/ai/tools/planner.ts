@@ -2,6 +2,12 @@ import 'server-only';
 
 import { getAITool } from './registry';
 import { isReadOnlyRequest, isRepositoryRevisionInspection } from '../command-intent';
+// OpenHands has been removed: engineering execution always routes to the
+// owned internal engine (studio.engineering.execute). Naming OpenHands in
+// a command cannot select it — there is no OpenHands execution path.
+function routeEngineeringExecution(_lower: string): 'studio.engineering.execute' {
+  return 'studio.engineering.execute';
+}
 
 export type PlannedAITool = {
   name: string;
@@ -165,7 +171,9 @@ function matchAITool(command: string, context: Record<string, unknown>): Planned
     return { name: 'studio.repository.status', input: {} };
   }
   if (isOpenHandsStatusCommand(lower)) {
-    return { name: 'openhands.status', input: asAIRecord(context.toolInput) };
+    // OpenHands has been removed: there is no OpenHands status tool and no
+    // OpenHands route. A status query about it plans no tool.
+    return null;
   }
   // Read-only workflow inspection outranks generic engineering keywords.
   // Negated phrases such as "do not modify" describe a safety boundary, not
@@ -214,7 +222,7 @@ function matchAITool(command: string, context: Record<string, unknown>): Planned
   // can use the requested browser verification as an acceptance criterion.
   if (!isReadOnlyRequest(command) && isEngineeringExecutionCommand(lower)) {
     return {
-      name: /\bopenhands\b/.test(lower) ? 'openhands.execute' : 'studio.engineering.execute',
+      name: routeEngineeringExecution(lower),
       input: { ...asAIRecord(context.toolInput), task: command },
     };
   }
@@ -236,7 +244,7 @@ function matchAITool(command: string, context: Record<string, unknown>): Planned
   }
   if (isEngineeringCommand(lower)) {
     return {
-      name: /\bopenhands\b/.test(lower) ? 'openhands.execute' : 'studio.engineering.execute',
+      name: routeEngineeringExecution(lower),
       input: { ...asAIRecord(context.toolInput), task: command },
     };
   }
@@ -449,10 +457,6 @@ function matchAITool(command: string, context: Record<string, unknown>): Planned
       },
     };
   }
-  // OpenHands is an engineering worker, not a general platform action router.
-  if (isOpenHandsStatusCommand(lower)) {
-    return { name: 'openhands.status', input: asAIRecord(context.toolInput) };
-  }
   if (isLiveBrowserWork(lower)) {
     return {
       name: 'browser.execute',
@@ -461,7 +465,7 @@ function matchAITool(command: string, context: Record<string, unknown>): Planned
   }
   if (isEngineeringCommand(lower)) {
     return {
-      name: /\bopenhands\b/.test(lower) ? 'openhands.execute' : 'studio.engineering.execute',
+      name: routeEngineeringExecution(lower),
       input: {
         ...asAIRecord(context.toolInput),
         task: command,

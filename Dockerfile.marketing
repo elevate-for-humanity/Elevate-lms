@@ -113,7 +113,7 @@ RUN echo "Verifying marketing service-worker cache versions..." && \
     ! grep -R -q '__CACHE_VERSION__' /workspace/public/sw.js /workspace/public/sw-marketing.js 2>/dev/null && \
     echo "Marketing service workers stamped correctly"
 
-RUN node scripts/run-bounded-build.mjs -- pnpm --filter @elevate/marketing build
+RUN pnpm --filter @elevate/marketing build
 RUN test -d /workspace/apps/marketing/.next
 RUN test -f /workspace/apps/marketing/.next/BUILD_ID
 

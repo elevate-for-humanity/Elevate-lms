@@ -34,9 +34,12 @@ import CookieConsent from '@/components/CookieConsent';
 import FacebookPixel from '@/components/FacebookPixel';
 import { ScrollNarrator } from '@/components/home/ScrollNarrator';
 import { MediaPlaybackCoordinator } from '@/components/media/MediaPlaybackCoordinator';
+import {
+  MARKETING_SITE_URL,
+  organizationJsonLd,
+} from '@/lib/seo/marketing-organization-schema';
 
-const siteUrl = 'https://www.elevateforhumanity.org';
-const logoUrl = `${siteUrl}/images/logo.png`;
+const siteUrl = MARKETING_SITE_URL;
 const shareImageUrl = `${siteUrl}/images/partners/salon-saloon/team-sign.webp`;
 
 export const metadata: Metadata = {
@@ -87,43 +90,6 @@ export const metadata: Metadata = {
       'max-video-preview': -1,
     },
   },
-};
-
-const organizationJsonLd = {
-  '@context': 'https://schema.org',
-  '@type': ['Organization', 'EducationalOrganization'],
-  '@id': `${siteUrl}/#organization`,
-  name: 'Elevate for Humanity',
-  alternateName: 'Elevate for Humanity Career & Technical Institute',
-  legalName: '2Exclusive LLC-S',
-  url: siteUrl,
-  logo: { '@type': 'ImageObject', url: logoUrl, contentUrl: logoUrl, width: 256, height: 256 },
-  image: logoUrl,
-  telephone: '+1-463-240-1404',
-  address: {
-    '@type': 'PostalAddress',
-    streetAddress: '120 East Market Street, Suite 930',
-    addressLocality: 'Indianapolis',
-    addressRegion: 'IN',
-    postalCode: '46204',
-    addressCountry: 'US',
-  },
-  description:
-    'Career and technical education provider connecting learners with training, registered apprenticeships, testing and credential pathways, workforce funding navigation, employers, and supportive services.',
-  knowsAbout: [
-    'Registered Apprenticeship',
-    'Career and Technical Training',
-    'Barber and Beauty Apprenticeships',
-    'HVAC Training',
-    'Commercial Driver Training',
-    'Business and Entrepreneurship Training',
-    'Testing and Proctoring',
-    'Credentialing',
-    'Workforce Development',
-    'Work-Based Learning',
-    'WIOA',
-    'Employer Services',
-  ],
 };
 
 // Public pages can prerender or revalidate. Authenticated route layouts and

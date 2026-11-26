@@ -19,6 +19,7 @@ const PROTECTED_PREFIXES = [
   '/lms/scorm',
   '/scorm/job-ready',
   '/learner',
+  '/onboarding',
   '/apprentice',
   '/apprenticeship',
   '/admin-preview',

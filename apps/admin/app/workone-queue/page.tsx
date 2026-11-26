@@ -7,6 +7,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { Clock, CheckCircle, AlertTriangle, Phone, Mail, ExternalLink, Link2, ArrowRight } from 'lucide-react';
 import WorkOneApproveButton from './WorkOneApproveButton';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { WORKONE_ACCESS_START_ISO } from '@/lib/workone/access-scope';
 
 export const metadata: Metadata = {
   robots: { index: false },
@@ -50,6 +51,8 @@ export default async function WorkOneQueuePage() {
     `,
     )
     .in('status', ['pending_workone', 'funding_review'])
+    // WorkOne scope: NEW applicants only — never the pre-access backlog.
+    .gte('created_at', WORKONE_ACCESS_START_ISO)
     .order('created_at', { ascending: true });
 
   const pending = apps ?? [];
@@ -62,7 +65,8 @@ export default async function WorkOneQueuePage() {
       .from('workforce_referrals')
       .select('id, application_id, agency_name, status, partner_acknowledged')
       .in('application_id', appIds)
-      .eq('archived', false);
+      .eq('archived', false)
+      .gte('created_at', WORKONE_ACCESS_START_ISO);
     for (const r of referrals ?? []) {
       if (r.application_id) referralMap[r.application_id] = r;
     }

@@ -223,6 +223,10 @@ export async function approveEnrollment(enrollmentId: string, userId: string) {
       .eq('id', enrollmentId)
       .maybeSingle();
 
+  // program_enrollments.eligibility_status is never populated (the
+  // eligibility review writes 'eligible' to the applications table, not
+  // here), so a missing value must not block approval; only an explicitly
+  // recorded non-'eligible' value does.
   if (
     enrollmentError ||
     !enrollment ||
@@ -231,7 +235,8 @@ export async function approveEnrollment(enrollmentId: string, userId: string) {
     enrollment.cancelled_at ||
     enrollment.suspended_at ||
     enrollment.refunded_at ||
-    enrollment.eligibility_status !== 'eligible' ||
+    (enrollment.eligibility_status &&
+      enrollment.eligibility_status !== 'eligible') ||
     !hasAdmissionPaymentOrFunding(enrollment)
   ) {
     throw new Error(

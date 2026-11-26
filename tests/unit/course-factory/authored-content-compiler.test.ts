@@ -193,3 +193,78 @@ it('preserves indexed answers in imported HVAC practice assessments', () => {
   expect(result.questions).toHaveLength(3);
   expect(result.questions.map(question => question.correctAnswer)).toEqual([0, 0, 0]);
 });
+
+describe('authored question shapes used by Elevate courses', () => {
+  const baseInput = {
+    courseTitle: 'Forklift and Manufacturing Operations',
+    moduleTitle: 'Forklift foundations',
+    lessonTitle: 'Operator boundaries and safe handoff',
+    lessonSlug: 'forklift-01',
+    domainKey: 'forklift',
+    html,
+    learningObjectives: [
+      'Explain operator boundaries.',
+      'Apply capacity evidence.',
+      'Document a safe handoff.',
+    ],
+  };
+
+  it('compiles complete three-option questions (the forklift authored shape)', () => {
+    const result = compileAuthoredLessonExperience({
+      ...baseInput,
+      quizQuestions: [0, 1, 2].map((index) => ({
+        id: `forklift-01-q${index + 1}`,
+        prompt: `Forklift decision ${index + 1}?`,
+        question: `Forklift decision ${index + 1}?`,
+        options: ['Hold the task', 'Estimate and proceed', 'Ask a peer'],
+        correctAnswer: 0,
+        explanation: 'The approved information governs the decision.',
+      })),
+    });
+    expect(result.questions).toHaveLength(3);
+    expect(result.questions[0]?.options).toHaveLength(3);
+    expect(result.experience.knowledgeChecks[0]?.options).toHaveLength(3);
+    expect(result.experience.knowledgeChecks[0]?.correct).toBe(0);
+  });
+
+  it('compiles the ultimate-builder shape (prompt + choices + answerIndex)', () => {
+    const result = compileAuthoredLessonExperience({
+      ...baseInput,
+      quizQuestions: [0, 1, 2].map((index) => ({
+        id: `ultimate:q-${index + 1}`,
+        prompt: `Builder question ${index + 1}?`,
+        choices: ['First choice', 'Second choice', 'Third choice', 'Fourth choice'],
+        answerIndex: 2,
+        explanation: 'The third choice matches the lesson evidence.',
+      })),
+    });
+    expect(result.questions).toHaveLength(3);
+    expect(result.questions.map((question) => question.correctAnswer)).toEqual([2, 2, 2]);
+  });
+
+  it('still requires three complete questions per lesson', () => {
+    expect(() =>
+      compileAuthoredLessonExperience({
+        ...baseInput,
+        quizQuestions: questions.slice(0, 2),
+      }),
+    ).toThrow(/at least three complete authored assessment questions/i);
+  });
+
+  it('rejects a question whose marked answer is outside its options', () => {
+    expect(() =>
+      compileAuthoredLessonExperience({
+        ...baseInput,
+        quizQuestions: [
+          ...questions.slice(0, 2),
+          {
+            question: 'Which answer index is impossible?',
+            options: ['One', 'Two', 'Three'],
+            correctAnswer: 3,
+            explanation: 'No fourth option exists.',
+          },
+        ],
+      }),
+    ).toThrow(/at least three complete authored assessment questions/i);
+  });
+});

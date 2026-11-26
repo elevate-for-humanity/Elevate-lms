@@ -45,7 +45,7 @@ it('repeated Admin requests use the same owner-bound idempotency fingerprint and
  const result=await (await POST(post())).json();
  expect(h.enqueue.mock.calls[0][0]).toEqual(h.enqueue.mock.calls[1][0]);
  expect(h.enqueue.mock.calls[0][0].fingerprint).toBe('studio-openhands:owner:11111111-1111-4111-8111-111111111111');
- expect(result).toMatchObject({status:'validating',executed:false,engine:'openhands'});
+ expect(result).toMatchObject({status:'validating',executed:false,engine:'paris'});
 });
 it('does not relabel an earlier internal repair as an OpenHands execution',async()=>{
  h.rows=[{id:'legacy-repair',status:'blocked',candidate:{provider:'elevate',branch:{name:'studio/legacy'}},verification:{},release_sha:null}];
@@ -64,7 +64,7 @@ it('Admin panel queues a repair and displays pending validation without claiming
  }));
  render(<OpenHandsRepairPanel/>);
  fireEvent.change(screen.getByLabelText('What needs repair?'),{target:{value:h.goal}});
- fireEvent.click(screen.getByRole('button',{name:'Send repair to OpenHands'}));
+ fireEvent.click(screen.getByRole('button',{name:'Send repair'}));
  await screen.findByRole('status');
  await waitFor(()=>expect(screen.getByText(/production not yet verified/)).toBeTruthy());
  const request=calls.find(init=>init?.method==='POST');expect(request.headers['Idempotency-Key']).toMatch(/^[a-f0-9-]{36}$/);

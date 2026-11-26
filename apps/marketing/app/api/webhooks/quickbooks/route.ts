@@ -30,6 +30,7 @@ export async function POST(request: NextRequest) {
   const invoiceIds = invoiceIdsFromWebhook(payload);
   const db = await requireAdminClient();
   const config = await loadQuickBooksConfig(db);
+  let queuedPaidJob = false;
 
   for (const invoiceId of invoiceIds) {
     try {
@@ -87,11 +88,28 @@ export async function POST(request: NextRequest) {
           { onConflict: 'billing_invoice_id', ignoreDuplicates: true },
         );
         if (queued.error) throw new Error(queued.error.message);
+        queuedPaidJob = true;
       }
     } catch (cause) {
       logger.error('[quickbooks-webhook] invoice synchronization failed', cause, { invoiceId });
       return NextResponse.json({ error: 'Webhook processing failed' }, { status: 500 });
     }
   }
+  if (queuedPaidJob) {
+    // Advance the paid enrollment now, in this request: the fulfillment
+    // outbox used to wait for a cron call that might never come, leaving
+    // paid students stuck at checkout states. A processing failure leaves
+    // the job pending/failed for the cron sweeper and must not fail the
+    // webhook — QuickBooks has already been told the truth (invoice paid).
+    try {
+      const { processBillingFulfillmentJobs } = await import(
+        '@/lib/billing/handlers/process-billing-fulfillment'
+      );
+      await processBillingFulfillmentJobs(db);
+    } catch (cause) {
+      logger.error('[quickbooks-webhook] inline fulfillment processing failed', cause);
+    }
+  }
   return NextResponse.json({ ok: true, processed: invoiceIds.length });
 }
+

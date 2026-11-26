@@ -863,47 +863,6 @@ export const AI_TOOL_REGISTRY: readonly AIToolDefinition[] = [
     retryAttempts: 1,
     audit: true,
   },
-  {
-    name: 'openhands.execute',
-    description:
-      'Dispatch a privileged software-engineering task to OpenHands Cloud through the canonical Dev Studio runtime.',
-    method: 'POST',
-    path: '/api/admin/dev-studio/openhands/agent',
-    classification: 'write',
-    risk: 'high',
-    scope: 'platform',
-    allowedAgents: ['LIZZY'],
-    allowedRoles: ['admin', 'super_admin'],
-    requiredInput: ['task'],
-    approvalRequired: true,
-    confirmationPhrase: 'CONFIRM OPENHANDS EXECUTION',
-    idempotent: false,
-    timeoutMs: 90_000,
-    retryAttempts: 1,
-    audit: true,
-  },
-  {
-    name: 'openhands.status',
-    description:
-      'Refresh the status of an existing OpenHands engineering task without changing repository state.',
-    method: 'GET',
-    path: (input) =>
-      queryPath('/api/admin/dev-studio/openhands/agent', input, [
-        'taskId',
-        'startTaskId',
-        'conversationId',
-      ]),
-    classification: 'read',
-    risk: 'low',
-    scope: 'platform',
-    allowedAgents: ['LIZZY', 'ZORA'],
-    allowedRoles: ['admin', 'super_admin'],
-    approvalRequired: false,
-    idempotent: true,
-    timeoutMs: 30_000,
-    retryAttempts: 2,
-    audit: true,
-  },
 ] as const;
 
 const BY_NAME = new Map(AI_TOOL_REGISTRY.map((tool) => [tool.name, tool]));

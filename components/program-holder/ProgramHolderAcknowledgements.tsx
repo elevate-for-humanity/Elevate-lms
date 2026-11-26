@@ -4,8 +4,10 @@ import { ENCHANTED_HEARTS, formatUsd } from '@/lib/partners/enchanted-hearts';
 
 export function ProgramHolderAcknowledgements({
   requiresEnchantedHeartsTerms = false,
+  requiresSeparateNda = false,
 }: {
   requiresEnchantedHeartsTerms?: boolean;
+  requiresSeparateNda?: boolean;
 }) {
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState('');
@@ -72,7 +74,16 @@ export function ProgramHolderAcknowledgements({
           <input name="rights" value="yes" type="checkbox" required className="mt-1" /> I reviewed
           and accept the rights and responsibilities.
         </label>
-        <label className="flex items-start gap-3 rounded-xl border p-4 text-sm font-semibold"><input name="nda" value="yes" type="checkbox" required className="mt-1" /> I reviewed and accept the confidentiality and student privacy obligations in the full Program Holder agreement linked above.</label>
+        {requiresSeparateNda ? (
+          <a href="/program-holder/agreements" className="block text-sm font-bold text-blue-700 underline">
+            Review and sign the separate CNA NDA
+          </a>
+        ) : (
+          <label className="flex items-start gap-3 rounded-xl border p-4 text-sm font-semibold">
+            <input name="nda" value="yes" type="checkbox" required className="mt-1" />
+            I reviewed and accept the confidentiality and student privacy obligations in the full Program Holder agreement linked above.
+          </label>
+        )}
         <label className="flex items-start gap-3 rounded-xl border p-4 text-sm font-semibold">
           <input name="non_compete" value="yes" type="checkbox" required className="mt-1" /> I
           reviewed and agree to the Program Holder non-compete and non-solicitation terms.

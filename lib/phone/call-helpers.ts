@@ -1,0 +1,59 @@
+import 'server-only';
+
+import { hydrateProcessEnv } from '@/lib/secrets';
+import { resolveSendingNumber } from './sending-number';
+
+/**
+ * Provider-neutral phone helpers shared by the communications hub.
+ * These were previously housed in lib/phone/telnyx.ts even though none of
+ * them touch the retired Telnyx provider; they live here so the only code
+ * under the Telnyx name is the retirement boundary itself.
+ */
+
+export function encodeCallState(value: Record<string, string>) {
+  return Buffer.from(JSON.stringify(value), 'utf8').toString('base64');
+}
+
+export function decodeCallState(value?: string): Record<string, string> {
+  if (!value) return {};
+  try {
+    return JSON.parse(Buffer.from(value, 'base64').toString('utf8'));
+  } catch {
+    return {};
+  }
+}
+
+export async function publicPhoneNumber() {
+  await hydrateProcessEnv();
+  const { requireAdminClient } = await import('@/lib/supabase/admin');
+  const number = await resolveSendingNumber(await requireAdminClient());
+  if (!number) throw new Error('An active primary Twilio number is not configured');
+  return number;
+}
+
+export function menuPrompt(greeting: string, options: Array<{ digit: number; label: string }>) {
+  const choices = options.map((option) => `Press ${option.digit} for ${option.label}.`).join(' ');
+  return `${greeting} ${choices}`.trim();
+}
+
+export function isOpenNow(
+  hours: Record<string, [string, string]>,
+  timeZone: string,
+  now = new Date(),
+) {
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone,
+    weekday: 'short',
+    hour: '2-digit',
+    minute: '2-digit',
+    hourCycle: 'h23',
+  }).formatToParts(now);
+  const weekday = parts.find((part) => part.type === 'weekday')?.value.toLowerCase();
+  const hour = parts.find((part) => part.type === 'hour')?.value;
+  const minute = parts.find((part) => part.type === 'minute')?.value;
+  if (!weekday || !hour || !minute) return false;
+  const window = hours[weekday];
+  if (!window) return false;
+  const current = `${hour}:${minute}`;
+  return current >= window[0] && current < window[1];
+}

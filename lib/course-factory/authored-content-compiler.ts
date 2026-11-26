@@ -62,22 +62,38 @@ function normalizeQuestion(
 ): AuthoredQuestion | null {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
   const question = value as Record<string, any>;
-  const options = Array.isArray(question.options)
-    ? question.options.map(clean).filter(Boolean)
-    : [];
-  const correct = Number(question.correctAnswer ?? question.correct ?? question.correct_index);
+  // Authored questions reach the compiler in several of the platform's own
+  // shapes: the authored-course shape (question/options/correctAnswer), the
+  // ultimate-builder shape (prompt + choices/options + answerIndex), and the
+  // assessment shape (prompt/choices/correct). Accept every complete shape;
+  // a question is complete when it has text, 2–6 usable options, and a marked
+  // correct option inside that range.
+  const questionText = clean(question.question ?? question.prompt);
+  const rawOptions = Array.isArray(question.options)
+    ? question.options
+    : Array.isArray(question.choices)
+      ? question.choices
+      : [];
+  const options = rawOptions.map(clean).filter(Boolean);
+  const correct = Number(
+    question.correctAnswer ??
+      question.correct ??
+      question.correct_index ??
+      question.answerIndex,
+  );
   if (
-    !clean(question.question) ||
-    options.length !== 4 ||
+    !questionText ||
+    options.length < 2 ||
+    options.length > 6 ||
     !Number.isInteger(correct) ||
     correct < 0 ||
-    correct > 3
+    correct >= options.length
   ) {
     return null;
   }
   return {
     id: clean(question.id) || `authored-q${index + 1}`,
-    question: clean(question.question),
+    question: questionText,
     options,
     correctAnswer: correct,
     explanation:

@@ -14,14 +14,15 @@ const ORIGIN='https://phone.elevateforhumanity.org',DB='https://cuxzzpsyufcewtmi
 const wait=ms=>new Promise(r=>setTimeout(r,ms));
 const report=value=>console.log(JSON.stringify(value));
 export function verifyOwner(system,extension,profile){
- if(system?.id!==SYSTEM||system.status!=='active'||system.admin_extension!=='0'||system.voicemail_enabled!==true||extension?.id!==EXTENSION||extension.profile_id!==PROFILE||extension.extension!=='0'||extension.enabled!==true||extension.webrtc_provider!=='asterisk'||profile?.id!==PROFILE||profile.email?.toLowerCase()!=='curvaturebodysculpting@gmail.com'||profile.full_name!=='Elizabeth Greene')throw Error('PHONE_ACCEPTANCE_OWNER_UNVERIFIED');
+ const operatorExtension=system?.admin_extension;
+ if(system?.id!==SYSTEM||system.status!=='active'||typeof operatorExtension!=='string'||!/^(0|[1-9][0-9]{2})$/.test(operatorExtension)||system.voicemail_enabled!==true||extension?.id!==EXTENSION||extension.profile_id!==PROFILE||extension.extension!==operatorExtension||extension.enabled!==true||extension.webrtc_provider!=='asterisk'||profile?.id!==PROFILE||profile.email?.toLowerCase()!=='curvaturebodysculpting@gmail.com'||profile.full_name!=='Elizabeth Greene')throw Error('PHONE_ACCEPTANCE_OWNER_UNVERIFIED');
 }
-export function verifyHandsetAuthorization(extension,preflight,authorization,attempt){
- if(authorization!=='317-956-2748'||attempt!=='1'||extension.id!==EXTENSION||extension.profile_id!==PROFILE||extension.extension!=='0'||extension.enabled!==true||extension.admin_external_fallback!==true||extension.external_fallback_number!=='+13179562748'||preflight.adminCellularFallbackConfigured!==true||preflight.adminBrandCallerIdConfigured!==true)throw Error('PHONE_ACCEPTANCE_HANDSET_AUTHORIZATION_REQUIRED');
+export function verifyHandsetAuthorization(extension,preflight,authorization,attempt,operatorExtension){
+ if(authorization!=='317-956-2748'||attempt!=='1'||typeof operatorExtension!=='string'||!/^(0|[1-9][0-9]{2})$/.test(operatorExtension)||extension.id!==EXTENSION||extension.profile_id!==PROFILE||extension.extension!==operatorExtension||extension.enabled!==true||extension.admin_external_fallback!==true||extension.external_fallback_number!=='+13179562748'||preflight.adminCellularFallbackConfigured!==true||preflight.adminBrandCallerIdConfigured!==true)throw Error('PHONE_ACCEPTANCE_HANDSET_AUTHORIZATION_REQUIRED');
 }
-export function verifyCredential(value,identity){
+export function verifyCredential(value,identity,operatorExtension){
  const endpoint='pwa-'+createHash('sha256').update(identity.profileId+':'+identity.deviceId).digest('hex').slice(0,40);
- if(value?.provider!=='asterisk'||value.endpointId!==endpoint||value.sipUsername!==endpoint||value.extensionId!==EXTENSION||value.extension!=='0'||value.sipDomain!=='phone.elevateforhumanity.org'||value.wsUrl!=='wss://phone.elevateforhumanity.org/ws'||!/^[A-Za-z0-9_-]{43}$/.test(value.sipPassword||''))throw Error('PHONE_ACCEPTANCE_DEVICE_UNVERIFIED');
+ if(typeof operatorExtension!=='string'||!/^(0|[1-9][0-9]{2})$/.test(operatorExtension)||value?.provider!=='asterisk'||value.endpointId!==endpoint||value.sipUsername!==endpoint||value.extensionId!==EXTENSION||value.extension!==operatorExtension||value.sipDomain!=='phone.elevateforhumanity.org'||value.wsUrl!=='wss://phone.elevateforhumanity.org/ws'||!/^[A-Za-z0-9_-]{43}$/.test(value.sipPassword||''))throw Error('PHONE_ACCEPTANCE_DEVICE_UNVERIFIED');
  return value;
 }
 function remoteProgram(name,{directMailbox=false}={}){
@@ -136,7 +137,7 @@ async function main(){
  if(!preflight.idle||!preflight.gatewayARIApplicationRegistered||!preflight.operatorEntryVerified||!preflight.operatorDeviceRouteVerified||!preflight.operatorVoicemailFallbackVerified||!preflight.operatorMailboxConfigured||!preflight.operatorVoicemailPromptsReady||!preflight.operatorVoicemailApplicationRegistered||!preflight.voicemailWorkerActive||preflight.sourceSha256?.gateway!==sourceHash)throw Error('PHONE_ACCEPTANCE_PREFLIGHT_NOT_READY');
  if(mode==='preflight'){report({phoneAcceptance:'PREFLIGHT_PASS',callsPlaced:0,recipientVerified:true});return;}
  if(mode==='handset'){
-  verifyHandsetAuthorization(extensions[0],preflight,process.env.AUTHORIZED_OWNER_HANDSET_TEST,process.env.GITHUB_RUN_ATTEMPT);
+  verifyHandsetAuthorization(extensions[0],preflight,process.env.AUTHORIZED_OWNER_HANDSET_TEST,process.env.GITHUB_RUN_ATTEMPT,systems[0].admin_extension);
   const call=await exerciseSelfCall(await verifiedTwilioBindings(config),{expectedGreeting:systems[0].greeting,handsetTest:true,report});
   report({phoneAcceptance:'HANDSET_TEST_PLACED',...call,callsPlaced:1,forwardingTargetVerified:true,verifiedLive:false});return;
  }
@@ -153,7 +154,7 @@ async function main(){
  }
  let phone,folder,deviceSaved=false;const rowId=randomUUID();
  try{
-  const credential=verifyCredential(await control(''),identity);
+  const credential=verifyCredential(await control(''),identity,systems[0].admin_extension);
   deviceSaved=true;
   await db('phone_webrtc_devices',{method:'POST',body:{id:rowId,extension_id:EXTENSION,profile_id:PROFILE,device_id:identity.deviceId,provider:'asterisk',provider_credential_id:credential.endpointId,sip_username:credential.sipUsername,status:'active',registration_state:'unregistered',connection_state:'disconnected',last_seen_at:null}});
   const mediaEnv=loadGoogleConfig('lms').runtimeEnvironment;

@@ -10,7 +10,8 @@ import { PARIS_SYSTEM_IDENTITY } from '@/lib/ai/paris-identity';
 import { NextRequest, NextResponse } from 'next/server';
 import { aiChat, aiChatStream, isAIAvailable } from '@/lib/ai/ai-service';
 import { findSiteFacts, formatProgramIndex, formatSiteFacts } from '@/lib/ai/paris-site-facts';
-import { hydrateProcessEnv } from '@/lib/secrets';
+import { formatWebResults, searchWebForParis, shouldWebSearch } from '@/lib/ai/paris-web-search';
+import { hydrateProcessEnvBounded } from '@/lib/secrets';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import { VERIFIED_WORKFORCE_FUNDED_PROGRAMS } from '@/lib/programs/funding-registry';
 
@@ -24,6 +25,11 @@ export const dynamic = 'force-dynamic';
 // scripts/gcp/deploy-owned-cpu-model.mjs) — but the route still leaves time
 // for gateway cleanup and the guided response before it expires.
 const INFERENCE_TIMEOUT_MS = 120_000;
+
+// Interactive streaming clients show a spinner until the first token, so the
+// optional pre-stream web search gets a tighter budget on that path. It
+// still fails open: a timeout just means no web results in the prompt.
+const STREAM_WEB_SEARCH_TIMEOUT_MS = 2_000;
 
 type ParisSurface = 'public' | 'learner' | 'store';
 
@@ -236,8 +242,10 @@ export async function POST(req: NextRequest) {
     // question. The owned model cannot browse, so facts reach it here.
     // Retrieval never blocks the reply: a failure just means no site facts.
     let siteFacts = '';
+    let matchedProgramCount = 0;
+    let recentUserText = lastUserMessage;
     try {
-      const recentUserText = [...messages]
+      recentUserText = [...messages]
         .reverse()
         .filter((message) => message.role === 'user')
         .slice(0, 2)
@@ -245,19 +253,45 @@ export async function POST(req: NextRequest) {
         .map((message) => message.content)
         .join('\n');
       const matched = findSiteFacts(recentUserText);
+      matchedProgramCount = matched.length;
       siteFacts = matched.length > 0 ? formatSiteFacts(matched) : formatProgramIndex();
     } catch {
       siteFacts = '';
     }
 
     // Marketing must hydrate the same canonical runtime connection as Admin
-    // before deciding that the shared owned model is unavailable.
-    await hydrateProcessEnv();
+    // before deciding that the shared owned model is unavailable. Bounded:
+    // a cold or failing secret store must not hold this interactive route
+    // for the full read chain (measured live at up to 43s to first byte);
+    // hydration continues in the background and later requests are warm.
+    await hydrateProcessEnvBounded();
     signal.throwIfAborted();
     if (!isAIAvailable()) {
       if (wantsStream) return streamReplyResponse(null, lastUserMessage, context);
       return NextResponse.json({ reply: fallbackReply(lastUserMessage, context), mode: 'guided', liveAiAvailable: false },
         { headers: { 'Cache-Control': 'no-store' } });
+    }
+
+    // Web search for questions the site's own catalog cannot answer
+    // (external or general facts). Public surface only, and only when the
+    // site-facts retrieval found no confident program match or the question
+    // is about the outside world — program questions never pay this latency.
+    // Fails open: any problem just means no web results, exactly as before.
+    let webResults = '';
+    try {
+      if (
+        (context.surface ?? 'public') === 'public' &&
+        shouldWebSearch(recentUserText, matchedProgramCount)
+      ) {
+        webResults = formatWebResults(
+          await searchWebForParis(
+            recentUserText,
+            wantsStream ? { timeoutMs: STREAM_WEB_SEARCH_TIMEOUT_MS } : {},
+          ),
+        );
+      }
+    } catch {
+      webResults = '';
     }
 
     try {
@@ -268,6 +302,10 @@ export async function POST(req: NextRequest) {
         (siteFacts
           ? '\n\nSITE FACTS — retrieved from Elevate\u2019s own program catalog for this question. Use these exact facts; do not invent prices, durations, credentials, or funding beyond what is written here:\n' +
             siteFacts
+          : '') +
+        (webResults
+          ? '\n\nWEB RESULTS — retrieved from the public web for this question, for general and external facts only (for example licensing rules, job-market pay, or definitions). They may be imperfect or out of date. If a web result conflicts with the SITE FACTS above about Elevate\u2019s own programs, the SITE FACTS win. When you use a fact from these results, name its source:\n' +
+            webResults
           : '');
       if (wantsStream) {
         return streamReplyResponse(
@@ -303,3 +341,5 @@ export async function POST(req: NextRequest) {
     }, { status: 503, headers: { 'Cache-Control': 'no-store' } });
   }
 }
+
+

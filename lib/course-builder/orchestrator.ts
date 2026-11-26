@@ -26,6 +26,13 @@ import { runGovernmentProcurementGate } from '../course-factory/procurement-gate
 import { auditCourseTemplate } from './audit';
 import type { ProgramBuilderTemplate } from './schema';
 import { adaptProgramTemplateToBlueprint } from './publish-adapter';
+import {
+  applyPublishStandard,
+  persistBuilderAlignment,
+  persistBuilderAssignments,
+  recordPublishOverride,
+} from './publish-standard';
+import type { PublishOverride } from './publish-checklist';
 import { requireAdminClient } from '../supabase/admin';
 import { assertCourseBuilderGenerationEnabled } from '@/lib/ultimate-course-builder/core/generation-control';
 import { attachJobFeedEvidence } from './workforce-evidence';
@@ -147,6 +154,29 @@ const courseProgramConfigSchema = z.object({
   status: z.enum(['draft', 'published']).default('draft'),
   /** O*NET-SOC code; resolved from the slug map when omitted. */
   socCode: z.string().trim().optional(),
+  /** CIP code for the program of study; persisted with socCode. */
+  cipCode: z.string().trim().nullable().optional(),
+  /** Tuition / credential exam fee (dollars). */
+  tuition: z
+    .object({
+      costDollars: z.number().nonnegative().nullable().optional(),
+      examFeeDollars: z.number().nonnegative().nullable().optional(),
+      isFree: z.boolean().optional(),
+      notes: z.string().optional(),
+    })
+    .nullable()
+    .optional(),
+  /** Workbook (digital_workbooks) that ships with the course. */
+  workbook: z
+    .object({
+      workbookId: z.string().min(1),
+      slug: z.string().nullable().optional(),
+      title: z.string().nullable().optional(),
+    })
+    .nullable()
+    .optional(),
+  /** Machine/equipment trade: publish requires a simulation activity. */
+  handsOnTrade: z.boolean().optional(),
   /**
    * Funding / program types. JAG is Jobs for America's Graduates — a funding
    * type only (see public/docs/PROGRAM_HOLDER_ONBOARDING_PACKET.md); there
@@ -193,6 +223,9 @@ export async function saveCourseProgramConfiguration(input: unknown) {
     governing_body: body.regulatory.governingBody ?? null,
     governing_region: body.regulatory.governingRegion ?? null,
     governing_standard_version: body.regulatory.governingStandardVersion ?? null,
+    ...(body.tuition
+      ? { tuition_cost: body.tuition.isFree ? 0 : (body.tuition.costDollars ?? null) }
+      : {}),
     metadata: {
       credentialTarget: body.credentialTarget,
       minimumHours: body.minimumHours,
@@ -201,6 +234,10 @@ export async function saveCourseProgramConfiguration(input: unknown) {
       certificateRequirements: body.certificateRequirements,
       regulatory: body.regulatory,
       socCode: body.socCode ?? null,
+      cipCode: body.cipCode ?? null,
+      tuition: body.tuition ?? null,
+      workbook: body.workbook ?? null,
+      handsOnTrade: body.handsOnTrade ?? false,
       funding: body.funding ?? null,
       workforceEvidence: body.workforceEvidence ?? null,
     },
@@ -223,6 +260,7 @@ export function auditCourseGovernance(template: ProgramBuilderTemplate) {
 export async function publishGovernedCourse(
   template: ProgramBuilderTemplate,
   progress?: ProgressCallback,
+  options?: { actorId?: string | null; publishOverride?: PublishOverride | null },
 ) {
   // Single builder: every governed publication first attaches the government
   // job feed (O*NET, CareerOneStop, USAJobs, BLS) to the template and
@@ -267,6 +305,28 @@ export async function publishGovernedCourse(
     }
   }
 
+  // Build standard (alignment, required lesson work, workbook, simulation):
+  // evaluated purely from the builder's own template state. Missing items
+  // block publication with an itemized, fixable list — unless the owner
+  // publishes anyway with an override acknowledgment, in which case the
+  // gaps are audited and routed to PARIS after publication (see
+  // publish-standard.ts). Drafts are never affected; this runs only here,
+  // at the publish step.
+  const standard = applyPublishStandard(withEvidence, options?.publishOverride);
+  if (standard.blocked) {
+    return {
+      ok: false,
+      error: 'PUBLISH_STANDARD_INCOMPLETE',
+      message:
+        'This course does not yet meet the build standard. Each missing item names where to fix it in the builder — or publish anyway with an owner override acknowledgment.',
+      publishStandard: { missing: standard.missing, overridden: false },
+      audit: null,
+      procurement: null,
+      result: null,
+      governance: null,
+    };
+  }
+
   const gate = auditCourseGovernance(withEvidence);
   if (!gate.ok) {
     return {
@@ -293,7 +353,40 @@ export async function publishGovernedCourse(
 
   const governance = null;
 
-  return { ...gate, ok: gate.ok && result.ok, result, governance };
+  if (result.ok) {
+    // Round-trip what the author built onto the records the LMS reads, and
+    // route any override-acknowledged gaps to PARIS. Best-effort: none of
+    // this may fail a publication that already succeeded.
+    try {
+      const db = await requireAdminClient();
+      await persistBuilderAlignment(db, withEvidence);
+      if (withEvidence.courseId) {
+        await persistBuilderAssignments(db, withEvidence, withEvidence.courseId);
+      }
+      if (standard.overridden) {
+        await recordPublishOverride({
+          db,
+          template: withEvidence,
+          actorId: options?.actorId ?? null,
+          missing: standard.missing,
+          note: options?.publishOverride?.note,
+        });
+      }
+    } catch (error) {
+      logger.warn('[course-builder] Post-publish standard persistence failed', {
+        courseSlug: template.slug,
+        error: error instanceof Error ? error.message : String(error),
+      });
+    }
+  }
+
+  return {
+    ...gate,
+    ok: gate.ok && result.ok,
+    result,
+    governance,
+    publishStandard: { missing: standard.missing, overridden: standard.overridden },
+  };
 }
 
 export type ContractWalkthroughStep = {

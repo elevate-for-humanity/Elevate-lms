@@ -1,22 +1,33 @@
 'use client';
 
-import { useActionState } from 'react';
+import { useActionState, useRef, useState } from 'react';
 import {
   Bot,
   CalendarClock,
   CheckCircle2,
   ChevronDown,
+  MessageSquareText,
+  Mic,
   PhoneForwarded,
   Route,
   Sparkles,
+  Square,
+  Voicemail,
 } from 'lucide-react';
 import { WEEKDAYS, type BusinessHours } from '@/lib/phone/config';
 import {
   addExternalNumber,
+  saveExtensionVoicemailGreetingSettings,
   saveMenuOption,
   savePhoneSettings,
+  saveSmsAutoReplySettings,
+  saveVoicemailGreetingSettings,
   type PhoneActionState,
 } from './actions';
+import {
+  VOICEMAIL_GREETING_MAX_CHARS,
+  type VoicemailGreetingMode,
+} from '@/lib/phone/voicemail-greeting';
 
 const initial: PhoneActionState = { ok: false, message: '' };
 const field =
@@ -81,6 +92,23 @@ export type PhoneSettings = {
   aiInstructions: string;
   aiAllowInterruptions: boolean;
   aiHumanHandoffEnabled: boolean;
+  smsAutoReplyEnabled: boolean;
+  smsAutoReplyMessage: string;
+  voicemailGreetingText: string;
+  voicemailGreetingMode: VoicemailGreetingMode;
+  voicemailGreetingRecordingPath: string;
+  voicemailGreetingRecordingUrl: string | null;
+};
+
+export type ExtensionGreetingOption = {
+  id: string;
+  extension: string;
+  name: string;
+  enabled: boolean;
+  text: string;
+  mode: VoicemailGreetingMode;
+  recordingPath: string;
+  recordingUrl: string | null;
 };
 
 export type PhoneSetupStep = { label: string; complete: boolean };
@@ -140,16 +168,270 @@ export function NewSystemNotice({
   );
 }
 
+
+/**
+ * The two ways to set a voicemail greeting, shared by the system-default
+ * form and the per-extension form: type it (the phone system speaks it) or
+ * record it here with the microphone (the recording is played as-is).
+ * Field names match the save actions in ./actions.
+ */
+function VoicemailGreetingFields({
+  scope,
+  extension,
+  text,
+  mode: initialMode,
+  recordingPath: initialRecordingPath,
+  recordingUrl,
+}: {
+  scope: string;
+  extension: string;
+  text: string;
+  mode: VoicemailGreetingMode;
+  recordingPath: string;
+  recordingUrl: string | null;
+}) {
+  const [mode, setMode] = useState<VoicemailGreetingMode>(initialMode);
+  const [recordingPath, setRecordingPath] = useState(initialRecordingPath);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(recordingUrl);
+  const [recording, setRecording] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [recorderError, setRecorderError] = useState('');
+  const recorderRef = useRef<MediaRecorder | null>(null);
+  const chunksRef = useRef<Blob[]>([]);
+
+  async function uploadRecording(blob: Blob) {
+    setUploading(true);
+    setRecorderError('');
+    try {
+      const body = new FormData();
+      body.set('audio', blob, 'voicemail-greeting');
+      body.set('scope', scope);
+      body.set('extension', extension);
+      const response = await fetch('/api/phone/voicemail-greeting/recording', {
+        method: 'POST',
+        body,
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok || !result.path)
+        throw new Error(result.error || 'The recording could not be stored. Try again.');
+      setRecordingPath(result.path as string);
+    } catch (error) {
+      setRecorderError(
+        error instanceof Error ? error.message : 'The recording could not be stored. Try again.',
+      );
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  async function startRecording() {
+    setRecorderError('');
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const recorder = new MediaRecorder(stream);
+      chunksRef.current = [];
+      recorder.ondataavailable = (event) => {
+        if (event.data.size > 0) chunksRef.current.push(event.data);
+      };
+      recorder.onstop = () => {
+        stream.getTracks().forEach((track) => track.stop());
+        const blob = new Blob(chunksRef.current, {
+          type: recorder.mimeType || 'audio/webm',
+        });
+        setPreviewUrl(URL.createObjectURL(blob));
+        void uploadRecording(blob);
+      };
+      recorderRef.current = recorder;
+      recorder.start();
+      setRecording(true);
+    } catch {
+      setRecorderError(
+        'The microphone is unavailable. Allow microphone access in this browser, or type the greeting instead.',
+      );
+    }
+  }
+
+  function stopRecording() {
+    recorderRef.current?.stop();
+    setRecording(false);
+  }
+
+  return (
+    <div className="mt-4 space-y-3">
+      <div className="flex flex-wrap gap-2" role="radiogroup" aria-label="How the greeting is provided">
+        {(
+          [
+            ['text', 'Type it — the phone system reads it aloud'],
+            ['recording', 'Record my voice'],
+          ] as Array<[VoicemailGreetingMode, string]>
+        ).map(([value, label]) => (
+          <label
+            key={value}
+            className={`flex min-h-11 cursor-pointer items-center gap-2 rounded-lg border px-3 py-2 text-sm font-semibold ${
+              mode === value
+                ? 'border-slate-950 bg-slate-950 text-white'
+                : 'border-slate-300 bg-white text-slate-800'
+            }`}
+          >
+            <input
+              type="radio"
+              name="voicemailGreetingMode"
+              value={value}
+              checked={mode === value}
+              onChange={() => setMode(value)}
+              className="sr-only"
+            />
+            {label}
+          </label>
+        ))}
+      </div>
+      {mode === 'text' ? (
+        <label className="block text-sm font-bold">
+          Greeting text
+          <textarea
+            name="voicemailGreeting"
+            rows={4}
+            maxLength={VOICEMAIL_GREETING_MAX_CHARS}
+            defaultValue={text}
+            placeholder="You have reached Elevate for Humanity. Please leave your name, callback number, and the reason for your call."
+            className={field}
+          />
+          <span className="mt-1 block text-xs font-medium text-slate-500">
+            Callers hear this read aloud in the phone system&apos;s voice. Leave it empty to use
+            the standard voicemail prompts.
+          </span>
+        </label>
+      ) : (
+        <div className="space-y-3">
+          <input type="hidden" name="voicemailGreeting" value="" />
+          <div className="flex flex-wrap items-center gap-2">
+            {recording ? (
+              <button
+                type="button"
+                onClick={stopRecording}
+                className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-rose-700 px-4 py-2 text-sm font-bold text-white"
+              >
+                <Square className="h-4 w-4" /> Stop recording
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={startRecording}
+                disabled={uploading}
+                className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-slate-950 px-4 py-2 text-sm font-bold text-white disabled:opacity-50"
+              >
+                <Mic className="h-4 w-4" />
+                {recordingPath ? 'Re-record my greeting' : 'Record my greeting'}
+              </button>
+            )}
+            {recording ? (
+              <span className="text-sm font-semibold text-rose-700">Recording… speak now.</span>
+            ) : uploading ? (
+              <span className="text-sm font-semibold text-slate-600">Saving the recording…</span>
+            ) : recordingPath ? (
+              <span className="text-sm font-semibold text-emerald-700">
+                Recording ready — press Save below to use it.
+              </span>
+            ) : (
+              <span className="text-sm font-semibold text-slate-600">No recording yet.</span>
+            )}
+          </div>
+          {previewUrl ? (
+            <audio controls src={previewUrl} className="w-full">
+              Your browser cannot play the recording preview.
+            </audio>
+          ) : null}
+          {recorderError ? (
+            <p role="alert" className="text-sm font-semibold text-rose-700">
+              {recorderError}
+            </p>
+          ) : null}
+          <p className="text-xs font-medium text-slate-500">
+            Keep it short — name, and what a caller should leave in their message. The recording
+            is what callers hear, exactly as recorded.
+          </p>
+        </div>
+      )}
+      <input type="hidden" name="voicemailGreetingRecordingPath" value={recordingPath} />
+    </div>
+  );
+}
+
+function ExtensionVoicemailGreetingForm({
+  extensions,
+}: {
+  extensions: ExtensionGreetingOption[];
+}) {
+  const [state, formAction, pending] = useActionState(
+    saveExtensionVoicemailGreetingSettings,
+    initial,
+  );
+  const [selectedId, setSelectedId] = useState(extensions[0]?.id ?? '');
+  const selected = extensions.find((item) => item.id === selectedId) ?? extensions[0];
+  if (!selected) return null;
+  return (
+    <form
+      action={formAction}
+      className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
+    >
+      <Voicemail className="h-5 w-5 text-orange-600" />
+      <h2 className="mt-2 font-black">One person&apos;s voicemail greeting</h2>
+      <p className="mt-1 text-sm text-slate-600">
+        A personal greeting replaces the default for that person&apos;s mailbox only. Clear it to
+        go back to the default.
+      </p>
+      <label className="mt-4 block text-sm font-bold">
+        Person / extension
+        <select
+          name="extensionPicker"
+          value={selected.id}
+          onChange={(event) => setSelectedId(event.target.value)}
+          className={field}
+        >
+          {extensions.map((item) => (
+            <option key={item.id} value={item.id}>
+              Ext. {item.extension} — {item.name}
+              {item.enabled ? '' : ' (paused)'}
+            </option>
+          ))}
+        </select>
+      </label>
+      <input type="hidden" name="extensionId" value={selected.id} />
+      <VoicemailGreetingFields
+        key={selected.id}
+        scope={selected.id}
+        extension={selected.extension}
+        text={selected.text}
+        mode={selected.mode}
+        recordingPath={selected.recordingPath}
+        recordingUrl={selected.recordingUrl}
+      />
+      <button disabled={pending} className={button}>
+        {pending ? 'Saving…' : 'Save this greeting'}
+      </button>
+      <Result state={state} />
+    </form>
+  );
+}
+
 export function PhoneSetupForms({
   settings,
   destinations,
+  extensionGreetings = [],
 }: {
   settings: PhoneSettings;
   destinations: DestinationOption[];
+  extensionGreetings?: ExtensionGreetingOption[];
 }) {
   const [saved, saveAction, savePending] = useActionState(savePhoneSettings, initial);
   const [number, numberAction, numberPending] = useActionState(addExternalNumber, initial);
   const [menu, menuAction, menuPending] = useActionState(saveMenuOption, initial);
+  const [autoReply, autoReplyAction, autoReplyPending] = useActionState(
+    saveSmsAutoReplySettings,
+    initial,
+  );
+  const [voicemailGreeting, voicemailGreetingAction, voicemailGreetingPending] =
+    useActionState(saveVoicemailGreetingSettings, initial);
 
   return (
     <div className="space-y-6">
@@ -421,6 +703,64 @@ export function PhoneSetupForms({
           </button>
           <Result state={menu} />
         </form>
+        <form
+          action={autoReplyAction}
+          className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
+        >
+          <MessageSquareText className="h-5 w-5 text-orange-600" />
+          <h2 className="mt-2 font-black">Text message auto-reply</h2>
+          <p className="mt-1 text-sm text-slate-600">
+            When someone texts your business number, this reply is sent back right away — at most
+            once per person per day, and never in response to another auto-reply.
+          </p>
+          <div className="mt-4 space-y-3">
+            <Toggle
+              name="smsAutoReplyEnabled"
+              label="Auto-reply to incoming texts"
+              defaultChecked={settings.smsAutoReplyEnabled}
+            />
+            <label className="block text-sm font-bold">
+              Auto-reply message
+              <textarea
+                name="smsAutoReplyMessage"
+                rows={3}
+                maxLength={480}
+                defaultValue={settings.smsAutoReplyMessage}
+                className={field}
+              />
+            </label>
+          </div>
+          <button disabled={autoReplyPending} className={button}>
+            {autoReplyPending ? 'Saving…' : 'Save auto-reply'}
+          </button>
+          <Result state={autoReply} />
+        </form>
+      </section>
+      <section className="grid gap-5 xl:grid-cols-2">
+        <form
+          action={voicemailGreetingAction}
+          className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
+        >
+          <Voicemail className="h-5 w-5 text-orange-600" />
+          <h2 className="mt-2 font-black">Voicemail greeting</h2>
+          <p className="mt-1 text-sm text-slate-600">
+            What a caller hears when a call goes to voicemail — including pressing 0 for Admin.
+            Type it and the phone system reads it aloud, or record it in your own voice.
+          </p>
+          <VoicemailGreetingFields
+            scope="system"
+            extension="0"
+            text={settings.voicemailGreetingText}
+            mode={settings.voicemailGreetingMode}
+            recordingPath={settings.voicemailGreetingRecordingPath}
+            recordingUrl={settings.voicemailGreetingRecordingUrl}
+          />
+          <button disabled={voicemailGreetingPending} className={button}>
+            {voicemailGreetingPending ? 'Saving…' : 'Save voicemail greeting'}
+          </button>
+          <Result state={voicemailGreeting} />
+        </form>
+        <ExtensionVoicemailGreetingForm extensions={extensionGreetings} />
       </section>
     </div>
   );

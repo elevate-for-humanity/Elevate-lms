@@ -1,10 +1,10 @@
 vi.mock('@/components/communications/DashboardVideoCalls', () => ({ DashboardVideoCalls: () => null }));
 import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-const mock = vi.hoisted(() => ({ create:vi.fn(), newCall:vi.fn(), ringStart:vi.fn(), ringStop:vi.fn(), audioCleanup:vi.fn(), handlers:{} as Record<string,(value?: any)=>void> }));
+const mock = vi.hoisted(() => ({ create:vi.fn(), newCall:vi.fn(), ringStart:vi.fn(), ringStop:vi.fn(), audioCleanup:vi.fn(), unlock:vi.fn().mockResolvedValue(true), handlers:{} as Record<string,(value?: any)=>void> }));
 vi.mock('@/lib/phone/browser-client',()=>({createPhoneClient:mock.create,phoneDestination:(value:string)=>value}));
 vi.mock('@/lib/notifications/push-client',()=>({getPushNotificationClient:vi.fn()}));
-vi.mock('@/lib/notifications/audio-unlock',()=>({installAudioUnlock:()=>mock.audioCleanup,startRingtone:mock.ringStart,stopRingtone:mock.ringStop}));
+vi.mock('@/lib/notifications/audio-unlock',()=>({installAudioUnlock:()=>mock.audioCleanup,startRingtone:mock.ringStart,stopRingtone:mock.ringStop,unlockAudio:mock.unlock}));
 vi.mock('@/components/program-holder/ProgramHolderPhoneIntroduction',()=>({ProgramHolderPhoneIntroduction:()=>null}));
 import { ProgramHolderPhone } from '@/components/program-holder/ProgramHolderPhone';
 const data={readOnly:false,phoneNumber:'',system:{name:'Isolated fixture',timezone:'UTC',status:'active'},
@@ -15,7 +15,7 @@ const data={readOnly:false,phoneNumber:'',system:{name:'Isolated fixture',timezo
 let laterHeartbeat:(response:Response)=>void;
 let disconnectOk:boolean;
 beforeEach(()=>{
-  mock.ringStart.mockClear();mock.ringStop.mockClear();mock.audioCleanup.mockClear();
+  mock.ringStart.mockClear();mock.ringStop.mockClear();mock.audioCleanup.mockClear();mock.unlock.mockClear();
   mock.handlers={};disconnectOk=true;let heartbeats=0;
   mock.newCall.mockResolvedValue({id:'outbound-call'});
   mock.create.mockResolvedValue({on:(event:string,callback:any)=>{mock.handlers[event]=callback;},

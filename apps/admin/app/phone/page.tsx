@@ -26,12 +26,20 @@ import { scopePhoneProfileQuery, phoneNumberProfileChoices } from '@/lib/phone/p
 import { PHONE_MANAGER_ROLES } from '@/lib/phone/access';
 import { hydrateProcessEnv } from '@/lib/secrets';
 import { probePhoneReadiness } from '@/lib/phone/readiness-probe';
+import { DEFAULT_SMS_AUTO_REPLY_MESSAGE } from '@/lib/phone/sms-auto-reply';
+import {
+  DEFAULT_VOICEMAIL_GREETING,
+  VOICEMAIL_GREETING_BUCKET,
+  extensionVoicemailGreetingSlot,
+  systemVoicemailGreetingSlot,
+} from '@/lib/phone/voicemail-greeting';
 import { derivePhoneDevicePresence } from '@/lib/phone/availability';
 import { summarizePhoneReadiness } from '@/lib/phone/readiness';
 import {
   CapabilityGuide,
   NewSystemNotice,
   PhoneSetupForms,
+  type ExtensionGreetingOption,
   type PhoneSettings,
 } from './PhoneSetupForms';
 import {
@@ -194,7 +202,57 @@ export default async function PhonePage() {
       'Identify yourself as PARIS with Elevate for Humanity. Answer ordinary caller questions first using verified Elevate website and platform knowledge. Use the live enabled extension directory when the caller asks for a person or department or needs a human. Name the staff member and extension before offering the transfer. Never identify an individual staff member as the administrator unless their live role says so. Never guess unverified program, funding, enrollment, licensing, payment, or compliance information; offer a human transfer when uncertain.',
     aiAllowInterruptions: system?.ai_allow_interruptions ?? true,
     aiHumanHandoffEnabled: system?.ai_human_handoff_enabled ?? true,
+    smsAutoReplyEnabled: system?.sms_auto_reply_enabled ?? false,
+    smsAutoReplyMessage: system?.sms_auto_reply_message ?? DEFAULT_SMS_AUTO_REPLY_MESSAGE,
+    voicemailGreetingText:
+      systemVoicemailGreetingSlot(system).text || DEFAULT_VOICEMAIL_GREETING,
+    voicemailGreetingMode: systemVoicemailGreetingSlot(system).mode,
+    voicemailGreetingRecordingPath: systemVoicemailGreetingSlot(system).recordingPath,
+    voicemailGreetingRecordingUrl: null,
   };
+  // Signed preview links for greetings already recorded in the dashboard,
+  // so the saved recording can be played back (and re-recorded) in place.
+  const greetingRecordingUrl = async (recordingPath: string): Promise<string | null> => {
+    if (!recordingPath) return null;
+    const { data } = await db.storage
+      .from(VOICEMAIL_GREETING_BUCKET)
+      .createSignedUrl(recordingPath, 3600);
+    return data?.signedUrl ?? null;
+  };
+  settings.voicemailGreetingRecordingUrl = await greetingRecordingUrl(
+    settings.voicemailGreetingRecordingPath,
+  );
+  // The greeting columns arrive with the voicemail_greeting_config
+  // migration; until then this lookup fails and every greeting simply
+  // reads as unset — a settings column must never break the directory.
+  const greetingById = new Map<string, any>();
+  if (extensions.length) {
+    const { data: greetingRows } = await db
+      .from('communication_extensions')
+      .select(
+        'id,voicemail_greeting,voicemail_greeting_mode,voicemail_greeting_recording_path',
+      )
+      .in(
+        'id',
+        extensions.map((entry: any) => entry.id),
+      );
+    for (const row of greetingRows ?? []) greetingById.set(row.id, row);
+  }
+  const extensionGreetings: ExtensionGreetingOption[] = await Promise.all(
+    extensions.map(async (entry: any) => {
+      const slot = extensionVoicemailGreetingSlot(greetingById.get(entry.id));
+      return {
+        id: entry.id,
+        extension: entry.extension,
+        name: entry.display_name || entry.department || `Extension ${entry.extension}`,
+        enabled: entry.enabled !== false,
+        text: slot.text,
+        mode: slot.mode,
+        recordingPath: slot.recordingPath,
+        recordingUrl: await greetingRecordingUrl(slot.recordingPath),
+      };
+    }),
+  );
 
   const cards = [
     ['Business numbers', numbers.length, Phone],
@@ -377,6 +435,7 @@ export default async function PhonePage() {
       <CapabilityGuide />
       <PhoneSetupForms
         settings={settings}
+        extensionGreetings={extensionGreetings}
         destinations={destinations.map((item: any) => ({
           id: item.id,
           name: item.name,

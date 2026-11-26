@@ -45,7 +45,7 @@ contact=sip:elevate-4632401404.pstn.twilio.com:5061\;transport=tls
 type=endpoint
 transport=elevate-twilio-tls
 aors=twilio-aor
-context=elevate-twilio-in
+context=elevate-paris-inbound
 identify_by=ip
 disallow=all
 allow=ulaw,alaw
@@ -373,4 +373,5 @@ if __name__ == '__main__':
         result = {'result': 'BLOCKED', 'code': str(error) if isinstance(error, ValueError) and re.fullmatch('[a-z_]+', str(error)) else 'isolated_trunk_validation_unavailable'}
     print(json.dumps(result))
     raise SystemExit(0 if result['result'] == 'PASS' else 1)
+
 

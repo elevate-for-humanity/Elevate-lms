@@ -5,6 +5,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 const source = readFileSync('scripts/qa/provision-learner-program-holder-e2e.mjs', 'utf8');
 const cleanup = source.slice(source.indexOf('async function cleanup() {'), source.indexOf("\nif (action === 'provision')"));
+const mustHelper = source.slice(source.indexOf('async function must('), source.indexOf('\n', source.indexOf('async function must(')));
 const runId = '12345-2-4', marker = `qa-portal-e2e-${runId}`;
 const courseId = 'd48c61c4-8880-4d9d-9ab5-fab4dd51b201';
 type Row = Record<string, any>;
@@ -53,6 +54,12 @@ function harness() {
           predicates.push(row => row[column] === value); return query;
         },
         contains: (column: string, value: Row) => { predicates.push(row => Object.entries(value).every(([key, expected]) => row[column]?.[key] === expected)); return query; },
+        like: (column: string, pattern: string) => {
+          if (!mode) throw new Error('PostgREST requires select/update/delete before filters');
+          const regex = new RegExp(`^${pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/%/g, '.*').replace(/_/g, '.')}$`);
+          predicates.push(row => typeof row[column] === 'string' && regex.test(row[column])); return query;
+        },
+        limit: () => query,
         maybeSingle: () => { one = true; return query; },
         then(resolve: (value: unknown) => unknown, reject: (error: unknown) => unknown) {
           const rows = tables[table].filter(row => predicates.every(matches => matches(row)));
@@ -75,7 +82,8 @@ function harness() {
       deleteUser: vi.fn(async (id: string, softDelete: boolean) => {
         expect(softDelete).toBe(true); writes.push('auth:delete');
         if (errors['auth:delete']) return { error: { status: 500, message: errors['auth:delete'] } };
-        const user = users.find(user => user.id === id)!;
+        const user = users.find(user => user.id === id);
+        if (!user) return { error: { status: 404, code: 'user_not_found', message: 'User not found' } };
         // GoTrue may redact soft-deleted identity metadata. Replay must not
         // mistake that for a live account with forged QA authority.
         Object.assign(user, { deleted_at: '2026-11-24T00:00:00Z', email: null, app_metadata: {} });
@@ -83,8 +91,8 @@ function harness() {
       }),
     } },
   };
-  const run = () => runInNewContext(`(async () => { ${cleanup}\n await cleanup(); })()`, {
-    db, statePath: 'private-state', QA_HVAC_COURSE_ID: courseId,
+  const run = () => runInNewContext(`(async () => { ${mustHelper}\n${cleanup}\n await cleanup(); })()`, {
+    db, statePath: 'private-state', QA_HVAC_COURSE_ID: courseId, marker, runId,
     readFile: async () => JSON.stringify(state), console: { log: vi.fn() },
   }) as Promise<void>;
   return { run, state, tables, users, writes, errors, keepRows, db, setAuthError: (error: Row) => { authError = error; } };

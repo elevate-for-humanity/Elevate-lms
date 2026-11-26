@@ -32,6 +32,7 @@ const fixture = vi.hoisted(() => ({
 }));
 vi.mock('@/lib/program-holder/workspace', () => ({
   getProgramHolderWorkspace: vi.fn(async () => fixture),
+  getProgramHolderWorkspaceWithOnlineStudy: vi.fn(async () => fixture),
   programTitle: () => 'Assigned program',
 }));
 import { getProgramHolderWorkspace } from '@/lib/program-holder/workspace';

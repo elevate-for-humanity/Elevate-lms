@@ -596,8 +596,6 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
   if (!onlineStudyOutcome.ok) throw onlineStudyOutcome.error;
   const onlineStudySessions = onlineStudyOutcome.value;
 
-  const onlineStudySessions = await loadHolderOnlineStudy(db, enrolledRoster);
-
   let phoneLine = phoneLineRes.data ?? null;
   const extension = extensionRes.data?.extension ?? phoneLine?.extension ?? null;
   const workspaceValue = extensionRes.data?.workspace as

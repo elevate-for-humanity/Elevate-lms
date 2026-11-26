@@ -15,7 +15,7 @@ import {
 // The sibling sets are derived inside removeStaleWorkers, not at module
 // scope: they are only needed in a real browser with the registry loaded.
 async function removeStaleWorkers(workerPath: string, cachePrefix: string) {
-  const knownWorkerPaths = new Set(
+  const knownWorkerPaths = new Set<string>(
     Object.values(PWA_APPLICATIONS).map((app) => app.workerPath),
   );
   const knownCachePrefixes = Object.values(PWA_APPLICATIONS).map(

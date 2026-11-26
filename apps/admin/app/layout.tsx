@@ -78,8 +78,9 @@ export default async function AdminGroupLayout({ children }: { children: React.R
   const staffInbox = requestHeaders.get('x-elevate-staff-inbox') === '1';
   // Elevate Mail (/mail) is a separate installed app on this origin: it
   // registers its own service worker and never activates the phone receiver.
-  const pathname = requestHeaders.get('x-pathname') ?? '';
-  const mailApp = pathname === '/mail' || pathname.startsWith('/mail/');
+  // Middleware marks the app with a purpose header (same pattern as the
+  // staff-inbox flag); the layout never branches on the raw pathname.
+  const mailApp = requestHeaders.get('x-elevate-mail-app') === '1';
   return (
     <html lang="en" suppressHydrationWarning>
       <head>

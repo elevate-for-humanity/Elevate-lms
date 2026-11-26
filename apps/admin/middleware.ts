@@ -219,7 +219,11 @@ export async function middleware(req: NextRequest) {
   const pendingCookies: PendingCookie[] = [];
   const requestHeaders = new Headers(req.headers);
   requestHeaders.delete('x-elevate-staff-inbox');
+  requestHeaders.delete('x-elevate-mail-app');
   requestHeaders.set('x-pathname', `${pathname}${search}`);
+  if (pathname === '/mail' || pathname.startsWith('/mail/')) {
+    requestHeaders.set('x-elevate-mail-app', '1');
+  }
 
   const supabase = createMiddlewareSupabaseClient(req, (cookiesToSet) => {
     for (const cookie of cookiesToSet) {

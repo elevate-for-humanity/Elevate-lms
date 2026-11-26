@@ -297,24 +297,38 @@ export async function PATCH(request: Request) {
               error: statusError
                 ? 'Registration evidence could not be saved.'
                 : 'The SIP registration is not currently reachable.',
+              // When the provisioner no longer holds this device at all
+              // (its lease expired and the record was removed), no
+              // heartbeat can ever succeed again. Say so distinctly so
+              // the client stops heartbeating a dead device and does a
+              // full re-provision/connect cycle instead.
+              ...(!statusError && evidence.provisioned === false
+                ? { code: 'device_not_provisioned' }
+                : {}),
             },
             { status: statusError ? 500 : 409 },
           );
         }
         verifiedAt = evidence.observedAt;
       } catch {
-        await ctx.db
+        // The provisioner could not be reached, so it produced no evidence
+        // about this device. The heartbeat itself proves the PWA is alive:
+        // record the sighting and preserve the last verified registration
+        // state instead of erasing it. Presence derivation ages a device
+        // out on its own if heartbeats actually stop arriving, and the
+        // next successful verification restores the confirmed state.
+        const seenAt = new Date().toISOString();
+        const { error: seenError } = await ctx.db
           .from('phone_webrtc_devices')
-          .update({
-            registration_state: 'unregistered',
-            connection_state: 'disconnected',
-            registration_verified_at: null,
-            updated_at: new Date().toISOString(),
-          })
+          .update({ last_seen_at: seenAt, updated_at: seenAt })
           .eq('id', registeredDevice.id);
         return NextResponse.json(
-          { error: 'Asterisk has not confirmed a reachable SIP registration.' },
-          { status: 409 },
+          {
+            error: seenError
+              ? 'Registration evidence could not be saved.'
+              : 'Asterisk registration could not be verified. Your check-in was recorded; please retry.',
+          },
+          { status: seenError ? 500 : 503 },
         );
       }
     }

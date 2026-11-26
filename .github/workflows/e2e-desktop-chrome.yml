@@ -95,8 +95,7 @@ jobs:
         run: node scripts/qa/provision-remaining-portal-e2e.mjs provision
       - name: Provision disposable Learner and Program Holder QA identities
         run: node scripts/qa/provision-learner-program-holder-e2e.mjs provision
-      - name: Provision disposable Apprenticeship QA identities
-        if: ${{ matrix.shard == 4 }}
+      - name: Provision disposable Apprentice and Host Shop QA identities
         run: node scripts/qa/provision-apprenticeship-e2e.mjs provision
       - name: Verify preinstalled Playwright browsers
         run: node scripts/verify-playwright-runtime.mjs chromium
@@ -154,15 +153,15 @@ jobs:
         run: |
           echo "Focused exhaustive browser regression failed; all shard evidence was retained."
           exit 1
+      - name: Clean up disposable Apprentice and Host Shop QA identities
+        if: always()
+        run: node scripts/qa/provision-apprenticeship-e2e.mjs cleanup  
       - name: Clean up disposable Learner and Program Holder QA identities
         if: always()
         run: node scripts/qa/provision-learner-program-holder-e2e.mjs cleanup
       - name: Clean up disposable Employer, Instructor, Staff, Case Manager and Admin QA identities
         if: always()
         run: node scripts/qa/provision-remaining-portal-e2e.mjs cleanup
-      - name: Clean up disposable Apprenticeship QA identities
-        if: ${{ always() && matrix.shard == 4 }}
-        run: node scripts/qa/provision-apprenticeship-e2e.mjs cleanup
       - name: Upload Playwright report
         if: always()
         uses: actions/upload-artifact@v7

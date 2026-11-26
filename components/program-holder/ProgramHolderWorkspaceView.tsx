@@ -43,7 +43,7 @@ import { getProgramHolderWorkspace, programTitle } from '@/lib/program-holder/wo
 import { ProgramHolderDocumentUpload } from './ProgramHolderDocumentUpload';
 import { ProgramHolderTrainingLogForm } from './ProgramHolderTrainingLogForm';
 import { ProgramHolderStudentCloseoutForm } from './ProgramHolderStudentCloseoutForm';
-import { ACHIEVE_HOLDER_ID } from '@/lib/program-holder/achieve-holder';
+import { ACHIEVE_HOLDER_ID, achieveCnaAgreements, hasCurrentAchieveSignature } from '@/lib/program-holder/achieve-cna-agreements';
 import { ProgramHolderAcknowledgements } from './ProgramHolderAcknowledgements';
 import { ProgramHolderNotificationPreferences } from './ProgramHolderNotificationPreferences';
 import { WorkOneOutreachButton } from './WorkOneOutreachButton';
@@ -85,7 +85,8 @@ export async function ProgramHolderWorkspaceView({
   studentStatus?: string;
   reportEnrollmentId?: string;
 }) {
-  const data = workspace || (await getProgramHolderWorkspace());
+  const data =
+    workspace || (await getProgramHolderWorkspace({ includeOnlineStudy: section === 'hours' }));
   const coordinatorRole =
     data.mode === 'holder'
       ? String(
@@ -122,6 +123,15 @@ export async function ProgramHolderWorkspaceView({
   );
   const holderFeatures =
     data.holder?.features && typeof data.holder.features === 'object' ? data.holder.features : {};
+  const requiresSeparateNda = data.holder?.id === ACHIEVE_HOLDER_ID;
+  const achievePacket = requiresSeparateNda ? achieveCnaAgreements(holderFeatures) : null;
+  const currentMouSigned = Boolean(data.holder?.mou_signed) &&
+    (!requiresSeparateNda || hasCurrentAchieveSignature(holderFeatures, 'mou', achievePacket?.digest));
+  const currentNdaSigned = requiresSeparateNda
+    ? hasCurrentAchieveSignature(holderFeatures, 'nda', achievePacket?.digest)
+    : data.acknowledgements.some((item) =>
+        ['nda', 'non_disclosure', 'confidentiality'].includes(item.document_type),
+      );
   const requiredDocumentTypes = requiredProgramHolderDocuments(isHvac, holderFeatures).map(
     (item) => item.type,
   );
@@ -170,7 +180,7 @@ export async function ProgramHolderWorkspaceView({
     },
     {
       label: 'Memorandum of Understanding',
-      complete: Boolean(data.holder?.mou_signed),
+      complete: currentMouSigned,
       required: true,
       owner: 'Shared',
     },
@@ -209,9 +219,7 @@ export async function ProgramHolderWorkspaceView({
     },
     {
       label: 'Non-disclosure and confidentiality agreement',
-      complete: data.acknowledgements.some((item) =>
-        ['nda', 'non_disclosure', 'confidentiality'].includes(item.document_type),
-      ),
+      complete: currentNdaSigned,
       required: true,
       owner: 'Program Holder',
     },
@@ -472,7 +480,7 @@ export async function ProgramHolderWorkspaceView({
         isHvac={isHvac}
         requiresEnchantedHeartsTerms={data.requiresEnchantedHeartsTerms}
         insuranceRequired={holderFeatures.insurance_required !== false}
-        requiresSeparateNda={data.holder?.id === ACHIEVE_HOLDER_ID}
+        requiresSeparateNda={requiresSeparateNda}
       />
     );
   if (section === 'reports')
@@ -585,7 +593,7 @@ export async function ProgramHolderWorkspaceView({
           },
         ]
       : []),
-    ...(!data.holder?.mou_signed
+    ...(!currentMouSigned
       ? [
           {
             title: 'Review and sign your agreement',

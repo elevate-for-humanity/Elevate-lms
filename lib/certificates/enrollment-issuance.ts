@@ -5,7 +5,7 @@ import type { HostStudentCertificate } from './host-shop-student-records';
 import { hostStudentCertificatePdf } from './host-shop-student-pdf';
 import { eligibleForEnrollmentCertificate, enrollmentCertificateCampaign } from './enrollment-issuance-policy';
 
-const fields = 'id,user_id,student_id,full_name,email,program_slug,status,payment_status,amount_paid_cents,amount_paid,revoked_at,refunded_at,enrollment_confirmed_at,enrolled_at,host_shop_id';
+const fields = 'id,user_id,student_id,full_name,email,program_slug,status,payment_status,amount_paid_cents,amount_paid,revoked_at,refunded_at,enrollment_confirmed_at,enrolled_at,host_shop_id,funding_status';
 const cleanEmail = (value: unknown) => String(value || '').trim().toLowerCase();
 // Kept local on purpose: this module is loaded standalone by the native test
 // harness, so it must not depend on imports beyond the ones it already has.

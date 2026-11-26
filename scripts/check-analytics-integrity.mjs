@@ -65,11 +65,15 @@ try {
   }
 
   const hardcodedIds = grep(
-    'G-[A-Z0-9]\\{8,\\}',
+    // Match a complete identifier, not the interior of a program name such as
+    // BUILDING-MAINTENANCE-WRG. Keep genuine IDs detectable in strings and URLs.
+    '\\<G-[A-Z0-9]\\{8,\\}\\>',
     ['tsx', 'ts', 'jsx'],
     ['node_modules', '.next', '.git'],
   )
-    .filter((line) => !line.includes('G-XXXXXXXXXX'))
+    // A placeholder must not hide a real measurement ID on the same line.
+    .filter((line) => (line.match(/\bG-[A-Z0-9]{8,}\b/g) || [])
+      .some((id) => id !== 'G-XXXXXXXXXX'))
     .filter((line) => !line.includes('.env.example'))
     .filter((line) => !line.includes('partnerCode'))
     .filter((line) => !line.includes('public/'));

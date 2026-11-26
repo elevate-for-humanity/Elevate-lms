@@ -3,7 +3,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { BEAUTY_TRADES } from '@/lib/programs/beauty-trade-navigation';
 import { getHostShopNetwork } from '@/lib/programs/host-shop-network';
-import { matchesHostShopPresentationProgram } from '@/lib/programs/host-shop-programs';
+import { matchesHostShopPresentationProgram, matchesHostShopProgram } from '@/lib/programs/host-shop-programs';
 
 export const dynamic = 'force-dynamic';
 
@@ -20,6 +20,7 @@ export const metadata: Metadata = {
  */
 export default async function HostShopsPage() {
   const shops = await getHostShopNetwork();
+  const alphabetical = [...shops].sort((left, right) => left.name.localeCompare(right.name) || left.city.localeCompare(right.city));
   return (
     <main className="min-h-screen bg-white text-slate-950">
       <header className="border-b border-slate-200 bg-slate-950 px-4 py-16 text-white sm:py-20">
@@ -30,9 +31,13 @@ export default async function HostShopsPage() {
           <div className="relative mt-8 aspect-[16/7] max-w-3xl overflow-hidden rounded-2xl border border-white/20 bg-slate-800">
             <Image src="/images/partners/kountry-kutz/interior-active-enhanced-2026.webp" alt="Professional barbers at an approved Elevate apprenticeship Host Shop" fill sizes="(min-width: 768px) 768px, 100vw" className="object-cover" priority />
           </div>
+          <Link href="/apprenticeships/indiana" className="mt-6 block w-fit font-bold text-white underline">
+            Search the Indiana map and directory
+          </Link>
           <Link href="/partners/host-shop/apply" className="mt-8 inline-flex min-h-12 items-center rounded-xl bg-white px-6 font-bold text-slate-950 hover:bg-slate-100">
             Own a shop? Apply to host apprentices — Free
           </Link>
+          <a href="#all-approved-host-shops" className="ml-0 mt-4 block w-fit font-semibold text-white underline underline-offset-4 sm:ml-5 sm:inline-block">See the full approved roster</a>
         </div>
       </header>
       <section className="px-4 py-14 sm:py-16" aria-labelledby="choose-trade-heading">
@@ -55,6 +60,27 @@ export default async function HostShopsPage() {
               );
             })}
           </div>
+        </div>
+      </section>
+      <section id="all-approved-host-shops" className="border-t border-slate-200 px-4 py-12" aria-labelledby="all-approved-host-shops-heading">
+        <div className="mx-auto max-w-6xl">
+          <h2 id="all-approved-host-shops-heading" className="text-3xl font-black tracking-tight">All approved Host Shops</h2>
+          <p className="mt-3 max-w-3xl text-slate-700">Every approved shop in the public directory is listed here once. A shop may be approved for more than one trade. Current placement availability is confirmed separately.</p>
+          <ul className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {alphabetical.map(shop => {
+              const trades = BEAUTY_TRADES.filter(trade => matchesHostShopProgram(shop, trade.programSlug));
+              const location = [shop.city, shop.state].filter(Boolean).join(', ');
+              return (
+                <li key={shop.slug} className="rounded-xl border border-slate-200 p-4">
+                  <Link href={`/host-shops/${shop.slug}`} className="inline-flex min-h-11 items-center font-bold text-blue-900 underline underline-offset-4">
+                    {shop.name}
+                  </Link>
+                  {location ? <p className="text-sm text-slate-700">{location}</p> : null}
+                  {trades.length ? <p className="mt-1 text-sm text-slate-700">{trades.map(trade => trade.label).join(' · ')}</p> : null}
+                </li>
+              );
+            })}
+          </ul>
         </div>
       </section>
       <section className="border-t border-slate-200 bg-slate-50 px-4 py-12">

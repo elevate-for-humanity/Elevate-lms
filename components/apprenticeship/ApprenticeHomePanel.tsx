@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { apprenticeDocumentChecklist } from '@/lib/apprenticeship/document-checklist';
 import { actionableNoticeFilter, actionableNotices } from '@/lib/notifications/actionable-notices';
 import {
@@ -20,11 +21,13 @@ export default async function ApprenticeHomePanel({
   programSlug,
   runtime,
   billing,
+  supportPanels,
 }: {
   userId: string;
   programSlug: string;
   runtime: ApprenticeshipRuntimeContext;
   billing: LearnerBillingRequirement;
+  supportPanels?: ReactNode;
 }) {
   const db = await requireAdminClient();
   const results = await Promise.all([
@@ -392,6 +395,7 @@ export default async function ApprenticeHomePanel({
           </p>
         ) : null}
       </section>
+      {supportPanels}
     </main>
   );
 }

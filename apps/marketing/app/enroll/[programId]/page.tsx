@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useParams, useRouter } from 'next/navigation';
+import { EMT_INQUIRY_HREF, isEmtInquiryOnly } from '@/lib/programs/emt-inquiry-only';
 import { BookOpen, Key, CheckCircle, AlertCircle, ArrowRight, Tag } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { logger } from '@/lib/logger';
@@ -41,7 +42,9 @@ export default function EnrollPage() {
   const [licenseKey, setLicenseKey] = useState('');
   const [loading, setLoading] = useState(true);
   const [enrolling, setEnrolling] = useState(false);
-  const [paymentMethod, setPaymentMethod] = useState<'quickbooks' | 'affirm'>('quickbooks');
+  const [paymentMethod, setPaymentMethod] = useState<'quickbooks' | 'affirm'>(() =>
+    getClientSearchParam('payment_method') === 'affirm' ? 'affirm' : 'quickbooks',
+  );
   const [message, setMessage] = useState('');
   const [paymentUrl, setPaymentUrl] = useState('');
   const [apprenticeshipDisclosureAccepted, setApprenticeshipDisclosureAccepted] = useState(false);
@@ -57,6 +60,10 @@ export default function EnrollPage() {
 
   useEffect(() => {
     setApprenticeshipDisclosureAccepted(false);
+    if (isEmtInquiryOnly(programId)) {
+      window.location.replace(EMT_INQUIRY_HREF);
+      return;
+    }
     loadProgram();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [programId]);
@@ -69,6 +76,10 @@ export default function EnrollPage() {
       if (!response.ok || !result.program)
         throw new Error(result.error || 'Unable to load program.');
       const data = result.program;
+      if (isEmtInquiryOnly(data.slug)) {
+        window.location.replace(EMT_INQUIRY_HREF);
+        return;
+      }
 
       setProgram(data);
       if (!/apprentice/i.test(data.slug || '') && !getClientSearchParam('payment_plan')) setPaymentPlan('full');
@@ -140,6 +151,7 @@ export default function EnrollPage() {
         setMessage('Please sign in to enroll');
         const query = new URLSearchParams(window.location.search);
         query.set('payment_plan', paymentPlan);
+        query.set('payment_method', paymentMethod);
         query.set('down_payment', downPayment);
         if (couponCode.trim()) query.set('coupon', couponCode.trim());
         const destination = `/enroll/${programId}?${query.toString()}`;

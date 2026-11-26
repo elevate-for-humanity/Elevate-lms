@@ -2,6 +2,8 @@ import 'server-only';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { resolvePortalPreviewSubject } from '@/lib/admin/portal-preview';
+import { getInstructorCurriculumLicenseStatus } from '@/lib/legal/instructorCurriculumLicense';
+import { HVAC_COURSE_ID } from '@/lib/lms/hvac-workbook-contract';
 
 export type Workbook = {
   id: string;
@@ -58,10 +60,25 @@ export async function loadMyDigitalWorkbooks() {
     if (teaching.error) throw new Error('Workbook teaching access could not be verified.');
     const teachingIds = (teaching.data ?? []).map(row => row.course_id).filter(Boolean);
     if (teachingIds.length) {
-      const courses = await admin.from('courses').select('program_id')
+      const courses = await admin.from('courses').select('id,program_id')
         .in('id', teachingIds).eq('is_active', true).eq('status', 'published');
       if (courses.error) throw new Error('Workbook teaching programs could not be verified.');
-      programIds = [...new Set([...programIds, ...(courses.data ?? []).map(row => row.program_id).filter(Boolean)])];
+      let teachingPrograms = (courses.data ?? [])
+        .map((row) => ({ courseId: String(row.id), programId: row.program_id }))
+        .filter((row) => row.programId);
+      // Proprietary-curriculum gate: teaching the HVAC course also requires
+      // the current instructor IP license. Without it, the HVAC program is
+      // excluded from the teaching workbook set; other teaching programs pass
+      // through unchanged. (Assignment itself is already proven above.)
+      const hvacTeaching = teachingPrograms.filter((row) => row.courseId === HVAC_COURSE_ID);
+      if (hvacTeaching.length) {
+        const licenseStatus = await getInstructorCurriculumLicenseStatus(admin, subject.userId);
+        if (!licenseStatus.authorized) {
+          const hvacProgramIds = new Set(hvacTeaching.map((row) => row.programId));
+          teachingPrograms = teachingPrograms.filter((row) => !hvacProgramIds.has(row.programId));
+        }
+      }
+      programIds = [...new Set([...programIds, ...teachingPrograms.map((row) => row.programId)])];
     }
     if (!programIds.length)
       return { user: { id: subject.userId }, workbooks: [] as Workbook[], previewing: true };

@@ -21,6 +21,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { glob } from 'glob';
+import { stripSqlComments } from './lib/sql-comments.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -219,7 +220,7 @@ function parseMigrations(migrationsDir: string): TableSchema {
     .map((f) => path.join(migrationsDir, f));
 
   for (const file of files) {
-    const sql = fs.readFileSync(file, 'utf8');
+    const sql = stripSqlComments(fs.readFileSync(file, 'utf8'));
 
     const createRe = /CREATE\s+TABLE\s+(?:IF\s+NOT\s+EXISTS\s+)?(?:public\.)?(\w+)\s*\(([^;]+?)\);/gis;
     let m: RegExpExecArray | null;

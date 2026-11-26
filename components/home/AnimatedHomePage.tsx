@@ -39,7 +39,7 @@ const STATS: Stat[] = [
 ];
 
 const CAMPUSES: Campus[] = [
-  { name: 'Main Campus', address: '6331 N Keystone Ave, Indianapolis, IN 46220', phone: '(463) 240-1404' },
+  { name: 'Main Campus', address: '120 East Market Street, Suite 930, Indianapolis, IN 46204', phone: '(463) 240-1404' },
 ];
 
 const FUNDING_OPTIONS = [
@@ -542,7 +542,7 @@ export default function AnimatedHomePage() {
             <div>
               <h4 className="font-bold mb-4">Contact</h4>
               <div className="space-y-2 text-slate-400">
-                <p>6331 N Keystone Ave, Suite D, Indianapolis, IN 46220</p>
+                <p>120 East Market Street, Suite 930, Indianapolis, IN 46204</p>
                 <p className="text-brand-red-400">(463) 240-1404</p>
               </div>
             </div>

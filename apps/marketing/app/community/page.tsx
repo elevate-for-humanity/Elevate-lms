@@ -36,7 +36,7 @@ export default function Page() {
           </p>
           <div className="mt-7 flex flex-wrap gap-3">
             <Link
-              href="https://app.elevateforhumanity.org/signup"
+              href="https://app.elevateforhumanity.org/signup?next=%2Fcommunity"
               className="inline-flex min-h-12 items-center rounded-xl bg-cyan-300 px-6 py-3 font-black text-slate-950"
             >
               Create your account
@@ -74,8 +74,9 @@ export default function Page() {
           ))}
         </ol>
         <p className="mt-6 max-w-3xl text-sm leading-7 text-slate-600">
-          After account creation, return here and select Sign in to community. Posts and attachments
-          stay inside the authenticated community. An approved public business profile can help
+          Verify your email to continue to the community. If you already have an account, select
+          Sign in to community. Posts and attachments stay inside the authenticated community.
+          An approved public business profile can help
           visitors discover your services; uploading a community post does not automatically publish
           it to Google.
         </p>

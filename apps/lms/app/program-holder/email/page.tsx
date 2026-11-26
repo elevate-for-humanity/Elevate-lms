@@ -23,6 +23,7 @@ export default async function ProgramHolderEmailPage() {
         </p>
       </div>
       <EmailWorkspace
+        guideHref="/communications/email/help?mailbox=program-holder"
         communicationLinks={{
           phone: '/program-holder/phone',
           chat: '/program-holder/inbox',

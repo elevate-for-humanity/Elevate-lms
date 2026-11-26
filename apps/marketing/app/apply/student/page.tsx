@@ -1,3 +1,4 @@
+import { EMT_INQUIRY_HREF, isEmtInquiryOnly } from '@/lib/programs/emt-inquiry-only';
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { resolveSlug } from '@/lib/program-registry';
@@ -35,6 +36,7 @@ export default async function StudentApplicationPage({
 }) {
   const params = await searchParams;
   const program = resolveSlug(params?.program || '') || '';
+  if (isEmtInquiryOnly(params?.program) || isEmtInquiryOnly(program)) redirect(EMT_INQUIRY_HREF);
   // Keep the shopper's validated enrollment choices intact across the canonical PARIS redirect.
   const query = new URLSearchParams();
   if (program) query.set('program', program);

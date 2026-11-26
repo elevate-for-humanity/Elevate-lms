@@ -1,0 +1,162 @@
+# Janitorial partner onboarding repair
+
+## Problem and corrections
+
+The public cleaning application saves an applicant, but provider enrollment was
+coupled to the paid-marketplace launch flag. New business accounts also followed
+the learner dashboard into a paid-enrollment gate when entering community. The
+program-holder form had no way to request janitorial scope review without naming
+an unrelated published course. Generic holder approvals sent a Gary coordinator's
+role and compensation to every applicant.
+
+This repair:
+
+- Allows a verified-email cleaning applicant to create a pending provider profile
+  from their existing application, with their own rate, ZIP coverage, services and
+  explicit email choice. It does not grant eligibility or import other people's
+  applications. Existing reviewed providers retain the narrow rate-update path.
+- Requires a signature-verified PKCE email magic-link session and a server-held
+  receipt binding the exact website, user, session and email before every
+  provider read or write. Production currently automatically confirms ordinary
+  signup emails, so `email_confirmed_at` alone cannot prove mailbox ownership.
+  The server sends the requested link for the current account email and retains
+  its exact PKCE verifier in protected storage. The callback must match that
+  request, its browser nonce and its identity before recording proof. Password,
+  signup, generic OTP/SMS, anonymous, forged and unrelated magic-link sessions
+  cannot claim a lead or read assignments.
+- Separates `cleaningProviderOnboardingEnabled` from `cleaningNetworkEnabled`.
+  Booking, payment, offers and email dispatch retain the full commerce gate.
+- Adds `prepareCleaningProviderOnboardingConfig(current, true)` for publishing
+  only the provider enrollment page and optional application rate field after the
+  matching renderer/API are live. It preserves unrelated pages and commerce state.
+- Keeps authenticated general community outside the learner admission layout.
+  Approved business roles retain their respective portals; student course access
+  still requires the existing admission checks.
+- Gives the visible signup form ownership of its sign-in destination. The
+  page-level fallback appears only when registration is unavailable, so selecting
+  Community cannot leave a second link pointing at learner admission.
+- Preserves safe return destinations across signup, verification, resend, OAuth
+  and login. Public role selections record interest, not authority.
+- Lets the Auth SDK finish its URL initialization before completing the callback,
+  so a PKCE code consumed by automatic initialization is not redeemed twice.
+- Keeps the employer application confirmation's resources link on the public
+  employer information page, which is available before partnership approval.
+- Restores the previously authored trusted-metadata profile trigger in a focused
+  versioned migration. Public signup can supply a display name and requested role;
+  only server-managed metadata grants a role or tenant. The migration refuses an
+  unreviewed function definition and does not rewrite existing profiles.
+- Captures a Janitorial / Building Services Technician program-holder request as
+  `requested_program_interest: janitorial`, separate from learner program slugs.
+  Approval requires an actual active program link before account/role provisioning.
+- Accepts canonical catalog programs with `is_active = true` and status `active`
+  or `published`, matching the program publisher. The picker, scope resolution
+  and final approval use the same eligibility rule and reject unavailable or
+  noncanonical programs.
+- Sends role-appropriate generic approval instructions. Gary's custom notice is
+  used only for an explicitly assigned Gary site coordinator; its compensation is
+  never applied to an ordinary Program Holder.
+
+## Provider mailbox verification
+
+An AMR method names how a session authenticated; it does not permanently bind
+that event to the current account email. Review of Supabase Auth commit
+`83865c14a595aa616af30549ddf4477de0a0d732` identified a conditional email-change
+path under automatic confirmation and secure email change where an old-address
+confirmation can finish the change. Existing sessions retain their AMR, and a
+previously verified PKCE code can be exchanged after the address changes. See
+the upstream [email-change verification](https://github.com/supabase/auth/blob/83865c14a595aa616af30549ddf4477de0a0d732/internal/api/verify.go)
+and [PKCE exchange](https://github.com/supabase/auth/blob/83865c14a595aa616af30549ddf4477de0a0d732/internal/api/token.go)
+implementations. This is a source finding, not a live exploit test or a claim
+about the exact managed Auth build. The repair does not change global Auth
+settings or rely on that configuration combination remaining disabled.
+
+Provider verification now follows this sequence:
+
+1. A same-origin authenticated request sends an empty body to
+   `/api/tenant-sites/cleaning/provider/verification`. The server obtains the
+   account email and a new PKCE verifier; the browser cannot choose either.
+2. Protected database state binds the fixed website, user, original session,
+   exact email, state hash and separate browser-nonce hash for ten minutes.
+   Only the HttpOnly browser nonce is stored in a cookie. The verifier is never
+   sent to the browser.
+3. The fixed callback atomically claims that state once and removes its stored
+   verifier. It exchanges the received code using the claimed verifier, checks
+   the resulting identity, and records proof for the new session and exact email.
+4. A protected RPC verifies that proof before any application, provider or
+   assignment lookup. It checks the current Auth identity and live session.
+   Ordinary token refresh preserves the same binding; changing the email or
+   session cannot transfer it. Proof expires after thirty days.
+
+The tables have RLS enabled and no direct client or service-role table grants.
+Only narrowly scoped service-role RPCs can begin, claim, complete, validate or
+cancel a challenge. Expired, replayed, wrong-browser and mismatched identities
+fail closed. Callback status parameters provide feedback only; they cannot
+unlock private data. No new signing secret or alternative email transport is
+introduced.
+
+Provider profile requests, callbacks and email sends use distinct server-owned
+rate-limit buckets. Mail sends remain limited to three per minute for both the
+visitor and the verified user; profile reads/saves and callbacks cannot consume
+that allowance. Provider buckets do not inherit the general internal-IP bypass.
+Rate-limit responses retain their retry timing. An invalid callback preserves a
+pending browser nonce; only a successfully claimed challenge can cause its nonce
+to be cleared on completion or a subsequent failure.
+
+## Program and payment boundary
+
+The commercial-cleaning course, building-maintenance classroom program and
+Building Services Technician apprenticeship are distinct records. This repair
+does not alias them, create an active learner program, assert funding eligibility,
+or replace the signed apprenticeship standards. Scope review must reconcile the
+canonical program record, approved delivery and applicable agreement first.
+
+The executed individual agreement and addenda govern compensation. The current
+signing flow presents participation tiers with cohort-based hosting terms or a
+student referral fee; a separate legacy admin download still describes a
+per-student midpoint/completion model. These are not interchangeable offers.
+This repair does not select a participation tier or set a janitorial rate.
+The janitorial agreement must specify the per-student amount or calculation,
+qualifying milestones, funding conditions and payment timing before training
+begins. Subcontractor job payments are separate.
+
+## Production checks before an invitation claims complete readiness
+
+1. Pass required exact-commit CI, protected merge and affected Google releases.
+   Verify the marketing, LMS and Admin runtime SHA/revision against the release.
+2. After the migration commit is contained in `main`, apply only the reviewed
+   auth-profile and provider-proof migrations through the supervised production
+   migration process. Verify both recorded migrations, the hardened profile
+   function, proof functions, table RLS and restricted grants. Do not run
+   unrelated pending migrations as a side effect of this repair.
+   The official apply-migration API may assign a different history timestamp:
+   record the source commit, source SQL SHA-256, actual remote version/name,
+   stored-statement fingerprint, resulting function definition and privileges.
+   Do not rewrite migration history or replay old migrations to force timestamps
+   to match.
+3. Preserve the current tenant configuration/revision. Apply only the provider
+   onboarding helper after its source is live; do not turn on paid commerce as an
+   incidental consequence of enabling applications.
+4. Verify the Supabase Auth redirect allowlist and existing application lookup,
+   verified-email account return, pending
+   provider profile, consent, and community access in the authenticated browser.
+   Use authorized test identities; do not create a real applicant's account or
+   agree to their terms on their behalf.
+   The existing main-only OAuth audit now reads the managed Auth settings with
+   sanitized callback patterns, mail configuration presence, secure-email-change
+   state and magic-link
+   template checks. Its read-only report does not prove actual mail receipt or
+   successful login; verify those through the server-owned PKCE flow and its
+   actual Marketing callback at
+   `/api/tenant-sites/cleaning/provider/verification/callback`. Administrative
+   `generateLink` plus `verifyOtp` produces a generic OTP session and must not be
+   substituted for the required server-bound mailbox receipt. A direct generic
+   browser magic-link login is also insufficient without that receipt.
+5. Complete the paid-marketplace gates in `marketplace-release.md` before enabling
+   job offers: actual provider review, payment/invoice/webhook/worker evidence and
+   approved end-to-end transaction, email receipt, acceptance and ledger checks.
+6. Confirm a provider accepts a job's stated date/time. This is not permission to
+   arbitrarily change a customer's schedule. No jobs or income are guaranteed.
+
+Do not send a complete-readiness invitation merely because tests or source review
+pass. No provider approval, job transaction or real email receipt is created by
+this patch.

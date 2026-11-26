@@ -19,6 +19,7 @@ import { AdminApplicationChrome } from '@/components/admin/AdminApplicationChrom
 import { DEFAULT_NAV } from '@/lib/admin/nav-config';
 import { I18nProvider } from '@/lib/i18n/context';
 import { AdminPwaRegister } from '@/components/pwa/AdminPwaRegister';
+import { MailPwaRegister } from '@/components/pwa/MailPwaRegister';
 import { SupabasePublicConfigScript } from '@/components/supabase/SupabasePublicConfigScript';
 import { SupabaseConfigBootstrap } from '@/components/supabase/SupabaseConfigBootstrap';
 import { chunkRecoveryBootstrap } from '@/lib/browser/chunk-recovery-bootstrap';
@@ -73,7 +74,12 @@ export const viewport = {
 };
 
 export default async function AdminGroupLayout({ children }: { children: React.ReactNode }) {
-  const staffInbox = (await headers()).get('x-elevate-staff-inbox') === '1';
+  const requestHeaders = await headers();
+  const staffInbox = requestHeaders.get('x-elevate-staff-inbox') === '1';
+  // Elevate Mail (/mail) is a separate installed app on this origin: it
+  // registers its own service worker and never activates the phone receiver.
+  const pathname = requestHeaders.get('x-pathname') ?? '';
+  const mailApp = pathname === '/mail' || pathname.startsWith('/mail/');
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
@@ -85,11 +91,11 @@ export default async function AdminGroupLayout({ children }: { children: React.R
       </head>
       <body className="admin-portal efh-contrast">
         <SupabaseConfigBootstrap />
-        <AdminPwaRegister />
+        {mailApp ? <MailPwaRegister /> : <AdminPwaRegister />}
         <I18nProvider>
           <Suspense fallback={<main className="min-h-dvh min-w-0">{children}</main>}>
             <DashboardReadingSupport>
-              <AdminApplicationChrome navSections={DEFAULT_NAV} staffInbox={staffInbox}><CloudBudgetNotice />{children}<Suspense fallback={null}><AutomaticPhone admin /></Suspense></AdminApplicationChrome>
+              <AdminApplicationChrome navSections={DEFAULT_NAV} staffInbox={staffInbox}><CloudBudgetNotice />{children}{mailApp ? null : <Suspense fallback={null}><AutomaticPhone admin /></Suspense>}</AdminApplicationChrome>
             </DashboardReadingSupport>
           </Suspense>
         </I18nProvider>

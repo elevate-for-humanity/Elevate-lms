@@ -14,7 +14,7 @@ describe('host shop network architecture', () => {
   it('gives approved shops a profile before optional media exists', () => {
     const loader = readFileSync('lib/programs/host-shops.ts', 'utf8');
     const profile = readFileSync('apps/marketing/app/host-shops/[slug]/page.tsx', 'utf8');
-    expect(loader).toContain('profile?.public_slug ?? publicSlug(shop.name, shop.id)');
+    expect(loader).toContain('publicSlug: profileSlug || applicationSlug');
     expect(profile).toContain('ApprovedHostShopProfile');
   });
 

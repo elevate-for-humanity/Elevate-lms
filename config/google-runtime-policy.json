@@ -154,6 +154,7 @@
         "S3_REGION",
         "S3_SECRET_ACCESS_KEY",
         "SENDGRID_API_KEY",
+        "SENDGRID_EVENT_WEBHOOK_PUBLIC_KEY",
         "SENDGRID_INBOUND_WEBHOOK_PUBLIC_KEY",
         "SENDGRID_FROM",
         "SENDGRID_KEY",
@@ -252,3 +253,6 @@
     }
   }
 }
+
+
+

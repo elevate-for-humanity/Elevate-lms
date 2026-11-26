@@ -224,7 +224,7 @@ test.describe('Enrollment Flow - Complete Journey', () => {
 
       const menuButton = page.getByRole('button', { name: 'Open menu', exact: true });
       await menuButton.click();
-      const navigation = page.getByRole('navigation', { name: 'Site navigation' });
+      const navigation = page.getByRole('navigation', { name: 'Mobile navigation' });
       await expect(navigation).toBeVisible();
       const programs = navigation.getByRole('button', { name: 'Programs', exact: true });
       await programs.click();

@@ -1,45 +1,136 @@
-# HVAC dual-mode practical lab — additive implementation plan
+# HVAC interactive course implementation
 
-**Status:** Proposed curriculum mapping and initial contract tests only. Not published or assigned to learners.  
-**Existing course:** `d48c61c4-8880-4d9d-9ab5-fab4dd51b201` (EPA 608 Refrigeration — Core, Types I, II & III).  
-**Instructor source:** David Nazario's photographed 48-hour HVAC hands-on syllabus (residential split system, gas furnace, pressure test, vacuum, digital manifolds, recovery cylinders, multimeter, clamp meter, leak detector, pump-down, brazing; Interplay online).  
-**Important:** Source syllabus gives 48 hours total, not individual topic-hour values. The 10-module allocation in `lib/lms/hvac-practical-plan.ts` is proposed pending David's approval.
+**Course:** d48c61c4-8880-4d9d-9ab5-fab4dd51b201 — EPA 608 Refrigeration — Core, Types I, II & III.
 
-## Verified current assets
+**Scope:** Stateful simulated practice throughout the existing 17 instructional lessons, with the four required EPA practice tests retained.
 
-- 21 published lessons on the existing course. Four EPA 608 practice tests exist.
-- `components/lms/HvacSystemLab.tsx`: refrigeration diagram, hypothetical measurements, condenser 3D renderer.
-- `components/lms/HVACSimulation.tsx` and `lib/lms/hvac-simulations.ts`: 3D equipment hotspots, currently one configured lesson/simulation mapping.
-- `components/lms/HvacWorkbookTeaching.tsx`: interactive low-voltage circuit, recovery decision selector and airflow reasoning exercise.
-- `content/hvac-sims/sim-01.json` through `sim-10.json`: branching diagnosis content already exists.
-- Production Supabase `training_simulations`: 10 records, all active; `sim_attempts`: zero records at audit.
-- Existing `course_practical_submissions`, `course_practical_reviews` and `learning_action_events` infrastructure.
-- On the published course, zero lessons have explicit scenario prompts or structured `activities`, and none require instructor sign-off; course duration metadata is not credible evidence of 48 practical hours.
+The initial catalog contains **64 sequential practice stages** across those 17 lessons.
 
-## Implementation order
+**Release status:** Implementation and verification are in progress. This document is not deployment evidence. Production availability requires the protected release and live acceptance below.
 
-1. **Map, review and approve syllabus:** Instructor reviews topic coverage, learning outcomes, exact time allocation and performance rubrics. Do not overwrite current lessons or progress.
-2. **Build first equipment exercise:** start with digital manifold readings / pressure diagnostics as a branching, keyboard-accessible interactive lab. Use approved refrigerant/equipment specifications, safe mock values, fault branches and decision reasoning. No simulated tool action should command physical machinery.
-3. **Integrate existing scenario registry:** wire authorized enrolled-student access to simulation JSON, with schema validation, anti-tamper server-side scoring, versioned content and persistence. Reuse the existing `training_simulations` and `sim_attempts` structures only after validating live RLS and endpoint authority. Do not duplicate tables.
-4. **Instructor-led and independent modes:** David can demonstrate/assign a case, see attempts, review competency evidence and require remediation; remote learners can practice and submit evidence. Reuse the practical-review permission model.
-5. **Separate hour accounting:** active, validated simulation time must not be conflated with actual observed physical practice or EPA exam certification. Instructor physical sign-off must be a separate event. No automatic award of 48 physical hours.
-6. **Access and accessibility:** expose lab from the existing enrolled HVAC course and workbook; preserve student enrollment, progress and payment/access rules. Provide keyboard and mobile alternative to 3D/WebGL, server-side persisted resume state and adequate narration/transcripts.
-7. **Vendor decision:** Interplay licensing and LTI/API access are unverified. Do not embed or copy licensed simulations without rights and tested integration.
-8. **Release:** protected PR, current-head unit/integration/accessibility/RLS/E2E tests, independent reviewer approval, exact SHA deployment, real enrolled-student and instructor acceptance before announcing availability.
+## Source outline and hours
 
-## Acceptance gates (not yet satisfied)
+David Nazario's photographed outline is transcribed in HVAC_PRACTICAL_SOURCE_ALLOCATION in lib/lms/hvac-practical-plan.ts.
 
-- Enrolled learner can launch, complete, leave, return and resume the **same** case.
-- Unauthorized users cannot submit, alter scores, or inspect another learner's evidence.
-- Scoring is computed by the server and tied to an immutable simulation content version.
-- David can independently view, approve or reject competency evidence with retained history.
-- Student can retry safely without overwriting earlier attempt evidence.
-- Instructor-led and virtual use share outcomes but retain different delivery and hour categories.
-- Existing 21 lessons, workbook, four practice tests, enrollment/payment, and progress remain unchanged.
-- Instructor confirms physical hands-on equivalence is **not** asserted by completing virtual scenarios.
-- Zero 404s and successful keyboard/mobile/desktop execution on the serving LMS build.
-- Production acceptance records exact commit SHA and tested learner/instructor identities, without exposing their personal information.
+| Photographed activity        | Listed hours | Existing course practice                                 |
+| ---------------------------- | -----------: | -------------------------------------------------------- |
+| Interplay online             |            8 | Separate vendor activity; license/integration unverified |
+| Residential split-system     |            5 | Chapters 2, 5, 12 and 14                                 |
+| Gas furnace                  |            5 | Chapter 4                                                |
+| Pressure test                |            3 | Chapter 9                                                |
+| Vacuum                       |            3 | Chapter 9                                                |
+| Digital manifold gauges      |            3 | Chapters 5 and 12                                        |
+| Recovery cylinders           |            2 | Chapters 7 and 8                                         |
+| Multimeters                  |            2 | Chapter 3                                                |
+| Clamp meters                 |            4 | Chapter 3                                                |
+| Leak detectors               |            2 | Chapters 9 and 12                                        |
+| Pump down                    |            1 | Chapter 9                                                |
+| Braze                        |            5 | Chapter 13                                               |
+| **Sum of photographed rows** |       **43** |                                                          |
+| **Printed total**            |       **48** |                                                          |
+| **Unallocated difference**   |        **5** | Instructor clarification required                        |
 
-## Release hold
+Only eight hours are explicitly labeled online; delivery mode for the other 35 listed hours is not established. The older ten-module, 48-hour proposal in HVAC_PRACTICAL_MODULES remains an independent proposal, not the instructor's confirmed schedule. This implementation does not award attendance or physical hours, change course-duration metadata, or represent original simulations as licensed Interplay content.
 
-This PR deliberately provides a reviewed curriculum contract and tests only. It does not seed lessons, change production Supabase, create a new enrollment, adjust hour records, launch agents or claim virtual-lab completion.
+## Root cause and correction
+
+The canonical lesson route renders InteractiveLessonExperience. Earlier simulation assets were connected to old lesson IDs, limited to a few workbook sections, represented as checklist submissions, or not wired into that route. Their presence in the repository did not provide stateful practice throughout the enrolled course.
+
+HvacCourseSimulation is mounted in the actual canonical lesson page after the existing lesson experience and before the workbook. Each of the 17 instructional lesson IDs resolves to a versioned server-side definition. The existing video, reading, workbook, knowledge checks, lesson completion, enrollment, payment and pacing behavior are preserved. Lesson anchors and the existing HVAC course home provide direct lab access and saved mastery status.
+
+The four published required practice tests were attached to an unpublished retired Module 10, so the course map omitted them when grouping published modules. A guarded forward migration links those same four lessons to the published final module, **Practical Skills and Career Support**. It preserves IDs, questions, thresholds, global order, release weeks, scores and attempts. Course continuation follows global lesson order rather than presentation grouping.
+
+## Full-course learning sequence
+
+| Chapter | Simulated practice                                                                                               |
+| ------- | ---------------------------------------------------------------------------------------------------------------- |
+| 1       | Classify study, simulation, observed skill and external credential evidence                                      |
+| 2       | Trace split-system components in heating/cooling modes and choose an isolation response                          |
+| 3       | Operate a virtual meter bench: voltage, resistance, switch, instrument mode and clamp placement                  |
+| 4       | Interpret furnace call, draft, ignition, flame and limit states; respond to protective stops                     |
+| 5       | Adjust supplied saturation/line temperatures; interpret superheat, subcooling and inconsistent phase assumptions |
+| 6       | Evaluate refrigerant-release, labeling and recovery decisions                                                    |
+| 7       | Compare cylinder tare, gross mass and a fictional work-card limit                                                |
+| 8       | Select the small-appliance recovery path from equipment and compressor evidence                                  |
+| 9       | Compare pressure/vacuum observations at selected times, investigate leaks and evaluate pump-down conditions      |
+| 10      | Explore air ingress and equipment-specific decisions on a low-pressure system                                    |
+| 11      | Route Core, Type I, Type II and Type III equipment cases                                                         |
+| 12      | Choose manifold, temperature or leak-detection observations before changing a diagnosis                          |
+| 13      | Explore airflow restrictions and sequence supervised brazing preparation, process and inspection decisions       |
+| 14      | Investigate a changing cooling complaint with evidence-based next actions                                        |
+| 15      | Prepare a construction area and respond to ladder, electrical and hot-work hazards                               |
+| 16      | Coordinate an emergency response and distinguish practice from external CPR/first-aid verification               |
+| 17      | Complete a documented customer handoff, identify missing evidence and plan a verified next step                  |
+
+The four existing EPA practice quizzes follow the instructional sequence. Practice does not issue EPA certification, OSHA cards, CPR credentials or physical skill sign-offs.
+
+## Interaction and scoring
+
+Learners change labeled controls, apply settings and run a virtual check. Readings and SVG equipment states respond to those values. Decisions require an observation of the current settings; a control change invalidates that observation. An incorrect or unsafe choice retains the current stage and explains the correction.
+
+Stages are sequential. The server validates controls, finite values, numeric steps, stage identity and prerequisites. The client receives only the current stage, without future stages, requirements or answer keys. A finished attempt starts at 100 minus ten points per incorrect decision; at least 80 records simulation mastery. This metric is separate from lesson completion and required quiz results.
+
+The UI confirms saves, restores confirmed state, preserves best mastery after a restart, retries an uncertain save using the same request ID and reloads after a revision conflict. It never claims an unconfirmed decision was saved. Native controls, textual readings, focus management and mobile stacking provide access without WebGL. These are teaching models, not field equipment instructions or universal setpoints.
+
+## Persistence and access
+
+The API at /api/learner/hvac-simulations reuses interaction_progress with the reserved hvac-sim: namespace. No parallel progress table was added.
+
+Every request requires an active authenticated user, rate limiting, the exact canonical course, published lesson membership and existing assertLessonAccess authorization. The authenticated hvac_simulation_session_ready() RPC checks the existing privileged-session MFA condition before a narrow service-role save. Missing migration or failed security checks deny saving.
+
+Stored history includes schema/content versions, a monotonic revision and bounded request IDs/actions. Server replay calculates current state, completed attempts, best score and mastery. Compare-and-swap updates prevent lost changes; repeated request IDs are idempotent. Reset starts another attempt while retaining earlier events. Client-supplied scores, identities, completion or hours are rejected.
+
+Three restrictive RLS policies prevent browser clients from inserting, updating or deleting hvac-sim: progress. They supplement existing owner, administrator-read and MFA policies. Course-home and API reads use the authenticated client. The existing generic interaction endpoint cannot write the reserved namespace.
+
+Released content versions are immutable. Future scoring, stage, prerequisite or model-meaning changes require a new content version/interaction ID and explicit treatment of older attempts. Never silently reinterpret saved evidence. The initial unpublished version may be corrected before its first release.
+
+## Forward migrations
+
+1. 20261125014012_protect_hvac_simulation_progress.sql reserves authoritative writes and adds the authenticated readiness check. It changes no learner rows.
+2. 20261125014055_hvac_required_practice_module_links.sql repairs four stale quiz module links. It resolves verified course/module identity, refuses an unexpected prior mapping, runs atomically and is idempotent after repair. A fresh database without the authored course receives no synthetic lessons.
+3. 20261125080000_instructor_curriculum_ip_license.sql publishes agreement version 1.0 of the proprietary-curriculum instructor license (`instructor_curriculum_ip`, hash-pinned to `docs/legal/instructor-curriculum-ip-agreement-v1.md`) and creates the version-scoped, revocable `instructor_curriculum_licenses` table with RLS (owner/admin read; service-role issuance and revocation only).
+
+Apply only these scoped migrations through the approved Supabase path after release validation. Verify policy definitions, RPC grants, lesson/module counts, quiz content/score preservation and progress integrity. Do not run unrelated outstanding migrations as part of this change.
+
+## Instructor license gate
+
+An instructor accesses HVAC instructor content in a teaching capacity only with a
+current signed proprietary-curriculum IP agreement **and** an active
+`instructor_curriculum_licenses` row for that version, plus an active
+`instructor_assignments` row for the course. The general `instructor_services`
+acceptance does not satisfy the gate. Enforcement is server-side in
+`lib/legal/instructorCurriculumLicense.ts` at: the HVAC course page (teaching
+view with a license-reference watermark), the lesson page (HVAC demonstration
+view, no learner completion), the learner simulation API (demonstration
+practice saved under the instructor's own id), the workbook teaching path
+(HVAC program excluded without a license), and the admin instructor course
+workspace (HVAC only). Signing (LMS sign-agreement endpoint and the marketing
+legal page) records the acceptance with the canonical recorder and issues the
+license; revocation is an admin-only endpoint and fails the gate immediately.
+Stale versions and hash changes fail closed and require a fresh signature.
+
+No instructor license is issued until identity, entitlement and live
+positive/negative role tests are verified. The agreement text (version 1.0) is
+a draft pending legal review and owner approval. Workbook downloads remain
+disabled for everyone; the workbook save path stays per-user RPC/RLS enforced.
+Student enrollment-based access is unchanged.
+
+## Verification and release evidence
+
+Focused verification covers calculations and all canonical mappings, UI behavior, authenticated authorization, tamper rejection, retry/concurrency handling, event replay, PostgreSQL RLS, guarded quiz migration behavior and existing workbook/course-access regressions. Final combined verification passed **143 tests across ten files**, including the independent content and restart-state corrections. Repository-wide lint and migration lint also passed; recheck the final PR head through required CI.
+
+An isolated browser preview uses the real UI/model with synthetic in-memory progress. Closing the switch changed the displayed current from 0 A to 2 A; reloading restored the stage and control. This demonstrates interaction, not production authentication/database acceptance.
+
+The deployed-course acceptance spec is enabled by QA_HVAC_SIMULATION_ACCEPTANCE=1 in the existing trusted LMS release-acceptance workflow. It requires the exact serving SHA and a per-run disposable learner, exercises an incorrect choice, changing meter readings, saved-state reload, mastery, reset/history retention and all four practice links on five device profiles. It runs serially and cleans only that disposable learner's HVAC simulation rows. The isolated QA project currently contains only orientation, with no course modules or interaction_progress table; the full-course spec is deliberately not represented as having run against that incomplete fixture.
+
+The affected production TypeScript surface passed a scoped check. The full LMS typecheck exceeded workspace process resources (exit 137 without a TypeScript diagnostic). Exact-commit CI/build evidence remains required; scoped verification does not replace that gate.
+
+Before announcing availability:
+
+1. Reconcile current main, commit the complete change and satisfy protected PR checks/review.
+2. Apply and verify the two scoped migrations while preserving learner completion, enrollment, approvals and credentials.
+3. Release approved current main through the existing Google Cloud workflow; retain image digest, ready revision and serving SHA.
+4. Use the disposable enrolled QA learner to verify actual launch, changing readings, save, reload, retry, navigation and all four practice links on desktop and phone. Retain the exact deployed SHA.
+5. Verify existing instructor/practical-review behavior before claiming instructor acceptance or physical competency equivalence.
+
+Instructor physical approval, the missing five source hours and any Interplay license/integration remain separate decisions. Simulation completion does not resolve them automatically.

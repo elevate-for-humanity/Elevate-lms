@@ -94,9 +94,15 @@ function requiredRoles(pathname: string): readonly UserRole[] {
   if (pathname.startsWith('/instructor')) return INSTRUCTOR_ROLES;
   if (pathname.startsWith('/staff-portal') || pathname.startsWith('/api/staff')) return STAFF_ROLES;
 
-  // The staff inbox and its API enforce mailbox membership downstream.
-  // Keep account administration and all other Admin tools outside this grant.
-  if (pathname === '/phone/email' || pathname === '/api/communications/email') return ADMIN_ROLES;
+  // The staff inbox, the Elevate Mail app, and their API enforce mailbox
+  // membership downstream. Keep account administration and all other Admin
+  // tools outside this grant.
+  if (
+    pathname === '/phone/email' ||
+    pathname === '/mail' ||
+    pathname.startsWith('/mail/') ||
+    pathname === '/api/communications/email'
+  ) return ADMIN_ROLES;
 
   // The shared entry immediately routes staff to their own workspace before
   // loading platform data. Other Admin pages and APIs are not staff tools.

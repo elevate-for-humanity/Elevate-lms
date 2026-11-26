@@ -1,3 +1,4 @@
+import { EMT_INQUIRY_HREF, EMT_INQUIRY_MESSAGE, isEmtInquiryOnly } from '@/lib/programs/emt-inquiry-only';
 import { verifyPaidApplication, activatePaidApplication } from '@/lib/enrollment/paid-application';
 import { POST as submitProgramInquiry } from '../inquiries/route';
 import { applicationMatchesProgram, resolveCanonicalSlug } from '@/lib/programs/slug';
@@ -235,6 +236,12 @@ async function _POST(req: Request) {
 
     // Program is required but can come from different field names
     const program = resolveCanonicalSlug(String(body.program || body.programSlug || ''));
+    if (isEmtInquiryOnly(program) || isEmtInquiryOnly(body.program)) {
+      return NextResponse.json(
+        { error: EMT_INQUIRY_MESSAGE, inquiryUrl: EMT_INQUIRY_HREF },
+        { status: 409, headers: corsHeadersForOrigin(origin, allowedOrigins) },
+      );
+    }
     body.program = program;
     body.programSlug = program;
     if (!program) {

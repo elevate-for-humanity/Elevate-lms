@@ -21,7 +21,7 @@ vi.mock('@/lib/supabase/admin', () => ({
   }),
 }));
 import ApprenticeHomePanel from '@/components/apprenticeship/ApprenticeHomePanel';
-const home = () =>
+const home = (supportPanels?: React.ReactNode) =>
   ApprenticeHomePanel({
     userId: 'learner',
     programSlug: 'cosmetology-apprenticeship',
@@ -30,6 +30,7 @@ const home = () =>
       placement: { supervisor_user_id: 'supervisor' },
     } as any,
     billing: { required: false } as any,
+    supportPanels,
   });
 beforeEach(() => {
   state.fail = '';
@@ -74,4 +75,9 @@ it('does not claim the dashboard is clear when its data failed to load', async (
   const html = renderToStaticMarkup(await home());
   expect(html).toContain('Some alerts could not load');
   expect(html).not.toContain('No new alerts');
+});
+
+it('renders the support cards in the default dashboard view', async () => {
+  const html = renderToStaticMarkup(await home(<section>Practical services and refund information</section>));
+  expect(html).toContain('Practical services and refund information');
 });

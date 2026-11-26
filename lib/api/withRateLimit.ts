@@ -20,6 +20,13 @@ type Tier = Extract<
   'strict' | 'contact' | 'api' | 'auth' | 'payment' | 'public' | 'pageLoad'
 >;
 
+// Fixed server-owned namespaces. These are not identifiers supplied by a
+// caller, and unlike an identity scope they still derive the visitor normally.
+type RateLimitBucket =
+  | 'cleaning-provider-profile'
+  | 'cleaning-provider-email'
+  | 'cleaning-provider-callback';
+
 const limiters: Record<Tier, { get: () => any }> = {
   strict: strictRateLimit,
   contact: contactRateLimit,
@@ -90,6 +97,7 @@ export async function applyRateLimit(
   tier: Tier = 'contact',
   // Trusted server-side scope only; callers must derive it from verified identity.
   scope?: { key: string },
+  bucket?: RateLimitBucket,
 ): Promise<NextResponse | null> {
   const pathname = (() => {
     try {
@@ -107,7 +115,7 @@ export async function applyRateLimit(
         : tier;
 
   const visitor = scope ? scope.key : getIdentifier(request);
-  if (!scope && isInternalIP(visitor)) return null;
+  if (!scope && !bucket && isInternalIP(visitor)) return null;
   // A busy read-only endpoint must not exhaust the entire public site's
   // visitor allowance. Keep sensitive/write tiers aggregated per visitor.
   const routeBucket = ['public', 'pageLoad'].includes(effectiveTier)
@@ -115,7 +123,10 @@ export async function applyRateLimit(
         /^[0-9]{1,12}$/.test(segment) || /^[0-9a-f-]{36}$/i.test(segment) ? ':id' : segment
       ).join('/').slice(0, 160)
     : '';
-  const identifier = routeBucket ? visitor + ':route:' + routeBucket : visitor;
+  const bucketVisitor = bucket
+    ? `bucket:${bucket}:${scope ? 'subject' : 'visitor'}:${visitor}`
+    : visitor;
+  const identifier = routeBucket ? bucketVisitor + ':route:' + routeBucket : bucketVisitor;
 
   const limiter = limiters[effectiveTier]?.get();
 

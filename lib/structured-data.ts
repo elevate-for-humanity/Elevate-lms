@@ -13,7 +13,7 @@ export function generateOrganizationSchema() {
     logo: assets.logo,
     address: {
       '@type': 'PostalAddress',
-      streetAddress: '120 E Market St Suite 120',
+      streetAddress: '120 E Market St, Suite 930',
       addressLocality: 'Indianapolis',
       addressRegion: 'IN',
       postalCode: '46204',

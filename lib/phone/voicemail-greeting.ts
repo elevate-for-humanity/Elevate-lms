@@ -100,6 +100,7 @@ export function validateVoicemailGreetingText(
       ok: false,
       message: `Keep the voicemail greeting under ${VOICEMAIL_GREETING_MAX_CHARS} characters so callers are not kept listening too long.`,
     };
+  // eslint-disable-next-line no-control-regex -- intentional: a greeting must not contain control characters
   if (/[\u0000-\u001f\u007f]/.test(text))
     return { ok: false, message: 'Remove special characters from the voicemail greeting.' };
   return { ok: true, text };

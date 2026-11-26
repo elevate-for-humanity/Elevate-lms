@@ -17,7 +17,6 @@ on:
       - 'apps/lms/**'
       - 'packages/**'
       - 'scripts/northflank/**'
-      - 'scripts/container-build-policy.mjs'
       - 'package.json'
       - 'pnpm-lock.yaml'
       - 'pnpm-workspace.yaml'
@@ -41,7 +40,6 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        service: [marketing, lms, admin]
         include:
           - service: marketing
             dockerfile: Dockerfile.marketing
@@ -74,9 +72,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          FILE="$(node scripts/container-build-policy.mjs "${{ matrix.service }}")"
           docker build \
-            -f "$FILE" \
+            -f "${{ matrix.dockerfile }}" \
             --build-arg NEXT_PUBLIC_SITE_URL=https://www.elevateforhumanity.org \
             --build-arg NEXT_PUBLIC_APP_URL=https://app.elevateforhumanity.org \
             --build-arg NEXT_PUBLIC_ADMIN_URL=https://admin.elevateforhumanity.org \

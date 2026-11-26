@@ -385,9 +385,9 @@ export async function ProgramHolderWorkspaceView({
     return (
       <>
         <Hero
-          eyebrow="Enrollment Pipeline"
+          eyebrow="Program holder"
           title="Pending Students"
-          description="Review assigned applicants who have not yet become enrolled students."
+          description="School applications and applicant records that are not yet enrolled. Enrolled students appear under Students."
         />
         <SchoolApplicantRoster
           pending

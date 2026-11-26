@@ -16,7 +16,7 @@ export async function smsGet() {
     return NextResponse.json({ error: 'No phone system assigned.' }, { status: 403 });
   let query = ctx.db
     .from('communication_sms_messages')
-    .select('id,direction,from_number,to_number,body,media,status,error_message,created_at')
+    .select('id,direction,from_number,to_number,body,media,status,error_message,created_at,provider_event_id')
     .eq('phone_system_id', ctx.system.id)
     .order('created_at', { ascending: false })
     .limit(200);

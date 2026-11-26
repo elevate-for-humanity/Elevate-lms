@@ -44,6 +44,16 @@ def summarize(status, body):
         result['code'] = code if isinstance(code, str) and code in SAFE_ERRORS else 'unclassified_response'
     return result
 
+def operator_extension(send, base, system, headers):
+    """Resolve the operator target from the phone system record, never a literal."""
+    status, systems = send(base + '/rest/v1/phone_systems?select=admin_extension&id=eq.' + system, headers)
+    if status != 200 or not isinstance(systems, list) or len(systems) != 1:
+        raise ValueError('operator_assignment_unverified')
+    extension = systems[0].get('admin_extension')
+    if not isinstance(extension, str) or not re.fullmatch(r'0|[1-9][0-9]{2}', extension):
+        raise ValueError('operator_assignment_unverified')
+    return extension
+
 def exercise(body, token, send=request, run=subprocess.run):
     """Exercise only the approved operator, then revoke the temporary credential."""
     calls = run(['docker', 'exec', 'pbx_asterisk_1', 'asterisk', '-rx', 'core show channels count'],
@@ -95,7 +105,9 @@ def main():
     if len(token) < 32:
         raise ValueError('credential_reference_unverified')
     headers = {'apikey': service, 'Authorization': 'Bearer ' + service}
-    status, rows = request(values['SUPABASE_URL'].rstrip('/') + '/rest/v1/communication_extensions?select=id,profile_id,webrtc_provider,communication_workspaces!inner(phone_system_id)&extension=eq.0&enabled=eq.true&communication_workspaces.phone_system_id=eq.' + system, headers)
+    base = values['SUPABASE_URL'].rstrip('/')
+    extension = operator_extension(request, base, system, headers)
+    status, rows = request(base + '/rest/v1/communication_extensions?select=id,profile_id,webrtc_provider,communication_workspaces!inner(phone_system_id)&extension=eq.' + extension + '&enabled=eq.true&communication_workspaces.phone_system_id=eq.' + system, headers)
     if status != 200 or not isinstance(rows, list) or len(rows) != 1 or rows[0].get('webrtc_provider') != 'asterisk':
         raise ValueError('operator_assignment_unverified')
     if '--exercise' in sys.argv and (rows[0]['id'] != 'ea5439e0-014b-4020-8e25-e305f20c53d6' or

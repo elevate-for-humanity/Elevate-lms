@@ -211,11 +211,13 @@ export default function ParisChat({
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [awaitingFirstToken, setAwaitingFirstToken] = useState(false);
   const [autoSpeak, setAutoSpeak] = useState(voiceEnabled);
   const [isListening, setIsListening] = useState(false);
   const [speechInputAvailable, setSpeechInputAvailable] = useState(false);
   const [speechInputError, setSpeechInputError] = useState<string | null>(null);
   const recognitionRef = useRef<BrowserSpeechRecognition | null>(null);
+  const requestAbortRef = useRef<AbortController | null>(null);
   const initialGreetingSpokenRef = useRef(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -325,6 +327,15 @@ export default function ParisChat({
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
+  // Closing the bubble unmounts this component. Cancel any in-flight PARIS
+  // request at that moment so closing always takes effect immediately and
+  // the orphaned stream cannot keep the shared model busy.
+  useEffect(() => {
+    return () => {
+      requestAbortRef.current?.abort();
+    };
+  }, []);
+
   useEffect(() => {
     if (!voiceEnabled || !autoSpeak || initialGreetingSpokenRef.current) return;
     const greeting = messages[0]?.content?.trim();
@@ -349,6 +360,9 @@ export default function ParisChat({
       setMessages(requestMessages);
       setInput('');
       setIsLoading(true);
+      setAwaitingFirstToken(true);
+      const controller = new AbortController();
+      requestAbortRef.current = controller;
 
       try {
         if (surface === 'public') {
@@ -388,6 +402,7 @@ export default function ParisChat({
           headers: { 'Content-Type': 'application/json', Accept: 'text/event-stream' },
           credentials: 'same-origin',
           cache: 'no-store',
+          signal: controller.signal,
           body: JSON.stringify({
             messages: requestMessages,
             context: {
@@ -425,6 +440,7 @@ export default function ParisChat({
               });
             } else {
               messageStarted = true;
+              setAwaitingFirstToken(false);
               setMessages((previous) => [...previous, { role: 'assistant', content: delta }]);
             }
           };
@@ -480,6 +496,7 @@ export default function ParisChat({
         }
         onComplete?.([]);
       } catch {
+        if (controller.signal.aborted) return;
         setMessages((previous) => [
           ...previous,
           {
@@ -494,7 +511,9 @@ export default function ParisChat({
           },
         ]);
       } finally {
+        if (requestAbortRef.current === controller) requestAbortRef.current = null;
         setIsLoading(false);
+        setAwaitingFirstToken(false);
         inputRef.current?.focus();
       }
     },
@@ -616,7 +635,7 @@ export default function ParisChat({
           </div>
         ))}
 
-        {isLoading && (
+        {awaitingFirstToken && (
           <div className="flex gap-3">
             <div className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full bg-slate-950 text-white">
               <ParisAvatar size={32} className="h-8 w-8" fallbackIconClassName="h-4 w-4" />
@@ -729,44 +748,46 @@ export default function ParisChat({
           Ask PARIS a question
         </label>
         <div className="flex w-full min-w-0 max-w-full items-end gap-2 sm:gap-3">
-          <button
-            type="button"
-            aria-label={voice.isPlaying || voice.isLoading ? 'Stop PARIS voice' : 'Hear PARIS'}
-            aria-pressed={voice.isPlaying || voice.isLoading}
-            onClick={() => {
-              if (voice.isPlaying || voice.isLoading) {
-                voice.stop();
-                setAutoSpeak(false);
-                return;
-              }
+          {voiceEnabled ? (
+            <button
+              type="button"
+              aria-label={voice.isPlaying || voice.isLoading ? 'Stop PARIS voice' : 'Hear PARIS'}
+              aria-pressed={voice.isPlaying || voice.isLoading}
+              onClick={() => {
+                if (voice.isPlaying || voice.isLoading) {
+                  voice.stop();
+                  setAutoSpeak(false);
+                  return;
+                }
 
-              const latestReply = [...messages]
-                .reverse()
-                .find((message) => message.role === 'assistant')?.content;
-              if (!latestReply) return;
+                const latestReply = [...messages]
+                  .reverse()
+                  .find((message) => message.role === 'assistant')?.content;
+                if (!latestReply) return;
 
-              setAutoSpeak(true);
-              void voice.play(plainTextForSpeech(latestReply), {
-                voice: 'coral',
-                style: storeSurface ? 'commercial' : 'assistant',
-                rate: 1,
-                allowBrowserFallback: false,
-              });
-            }}
-            className={`inline-flex !h-11 !w-11 !min-w-11 !max-w-11 flex-none items-center justify-center rounded-full border !p-0 transition ${
-              voice.isPlaying || voice.isLoading
-                ? 'border-brand-blue-700 bg-brand-blue-700 text-white'
-                : 'border-slate-300 bg-white text-slate-700 hover:bg-slate-100'
-            }`}
-          >
-            {voice.isLoading ? (
-              <Loader2 className="h-5 w-5 shrink-0 animate-spin" aria-hidden="true" />
-            ) : voice.isPlaying ? (
-              <VolumeX className="h-5 w-5 shrink-0" aria-hidden="true" />
-            ) : (
-              <Volume2 className="h-5 w-5 shrink-0" aria-hidden="true" />
-            )}
-          </button>
+                setAutoSpeak(true);
+                void voice.play(plainTextForSpeech(latestReply), {
+                  voice: 'coral',
+                  style: storeSurface ? 'commercial' : 'assistant',
+                  rate: 1,
+                  allowBrowserFallback: false,
+                });
+              }}
+              className={`inline-flex !h-11 !w-11 !min-w-11 !max-w-11 flex-none items-center justify-center rounded-full border !p-0 transition ${
+                voice.isPlaying || voice.isLoading
+                  ? 'border-brand-blue-700 bg-brand-blue-700 text-white'
+                  : 'border-slate-300 bg-white text-slate-700 hover:bg-slate-100'
+              }`}
+            >
+              {voice.isLoading ? (
+                <Loader2 className="h-5 w-5 shrink-0 animate-spin" aria-hidden="true" />
+              ) : voice.isPlaying ? (
+                <VolumeX className="h-5 w-5 shrink-0" aria-hidden="true" />
+              ) : (
+                <Volume2 className="h-5 w-5 shrink-0" aria-hidden="true" />
+              )}
+            </button>
+          ) : null}
           <button
             type="button"
             aria-label={isListening ? 'Stop listening' : 'Talk to PARIS'}
@@ -832,18 +853,20 @@ export default function ParisChat({
             {speechInputError}
           </p>
         ) : null}
-        {voice.error ? (
+        {voiceEnabled && voice.error ? (
           <p className="mt-2 text-sm font-semibold leading-5 text-red-700" role="alert">
             {voice.error} Tap the speaker to retry, or continue reading the response.
           </p>
         ) : null}
         {!speechInputAvailable ? (
           <p className="mt-2 text-xs font-semibold leading-5 text-slate-600">
-            Voice input is unavailable in this browser. You can still type to PARIS, and spoken
-            replies remain available.
+            {voiceEnabled
+              ? 'Voice input is unavailable in this browser. You can still type to PARIS, and spoken replies remain available.'
+              : 'Voice input is unavailable in this browser. You can still type to PARIS.'}
           </p>
         ) : null}
       </form>
     </div>
   );
 }
+

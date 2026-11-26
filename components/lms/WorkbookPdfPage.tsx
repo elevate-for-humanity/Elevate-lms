@@ -26,10 +26,12 @@ export default function WorkbookPdfPage({
     (async () => {
       try {
         const pdfjs = await import('pdfjs-dist');
-        pdfjs.GlobalWorkerOptions.workerSrc = new URL(
-          'pdfjs-dist/build/pdf.worker.min.mjs',
-          import.meta.url,
-        ).toString();
+        // Vendored copy of pdfjs-dist@5.4.296's worker in apps/lms/public —
+        // the new URL(..., import.meta.url) asset form cannot resolve here:
+        // pdfjs-dist is a server-external package (pdf-parse needs Node's
+        // native canvas), which makes webpack reject the worker asset in
+        // the server bundle. Refresh the vendored file on version bumps.
+        pdfjs.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.mjs';
         const doc = await pdfjs.getDocument({ url }).promise;
         if (cancelled) return;
         const pageNumber = Math.min(Math.max(1, page), doc.numPages);
@@ -48,7 +50,7 @@ export default function WorkbookPdfPage({
         const context = canvas.getContext('2d');
         if (!context) throw new Error('canvas unavailable');
         context.setTransform(ratio, 0, 0, ratio, 0, 0);
-        await pdfPage.render({ canvasContext: context, viewport }).promise;
+        await pdfPage.render({ canvas, canvasContext: context, viewport }).promise;
         if (!cancelled) setState('ready');
       } catch {
         if (!cancelled) setState('error');

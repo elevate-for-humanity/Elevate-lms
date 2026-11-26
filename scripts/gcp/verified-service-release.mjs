@@ -1,8 +1,9 @@
 // GitHub workflow conclusion alone does not prove a service reached production.
 // Validation-only jobs can succeed while all deployment stages were skipped.
+// The acceptance job is the handoff, not a downstream browser result.
 const requiredReleaseJobs = Object.freeze({
   'deploy-admin.yml': ['Deploy and verify Admin on Google', 'acceptance'],
-  'deploy-google-lms-trigger.yml': ['deploy', 'acceptance'],
+  'deploy-google-lms-trigger.yml': ['deploy / deploy (lms)', 'acceptance'],
   'deploy-google-marketing-trigger.yml': ['Deploy and verify Marketing on Google', 'acceptance'],
   'deploy-google-store-runtime.yml': ['Deploy and verify Store on Google', 'acceptance'],
 });

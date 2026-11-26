@@ -33,7 +33,7 @@ test('every explicit course-image COPY input has an automatic source-change trig
   assert.deepEqual(missing, [], 'copied runtime inputs must not be silently excluded from deployment triggers');
 });
 function releaseJobFixture({acceptance=true, deploy=true}={}) {
-  const names=['Deploy and verify Admin on Google', 'deploy',
+  const names=['Deploy and verify Admin on Google', 'deploy / deploy (lms)',
     'Deploy and verify Marketing on Google', 'Deploy and verify Store on Google'];
   return [
     ...names.map(name => ({name,status:'completed',conclusion:deploy?'success':'skipped'})),
@@ -137,7 +137,7 @@ function setup({ green = true, current = sha, active = false, succeeded = false,
     calls.push({ path, method: init.method, body: init.body && JSON.parse(init.body) });
     if (path.endsWith('git/ref/heads/main')) return Response.json({ object: { sha: current } });
     if (path.endsWith('ci.yml/runs')) return Response.json({ workflow_runs: [{ ...completedCI, id: 1, status: 'completed' }] });
-    if (path.endsWith('/jobs')) return Response.json({ jobs: [{ name: 'CI Required Gate', status: 'completed', conclusion: green ? 'success' : 'failure' }] });
+    if (path.endsWith('/actions/runs/1/jobs')) return Response.json({ jobs: [{ name: 'CI Required Gate', status: 'completed', conclusion: green ? 'success' : 'failure' }] });
     if (path.endsWith('GOOGLE_RELEASE_HOLD')) {
       if (init.method === 'PATCH') return new Response(null, { status: 204 });
       return Response.json({ value: ++holdReads === 1 ? 'true' : readback });
@@ -275,4 +275,18 @@ test('completed green validation-only workflows do not count as deployed and acc
   };
   const result=await releaseApprovedWeb({sha,token:'scoped-test',releaseHold:'false',request});
   assert.deepEqual(result.workflows.map(x=>x.status),Array(4).fill('dispatched'));
+});
+
+test('LMS release deduplication requires the named reusable rollout and acceptance handoff jobs', async () => {
+  const { completedServiceReleaseVerified } = await import('./verified-service-release.mjs');
+  const run = { id: 42, status: 'completed', conclusion: 'success' };
+  const jobs = ['deploy / deploy (lms)', 'acceptance'].map(name => ({ name, status: 'completed', conclusion: 'success' }));
+  const verify = (rows, total_count = rows.length) => completedServiceReleaseVerified(run, 'deploy-google-lms-trigger.yml', async path => {
+    assert.equal(path, 'actions/runs/42/jobs?per_page=100');
+    return { jobs: rows, total_count };
+  });
+  assert.equal(await verify(jobs), true);
+  assert.equal(await verify([{ ...jobs[0], name: 'deploy' }, jobs[1]]), false);
+  assert.equal(await verify([jobs[0], { ...jobs[1], conclusion: 'skipped' }]), false);
+  assert.equal(await verify(jobs, 3), false);
 });

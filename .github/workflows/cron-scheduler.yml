@@ -171,6 +171,11 @@ jobs:
           curl -sf -X GET "$ADMIN_URL/api/cron/interoffice-mail" \
             -H "Authorization: Bearer $CRON_SECRET" --max-time 55 \
             || echo "::warning::interoffice-mail queue failed"
+      - name: Interoffice SMS queue
+        run: |
+          curl -sf -X GET "$ADMIN_URL/api/cron/interoffice-sms" \
+            -H "Authorization: Bearer $CRON_SECRET" --max-time 55 \
+            || echo "::warning::interoffice-sms queue failed"
 
       - name: Process provisioning jobs
         run: |

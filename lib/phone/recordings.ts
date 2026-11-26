@@ -61,7 +61,7 @@ export function parseByteRange(
  * play at all; without them the player sits at 0:00 on a real recording.
  */
 function audioResponse(
-  audio: Uint8Array,
+  audio: Uint8Array<ArrayBuffer>,
   contentType: string,
   range?: string | null,
 ): Response {

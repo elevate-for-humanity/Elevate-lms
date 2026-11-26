@@ -8,7 +8,7 @@ spec = importlib.util.spec_from_file_location('repair', Path(__file__).with_name
 m = importlib.util.module_from_spec(spec); spec.loader.exec_module(m)
 class SettingsTests(unittest.TestCase):
     def system(self):
-        return dict(status='active', ai_enabled=True, greeting='Welcome to Elevate.', ai_instructions='Ask one question at a time.')
+        return dict(status='active', ai_enabled=True, greeting='Welcome to Elevate.', ai_instructions='Ask one question at a time.', admin_extension='0')
     def test_authoritative_settings_and_extensions(self):
         result=m.settings(self.system(), [{'extension':'105'},{'extension':'0'},{'extension':'102'}])
         self.assertEqual(result['PARIS_GREETING'],'Welcome to Elevate.')
@@ -29,6 +29,21 @@ class SettingsTests(unittest.TestCase):
         for invalid in [[{**menu[1],'destination_id':'outside-workspace'}],[menu[1],menu[1]],[{**menu[1],'digit':0}],[{**menu[1],'label':'bad\nlabel'}]]:
             with self.assertRaises(ValueError):m.settings(self.system(),extensions,invalid)
         with self.assertRaises(ValueError):m.settings({**self.system(),'greeting':'x'*1200},extensions,menu)
+    def test_operator_extension_comes_from_admin_extension(self):
+        result=m.settings(self.system(), [{'extension':'105'},{'extension':'102'}])
+        self.assertEqual(result['PARIS_OPERATOR_EXTENSION'],'0')
+        system={**self.system(),'admin_extension':'100'}
+        extensions=[{'extension':'100','destination_id':'admin'},{'extension':'105','destination_id':'beauty'}]
+        menu=[{'digit':0,'label':'Administration','destination_id':'admin'},{'digit':5,'label':'Beauty Programs','destination_id':'beauty'}]
+        result=m.settings(system,extensions,menu)
+        self.assertEqual(result['PARIS_OPERATOR_EXTENSION'],'100')
+        self.assertEqual(result['PARIS_ALLOWED_EXTENSIONS'],'105')
+        self.assertEqual(json.loads(result['PARIS_MENU_OPTIONS']),[
+            {'digit':'0','label':'Administration','extension':'100'}, {'digit':'5','label':'Beauty Programs','extension':'105'}])
+        stale=[{'extension':'0','destination_id':'admin'},{'extension':'105','destination_id':'beauty'}]
+        with self.assertRaises(ValueError):m.settings(system,stale,menu)
+        for bad in ['00','1000','',None]:
+            with self.assertRaises(ValueError):m.settings({**self.system(),'admin_extension':bad},[{'extension':'105'}])
     def test_refuses_active_or_unknown_calls(self):
         for output in ['1 active call','unknown','']:
             with patch.object(m,'run',return_value=output),self.assertRaises(ValueError):m.require_idle()

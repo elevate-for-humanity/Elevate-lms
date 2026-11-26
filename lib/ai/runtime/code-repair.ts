@@ -19,7 +19,7 @@ import {infrastructureRepairPath,openInfrastructureRepair,infrastructureMergeEvi
 import {verifyProtectedParisMerge} from '@/lib/devstudio/openhands/paris-protected-merge.mjs';
 import {currentWorkflowGitHubToken} from '@/lib/devstudio/workflow-github-context';
 import {readRecentRepairEvents} from './repair-events';
-import {REPAIR_REPOSITORY,REPAIR_WORKFLOW,REPAIR_DEPLOYMENTS,eligibleRepairEvents,repairFingerprint,repairIncidentFingerprint,validationPassed,repairDeploymentState,canRetryRepair,canRetryHealthyProviderRepair,canRetryVerifiedGithubAppRepair,canResumeLegacyCpuEdit,canResumeContextBudgetRepair,canResumePlannerInspectionRepair,canResumeZeroWritePlannerRepair,nextRepairDeployment,unobservedRepairDeployment,courseDefectDisposition,canDispatchParisRepairAttempt,isParisAttemptConstraintMismatch,inFlightRepairTimedOut,repairRunsSettled,IN_FLIGHT_REPAIR_TIMEOUT_MINUTES} from './code-repair-policy.mjs';
+import {REPAIR_REPOSITORY,REPAIR_WORKFLOW,REPAIR_DEPLOYMENTS,eligibleRepairEvents,repairFingerprint,repairIncidentFingerprint,validationPassed,repairDeploymentState,canRetryRepair,canRetryHealthyProviderRepair,canRetryVerifiedGithubAppRepair,isGithubAppBranchFailure,canResumeLegacyCpuEdit,canResumeContextBudgetRepair,canResumePlannerInspectionRepair,canResumeZeroWritePlannerRepair,nextRepairDeployment,unobservedRepairDeployment,courseDefectDisposition,canDispatchParisRepairAttempt,isParisAttemptConstraintMismatch,inFlightRepairTimedOut,repairRunsSettled,IN_FLIGHT_REPAIR_TIMEOUT_MINUTES} from './code-repair-policy.mjs';
 // OpenHands has been removed: the owned internal engine is the only repair
 // engine. A historical OpenHands checkpoint is restaged on the owned engine
 // instead of waiting for the removed provider; no environment variable can
@@ -453,6 +453,7 @@ async function runParisCodeRepairTick({workflowOwnedDispatch=false}:{workflowOwn
  let ownedProviderReadiness: {verified:boolean;status?:string} | undefined;
  let recoveredAppThisTick=false;
  let githubAppRecoveryHealth: boolean | undefined;
+ let githubAppWriteHealth: boolean | undefined;
  const ownedTier=resolveOwnedModelConnection().tier;
  for(const repair of blocked.data??[]){
   // The observation may have updated this row since the blocked snapshot.
@@ -524,8 +525,10 @@ async function runParisCodeRepairTick({workflowOwnedDispatch=false}:{workflowOwn
    continue;
   }
   // Only a fresh, verified GitHub App identity may revive one historical
-  // source-free auth failure. Do not retry a source-linked job, exhausted
-  // attempt, or a repair that already has a release candidate.
+  // credential failure. Do not retry an exhausted attempt or a repair that
+  // already has a release candidate. The branch-creation class may be
+  // source-linked — the queue scan revalidates its source before a claim —
+  // but it revives only on proven Contents write authority, below.
   if(!recoveredAppThisTick && canRetryVerifiedGithubAppRepair(repair)){
    if(githubAppRecoveryHealth===undefined){
     const token=await getGitHubAppToken().catch(()=>null);
@@ -534,8 +537,15 @@ async function runParisCodeRepairTick({workflowOwnedDispatch=false}:{workflowOwn
     }).catch(()=>null):null;
     githubAppRecoveryHealth=Boolean(token && diagnostic?.repository?.ok &&
      diagnostic?.contents?.ok && diagnostic?.workflow?.ok);
+    // A branch-creation refusal is cured only by proven write authority:
+    // the read preflight above would requeue that class into the same 403.
+    // The diagnostic reports the freshly minted App token's own contents
+    // permission, so require it explicitly for that failure class.
+    githubAppWriteHealth=githubAppRecoveryHealth &&
+     diagnostic?.repository?.permissions?.contentsWrite===true;
    }
-   if(githubAppRecoveryHealth){
+   const branchFailure=isGithubAppBranchFailure(repair);
+   if(branchFailure?githubAppWriteHealth:githubAppRecoveryHealth){
     const updated=await db.from('paris_code_repairs').update({
      status:'queued',error_code:null,
      attempt_history:[...(repair.attempt_history??[]),{
@@ -544,6 +554,7 @@ async function runParisCodeRepairTick({workflowOwnedDispatch=false}:{workflowOwn
      }],
      verification:{...repair.verification,credentialRecoveryPreflight:{
       githubAppVerified:true,repositoryRead:true,workflowEnabled:true,
+      ...(branchFailure?{contentsWrite:true}:{}),
       checkedAt:new Date().toISOString()
      }},
      updated_at:new Date().toISOString(),

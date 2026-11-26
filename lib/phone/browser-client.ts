@@ -82,11 +82,22 @@ function ringtone() {
           oscillator.stop(context.currentTime + 1.5);
         }
       };
-      void context
-        .resume()
-        .then(ring)
-        .catch(() => undefined);
-      interval = setInterval(ring, 3500);
+      // A fresh context starts suspended until the page has had a user
+      // gesture. Retry the resume on every ring instead of no-oping in
+      // silence for the whole call when the first attempt does not take.
+      const attemptRing = () => {
+        if (!context) return;
+        if (context.state === 'running') {
+          ring();
+          return;
+        }
+        void context
+          .resume()
+          .then(ring)
+          .catch(() => undefined);
+      };
+      attemptRing();
+      interval = setInterval(attemptRing, 3500);
     },
   };
 }

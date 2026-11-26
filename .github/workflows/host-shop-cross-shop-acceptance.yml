@@ -122,6 +122,10 @@ jobs:
           pnpm exec playwright install chromium webkit --with-deps
       - name: Provision two disposable approved Host Shop identities and match requests
         id: provision
+        # This job is restricted to trusted main and the attested production LMS.
+        # The shared fixture refuses production unless explicitly opted in.
+        env:
+          QA_E2E_ALLOW_PRODUCTION_DISPOSABLES: '1'
         run: node scripts/qa/host-shop-cross-shop-acceptance.mjs provision
       - name: Certify authenticated roster and cross-shop API isolation
         id: browser
@@ -149,6 +153,8 @@ jobs:
         # with an import failure when pnpm install never ran. Cancellation can leave
         # partial fixtures too, so clean up every started provisioning outcome.
         if: ${{ always() && (steps.provision.outcome == 'success' || steps.provision.outcome == 'failure' || steps.provision.outcome == 'cancelled') }}
+        env:
+          QA_E2E_ALLOW_PRODUCTION_DISPOSABLES: '1'
         run: node scripts/qa/host-shop-cross-shop-acceptance.mjs cleanup
       # Playwright screenshots, videos, traces and error contexts can contain
       # authenticated browser state. Never upload the raw test-results directory.

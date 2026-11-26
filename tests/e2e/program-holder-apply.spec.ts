@@ -20,9 +20,12 @@ import { test, expect, type Page } from '@playwright/test';
  *   certification before submitting."
  * - Success shows "Application Received" and then redirects to
  *   /apply/success?type=program-holder.
- * - There is deliberately NO duplicate-application test here: the API
- *   has no duplicate guard — it inserts a new application_intake row per
- *   submission — so "already pending" can never appear.
+ * - The duplicate-application contract (409 + "already pending" for a
+ *   second submission of the same organization + email) is covered by the
+ *   "Application Flow" block in tests/e2e/program-holder.spec.ts, against
+ *   the guard added in this branch (see the
+ *   guard_pending_program_holder_applications migration). It is not
+ *   repeated here.
  */
 
 const FORM = 'form:has(input[name="orgName"])';

@@ -1,4 +1,4 @@
-import { appOrigin } from './helpers/app-origins';
+import { appOrigin, peerOrigin } from './helpers/app-origins';
 /**
  * Student login → dashboard → LMS smoke test.
  *
@@ -49,9 +49,13 @@ test.describe('Public routes', () => {
     expect(res?.status()).toBeLessThan(500);
   });
 
-  test('/onboarding/learner redirects unauthenticated users to /login', async ({ page }) => {
-    await page.goto(`${BASE}/onboarding/learner`, { waitUntil: 'domcontentloaded' });
-    await expect(page).toHaveURL(/\/login/);
+  test('Marketing learner onboarding redirects unauthenticated users to /login', async ({ page }) => {
+    // The onboarding route belongs to Marketing; the LMS app does not own it.
+    const marketing = peerOrigin('marketing');
+    const response = await page.goto(`${marketing}/onboarding/learner`, { waitUntil: 'domcontentloaded' });
+    expect(response, 'Marketing learner onboarding must respond').not.toBeNull();
+    await expect(page).toHaveURL(/\/login(?:[?#]|$)/);
+    expect(new URL(page.url()).origin).toBe(marketing);
   });
 });
 

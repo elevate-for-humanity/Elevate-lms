@@ -256,3 +256,18 @@ test('Host Shop failure artifact never uploads raw authenticated browser state',
  assert.doesNotMatch(upload,/test-results\/|playwright-report|\.zip|\.png|\.webm|trace/);
  assert.doesNotMatch(workflow,/name: Upload redacted Playwright failure evidence/);
 });
+
+
+test('Host Shop production fixture opt-in is limited to attested provision and teardown steps',()=>{
+ const workflow=readFileSync(new URL('../../.github/workflows/host-shop-cross-shop-acceptance.yml',import.meta.url),'utf8');
+ const provision=workflow.split('      - name: Provision two disposable approved Host Shop identities and match requests\n')[1]?.split('\n      - name:')[0];
+ const cleanup=workflow.split('      - name: Remove disposable match requests, shops, placements, and QA users\n')[1]?.split('\n      - name:')[0];
+ assert.ok(provision && cleanup);
+ const optIn=/^ {8}env:\n {10}QA_E2E_ALLOW_PRODUCTION_DISPOSABLES: '1'$/m;
+ assert.match(provision,optIn);
+ assert.match(cleanup,optIn);
+ assert.equal((workflow.match(/QA_E2E_ALLOW_PRODUCTION_DISPOSABLES:/g)||[]).length,2);
+ assert.ok(workflow.indexOf('Verify exact source-release and current-main production SHA before QA')<workflow.indexOf('id: provision'));
+ assert.match(workflow,/case "\$\{NEXT_PUBLIC_SUPABASE_URL\}" in\s*https:\/\/cuxzzpsyufcewtmicszk\.supabase\.co\) ;;/);
+ assert.match(workflow,/github\.ref == 'refs\/heads\/main'/);
+});

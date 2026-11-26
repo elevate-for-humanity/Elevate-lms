@@ -1,4 +1,5 @@
 import { test, expect, type Page } from '@playwright/test';
+import { peerOrigin } from './helpers/app-origins';
 
 /**
  * E2E Tests for Program Holder Portal (LMS app, :3002)
@@ -21,8 +22,11 @@ import { test, expect, type Page } from '@playwright/test';
  *   name="password" to apps/lms/app/login/page.tsx.
  * - The old "Application Flow" block tested /program-holder/apply, which
  *   does not exist in the LMS app. The real application lives on the
- *   marketing app at /apply/program-holder and is covered by
- *   tests/e2e/program-holder-apply.spec.ts instead.
+ *   marketing app at /apply/program-holder. Its field-level validation is
+ *   covered by tests/e2e/program-holder-apply.spec.ts; the API contract
+ *   (201 + { ok, applicationType }, 409 duplicate guard) is covered by
+ *   the "Application Flow" block below, which posts to the marketing
+ *   origin via peerOrigin('marketing').
  * - The old dashboard/navigation/report/settings assertions named labels
  *   that do not exist in the UI ("Active Students", "Manage Students",
  *   "Settings saved", ...). They are rewritten to the real labels here.
@@ -39,9 +43,67 @@ async function loginAsProgramHolder(page: Page) {
   await page.waitForURL(/.*dashboard/);
 }
 
+const applicationUrl = `${peerOrigin('marketing')}/apply/program-holder`;
+
+async function fillApplication(page: Page, email: string) {
+  await page.getByLabel('Legal Organization Name').fill('QA Training Center');
+  await page.getByLabel('Primary Contact').fill('QA Applicant');
+  await page.getByLabel('Email', { exact: false }).fill(email);
+  await page.getByLabel('Phone').fill('317-555-0100');
+  await page.getByLabel('Street Address').fill('123 Main St');
+  await page.getByLabel('City', { exact: true }).fill('Indianapolis');
+  await page.getByLabel('State', { exact: true }).fill('IN');
+  await page.getByLabel('ZIP').fill('46204');
+  await page.locator('select[name="requestedProgram"]').selectOption({ index: 1 });
+  await page.getByRole('checkbox', { name: 'Healthcare Training' }).check();
+  await page.getByRole('checkbox', { name: /I certify that I am authorized/ }).check();
+}
+
 test.describe('Program Holder Portal', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/');
+  });
+
+  test.describe('Application Flow', () => {
+    test('should submit program holder application', async ({ page }) => {
+      await page.goto(applicationUrl);
+      await fillApplication(page, `ph-qa-${Date.now()}@example.com`);
+
+      const receipt = page.waitForResponse((response) =>
+        new URL(response.url()).pathname === '/api/program-holder/apply' &&
+        response.request().method() === 'POST',
+      );
+      await page.getByRole('button', { name: 'Submit Program Holder Application' }).click();
+      const response = await receipt;
+      expect(response.status()).toBe(201);
+      expect(await response.json()).toMatchObject({ ok: true, applicationType: 'program_holder' });
+      await expect(page).toHaveURL(/\/apply\/success\?(?=.*\bref=)(?=.*\btype=program-holder)/);
+    });
+
+    test('should validate required fields', async ({ page }) => {
+      await page.goto(applicationUrl);
+      await page.getByRole('button', { name: 'Submit Program Holder Application' }).click();
+      await expect(page.locator('input[name="orgName"]:invalid')).toBeFocused();
+    });
+
+    test('should prevent duplicate applications', async ({ page }) => {
+      const email = `duplicate-${Date.now()}@qa.invalid`;
+
+      await page.goto(applicationUrl);
+      await fillApplication(page, email);
+      await page.getByRole('button', { name: 'Submit Program Holder Application' }).click();
+      await expect(page).toHaveURL(/\/apply\/success\?/);
+
+      await page.goto(applicationUrl);
+      await fillApplication(page, email);
+      const duplicate = page.waitForResponse((response) =>
+        new URL(response.url()).pathname === '/api/program-holder/apply' &&
+        response.request().method() === 'POST',
+      );
+      await page.getByRole('button', { name: 'Submit Program Holder Application' }).click();
+      expect((await duplicate).status()).toBe(409);
+      await expect(page.getByText(/already pending/i)).toBeVisible();
+    });
   });
 
   test.describe('Authentication', () => {

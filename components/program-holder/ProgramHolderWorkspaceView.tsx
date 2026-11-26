@@ -85,7 +85,8 @@ export async function ProgramHolderWorkspaceView({
   studentStatus?: string;
   reportEnrollmentId?: string;
 }) {
-  const data = workspace || (await getProgramHolderWorkspace());
+  const data =
+    workspace || (await getProgramHolderWorkspace({ includeOnlineStudy: section === 'hours' }));
   const coordinatorRole =
     data.mode === 'holder'
       ? String(

@@ -113,8 +113,10 @@ const projects: Project[] = apps.flatMap((app) =>
 
 // Specs that also call a peer app's local origin (cross-app redirects/APIs).
 const PEER_APPS: Record<string, E2EApp[]> = {
+  'complete-platform.spec.ts': ['lms'],
   'program-e2e-flows.spec.ts': ['lms'],
   'portal-responsive-design.spec.ts': ['admin', 'marketing'],
+  'program-holder.spec.ts': ['marketing'],
   'registered-apprenticeship-authenticated.spec.ts': ['admin'],
 };
 
@@ -174,6 +176,9 @@ const DEV_SERVER_HEAP_MB: Record<E2EApp, number> = {
 const webServer: PlaywrightTestConfig['webServer'] = apps
   .filter((app) => usesLocalDevServer(app) && requested.has(app))
   .map((app) => ({
+    // Prefix Next.js stderr with the app name so RSC aborts and ECONNRESET
+    // are attributable to Marketing, Admin, or LMS instead of [WebServer].
+    name: `next-${app}`,
     // Run the workspace's own dev script (and predev asset sync) on its port.
     command: `pnpm --filter ${E2E_APPS[app].workspace} dev --port ${E2E_APPS[app].port}`,
     url: `${appOrigin(app)}${E2E_APPS[app].readyPath}`,

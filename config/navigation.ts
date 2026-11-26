@@ -24,7 +24,7 @@ export const headerNav: NavSection[] = [
       { label: 'Testing Center', href: '/testing' },
       { label: 'Choose an Exam', href: '/testing' },
       { label: 'Certiport', href: '/testing/certiport' },
-      { label: 'WorkKeys', href: '/testing/workkeys' },
+      { label: 'WorkKeys', href: '/testing#workkeys' },
       { label: 'Policies', href: '/testing/policies' },
     ],
   },

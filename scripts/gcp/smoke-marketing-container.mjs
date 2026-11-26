@@ -11,20 +11,33 @@ assert.match(sha ?? '', /^[a-f0-9]{40}$/);
 const component = process.env.COMPONENT || 'marketing';
 assert.ok(['marketing','store'].includes(component));
 const image = `elevate-${component}:${sha}`;
-const name = `${component}-smoke-${process.env.GITHUB_RUN_ID || process.pid}`;
-const docker = args => execFileSync('docker', args, { encoding: 'utf8', timeout: 30000, stdio: ['ignore', 'pipe', 'pipe'] }).trim();
-let started = false;
+const name = `${component}-smoke-${process.env.GITHUB_RUN_ID || process.pid}-${process.env.GITHUB_RUN_ATTEMPT || 1}`;
+const probe = `${name}-probe`;
+const containers = [];
 let phase = 'image-content-check';
 let lastStartupObservation = 'not_checked';
 const phaseStart = Date.now();
 const reportPhase = label => {
   phase = label;
-  console.log(`Marketing smoke phase=${label} elapsed_ms=${Date.now()-phaseStart}`);
+  console.log(`[${component} smoke] phase=${label} elapsed_ms=${Date.now() - phaseStart}`);
 };
+function docker(operation, args, timeout = 30000) {
+  try {
+    return execFileSync('docker', args, {
+      encoding: 'utf8', timeout, killSignal: 'SIGKILL', stdio: ['ignore', 'pipe', 'pipe'],
+    }).trim();
+  } catch (error) {
+    const reason = error.code === 'ETIMEDOUT'
+      ? `timed out after ${timeout / 1000} seconds`
+      : error.code || error.signal || `exited with status ${error.status}`;
+    throw new Error(`Docker ${operation} ${reason}`, { cause: error });
+  }
+}
 try {
   // Resolve dependencies and assets inside the final image, as its runtime user.
   reportPhase('image-content-check');
-  docker(['run', '--rm', '--entrypoint=node', image, '-e', `
+  containers.push(probe);
+  docker('packaged-file probe', ['run', '--rm', '--name', probe, '--entrypoint=node', image, '-e', `
     const fs=require('fs');
     for(const file of ['/app/apps/marketing/server.js','/app/apps/marketing/.next/BUILD_ID','/app/apps/marketing/public/version.json','/app/apps/marketing/public/data/hero-banners.json']) {
       if(!fs.statSync(file).size) throw new Error('Missing runtime file: '+file);
@@ -32,23 +45,25 @@ try {
     for(const pkg of ['next','react','react-dom','styled-jsx/style']) require.resolve(pkg,{paths:['/app/apps/marketing']});
     const version=JSON.parse(fs.readFileSync('/app/apps/marketing/public/version.json','utf8'));
     if(version.commit!==process.env.GIT_SHA) throw new Error('Packaged version mismatch');
-  `]);
+  `], 60000);
+  containers.pop();
   reportPhase('start-local-container');
-  docker(['run', '-d', '--name', name, '-p', '127.0.0.1::3000',
+  containers.push(name);
+  docker('server container start', ['run', '-d', '--name', name, '-p', '127.0.0.1::3000',
     '--env', 'PORT=3000', '--env', 'HOSTNAME=0.0.0.0',
     '--env', `K_SERVICE=elevate-${component}-migration`,
     '--env', `STORE_ONLY_RUNTIME=${component === 'store'}`,
-    '--env', 'NEXT_PUBLIC_SUPABASE_URL', '--env', 'NEXT_PUBLIC_SUPABASE_ANON_KEY', image]);
-  started = true;
-  const port = docker(['port', name, '3000/tcp']).split(':').at(-1);
+    '--env', 'NEXT_PUBLIC_SUPABASE_URL', '--env', 'NEXT_PUBLIC_SUPABASE_ANON_KEY', image], 60000);
+  const port = docker('published port lookup', ['port', name, '3000/tcp']).split(':').at(-1);
   assert.match(port, /^\d+$/);
   const root = `http://127.0.0.1:${port}`;
+  const startedAt = Date.now();
   const deadline = Date.now() + 120000;
   reportPhase('local-ping-startup');
   let startupAttempts = 0;
   let ready = false;
   while (Date.now() < deadline) {
-    assert.equal(docker(['inspect', '--format={{.State.Running}}', name]), 'true', 'Container exited during startup');
+    assert.equal(docker('container state inspection', ['inspect', '--format={{.State.Running}}', name]), 'true', 'Container exited during startup');
     startupAttempts++;
     try {
       const {status,body} = await fetchSmoke(root + '/api/ping', {redirect:'manual'}, 5000);
@@ -60,23 +75,36 @@ try {
         ? 'post_header_response_error' : 'connection_or_pre_header_timeout';
     }
     if (startupAttempts === 1 || startupAttempts % 5 === 0) {
-      console.log(`Marketing smoke startup attempts=${startupAttempts} result=${lastStartupObservation} elapsed_ms=${Date.now()-phaseStart}`);
+      console.log(`[${component} smoke] startup attempts=${startupAttempts} result=${lastStartupObservation}`);
     }
     await new Promise(resolve => setTimeout(resolve, 2000));
   }
   assert.ok(ready, `Packaged server did not start within 120 seconds; last=${lastStartupObservation}`);
+  console.log(`[${component} smoke] server answered liveness in ${Date.now() - startedAt}ms`);
+
+  async function probeHttp(path, { host, timeoutMs = 10000, responseType = 'json' } = {}) {
+    const target = `${host || 'local'}${path}`;
+    const started = Date.now();
+    const options = { redirect: 'manual', ...(host ? { headers: { host } } : {}) };
+    console.log(`[${component} smoke] GET ${target} (deadline ${timeoutMs}ms)`);
+    try {
+      const response = await smokeProbe(root + path, options, timeoutMs, responseType, {
+        report: ({ attempt }) => console.log(`[${component} smoke] GET ${target} attempt=${attempt}/3`),
+      });
+      console.log(`[${component} smoke] GET ${target} returned ${response.status} in ${Date.now() - started}ms`);
+      return response;
+    } catch (error) {
+      throw new Error(`GET ${target}: ${error.message}`, { cause: error });
+    }
+  }
+
   reportPhase('multi-host-health-probes');
-  // Diagnose and bound intermittent localhost response stalls on a freshly
-  // unpacked image. Contract mismatches, non-200 HTTP and wrong SHA still fail.
-  const probe = (url, options={}, timeoutMs=10000, type='json') =>
-    smokeProbe(url, options, timeoutMs, type, {
-      report: ({path, host, attempt}) => console.log(
-        `Marketing smoke: ${component} ${path} host=${host} attempt=${attempt}/3`,
-      ),
-    });
-  for (const host of ['169.254.1.1:3000', '10.0.0.2:3000', 'customer.example', 'acme.app.elevateforhumanity.org']) {
+  const hosts = ['169.254.1.1:3000', '10.0.0.2:3000', 'customer.example', 'acme.app.elevateforhumanity.org'];
+  for (const host of hosts) {
     for (const path of ['/api/ping', '/api/ready', '/api/health']) {
-      const {status,body} = await probe(root + path, {headers:{host},redirect:'manual'}, 10000);
+      // The first request can load the packaged route from a cold image layer.
+      const timeoutMs = host === hosts[0] ? 20000 : 10000;
+      const {status,body} = await probeHttp(path, {host, timeoutMs});
       if (path === '/api/health') assert.ok([200,503].includes(status), 'Dependency health must return its real status');
       else assert.equal(status, 200, `${host}${path} must reach the service endpoint`);
       assert.equal(body.service, component);
@@ -85,19 +113,19 @@ try {
     }
   }
   reportPhase('version-and-packaged-assets');
-  const runtimeVersion = await probe(root + '/api/version', {}, 10000);
+  const runtimeVersion = await probeHttp('/api/version');
   assert.equal(runtimeVersion.status, 200);
   const identity = runtimeVersion.body;
   assert.equal(identity.service, component);
   assert.equal(identity.commitSha, sha);
-  const version = await probe(root + '/version.json', {}, 10000);
+  const version = await probeHttp('/version.json');
   assert.equal(version.status, 200);
   const packagedVersion = version.body;
   assert.equal(packagedVersion.commit, sha);
   assert.equal(packagedVersion.service, component);
   if (component === 'marketing') {
     reportPhase('homepage-render');
-    const home = await probe(root + '/', {}, 20000, 'text');
+    const home = await probeHttp('/', {timeoutMs: 20000, responseType: 'text'});
     assert.equal(home.status, 200, 'Packaged homepage must render');
     const { assertHomepageHostShopContract } = await import('./homepage-content.mjs');
     assertHomepageHostShopContract(home.body);
@@ -106,7 +134,7 @@ try {
     // Exercise the packaged pages: source-level rendering tests cannot detect a
     // Store image that accidentally prerendered the shared Marketing chrome.
     for (const path of ['/store', '/login', '/privacy', '/terms-of-service', '/security-and-data-protection']) {
-      const {status,body:html} = await probe(root + path, {headers:{host:'store.elevateforhumanity.org'},redirect:'manual'}, 20000, 'text');
+      const {status,body:html} = await probeHttp(path, {host: 'store.elevateforhumanity.org', timeoutMs: 20000, responseType: 'text'});
       assert.equal(status, 200, `Store page ${path} must be served locally`);
       assertStorePageChrome(html, path);
     }
@@ -114,15 +142,30 @@ try {
   console.log('Final Marketing image dependencies, assets, startup and internal-host health routing verified.');
 } catch (error) {
   // Do not export raw application logs or runtime environment values from CI.
-  console.error(`Marketing smoke failure phase=${phase} elapsed_ms=${Date.now()-phaseStart} startup_last=${lastStartupObservation}`);
+  console.error(`[${component} smoke] failure phase=${phase} elapsed_ms=${Date.now() - phaseStart} startup_last=${lastStartupObservation}`);
   console.error('Marketing container smoke test failed:', error.message);
-  if (started) {
-    console.error('Container state:', docker(['inspect', '--format={{.State.Status}} exit={{.State.ExitCode}} oom={{.State.OOMKilled}}', name]));
-    try {
-      console.error('Container resource snapshot:', docker(['stats', '--no-stream', '--format', 'cpu={{.CPUPerc}} memory={{.MemUsage}}', name]));
-    } catch { console.error('Container resource snapshot unavailable'); }
-  }
   process.exitCode = 1;
+  if (containers.includes(name)) {
+    try {
+      console.error('Container state:', docker('container state inspection', ['inspect', '--format={{.State.Status}} exit={{.State.ExitCode}} oom={{.State.OOMKilled}}', name], 5000));
+    } catch (inspectionError) {
+      console.error(inspectionError.message);
+    }
+    try {
+      console.error('Container resource snapshot:', docker('container resource snapshot', ['stats', '--no-stream', '--format', 'cpu={{.CPUPerc}} memory={{.MemUsage}}', name], 5000));
+    } catch (inspectionError) {
+      console.error(inspectionError.message);
+    }
+  }
 } finally {
-  if (started) { try { docker(['rm', '-f', name]); } catch { console.error('Smoke container cleanup failed'); process.exitCode = 1; } }
+  for (const container of containers.reverse()) {
+    try {
+      docker('container cleanup', ['rm', '-f', container], 10000);
+    } catch (error) {
+      if (!/No such container/i.test(error.cause?.stderr ?? '')) {
+        console.error(error.message);
+        process.exitCode = 1;
+      }
+    }
+  }
 }

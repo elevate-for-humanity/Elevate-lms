@@ -22,6 +22,20 @@ test('fails closed after three transport stalls',async()=>{
  }}),/attempt 3\/3: local_transport_timeout/);
  assert.equal(calls,3);
 });
+test('retries a path-specific timeout before response headers', async () => {
+  let calls = 0;
+  const actualFetch = async () => {
+    calls++;
+    if (calls === 1) return new Promise(() => {});
+    return new Response('{"ready":true}');
+  };
+  const result = await smokeProbe(url, {}, 20, 'json', {
+    request: (u, options, timeout, type) => fetchSmoke(u, options, timeout, type, actualFetch),
+    pause: sleep,
+  });
+  assert.equal(calls, 2);
+  assert.deepEqual(result, { status: 200, body: { ready: true } });
+});
 test('does not retry application HTTP failures or invalid response bodies',async()=>{
  let calls=0;
  const status=await smokeProbe(url,{},10000,'json',{pause:sleep,request:async()=>{calls++;return {status:503,body:{ready:false}};}});

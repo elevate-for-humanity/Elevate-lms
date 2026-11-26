@@ -11,8 +11,7 @@ import { verifiedTrainingForEnrollment } from './verified-hours';
 import { hasActiveProgramEnrollment, learnerProgramKey } from './enrollment-identity';
 import { holderCredentialStatus, holderTrainingRecord } from './student-training';
 import { studentContactProjection } from './contact-privacy';
-import { isLearnerRosterProfile } from './roster-eligibility';
-import { LEARNER_ROSTER_ROLES } from './roster-eligibility';
+import { isIsolatedQaProgramHolderRosterContext, isLearnerRosterProfile } from './roster-eligibility';
 import { requireProgramHolder } from '@/lib/auth/require-program-holder';
 import { calculateDistanceMiles, geocodeAddress, isGeocodingResult } from '@/lib/geo/geocode';
 
@@ -95,7 +94,9 @@ function getGaryRegionalCityCenter(city: unknown): RegionalLocation | null {
 }
 
 /** Canonical, holder-scoped data contract shared by every Program Holder page. */
-export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspace> {
+export async function getProgramHolderWorkspace({
+  includeOnlineStudy = false,
+}: { includeOnlineStudy?: boolean } = {}): Promise<ProgramHolderWorkspace> {
   const ctx = await requireProgramHolder();
   if (ctx.mode === 'holder') {
     const holderId = ctx.holderId;
@@ -515,27 +516,15 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
         : {}),
       ...holderCredentialStatus(row, credentialUploads ?? []),
     });
+  const includeIsolatedQaFixtures = isIsolatedQaProgramHolderRosterContext({
+    supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL,
+    testMode: process.env.TEST_MODE,
+  });
   const eligibleRosterUserIds = new Set(
-    (rosterProfiles ?? []).filter(isLearnerRosterProfile).map((row: any) => row.id),
+    (rosterProfiles ?? [])
+      .filter((row: any) => isLearnerRosterProfile(row, { includeIsolatedQaFixtures }))
+      .map((row: any) => row.id),
   );
-  // The production-roster safeguard above keeps test-marked profiles out of
-  // real holders' rosters. A QA fixture holder exists only to exercise this
-  // portal with its own fixture students, so when the viewing holder is
-  // itself a QA fixture, its own learner-role fixture profiles are eligible.
-  // Real holders (features.qa_e2e is not true) are unaffected.
-  if ((holderRes.data?.features as any)?.qa_e2e === true) {
-    for (const row of rosterProfiles ?? []) {
-      if (
-        typeof row?.id === 'string' &&
-        row.id &&
-        (LEARNER_ROSTER_ROLES as readonly string[]).includes(
-          String(row.role || '').toLowerCase(),
-        )
-      ) {
-        eligibleRosterUserIds.add(row.id);
-      }
-    }
-  }
   const nameByUserId = new Map<string, string>(
     (rosterProfiles ?? [])
       .filter((row: any) => typeof row.full_name === 'string' && row.full_name.trim())
@@ -556,7 +545,9 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
         training_start_date: row.training_start_date || verified.firstDate || null,
       };
     });
-  const onlineStudySessions = await loadHolderOnlineStudy(db, enrolledRoster);
+  const onlineStudySessions = includeOnlineStudy
+    ? await loadHolderOnlineStudy(db, enrolledRoster)
+    : [];
   const upcomingRoster = (upcomingRes.data ?? []).filter(
     (row: any) => !row.user_id || eligibleRosterUserIds.has(row.user_id),
   );

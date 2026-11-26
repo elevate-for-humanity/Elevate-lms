@@ -11,7 +11,6 @@ const CRITICAL_PUBLIC_ROUTES = [
   '/for-employers',
   '/partners',
   '/testing',
-  '/testing/workkeys',
   '/pricing',
   '/apply',
   '/apply/student',
@@ -174,40 +173,67 @@ async function collectInternalLinks(page: Page, selector: string): Promise<strin
   return [...new Set(hrefs.filter(isInternalHref))].sort();
 }
 
-async function assertNoRuntimeFailure(page: Page, route: string) {
+async function assertNoRuntimeFailure(page: Page, route: string, expectedPath?: string) {
   const pageErrors: string[] = [];
   const consoleErrors: string[] = [];
+  const failedResponses: string[] = [];
 
+  // Capture the failing resource URL instead of reporting an untraceable 503.
+  // Only store same-origin request paths; never log credential-bearing queries.
+  page.on('response', (response) => {
+    if (response.status() < 500) return;
+    try {
+      const url = new URL(response.url());
+      if (url.origin === new URL(page.url()).origin) {
+        failedResponses.push(`${response.status()} ${url.pathname}`);
+      }
+    } catch { /* Browser errors remain available below. */ }
+  });
   page.on('pageerror', (error) => pageErrors.push(error.message));
   page.on('console', (message) => {
     if (message.type() === 'error') consoleErrors.push(message.text());
   });
 
-  const response = await page.goto(route, { waitUntil: 'domcontentloaded' });
+  // The legacy WorkKeys route redirects to a URL with a fragment. When the
+  // browser is already on that exact URL, Playwright's same-document goto can
+  // return null despite the page being loaded. Check the actual canonical HTTP
+  // response without dropping any visible content, console or runtime assertions.
+  // All other navigations still require a non-null browser response.
+  // A newly created Playwright page is about:blank, not an HTTP URL base.
+  // Resolve same-document fragment navigation only after a real page loads.
+  const currentUrl = page.url();
+  const target = /^https?:\/\//.test(currentUrl) ? new URL(route, currentUrl) : null;
+  const sameHashDocument = Boolean(target?.hash && target.href === currentUrl);
+  const response = sameHashDocument
+    ? await page.request.get(currentUrl, { maxRedirects: 10, timeout: 30_000 })
+    : await page.goto(route, { waitUntil: 'domcontentloaded' });
   expect(response, `${route} did not return a response`).not.toBeNull();
   expect(response!.status(), `${route} returned ${response!.status()}`).toBeLessThan(400);
 
-  const documentBody = page.locator('body');
-  await expect
-    .poll(async () => (await documentBody.innerText()).trim().length, {
-      message: `${route} rendered an empty body`,
-      timeout: 15_000,
-    })
-    .toBeGreaterThan(80);
-
-  await page.waitForLoadState('networkidle').catch(() => undefined);
+  if (expectedPath) {
+    await expect(page).toHaveURL((url) => url.pathname === expectedPath);
+  }
 
   // innerText excludes embedded scripts. The application shell intentionally
   // contains chunk-recovery source code whose text includes "ChunkLoadError";
   // that source is not a rendered failure and must not trip the visible-page check.
-  const body = await documentBody.innerText();
+  const visibleBody = page.locator('body');
+  await expect.poll(async () => (await visibleBody.innerText()).trim().length, {
+    message: `${route} rendered an empty body`,
+    timeout: 15_000,
+  }).toBeGreaterThan(80);
+  const body = await visibleBody.innerText();
   for (const placeholder of FORBIDDEN_PLACEHOLDERS) {
     expect(body, `${route} contains forbidden placeholder: ${placeholder}`).not.toContain(placeholder);
   }
-  expect(body.trim().length, `${route} rendered an empty body`).toBeGreaterThan(80);
   expect(body, `${route} rendered an application exception`).not.toMatch(
     /Application error|client-side exception|server-side exception|ChunkLoadError|no healthy upstream/i,
   );
+
+  expect(
+    failedResponses,
+    `${route} had failed same-origin resources: ${failedResponses.join(' | ')}`,
+  ).toEqual([]);
 
   expect(pageErrors, `${route} emitted page errors: ${pageErrors.join(' | ')}`).toEqual([]);
 
@@ -216,13 +242,12 @@ async function assertNoRuntimeFailure(page: Page, route: string) {
   );
   expect(
     actionableConsoleErrors,
-    `${route} emitted console errors: ${actionableConsoleErrors.join(' | ')}`,
+    `${route} emitted console errors: ${actionableConsoleErrors.join(' | ')}. HTTP failures: ${failedResponses.join(' | ')}`,
   ).toEqual([]);
 }
 
-test.describe.configure({ mode: 'serial' });
-
 test.describe('page-by-page public production audit', () => {
+
   // The link checks run FIRST, while the dev server's heap is still low (only
   // `/` compiled). The 25 page renders below each compile a route on demand
   // and retain it, pushing the heap toward Next's 80%-of-limit dev restart
@@ -247,9 +272,10 @@ test.describe('page-by-page public production audit', () => {
     await assertAllLinksResolve(request, links, 'program route');
   });
 
+  const destinationByAlias = new Map([['/for-students', '/programs'], ['/for-employers', '/employers']]);
   for (const route of [...CRITICAL_PUBLIC_ROUTES, ...CRITICAL_PROGRAM_ROUTES]) {
     test(`${route} renders without runtime failure`, async ({ page }) => {
-      await assertNoRuntimeFailure(page, route);
+      await assertNoRuntimeFailure(page, route, destinationByAlias.get(route));
     });
   }
 });
@@ -270,7 +296,7 @@ test.describe('responsive navigation acceptance', () => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto('/', { waitUntil: 'domcontentloaded' });
 
-    const menuButton = page.getByRole('button', { name: /open menu|menu/i }).first();
+    const menuButton = page.getByRole('button', { name: 'Open menu', exact: true });
     await expect(menuButton).toBeVisible();
     await menuButton.click();
 
@@ -285,17 +311,27 @@ test.describe('responsive navigation acceptance', () => {
 });
 
 test.describe('application entry audit', () => {
-  for (const route of ['/apply', '/apply/student', '/programs/barber-apprenticeship/apply']) {
-    test(`${route} exposes an actionable application experience`, async ({ page }) => {
-      await assertNoRuntimeFailure(page, route);
-      const control = page.locator('form, input, select, textarea, button[type="submit"]').first();
-      await expect(control, `${route} has no actionable application control`).toBeVisible();
-    });
-  }
+  test('application chooser hands off to the student intake', async ({ page }) => {
+    await assertNoRuntimeFailure(page, '/apply');
+    await page.getByRole('link', { name: /^Intake Application/ }).click();
+    await expect(page).toHaveURL(/\/apply\/student\/interview/);
+    await expect(page.getByPlaceholder(/Type your answer|Escriba su respuesta/i)).toBeVisible();
+  });
 
-  test('student application has a submission control', async ({ page }) => {
-    await page.goto('/apply/student', { waitUntil: 'domcontentloaded' });
-    await expect(page.getByRole('button', { name: /submit application/i })).toBeVisible();
+  test('Barber enrollment retains the selected program and paid enrollment intent', async ({ page }) => {
+    await assertNoRuntimeFailure(page, '/programs/barber-apprenticeship/apply');
+    const enrollment = page.getByRole('link', { name: 'Start Enrollment' });
+    await expect(enrollment).toHaveAttribute('href',
+      '/apply/student/interview?program=barber-apprenticeship&intent=enrollment');
+    await enrollment.click();
+    await expect(page).toHaveURL(/\/apply\/student\/interview\?program=barber-apprenticeship&intent=enrollment/);
+  });
+
+  test('student application exposes the standard intake form', async ({ page }) => {
+    await assertNoRuntimeFailure(page, '/apply/student');
+    await page.getByRole('link', { name: 'Use standard form instead' }).click();
+    await expect(page).toHaveURL(/\/apply\/student\/form/);
+    await expect(page.getByRole('button', { name: 'Continue', exact: true })).toBeVisible();
   });
 
   test('application status page accepts tracking information', async ({ page }) => {
@@ -314,9 +350,22 @@ test.describe('pricing and testing integrity', () => {
     expect(body).not.toMatch(/0 programs available/i);
   });
 
-  test('WorkKeys page shows non-zero prices and purchase controls', async ({ page }) => {
-    await assertNoRuntimeFailure(page, '/testing/workkeys');
-    await expect(page.getByText(/\$104|\$168/).first()).toBeVisible({ timeout: 10_000 });
-    await expect(page.getByRole('button', { name: /add to cart/i }).first()).toBeVisible();
+  test('legacy WorkKeys URL redirects to canonical priced provider and retains purchase controls', async ({ page }) => {
+    // The legacy provider route is a permanent redirect, not its own content page.
+    const response = await page.goto('/testing/workkeys', { waitUntil: 'domcontentloaded' });
+    expect(response, 'WorkKeys legacy route did not respond').not.toBeNull();
+    await expect(page).toHaveURL(new RegExp('/testing#workkeys$'));
+    await assertNoRuntimeFailure(page, '/testing#workkeys');
+
+    const workkeys = page.locator('article#workkeys');
+    await expect(workkeys.getByRole('heading', { name: /ACT WorkKeys/i })).toBeVisible();
+    // Verify approved pricing and actions without hardcoding outdated amounts.
+    const bookLinks = workkeys.getByRole('link', { name: /Book —/ });
+    await expect(bookLinks.first()).toBeVisible();
+    const amountText = await bookLinks.first().innerText();
+    const amount = amountText.match(new RegExp('[$]([0-9]+(?:[.][0-9]{2})?)'))?.[1];
+    expect(Number(amount), 'WorkKeys must expose a positive approved exam price').toBeGreaterThan(0);
+    await expect(workkeys.getByRole('button', { name: /add to cart/i }).first()).toBeVisible();
+    await expect(bookLinks.first()).toHaveAttribute('href', /provider=workkeys.*exam=/);
   });
 });

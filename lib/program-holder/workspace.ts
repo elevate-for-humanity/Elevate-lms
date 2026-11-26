@@ -11,7 +11,8 @@ import { verifiedTrainingForEnrollment } from './verified-hours';
 import { hasActiveProgramEnrollment, learnerProgramKey } from './enrollment-identity';
 import { holderCredentialStatus, holderTrainingRecord } from './student-training';
 import { studentContactProjection } from './contact-privacy';
-import { isLearnerRosterProfile, isQaFixtureRosterProfile } from './roster-eligibility';
+import { isLearnerRosterProfile } from './roster-eligibility';
+import { LEARNER_ROSTER_ROLES } from './roster-eligibility';
 import { requireProgramHolder } from '@/lib/auth/require-program-holder';
 import { calculateDistanceMiles, geocodeAddress, isGeocodingResult } from '@/lib/geo/geocode';
 
@@ -166,15 +167,6 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
   const applicantNotesColumns = contactProjection.notes;
   const programWideStudentAccess = holderRes.data?.features?.program_wide_student_access === true;
   const recruitingEnabled = hasRecruitingAssignment(holderRes.data?.features);
-  // A QA fixture holder's own roster is the one place QA-marked profiles
-  // belong: the isolated-QA provisioner creates the holder and its student
-  // together, and the E2E report tests certify that roster. Real holders
-  // keep the production exclusion, so a disposable QA identity can never
-  // leak into a live roster.
-  const isQaFixtureHolder = holderRes.data?.features?.qa_e2e === true;
-  const rosterProfileEligible = isQaFixtureHolder
-    ? isQaFixtureRosterProfile
-    : isLearnerRosterProfile;
   const allApplicantAccess = holderRes.data?.features?.all_applicant_access === true;
   const regionalAssignment =
     holderRes.data?.features?.regional_assignment &&
@@ -524,8 +516,26 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
       ...holderCredentialStatus(row, credentialUploads ?? []),
     });
   const eligibleRosterUserIds = new Set(
-    (rosterProfiles ?? []).filter(rosterProfileEligible).map((row: any) => row.id),
+    (rosterProfiles ?? []).filter(isLearnerRosterProfile).map((row: any) => row.id),
   );
+  // The production-roster safeguard above keeps test-marked profiles out of
+  // real holders' rosters. A QA fixture holder exists only to exercise this
+  // portal with its own fixture students, so when the viewing holder is
+  // itself a QA fixture, its own learner-role fixture profiles are eligible.
+  // Real holders (features.qa_e2e is not true) are unaffected.
+  if ((holderRes.data?.features as any)?.qa_e2e === true) {
+    for (const row of rosterProfiles ?? []) {
+      if (
+        typeof row?.id === 'string' &&
+        row.id &&
+        (LEARNER_ROSTER_ROLES as readonly string[]).includes(
+          String(row.role || '').toLowerCase(),
+        )
+      ) {
+        eligibleRosterUserIds.add(row.id);
+      }
+    }
+  }
   const nameByUserId = new Map<string, string>(
     (rosterProfiles ?? [])
       .filter((row: any) => typeof row.full_name === 'string' && row.full_name.trim())

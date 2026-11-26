@@ -102,6 +102,23 @@ export async function verifyExactPrBrowserEvidence({
   throw Error(timeoutMs === 0 ? 'E2E_EXACT_HEAD_PENDING' : 'E2E_EXACT_HEAD_TIMEOUT');
 }
 
+/** The gate job must judge the browser run's completed state, not a snapshot
+ * taken before that run finishes: the verifier's polling loop is given a
+ * bounded budget here, at the CLI entrypoint. The library default stays
+ * single-shot (timeoutMs 0) so other callers — notably the completion
+ * finalizer, which may only act on already-completed evidence — never wait.
+ * The budget is capped so it expires before the gate job's workflow timeout. */
+export const DEFAULT_EVIDENCE_TIMEOUT_MS = 3_300_000;
+export const MAX_EVIDENCE_TIMEOUT_MS = 3_600_000;
+export function evidenceTimeoutFromEnv(env = process.env) {
+  const raw = env.E2E_EVIDENCE_TIMEOUT_MS;
+  if (raw === undefined || raw === '') return DEFAULT_EVIDENCE_TIMEOUT_MS;
+  if (!/^\d+$/.test(raw)) throw Error('E2E_EVIDENCE_TIMEOUT_INVALID');
+  const value = Number(raw);
+  if (!Number.isSafeInteger(value)) throw Error('E2E_EVIDENCE_TIMEOUT_INVALID');
+  return Math.min(value, MAX_EVIDENCE_TIMEOUT_MS);
+}
+
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   try {
     if (process.env.GITHUB_EVENT_NAME !== 'pull_request') throw Error('E2E_PR_EVENT_REQUIRED');
@@ -109,6 +126,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
     const evidence = await verifyExactPrBrowserEvidence({
       repository: process.env.GITHUB_REPOSITORY,
       event,
+      timeoutMs: evidenceTimeoutFromEnv(),
       token: process.env.GITHUB_TOKEN,
     });
     console.info('Required exact-head browser acceptance verified:', JSON.stringify(evidence));

@@ -194,6 +194,112 @@ export default function ComplianceFundingSection({ state, onChange }: Props) {
           )}
         </div>
 
+        {/* Industry alignment — build standard (required at publish) */}
+        <div className="rounded-xl border border-slate-200 px-4 py-4 space-y-3">
+          <div>
+            <p className="text-sm font-semibold text-slate-900">Industry Alignment — Build Standard</p>
+            <p className="text-xs text-slate-500 mt-0.5">
+              Required to publish. Drafts save without these; each missing item is listed in the
+              publish checklist with a jump back to this section.
+            </p>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Governing Body</label>
+            <input
+              type="text"
+              value={state.governing_body ?? ''}
+              onChange={(e) => onChange({ governing_body: e.target.value || null })}
+              placeholder="e.g. U.S. Department of Labor Office of Apprenticeship"
+              className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 placeholder-slate-400 focus:border-brand-blue-500 focus:outline-none focus:ring-2 focus:ring-brand-blue-500/20"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">
+              Governing Standard / Version
+            </label>
+            <input
+              type="text"
+              value={state.governing_standard_version ?? ''}
+              onChange={(e) => onChange({ governing_standard_version: e.target.value || null })}
+              placeholder="e.g. Appendix A revision 2025-07-10 / RAPIDS 0030CB V1"
+              className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 placeholder-slate-400 focus:border-brand-blue-500 focus:outline-none focus:ring-2 focus:ring-brand-blue-500/20"
+            />
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">SOC Code (O*NET)</label>
+              <input
+                type="text"
+                value={state.soc_code ?? ''}
+                onChange={(e) => onChange({ soc_code: e.target.value || null })}
+                placeholder="e.g. 49-9021.00"
+                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 placeholder-slate-400 focus:border-brand-blue-500 focus:outline-none focus:ring-2 focus:ring-brand-blue-500/20"
+              />
+              <p className="mt-1 text-xs text-slate-400">Keys the government job feed for this course.</p>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">CIP Code</label>
+              <input
+                type="text"
+                value={state.cip_code ?? ''}
+                onChange={(e) => onChange({ cip_code: e.target.value || null })}
+                placeholder="e.g. 47.0201"
+                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 placeholder-slate-400 focus:border-brand-blue-500 focus:outline-none focus:ring-2 focus:ring-brand-blue-500/20"
+              />
+              <p className="mt-1 text-xs text-slate-400">Classification of Instructional Programs code.</p>
+            </div>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">Tuition ($)</label>
+              <input
+                type="number"
+                min="0"
+                step="0.01"
+                value={state.tuition_cost_dollars ?? ''}
+                disabled={state.tuition_is_free === true}
+                onChange={(e) =>
+                  onChange({ tuition_cost_dollars: e.target.value === '' ? null : Number(e.target.value) })
+                }
+                placeholder="e.g. 4980"
+                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 placeholder-slate-400 focus:border-brand-blue-500 focus:outline-none focus:ring-2 focus:ring-brand-blue-500/20 disabled:bg-slate-50"
+              />
+            </div>
+            <div className="flex items-end pb-2">
+              <label className="flex items-center gap-2 text-sm text-slate-700 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={state.tuition_is_free === true}
+                  onChange={(e) => onChange({ tuition_is_free: e.target.checked })}
+                  className="h-4 w-4 rounded border-slate-300"
+                />
+                Course is explicitly free ($0)
+              </label>
+            </div>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">
+              Workbook (digital workbook ID)
+            </label>
+            <input
+              type="text"
+              value={state.workbook_id ?? ''}
+              onChange={(e) => onChange({ workbook_id: e.target.value || null })}
+              placeholder="Workbook ID — course, curriculum, and workbook ship together"
+              className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 placeholder-slate-400 focus:border-brand-blue-500 focus:outline-none focus:ring-2 focus:ring-brand-blue-500/20"
+            />
+          </div>
+          <label className="flex items-center gap-2 text-sm text-slate-700 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={state.hands_on_trade === true}
+              onChange={(e) => onChange({ hands_on_trade: e.target.checked })}
+              className="h-4 w-4 rounded border-slate-300"
+            />
+            Machine/equipment trade — a hands-on simulation is required at publish
+          </label>
+        </div>
+
         {/* Internal notes */}
         <div>
           <label className="block text-sm font-medium text-slate-700 mb-1">

@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
     status=existing.data.status;
   }
   return NextResponse.json({repairId:repair.id,status,executed:false,engine:'paris',
-    summary:'Repair saved. PARIS runs it on the owned engine and verifies its commits, runs independent checks, opens a protected pull request, and verifies the production release. OpenHands is opt-in only and is not used unless PARIS_REPAIR_ENGINE=openhands.'},{status:202});
+    summary:'Repair saved. PARIS runs it on the owned engine and verifies its commits, runs independent checks, opens a protected pull request, and verifies the production release. OpenHands has been removed and is never used.'},{status:202});
 }
 
 /** Dashboard status reads never dispatch, approve, publish or replay work. */

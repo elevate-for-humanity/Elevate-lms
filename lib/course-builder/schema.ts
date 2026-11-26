@@ -47,7 +47,8 @@ export type ActivityType =
   | 'discussion'
   | 'lab'
   | 'checkpoint'
-  | 'practice';
+  | 'practice'
+  | 'simulation';
 export type RequiredArtifact =
   | 'text'
   | 'video'
@@ -219,7 +220,17 @@ export interface BuilderLesson {
   practicalRequired?: boolean;
   requiredArtifacts?: RequiredArtifact[];
   unlockRule?: UnlockRule;
-  activities?: Array<{ type: ActivityType; label: string; config?: Record<string, unknown> }>;
+  activities?: Array<{
+    type: ActivityType;
+    label: string;
+    /** Author-marked required work: drives the publish checklist and no-skip gating. */
+    required?: boolean;
+    /** For type 'simulation': the lib/simulations/registry module id. */
+    simulationId?: string | null;
+    config?: Record<string, unknown>;
+  }>;
+  /** Assignments authored on this lesson. Required ones persist to the assignments table at publish and gate lesson completion. */
+  assignments?: BuilderAssignment[];
   isRequired?: boolean;
   aiGenerated?: boolean;
   approved?: boolean;
@@ -284,8 +295,24 @@ export interface ProgramBuilderTemplate {
    * The government job feed is keyed off this code.
    */
   socCode?: string | null;
+  /**
+   * CIP code (Classification of Instructional Programs) for the program of
+   * study, e.g. '47.0201' for Heating, Air Conditioning, Ventilation and
+   * Refrigeration Maintenance. Persisted alongside socCode, following the
+   * existing convention (programs.cip_code + courses.metadata.cipCode).
+   */
+  cipCode?: string | null;
   /** Funding / program types this course is eligible for. */
   funding?: CourseFunding;
+  /** Tuition and credential exam fee. Persisted to courses.tuition_cost (numeric dollars). */
+  tuition?: CourseTuition | null;
+  /** Workbook that ships with this course (a digital_workbooks row, linked through the program). */
+  workbook?: CourseWorkbookRef | null;
+  /**
+   * True when the trade involves machine/equipment work. The publish
+   * checklist then requires at least one simulation activity on a lesson.
+   */
+  handsOnTrade?: boolean;
   /**
    * Government job-feed evidence (O*NET, CareerOneStop, USAJobs, BLS),
    * fetched at build time and stored on the course — not prompt-only.
@@ -312,6 +339,41 @@ export interface CourseFunding {
   /** Jobs for America's Graduates. Funding/program type only, not a feed. */
   jagEligible?: boolean;
   fundingNotes?: string;
+}
+
+/**
+ * An assignment authored on a lesson in the builder. At publish, required
+ * assignments are written to the assignments table (lesson_id-linked) and
+ * the LMS no-skip gate requires a learner submission before the lesson can
+ * be marked complete. Optional assignments travel with the lesson content.
+ */
+export interface BuilderAssignment {
+  title: string;
+  instructions?: string;
+  /** Required assignments gate lesson completion (no-skip). */
+  required: boolean;
+  maxPoints?: number | null;
+  submissionType?: 'text' | 'file' | 'link' | 'mixed';
+}
+
+/** Tuition / fee alignment for a course. Amounts are dollars (courses.tuition_cost is numeric). */
+export interface CourseTuition {
+  /** Full tuition in dollars. */
+  costDollars?: number | null;
+  /** Credential exam fee in dollars, when one applies. */
+  examFeeDollars?: number | null;
+  /** Explicitly free — satisfies the publish tuition requirement at $0. */
+  isFree?: boolean;
+  notes?: string;
+}
+
+/** Reference to the workbook (digital_workbooks) that ships with a course. */
+export interface CourseWorkbookRef {
+  /** digital_workbooks.id */
+  workbookId: string;
+  /** digital_workbooks.slug, kept for display and lookup resilience. */
+  slug?: string | null;
+  title?: string | null;
 }
 
 /**

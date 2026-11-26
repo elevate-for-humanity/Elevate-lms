@@ -36,15 +36,18 @@ beforeEach(() => {
   state.welcome.mockReset();
   enrollment = { id: 'e', status: 'pending', payment_status: 'pending', funding_source: 'self_pay' };
 });
-it('confirmed deposit waits for the full application, without activating access or sending an enrollment welcome', async () => {
+it('confirmed deposit fully enrolls the student; the full application stays a follow-up, not a blocker', async () => {
   await fulfillPaidBillingInvoice(db, { billing_invoice_id: 'invoice', fulfillment_type: 'program_enrollment',
     payload: { enrollment_id: 'e', student_id: 'u', amount_cents: 60000, full_application_required: true } });
-  expect(state.writes).toEqual([{ table: 'program_enrollments', value: expect.objectContaining({
-    status: 'pending', payment_status: 'paid', next_required_action: 'FULL_APPLICATION',
-  }) }]);
-  expect(state.writes[0].value).not.toHaveProperty('access_granted_at');
-  expect(reads).toEqual([]);
-  expect(state.welcome).not.toHaveBeenCalled();
+  expect(state.writes[0].value).toMatchObject({
+    status: 'active', payment_status: 'paid', enrollment_state: 'active',
+    next_required_action: 'FULL_APPLICATION',
+  });
+  expect(reads).toEqual([{ table: 'program_enrollments', columns: expect.stringContaining('payment_reference') }]);
+  expect(state.writes).toHaveLength(2);
+  expect(state.writes[1].value).toMatchObject({ access_status: 'active', access_granted_at: expect.any(String), self_pay_application_verified_at: expect.any(String) });
+  expect(enrollment.payment_reference).toBe('invoice');
+  expect(state.welcome).toHaveBeenCalledWith(db, 'e');
 });
 it('preserves the existing legacy paid enrollment fulfillment contract', async () => {
   await fulfillPaidBillingInvoice(db, { billing_invoice_id: 'invoice', fulfillment_type: 'program_enrollment',
@@ -56,3 +59,4 @@ it('preserves the existing legacy paid enrollment fulfillment contract', async (
   expect(enrollment.payment_reference).toBe('invoice');
   expect(state.welcome).toHaveBeenCalledWith(db, 'e');
 });
+

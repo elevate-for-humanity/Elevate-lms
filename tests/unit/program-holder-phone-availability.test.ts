@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  derivePhoneDevicePresence,
   isExtensionReachable,
   isWithinSchedule,
   normalizeUsPhone,
@@ -70,5 +71,49 @@ describe('program-holder PWA phone availability', () => {
     ).toBe(true);
     expect(normalizeUsPhone('(317) 760-7908')).toBe('+13177607908');
     expect(normalizeUsPhone('not a number')).toBeNull();
+  });
+
+  it('derives device presence from last-seen freshness, never the stored claim alone', () => {
+    const now = mondayAtTenInIndianapolis;
+    const seenSecondsAgo = (seconds: number) =>
+      new Date(now.getTime() - seconds * 1000).toISOString();
+    expect(
+      derivePhoneDevicePresence(
+        {
+          registration_state: 'registered',
+          connection_state: 'connected',
+          last_seen_at: seenSecondsAgo(30),
+        },
+        now,
+      ),
+    ).toEqual({ registrationState: 'registered', connectionState: 'connected', live: true });
+    // A handset that vanished hours ago still stores 'registered'/'connected'
+    // — the derived presence must read as offline.
+    expect(
+      derivePhoneDevicePresence(
+        {
+          registration_state: 'registered',
+          connection_state: 'connected',
+          last_seen_at: seenSecondsAgo(3 * 60 * 60),
+        },
+        now,
+      ),
+    ).toEqual({ registrationState: 'unregistered', connectionState: 'disconnected', live: false });
+    expect(
+      derivePhoneDevicePresence(
+        { registration_state: 'registered', connection_state: 'connected', last_seen_at: null },
+        now,
+      ).live,
+    ).toBe(false);
+    expect(
+      derivePhoneDevicePresence(
+        {
+          registration_state: 'unregistered',
+          connection_state: 'disconnected',
+          last_seen_at: seenSecondsAgo(10),
+        },
+        now,
+      ).live,
+    ).toBe(false);
   });
 });

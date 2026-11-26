@@ -68,8 +68,8 @@ Gated, fail-closed without the opt-in:
 | `lib/ai/runtime/code-repair.ts` (PARIS staging + tick admission) | Checkpoints restage on the owned engine; new repairs admit on the owned model |
 | `lib/ai/tools/planner.ts` | Naming OpenHands in a command routes to `studio.engineering.execute` |
 | `lib/studio/master-runtime.ts` | Code-word plan steps fall through to `ROUTER`, not `OPENHANDS` |
-| `POST /api/admin/dev-studio/openhands/agent` | 503 `OpenHands is opt-in only...` |
-| `POST /api/admin/dev-studio/openhands/chat` | 503 `OpenHands is opt-in only...` |
+| `POST /api/admin/dev-studio/openhands/agent` | Route deleted (OpenHands removed) — the path no longer exists |
+| `POST /api/admin/dev-studio/openhands/chat` | Route deleted (OpenHands removed) — the path no longer exists |
 | `lib/devstudio/repair-dashboard.ts` | A repair with no candidate is labelled `internal`, not `openhands` |
 | `components/studio/OpenHandsRepairPanel.tsx` + engineering route | Copy no longer claims repairs go to OpenHands |
 

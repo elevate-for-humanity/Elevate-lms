@@ -45,14 +45,14 @@ function harness(overrides = {}) {
   return h;
 }
 
-test('OpenHands is opt-in-only: new repairs and unopted checkpoints use the internal engine', () => {
+test('OpenHands is removed: every repair and checkpoint uses the internal engine', () => {
   assert.equal(parisRepairEngine(null), 'internal');
   assert.equal(parisRepairEngine({kind: 'openhands-checkpoint'}), 'internal');
   assert.equal(parisRepairEngine({kind: 'planner-checkpoint', checkpoint: {writes: 2}}), 'internal');
-  assert.equal(parisRepairEngine({kind: 'openhands-checkpoint'}, {PARIS_REPAIR_ENGINE: 'openhands'}), 'openhands');
-  // With the opt-in, a fresh repair selects OpenHands first; the caller
-  // falls back to the internal engine when OpenHands readiness fails.
-  assert.equal(parisRepairEngine(null, {PARIS_REPAIR_ENGINE: 'openhands'}), 'openhands');
+  // The legacy opt-in environment value is inert: it cannot re-enable
+  // OpenHands for a checkpoint or for a fresh repair.
+  assert.equal(parisRepairEngine({kind: 'openhands-checkpoint'}, {PARIS_REPAIR_ENGINE: 'openhands'}), 'internal');
+  assert.equal(parisRepairEngine(null, {PARIS_REPAIR_ENGINE: 'openhands'}), 'internal');
   assert.equal(parisRepairEngine({kind: 'planner-checkpoint'}, {PARIS_REPAIR_ENGINE: 'openhands'}), 'internal');
 });
 test('external task diagnostics retain the defect and log URL while removing credentials and signed query strings',()=>{

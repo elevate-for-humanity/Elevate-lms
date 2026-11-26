@@ -24,6 +24,22 @@ class Registration(unittest.TestCase):
   self.assertIn('Dial(PJSIP/+13179562748@twilio,20,U(elevate-owner-accept))',offline)
   self.assertLess(offline.index('Dial(PJSIP/'),offline.index('VoiceMail(0@elevate,u)'))
   self.assertEqual(v.operator_route(system,{**owner,'admin_external_fallback':False}),v.OPERATOR)
+ def test_operator_target_follows_admin_extension(self):
+  system={'id':'341f59a3-b1d6-4360-8463-0ce0402f86fe','tenant_id':None,'status':'active','admin_extension':'100'}
+  owner={'profile_id':v.OWNER,'extension':'100','enabled':True,'admin_external_fallback':True,'external_fallback_number':v.FORWARD_NUMBER,'ring_mode':'ring'}
+  plan=v.operator_route(system,owner)
+  self.assertIn('Gosub(elevate-pwa-extensions,100,1)',plan)
+  self.assertIn('VoiceMail(100@elevate,u)',plan)
+  self.assertNotIn('elevate-pwa-extensions,0,1',plan)
+  self.assertNotIn('VoiceMail(0@elevate,u)',plan)
+  self.assertIn('exten => 0,1,Gosub(elevate-operator,s,1)',plan)
+  self.assertEqual(v.operator_route(system,{**owner,'admin_external_fallback':False}),v.operator_template('100'))
+  self.assertEqual(v.operator_template('0'),v.OPERATOR)
+  self.assertNotEqual(v.operator_template('100'),v.OPERATOR)
+  for bad in [{**owner,'extension':'0'},{**owner,'extension':'104'}]:
+   with self.assertRaises(ValueError):v.operator_route(system,bad)
+  for bad in [{**system,'admin_extension':'00'},{**system,'admin_extension':'1000'},{**system,'admin_extension':None}]:
+   with self.assertRaises(ValueError):v.operator_route(bad,owner)
  def test_module_running_and_mailbox_definitions_do_not_prove_application_registration(self):
   self.assertFalse(v.application_registered('app_voicemail.so Comedian Mail 0 Not Running'))
   self.assertFalse(v.application_registered('Your application(s) is (are) not registered'))

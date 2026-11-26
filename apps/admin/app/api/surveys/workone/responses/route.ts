@@ -11,6 +11,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { WORKONE_ACCESS_START_ISO } from '@/lib/workone/access-scope';
 
 export const runtime = 'nodejs';
 
@@ -44,7 +45,13 @@ export async function GET(request: NextRequest) {
     let query = supabase
       .from('workone_survey_responses')
       .select('*', { count: 'exact' })
-      .eq('survey_label', 'workone-funding-survey')
+      // Canonical label: rows in this table are created by the applicant
+      // handoff/progress collection path (lib/workone/handoff.ts), which
+      // writes 'workone-funding-progress'. Filtering on any other label
+      // returns zero rows even for brand-new responses.
+      .eq('survey_label', 'workone-funding-progress')
+      // WorkOne scope: NEW applicants only — never the pre-access backlog.
+      .gte('created_at', WORKONE_ACCESS_START_ISO)
       .order('submitted_at', { ascending: false, nullsFirst: false });
 
     // Filter by status
@@ -70,7 +77,8 @@ export async function GET(request: NextRequest) {
     const { data: stats } = await supabase
       .from('workone_survey_responses')
       .select('went_to_workone, signed_up_for_funding, still_needs_to_go, was_put_in_other_program, was_persuaded_away_from_elevate, wants_callback')
-      .eq('survey_label', 'workone-funding-survey')
+      .eq('survey_label', 'workone-funding-progress')
+      .gte('created_at', WORKONE_ACCESS_START_ISO)
       .not('submitted_at', 'is', null);
 
     const summary = {

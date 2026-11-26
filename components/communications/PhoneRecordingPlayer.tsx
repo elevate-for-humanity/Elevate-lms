@@ -10,7 +10,7 @@ export function PhoneRecordingPlayer({ url }: { url: string }) {
         ref={audio}
         controls
         playsInline
-        preload="none"
+        preload="metadata"
         src={url}
         className="w-full"
         aria-label="Play voicemail or call recording"

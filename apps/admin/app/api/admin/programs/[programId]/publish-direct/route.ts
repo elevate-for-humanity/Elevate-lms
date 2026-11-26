@@ -1,8 +1,7 @@
 /**
  * POST /api/admin/programs/[programId]/publish-direct
  *
- * Admin-only direct publish. Sets published=true, is_active=true,
- * status='published', review_status='approved', published_at=now().
+ * Compatibility endpoint for the normal reviewed publication workflow.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -11,6 +10,7 @@ import { apiRequireAdmin } from '@/lib/admin/guards';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
+import { publishProgram } from '@/lib/course-builder/program-versioning';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -46,20 +46,11 @@ export async function POST(
     return NextResponse.json({ error: 'Program is incomplete', missing }, { status: 422 });
   }
 
-  const now = new Date().toISOString();
-  const { error: updateErr } = await db
-    .from('programs')
-    .update({
-      published: true,
-      is_active: true,
-      status: 'published',
-      review_status: 'approved',
-      published_at: now,
-      updated_at: now,
-    })
-    .eq('id', programId);
-
-  if (updateErr) return safeInternalError(updateErr, 'Publish failed');
+  const result = await publishProgram(db, programId, auth.id);
+  if (!result.ok) {
+    if (result.blocked) return safeError(result.error ?? 'Program is incomplete', 422);
+    return safeInternalError(new Error(result.error), 'Publish failed');
+  }
 
   try {
     await db.from('audit_logs').insert({

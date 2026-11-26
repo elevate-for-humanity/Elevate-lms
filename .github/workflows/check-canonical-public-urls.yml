@@ -1,7 +1,7 @@
 name: Check canonical public URLs
 concurrency:
-group: ${{ github.workflow }}-${{ github.ref }}
-cancel-in-progress: true
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 on:
   pull_request:

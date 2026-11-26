@@ -190,8 +190,9 @@ export async function POST(req: NextRequest, { params }: Params) {
     await saveStagedProgress(db, run, p);
     return response({ progress: publicStagedProgress(p) });
   } catch (error) {
-    if (error instanceof Error && error.message.startsWith('PRACTICAL_'))
-      return response({ error: error.message }, 409);
+    const msg = error instanceof Error ? error.message : '';
+    if (msg.startsWith('PRACTICAL_'))
+      return response({ error: msg }, 409);
     logger.error('Staged learner action failed', error);
     return response({ error: 'Learner action failed' }, 500);
   }
@@ -297,8 +298,9 @@ export async function PATCH(req: NextRequest, { params }: Params) {
     await saveStagedProgress(db, run, progress);
     return response({ progress: publicStagedProgress(progress), syntheticQA: true, realCompetencyAwarded: false });
   } catch (error) {
-    if (error instanceof Error && error.message.startsWith('PRACTICAL_'))
-      return response({ error: error.message }, 409);
+    const msg = error instanceof Error ? error.message : '';
+    if (msg.startsWith('PRACTICAL_'))
+      return response({ error: msg }, 409);
     logger.error('Staged QA practical review failed', error);
     return response({ error: 'QA review failed' }, 500);
   }

@@ -2,6 +2,8 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import { EMT_INQUIRY_HREF, isEmtInterviewSelection } from '@/lib/programs/emt-inquiry-only';
 import {
   CheckCircle2,
   ChevronRight,
@@ -250,6 +252,10 @@ export default function ParisApplicationWorkspace({
 
   async function sendAnswer(value: string, inputMode: 'text' | 'voice' = 'text') {
     if (!value.trim() || sending) return;
+    if (session?.nextQuestion?.field === 'program' && isEmtInterviewSelection(value)) {
+      router.push(EMT_INQUIRY_HREF);
+      return;
+    }
     setSending(true);
     setError('');
     try {
@@ -366,6 +372,10 @@ export default function ParisApplicationWorkspace({
   async function submitApplication() {
     if (!session?.readyForSubmission || !session.applicationPayload || submitting) return;
     const answers = session.state.answers;
+    if (isEmtInterviewSelection(answers.program)) {
+      router.push(EMT_INQUIRY_HREF);
+      return;
+    }
     const claimed = transferHours(answers.transferHours);
     if (isApprenticeship(answers.program) && claimed > 0 && !transferEvidence) {
       setError(t.requiredEvidence);
@@ -404,7 +414,12 @@ export default function ParisApplicationWorkspace({
         error?: string;
         recordType?: string;
         nextStepUrl?: string;
+        inquiryUrl?: string;
       };
+      if (response.status === 409 && data.inquiryUrl === EMT_INQUIRY_HREF) {
+        router.push(EMT_INQUIRY_HREF);
+        return;
+      }
       if (!response.ok || !data.ok || !data.id) throw new Error(data.error || 'Application could not be submitted.');
       if (data.recordType === 'lead') {
         if (!data.nextStepUrl?.startsWith('/enroll/'))
@@ -437,6 +452,36 @@ export default function ParisApplicationWorkspace({
 
   if (!session) {
     return <div className="rounded-2xl border border-red-200 bg-red-50 p-6 text-red-900">{error || 'Unable to start the application interview.'}</div>;
+  }
+
+  const pending = session.state.pendingConfirmation;
+  const pendingEmt = pending?.field === 'program' && isEmtInterviewSelection(pending.value);
+  if (isEmtInterviewSelection(session.state.answers.program) || pendingEmt) {
+    return (
+      <section className="space-y-3 rounded-2xl border border-slate-200 bg-white p-6">
+        <h2 className="text-xl font-bold">
+          {locale === 'es' ? 'Consultas sobre capacitación EMT' : 'EMT training inquiries'}
+        </h2>
+        <p>{locale === 'es' ? 'La inscripción y el pago no están disponibles.' : 'Enrollment and payment are not open.'}</p>
+        <Link className="block font-bold text-blue-800 underline" href={EMT_INQUIRY_HREF}>
+          {locale === 'es' ? 'Preguntar sobre capacitación EMT' : 'Ask about EMT training'}
+        </Link>
+        {pendingEmt && (
+          <button
+            type="button"
+            className="block text-left font-bold text-blue-800 underline"
+            disabled={sending}
+            onClick={() => void chooseAction('change')}
+          >
+            {locale === 'es' ? 'Cambiar el programa en esta entrevista' : 'Change the program in this interview'}
+          </button>
+        )}
+        {error && <p role="alert" className="text-sm text-red-800">{error}</p>}
+        <Link className="block text-blue-800 underline" href="/apply/student/form">
+          {locale === 'es' ? 'Elegir otro programa en el formulario estándar' : 'Choose a different program in the standard form'}
+        </Link>
+      </section>
+    );
   }
 
   const question = session.nextQuestion;

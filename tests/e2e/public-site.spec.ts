@@ -285,7 +285,20 @@ test.describe('responsive navigation acceptance', () => {
 });
 
 test.describe('application entry audit', () => {
-  for (const route of ['/apply', '/apply/student', '/programs/barber-apprenticeship/apply']) {
+  test('/apply offers intake and full enrollment as separate choices', async ({ page }) => {
+    await assertNoRuntimeFailure(page, '/apply');
+    await expect(page.getByRole('heading', { name: 'Choose your application' })).toBeVisible();
+    const intake = page.getByRole('link', { name: /^Intake Application/i });
+    const enrollment = page.getByRole('link', { name: /^Full Enrollment Application/i });
+    await expect(intake).toBeVisible();
+    await expect(intake).toHaveAttribute('href', '/apply/student?intent=inquiry');
+    await expect(enrollment).toBeVisible();
+    await expect(enrollment).toHaveAttribute('href', '/programs');
+    await intake.click();
+    await expect(page).toHaveURL(/\/apply\/student\/interview(?:[?#]|$)/);
+  });
+
+  for (const route of ['/apply/student', '/programs/barber-apprenticeship/apply']) {
     test(`${route} exposes an actionable application experience`, async ({ page }) => {
       await assertNoRuntimeFailure(page, route);
       const control = page.locator('form, input, select, textarea, button[type="submit"]').first();

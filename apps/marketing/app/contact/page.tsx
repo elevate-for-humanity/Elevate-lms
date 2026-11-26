@@ -1,3 +1,4 @@
+import { EMT_PROGRAM_SLUG, isEmtInquiryOnly } from '@/lib/programs/emt-inquiry-only';
 import HeroPicture from '@/components/marketing/HeroPicture';
 import { siteConfig } from '@/lib/config/site';
 import { Metadata } from 'next';
@@ -30,7 +31,10 @@ export default async function ContactPage({ searchParams }: ContactPageProps) {
     ? COURSE_BUILDER_REQUESTS[product as keyof typeof COURSE_BUILDER_REQUESTS]
     : null;
   const defaultSubject = courseBuilderMessage ? 'course-builder' : course ? 'enrollment' : requestedItem ? 'other' : '';
-  const defaultMessage = courseBuilderMessage ?? (requestedItem
+  const emtInquiry = isEmtInquiryOnly(params.program);
+  const defaultMessage = emtInquiry
+    ? 'I would like an update on future EMT training, the training provider and certification requirements.'
+    : courseBuilderMessage ?? (requestedItem
     ? `I would like current availability, delivery details, access terms, and final pricing for ${titleFromSlug(requestedItem)}.`
     : '');
 
@@ -71,7 +75,8 @@ export default async function ContactPage({ searchParams }: ContactPageProps) {
                 )}
                 
                 <ContactRequestForm>
-                  {courseBuilderMessage && <input type="hidden" name="interest" value={product} />}
+                  {emtInquiry && <input type="hidden" name="program" value={EMT_PROGRAM_SLUG} />}
+                  {!emtInquiry && courseBuilderMessage && <input type="hidden" name="interest" value={product} />}
                   {/* Name */}
                   <div>
                     <label htmlFor="name" className="block text-sm font-semibold text-slate-700 mb-2">

@@ -1,6 +1,7 @@
 // PUBLIC ROUTE: public contact form
 
 import { NextResponse } from 'next/server';
+import { getContactFormReturnPath } from '@/lib/programs/emt-inquiry-only';
 import { z } from 'zod';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
@@ -41,8 +42,9 @@ async function _POST(req: Request) {
     contentType.includes('application/x-www-form-urlencoded') ||
     contentType.includes('multipart/form-data');
 
+  let submittedProgram: unknown;
   const redirectToContact = (status: 'submitted' | 'invalid' | 'error') =>
-    NextResponse.redirect(new URL(`/contact?${status === 'submitted' ? 'submitted=1' : `error=${status}`}`, req.url), 303);
+    NextResponse.redirect(new URL(getContactFormReturnPath(status, submittedProgram), req.url), 303);
 
   try {
     const rateLimited = await applyRateLimit(req, 'contact');
@@ -52,6 +54,7 @@ async function _POST(req: Request) {
     const body = isNativeForm
       ? Object.fromEntries(await req.formData())
       : await req.json().catch(() => null);
+    if (isNativeForm) submittedProgram = body?.program;
 
     if (!body) {
       return isNativeForm

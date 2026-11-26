@@ -420,11 +420,46 @@ export function createProvisioner(config, dependencies = {}) {
     initialized = true;
   }
 
+  // A lapsed lease must not erase the extension from the dialplan: the
+  // call-wake window lives in the extension's subroutine, which is rendered
+  // only while a record exists, so dropping the last record of an extension
+  // makes a closed app unreachable — the exact failure the wake window was
+  // built to prevent. Retain the most recently expired record per extension
+  // as a dormant record. It renders the subroutine (and the wake hook) but
+  // contributes no contacts, because the render gates every contact behind
+  // the lease expiry; a device that registers mid-window is found by the
+  // next scan on the same deterministic endpoint. Pruning is mechanical and
+  // retains without an owner lookup; reconciliation (the authoritative
+  // pass) re-verifies ownership and refreshes owner policy on the retained
+  // record, so a disabled or reassigned extension still loses its record
+  // within one reconcile cycle.
+  async function withDormant(candidates, active, verify) {
+    const covered = new Set(active.map(record => record.extension));
+    const dormant = new Map();
+    for (const record of candidates) {
+      if (record.expiresAt > now() || covered.has(record.extension)) continue;
+      const current = dormant.get(record.extension);
+      if (!current || record.expiresAt > current.expiresAt) dormant.set(record.extension, record);
+    }
+    const retained = [];
+    for (const record of dormant.values()) {
+      if (!verify) { retained.push(record); continue; }
+      try {
+        retained.push({ ...record, ...await owner(record) });
+      } catch (error) {
+        if (error.code !== 'device_not_authorized') throw error;
+      }
+    }
+    return [...active, ...retained];
+  }
+
   async function pruneExpired() {
     return serialize(async () => {
       if (quarantined) throw new ProvisioningError('provisioner_quarantined');
+      if (!records.some(record => record.expiresAt <= now())) return;
       const active = records.filter(record => record.expiresAt > now());
-      if (active.length !== records.length) await apply(active, 'expiry');
+      const next = await withDormant(records, active, false);
+      if (JSON.stringify(next) !== JSON.stringify(records)) await apply(next, 'expiry');
     });
   }
 
@@ -437,10 +472,11 @@ export function createProvisioner(config, dependencies = {}) {
         try { active.push({ ...record, ...await owner(record) }); }
         catch (error) { if (error.code !== 'device_not_authorized') throw error; }
       }
+      const next = await withDormant(records, active, true);
       // A fresh or older empty generation still needs the operator subroutine.
       // Materialize the current renderer once at startup, even with no leases;
       // an empty record comparison alone cannot detect missing dialplan code.
-      if (!initialized || JSON.stringify(active) !== JSON.stringify(records)) await apply(active, 'reconciliation');
+      if (!initialized || JSON.stringify(next) !== JSON.stringify(records)) await apply(next, 'reconciliation');
       else {
         await inspectOperator(records);
         for (const record of records) await inspect(record);

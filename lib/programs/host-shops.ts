@@ -280,7 +280,7 @@ export async function getApprovedShops(program?: ProgramKey): Promise<HostShop[]
       const sourceVerifiedPublicPhone =
         profile?.phone && (profile.source_url || profile.website_url || profile.website)
           ? profile.phone
-          : shop.phone;
+          : '';
       const applicationSlug = publicSlug(shop.name, shop.id);
       const profileSlug = profile?.public_slug;
       const enriched: HostShop = {
@@ -289,7 +289,8 @@ export async function getApprovedShops(program?: ProgramKey): Promise<HostShop[]
           .map(normalizeHostShopProgram).filter((value): value is string => Boolean(value))])],
         primaryProgram: profilePrograms(profile)
           .map(normalizeHostShopProgram).find((value): value is string => Boolean(value)) ?? shop.programs[0],
-        phone: sourceVerifiedPublicPhone || shop.phone,
+        // Intake numbers are operational even when the shop itself is approved.
+        phone: sourceVerifiedPublicPhone,
         // Every approved operational Host Site needs a stable public destination,
         // even before optional promotional media is added to public_host_shops.
         publicSlug: profileSlug || applicationSlug,

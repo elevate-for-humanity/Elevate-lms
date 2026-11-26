@@ -42,6 +42,21 @@ describe('approved host directory data', () => {
     expect(await getApprovedShops('nail')).toHaveLength(1);
     expect(await getApprovedShops('esthetician')).toHaveLength(0);
   });
+  it('keeps eligible application-backed shops visible without publishing their intake numbers', async () => {
+    fixture.rows.barbershop_partner_applications.data![0].contact_phone = '3175550111';
+    fixture.rows.host_shop_applications.data![0].phone = '3175550112';
+    fixture.rows.public_host_shops.data![0].phone = '3175550113';
+
+    const unsourced = await getApprovedShops();
+    expect(unsourced.map(({ id, phone }) => ({ id, phone }))).toEqual([
+      { id: 'barber-1', phone: '' },
+      { id: 'host-2', phone: '' },
+    ]);
+
+    fixture.rows.public_host_shops.data![0].source_url = 'https://shop.example.test/contact';
+    const sourced = await getApprovedShopByPublicSlug('style-and-scissors-hair-salon');
+    expect(sourced).toMatchObject({ id: 'barber-1', phone: '3175550113' });
+  });
   it('resolves an approved shop profile by its published link', async () => {
     expect((await getApprovedShopByPublicSlug('style-and-scissors-hair-salon'))?.id).toBe('barber-1');
   });

@@ -16,6 +16,15 @@ import { LEARNER_ROSTER_ROLES } from './roster-eligibility';
 import { requireProgramHolder } from '@/lib/auth/require-program-holder';
 import { calculateDistanceMiles, geocodeAddress, isGeocodingResult } from '@/lib/geo/geocode';
 
+type Settled<T> = { ok: true; value: T } | { ok: false; error: unknown };
+function settled<T>(promise: Promise<T>): Promise<Settled<T>> {
+  return promise.then(
+    (value): Settled<T> => ({ ok: true, value }),
+    (error): Settled<T> => ({ ok: false, error }),
+  );
+}
+
+
 export type ProgramHolderWorkspace = {
   mode: 'admin' | 'holder';
   holder: any | null;
@@ -367,20 +376,16 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
         .filter((value: unknown): value is string => typeof value === 'string' && value.length > 0),
     ),
   );
-  const schoolApplicantsPromise = loadApprovedSchoolApplicants(
-    db,
-    holderRes.data?.features,
-    programsRes.data || [],
-    contactAccessGranted,
-    true,
-  ).then(
-    (value) => ({ ok: true as const, value }),
-    (error) => ({ ok: false as const, error }),
+  const schoolApplicantsPromise = settled(
+    loadApprovedSchoolApplicants(
+      db,
+      holderRes.data?.features,
+      programsRes.data || [],
+      contactAccessGranted,
+      true,
+    ),
   );
-  const exitReportsPromise = loadHolderExitReports(db, holderId).then(
-    (value) => ({ ok: true as const, value }),
-    (error) => ({ ok: false as const, error }),
-  );
+  const exitReportsPromise = settled(loadHolderExitReports(db, holderId));
   const [secondaryCourses, progressEntriesRes, rosterProfilesOutcome, credentialOutcome, assignedTeaching] =
     await Promise.all([
       db.from('courses')
@@ -483,10 +488,7 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
         training_start_date: row.training_start_date || verified.firstDate || null,
       };
     });
-  const onlineStudyPromise = loadHolderOnlineStudy(db, enrolledRoster).then(
-    (value) => ({ ok: true as const, value }),
-    (error) => ({ ok: false as const, error }),
-  );
+  const onlineStudyPromise = settled(loadHolderOnlineStudy(db, enrolledRoster));
   const upcomingRoster = (upcomingRes.data ?? []).filter(
     (row: any) => !row.user_id || eligibleRosterUserIds.has(row.user_id),
   );

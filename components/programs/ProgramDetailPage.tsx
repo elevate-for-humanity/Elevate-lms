@@ -19,6 +19,7 @@ import { RAPIDS_VERIFIED_INVENTORY } from '@/lib/apprenticeship/rapids-verified-
 import { HAIR_STYLIST_PROGRAM } from '@/lib/apprenticeship/hair-stylist-program';
 import { getRegisteredProgramStandard } from '@/lib/apprenticeship/registered-program-contract';
 import Link from 'next/link';
+import { Fragment } from 'react';
 import dynamic from 'next/dynamic';
 import NarratedProgramIntro, {
   ProgramLearningPreview,
@@ -207,7 +208,13 @@ export default function ProgramDetailPage({
         data-narration-rate="0.82"
         data-narration-style="instructor"
       >
-        {heroOverride ?? <NarratedProgramIntro program={p} banner={banner} />}
+        {/* A server-rendered override can arrive as a lazy Flight chunk inside this
+            static child list, bypassing static key validation; give it a stable keyed slot. */}
+        {heroOverride != null ? (
+          <Fragment key="hero-override">{heroOverride}</Fragment>
+        ) : (
+          <NarratedProgramIntro program={p} banner={banner} />
+        )}
         {heroOverride && p.slug !== 'hvac-technician' ? (
           <div className="bg-slate-950 px-5 py-4 text-white">
             <div className="mx-auto max-w-6xl">

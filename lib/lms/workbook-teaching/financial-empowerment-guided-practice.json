@@ -1,0 +1,456 @@
+{
+ "version": 1,
+ "workbookSlug": "financial-empowerment-guided-practice",
+ "chapters": [
+  {
+   "number": 1,
+   "heading": "Start with take-home pay, then sort fixed from variable",
+   "text": "Every budget starts with the money that actually reaches you. Take-home income is available cash after taxes and deductions are taken out of gross pay; expenses are the costs that money must cover. The lesson's central caution is simple: use take-home pay, not gross pay, as your starting figure. If a paycheck shows $3,000 gross but $600 is withheld, only $2,400 reaches the bank account, and a budget built on $3,000 will be short $600 every single month even when every expense estimate is accurate. Next, sort expenses into two kinds. Fixed costs stay about the same each month no matter what you do: rent, a car payment, and an insurance premium are common examples. Variable costs change with your choices and usage: groceries, gasoline, dining out, and entertainment. That distinction matters when money gets tight, because variable costs are usually the fastest place to adjust — rent and a car payment cannot change overnight, but this week's grocery or eating-out spending can. Label every cost as you list it, total each group separately, and subtract the combined total from take-home pay to find what remains before savings and other bills.",
+   "example": "Work through Maya's month. Her take-home pay is $2,400. Fixed costs: $950 rent, a $210 car payment, and $90 insurance — $950 + $210 + $90 = $1,250. Variable costs: $360 groceries, $140 gasoline, and $80 eating out — $360 + $140 + $80 = $580. Combined costs are $1,250 + $580 = $1,830. Subtract from take-home pay: $2,400 − $1,830 = $570 remaining before savings and other bills. The lesson's simpler check agrees with the method: $2,800 take-home minus $1,000 rent, $400 food, $250 transport, and $150 utilities leaves $1,000 before other bills. Same order every time: take-home first, fixed and variable sorted, then subtract.",
+   "review": "A paycheck shows $3,000 gross and $600 withheld. What figure starts the budget, and which cost group do you adjust first when money gets tight?",
+   "diagram": [
+    "Start with take-home pay",
+    "List fixed costs, total",
+    "List variable costs, total",
+    "Add both cost groups",
+    "Subtract from take-home"
+   ]
+  },
+  {
+   "number": 2,
+   "heading": "Net worth: assets minus liabilities, and goals in monthly steps",
+   "text": "Net worth is a measurement, not a verdict. It is simply everything you own — your assets — minus everything you owe — your liabilities. Assets might be a car, savings, and belongings; liabilities might be a car loan and credit card balances. When liabilities are larger than assets, net worth is negative, and the lesson is clear that a negative figure is useful information: it is a starting measurement that tells you where you stand, not a judgment on you as a person. Net worth also does not measure human worth. The encouraging arithmetic is that progress works from both sides. Paying down $200 of debt raises net worth by $200, and adding $200 to savings raises it by exactly the same amount, so either move improves the number. The second half of the lesson turns a goal into something workable. A measurable goal needs both a target amount and a deadline, and dividing the target by the number of months gives the monthly step that gets you there. If that monthly step does not fit the budget, the fix is to extend the deadline or reduce the target — not to abandon the goal altogether.",
+   "example": "Calculate Jordan's position. Assets: a car worth $6,000, savings of $800, and belongings worth $1,200, totaling $8,000. Liabilities: a $5,500 car loan and $3,500 in credit card balances, totaling $9,000. Net worth is $8,000 − $9,000 = negative $1,000. The lesson's smaller check shows the same formula: assets of $5,000 minus debt of $2,000 gives net worth of $3,000. Now add a goal: $1,200 in 10 months needs $1,200 ÷ 10 = $120 saved each month. And the basic savings step from the lesson — $100 per month for six months — reaches $600, proof that a steady monthly step, repeated, is how a target gets met.",
+   "review": "Your assets total $8,000 and your liabilities total $9,000. What is your net worth, and why is that number a starting point rather than a reason to stop saving?",
+   "diagram": [
+    "List everything you own",
+    "Total the assets",
+    "List everything you owe",
+    "Total the liabilities",
+    "Assets minus liabilities",
+    "Goal ÷ months = step"
+   ]
+  },
+  {
+   "number": 3,
+   "heading": "Build the budget line by line, then review it weekly",
+   "text": "A monthly budget plans take-home income across four jobs, in a steady order: essentials first — housing, food, utilities, and transport — then debt minimum payments, then savings, then flexible spending. Writing the categories in the same order every month means nothing is forgotten, and every dollar is assigned a job before the month begins. That assignment is what makes trade-offs deliberate: overspending in one category means consciously taking from another instead of drifting into the red. Two habits keep the plan honest. First, budget realistic numbers. Planning food at $200 when the last three months averaged $340 does not save money; it just guarantees a broken budget, so use what spending actually runs and trim elsewhere. Second, review the budget against real spending once a week, comparing planned amounts with actual amounts while there is still time in the month to adjust. When income changes from month to month, plan conservatively using a low typical month as your base, and treat any extra income as a bonus directed to savings or debt rather than building the whole plan on the best month.",
+   "example": "Build a plan on $2,400 take-home pay. Set aside $950 rent, $150 utilities, $360 food, $180 transport, $100 debt minimums, and $150 savings. Add them: $950 + $150 + $360 + $180 + $100 + $150 = $1,890. Subtract from income: $2,400 − $1,890 = $510 left for flexible spending and surprises. The lesson's summary check uses the same shape at a larger scale: $2,800 income minus $2,350 total planned spending leaves $450. At the weekly review, if food is tracking toward $340 against a lower planned figure, you correct the plan itself — raise the food line to a realistic number and take the difference from flexible spending — instead of hoping next month behaves differently.",
+   "review": "Your food spending has averaged $340 for three months but your budget says $200. What do you change at the weekly review, and where does the difference come from?",
+   "diagram": [
+    "Take-home pay on top",
+    "Essentials first",
+    "Debt minimums, then savings",
+    "Flexible spending last",
+    "Review weekly vs actual"
+   ]
+  },
+  {
+   "number": 4,
+   "heading": "Applied assignment: build a budget you can defend line by line",
+   "text": "This assignment asks you to build a complete budget using fictional information only, and to show your working the way a reviewer needs to see it. Start from take-home pay, never gross pay, and show the arithmetic on every line: each category amount, the total of all categories, and what remains after subtracting that total from income. Label each cost as fixed or variable so your reasoning is visible rather than implied — the labels show you understand which costs can move quickly and which cannot. The assignment is graded on accuracy (40%), complete evidence (30%), analysis (20%), and clarity (10%), so a correct total with no visible working scores worse than a fully shown calculation. The final required piece is honesty about limits: state one risk or limitation of your budget, such as a food estimate taken from one unusually cheap month, or income that drops in slower months. The lesson is explicit that an accurate budget with a small, acknowledged limitation scores better than a tidy-looking budget with an arithmetic error hidden inside it. Checking your totals twice before submitting is part of the work itself, not an optional extra.",
+   "example": "Follow the lesson's model budget. A fictional worker has $2,600 take-home pay. The lines are $1,000 rent, $160 utilities, $400 food, $220 transport, $120 debt minimums, and $200 savings. Add them in order: $1,000 + $160 = $1,160; + $400 = $1,560; + $220 = $1,780; + $120 = $1,900; + $200 = $2,100 total planned. Subtract: $2,600 − $2,100 = $500 remaining for flexible spending. Label rent and debt minimums as fixed, food and transport as largely variable, and note the limitation beside the sheet — for example, that the food figure came from one cheap month. Then re-add the column once more before submitting, exactly as the assignment requires.",
+   "review": "Before you submit your budget, which two checks do you run — and why does a stated limitation raise rather than lower your analysis mark?",
+   "diagram": [
+    "Use fictional figures only",
+    "Start from take-home pay",
+    "Show arithmetic per line",
+    "Label fixed or variable",
+    "State one limitation",
+    "Recheck totals, submit"
+   ]
+  },
+  {
+   "number": 5,
+   "heading": "Compare bank accounts in yearly cost, not monthly labels",
+   "text": "Choosing a bank account means comparing five things: maintenance fees, overdraft rules, minimum balances, ATM access, and eligible deposit insurance — and reading the institution's own disclosures rather than trusting the account's marketing name. The key technique is converting every fee to a yearly cost, because a small monthly charge is easy to underestimate. A $12 monthly fee costs $144 a year. Whether an account is cheap depends on your own balance and habits. An account that waives its fee only above a minimum balance is expensive for someone who keeps less than that amount, and free for someone who always stays above it. An account with no monthly fee can still cost plenty if it charges for out-of-network ATM withdrawals and you make several each month. Overdrafts are the most expensive surprise: an overdraft happens when a payment takes the balance below zero, and accounts handle it differently — some decline the transaction, some cover it and charge a fee, and some offer an opt-in protection service with its own cost. A debit card approval does not guarantee money is available, because pending transactions can post in a different order than expected.",
+   "example": "Compare two accounts side by side. Account A charges a $10 monthly maintenance fee, waived only if you keep a $500 minimum balance. Account B charges no monthly fee but $3 for each out-of-network ATM withdrawal. A person who keeps less than $500 and uses in-network ATMs pays $10 × 12 = $120 a year with Account A and $0 with Account B. A person who makes four out-of-network withdrawals a month with Account B pays $3 × 4 × 12 = $144 a year in ATM fees. Neither account is 'the cheap one' in general — the answer flips with the user's balance and ATM habits, which is why the comparison must use your own pattern.",
+   "review": "An account charges $10 a month and another charges $3 per out-of-network ATM trip. What extra facts about yourself decide which one actually costs you less per year?",
+   "diagram": [
+    "List fees, rules, access",
+    "Convert fees to yearly",
+    "Check minimum balance",
+    "Check overdraft handling",
+    "Match to your habits"
+   ]
+  },
+  {
+   "number": 6,
+   "heading": "Build an emergency fund in stages you can actually reach",
+   "text": "An emergency fund is accessible savings kept for unexpected essential expenses — the urgent repair, the sudden drop in income — and nothing else. Because a full fund can feel out of reach, the lesson builds it in stages. Stage one is a starter fund, such as $500, enough to cover a car repair or a missed shift. Stage two is one month of essential expenses. Stage three is three months of essential expenses. Each stage protects you more than the one before, so progress counts long before the final target is reached. Two rules govern where the fund lives and when it is used. Keep it in an account you can reach within a day or two, separate from everyday spending money so it is not spent by accident; volatile investments are not a substitute for immediately accessible cash, because their value can be down exactly when the emergency arrives. Use the fund only for genuine emergencies — essential expenses you did not expect — and refill it afterward before returning to other goals. A sale or a vacation is not an emergency: anything that can be planned for belongs in the regular budget instead.",
+   "example": "Size the stages from essential expenses of $1,500 a month. Three months of essentials is 3 × $1,500 = $4,500 — the stage-three target. Saving $150 a month, the $500 starter fund takes about three to four months ($150 × 3 = $450, so the fourth month crosses $500). One month of expenses takes $1,500 ÷ $150 = 10 months. The full $4,500 takes $4,500 ÷ $150 = 30 months. The timeline is long, but notice what the staging buys: after roughly four months a single car repair no longer has to go on a credit card, and after ten months a full month without income is survivable. Each stage is real protection, not a fraction of protection.",
+   "review": "Your essential expenses are $1,500 a month and you save $150 a month. How long until you hold one month of expenses, and why does the fund sit in accessible savings rather than a volatile investment?",
+   "diagram": [
+    "Starter fund first",
+    "One month of essentials",
+    "Three months of essentials",
+    "Keep it reachable, separate",
+    "Use, then refill"
+   ]
+  },
+  {
+   "number": 7,
+   "heading": "Slow down for scams, and read insurance before you need it",
+   "text": "Consumer protection starts with controlling how you respond. Use unique passwords, multifactor authentication, and verified official channels for anything financial, and never share a one-time verification code. Scammers rely on pressure and urgency, so any message that demands immediate action is a reason to slow down, not speed up. The safe pattern for a suspicious message is to stop, ignore any link it contains, and reach the institution yourself — open your banking app, type the official web address yourself, or call the number printed on your debit card. If a caller demands an urgent bank transfer, hang up and contact the bank independently. Real institutions do not need you to act through a surprise link. The second half of protection is understanding coverage you already pay for. A deductible is the amount you pay out of pocket before insurance contributes, and exclusions are the situations a policy does not cover at all. Reading both when you buy a policy — not at claim time — prevents the worst surprise: discovering that the event was never covered, or that you owe far more of the cost than you expected.",
+   "example": "Handle two situations the lesson's way. First, a text claims your bank account is locked and gives you one hour to 'verify' through its link. You do not click. You open your banking app directly — or call the number on your debit card — and check the account through that verified channel; the urgency in the text was the warning sign, not a deadline. Second, an insurance claim: your policy has a $500 deductible and a repair costs $900. You pay the first $500 out of pocket, and the policy addresses the remaining $900 − $500 = $400, subject to its terms — and only if the event is not in the policy's exclusions, which is why you read them before the repair, not after.",
+   "review": "A message says your account is locked and you must verify within the hour through its link. What do you do instead, and what are the two policy terms you check before assuming a repair is covered?",
+   "diagram": [
+    "Stop at urgency",
+    "Never share a code",
+    "Use official channels",
+    "Read deductible amount",
+    "Read exclusions first"
+   ]
+  },
+  {
+   "number": 8,
+   "heading": "Applied assignment: compare banking and saving options fairly",
+   "text": "This assignment asks you to compare at least two banking or saving options using fictional information only, judged on the same grading split as before: accuracy 40%, complete evidence 30%, analysis 20%, and clarity 10%. The fairness rule is to use the same yardsticks for every option: monthly fees converted to a yearly cost, minimum balance rules, overdraft treatment, ATM access, and how quickly savings can be reached in an emergency. Converting fees to yearly figures is what makes the comparison honest, because monthly amounts hide their real weight. The lesson also warns against assuming the 'free' account always wins: an account with no monthly fee can cost more than a fee-charging account for a person whose habits trigger its other charges. On the savings side, state an emergency-fund target based on essential expenses — the staged approach from the emergency fund lesson — and the monthly amount you would save toward it, showing the division that connects the two. Finally, name one risk or limitation of your comparison, such as fees changing over time, or your ATM habits turning out different from the assumption you used.",
+   "example": "Run the lesson's comparison. Account one charges a $12 monthly fee: $12 × 12 = $144 a year. Account two charges no monthly fee but $3 per out-of-network ATM withdrawal. For a person making two such withdrawals a month, that is $3 × 2 × 12 = $72 a year — cheaper than $144, but not free, and for someone making four withdrawals a month it would be $144, exactly tying the fee account. Then add the savings side in the same document: state the emergency target from essential expenses and the monthly saving step that reaches it, and close by naming the limitation — for instance, that the whole ATM comparison rests on the assumed two withdrawals a month.",
+   "review": "Why must both accounts in your comparison be scored on identical yardsticks, and what limitation of your own comparison do you state at the end?",
+   "diagram": [
+    "Pick two options",
+    "Same yardsticks for both",
+    "Fees converted to yearly",
+    "Add emergency target",
+    "Name one limitation"
+   ]
+  },
+  {
+   "number": 9,
+   "heading": "Read your credit report as a record, and dispute real errors",
+   "text": "A credit report is a record, not a grade. It typically lists identifying information, your credit accounts with their balances and payment history, inquiries made when you applied for credit, and public records such as bankruptcies. Lenders — and sometimes landlords or employers, with permission — use it to judge how reliably bills have been paid. A credit score is a separate number calculated from the report's data, and because different scoring models weigh that data differently, two scores for the same person can differ; different lenders may use different models. That is why reviewing the report itself matters: errors in the underlying record flow into every score built on it. Disputing an error follows a set sequence. First, read each account and mark anything you do not recognize or that shows wrong information, such as a payment marked late that was made on time. Second, gather evidence — statements or receipts showing the correct information. Third, file a dispute with the credit reporting agency that issued the report, explaining the error and attaching copies of your evidence, never originals. Fourth, keep a copy of everything and follow up until the item is corrected or the agency explains its finding. Disputes are for genuine errors, not for accurate information you wish were gone.",
+   "example": "Work a dispute the lesson's way. Your report shows a payment marked late, but your statement and receipt show it was made on time. Step one: mark that account entry as the error, noting exactly what is wrong — the late mark, not the whole account. Step two: copy the statement and receipt that prove the on-time payment; the originals stay in your file. Step three: file the dispute with the reporting agency that issued this report, explaining in writing that the payment was made on time and attaching the copies. Step four: keep your own copy of the dispute and the evidence, and follow up until the agency corrects the entry or explains its finding. An incorrectly reported late payment, documented and disputed this way, is the lesson's model case.",
+   "review": "Your report marks an on-time payment as late. List the four dispute steps in order, and say why you send copies of evidence rather than originals.",
+   "diagram": [
+    "Read every account",
+    "Mark the genuine error",
+    "Gather proof copies",
+    "File dispute with agency",
+    "Keep copies, follow up"
+   ]
+  },
+  {
+   "number": 10,
+   "heading": "Judge borrowing by APR and total repaid, not the monthly payment",
+   "text": "When you borrow, four numbers decide whether the deal is good: the APR, the total of all fees, the repayment term, and the total amount paid over the life of the loan. The monthly payment alone is the most misleading figure of the four, because stretching a loan over a longer term lowers each payment while raising the total cost — you pay interest for more months on the same purchase. The lesson's instruction is to compare APR, fees, repayment terms, and total paid rather than focusing only on the monthly payment. Simple interest gives a clean way to see the arithmetic: interest equals the amount borrowed multiplied by the annual rate for each year the money is held. At a simple 12% annual rate, $1,000 borrowed for one year accrues $120 of interest. Real amortized loans calculate differently month by month, but the comparison principle is identical: the longer the term at a given rate, the more total interest accumulates. Before signing anything, pin down all four numbers in writing and compare offers on the totals, so a longer, more expensive loan cannot disguise itself as the better deal simply by shrinking the payment.",
+   "example": "Compare two simple-interest offers on a $2,000 purchase, both at 10% annual interest. Option A runs one year: interest is $2,000 × 10% = $200, so the total repaid is $2,200. Option B stretches the same purchase over two years at the same rate: interest is roughly $400 across the two years, so the total repaid is about $2,400. Option B's monthly payment is smaller — the same purchase spread over twice as many months — yet the borrower pays $200 more for the identical item. The lesson's anchor calculation confirms the method: $1,000 at simple 12% for one year accrues $1,000 × 12% = $120, for a total of $1,120. Always quote the interest and the total together.",
+   "review": "Two loans carry the same APR, but one has a smaller monthly payment and a higher total repaid. What explains the difference, and which four numbers do you compare before signing?",
+   "diagram": [
+    "Get the APR",
+    "Add all fees",
+    "Note the term",
+    "Compute total repaid",
+    "Never judge by payment"
+   ]
+  },
+  {
+   "number": 11,
+   "heading": "Pay debts in a deliberate order: avalanche or snowball",
+   "text": "A debt repayment plan starts with a list: every debt, its balance, its minimum payment, and its rate. Every minimum gets paid on time, always — a missed minimum can add fees and harm your credit record, no matter how good the rest of the plan is. Extra money beyond the minimums is then aimed at one debt at a time, using one of two orders. The highest-rate-first approach, often called the avalanche, sends extra principal to the debt with the highest APR; each dollar there stops the most expensive interest from growing, so it generally saves the most interest — extra principal on a 22% APR debt saves more than the same amount on an 8% APR debt. The smallest-balance-first approach, often called the snowball, clears the smallest balance first; it may cost slightly more interest, but the quick win can keep motivation alive. The lesson's judgment is that either plan beats paying only minimums everywhere. Two habits protect the plan: pause new charges on the cards being paid down, because adding new spending while paying extra barely moves the balance, and review the plan monthly, adjusting it if income changes rather than abandoning it at the first difficult month. Always check fees and cash-flow stability before committing extra money.",
+   "example": "Apply both orders to the lesson's debts: $400 on a card at 24% APR and $1,200 on a loan at 9% APR, with $100 a month available beyond the minimums. The avalanche sends the extra $100 to the 24% card, because that balance grows the most expensive interest. The snowball also sends the extra $100 to the $400 card, because it is the smallest balance and clearing it gives an early win. Here both methods pick the same debt for different reasons — it happens to be both the priciest and the smallest. They would differ if the smallest balance carried the lowest rate; then you would be choosing openly between saving the most interest and banking a quick win for motivation.",
+   "review": "You have $100 beyond your minimums. Explain how the avalanche and the snowball each choose where it goes, and name the two habits that keep either plan alive.",
+   "diagram": [
+    "List debts, rates, minimums",
+    "Pay every minimum on time",
+    "Aim extra at one debt",
+    "Avalanche or snowball",
+    "Pause new charges, review"
+   ]
+  },
+  {
+   "number": 12,
+   "heading": "Applied assignment: analyze a credit case in three parts",
+   "text": "This assignment asks you to analyze a fictional credit case, using fictional information only, under the usual grading split: accuracy 40%, complete evidence 30%, analysis 20%, and clarity 10%. The analysis must show three things clearly. First, describe what the credit report in the case shows and flag anything that looks like an error, explaining the dispute step you would take and the evidence you would attach — the same mark, gather, file, and follow-up sequence from the credit reports lesson. Second, compare any borrowing in the case properly: by APR, fees, term, and total repaid, never by monthly payment alone, and quote both the interest amount and the total repaid so the reader sees the full cost. Third, lay out a repayment order: minimums paid on everything, then extra principal aimed at one chosen debt, with your reason stated openly — highest rate first to cut interest cost, or smallest balance first for momentum. Close by naming one limitation of your analysis, such as not knowing whether the case person's income is stable from month to month, since that uncertainty affects how aggressive a repayment plan can safely be.",
+   "example": "Anchor the borrowing section with the lesson's calculation. A $1,000 loan at simple 12% annual interest for one year accrues $1,000 × 12% = $120 of interest, so the analysis quotes both figures: $120 of interest and a $1,120 total repaid. If the case offered the same loan over a longer term, you would show the higher total beside it rather than letting a smaller monthly payment speak for itself. Then the repayment order follows in one sentence of reasoning: minimums on all debts, extra principal to the highest-rate debt first to cut interest cost — or to the smallest balance first for momentum — with the chosen reason named, and the limitation about unknown income stability stated at the end.",
+   "review": "Name the three parts your credit case analysis must show, and the limitation you will state about the case person's circumstances.",
+   "diagram": [
+    "Read the report, flag errors",
+    "State dispute + evidence",
+    "Compare APR, fees, total",
+    "Order the repayment",
+    "Name one limitation"
+   ]
+  },
+  {
+   "number": 13,
+   "heading": "The accounting equation: assets = liabilities + equity",
+   "text": "Business bookkeeping rests on one equation: assets equal liabilities plus equity. Assets are what the business holds, liabilities are what it owes, and equity is the owner's share — the part left over. Rearranged, equity equals assets minus liabilities. Double-entry recording is the system that preserves the equation: every transaction moves at least two parts of it, and the equation must still balance afterward. That makes the equation a built-in error check — if your numbers ever stop balancing, a recording error has been made somewhere. Watch the two basic moves. Borrowing adds to both sides equally: cash rises and the amount owed rises by the same figure, leaving equity unchanged. An owner contribution raises assets and equity together, because the business holds more and the owner's share grew by the same amount. The lesson's caution protects the whole system: keep personal and business transactions separate. Mixing them breaks the check — if the owner pays a personal bill from the business account and records nothing, assets fall with no matching change anywhere, and the books no longer describe the business. Separate accounts make every movement explainable.",
+   "example": "Track the equation through two transactions. Start: $10,000 in assets, $4,000 in liabilities, and $6,000 in equity — check: $4,000 + $6,000 = $10,000, balanced, and equity alone is $10,000 − $4,000 = $6,000. First, the business borrows $2,000. Cash rises, so assets become $12,000; liabilities rise to $6,000; equity stays $6,000. Check: $6,000 + $6,000 = $12,000. Second, the owner contributes $1,000 of personal money. Assets rise to $13,000 and equity rises to $7,000, while liabilities stay $6,000. Check: $6,000 + $7,000 = $13,000. Both moves changed the totals, neither broke the balance — that is double-entry doing its job.",
+   "review": "A business holds $10,000 in assets and owes $4,000. What is equity, and what does it mean if your figures stop satisfying the equation after a transaction?",
+   "diagram": [
+    "Assets on one side",
+    "Liabilities + equity other",
+    "Every entry moves two parts",
+    "Check it still balances",
+    "Keep personal money out"
+   ]
+  },
+  {
+   "number": 14,
+   "heading": "Journals first, ledgers by account, debits equal credits",
+   "text": "Bookkeeping records each transaction twice in an organized way. The journal is the diary: every transaction is recorded there first, in date order, with the accounts affected, the amounts, and a short description. Posting then copies each journal line into the ledger account it belongs to, so the ledger shows the running story of one account at a time — all the cash movements together, all the rent together. Every balanced entry has equal total debits and total credits, and that equality is the balance check for the entry. The idea students most often get wrong is what a debit does. Debit does not always mean increase. Whether a debit increases an account depends on the account type: debits increase asset and expense accounts, but they decrease liability, equity, and revenue accounts; credits do exactly the opposite. So the same word means opposite movements in different accounts, while the totals still match. The common mistake to avoid is recording only one side of a transaction. A one-sided entry always breaks the debits-equal-credits check, and it should be caught the same day it is made, while the transaction is still easy to trace back to its source document.",
+   "example": "Post two entries from journal to ledger. First, the business pays $600 rent in cash. The journal entry debits Rent Expense $600 and credits Cash $600 — debits equal credits at $600 each. Posted to the ledger, the Cash account falls by $600 (a credit decreases this asset) and the Rent Expense account rises by $600 (a debit increases this expense). Second, the business buys $300 of supplies with cash: debit Supplies $300, credit Cash $300. Supplies, an asset, increases by the debit; Cash decreases by the credit; total assets do not change, because one asset rose while another fell by the same $300 — and the entry balances on both sides.",
+   "review": "An entry debits Supplies $300 and credits Cash $300. Why did one asset rise and the other fall under opposite labels, and what check proves the entry is complete?",
+   "diagram": [
+    "Record in journal first",
+    "Date, accounts, amounts",
+    "Post lines to ledger",
+    "Debits equal credits",
+    "Debit depends on type"
+   ]
+  },
+  {
+   "number": 15,
+   "heading": "Reconcile the ledger to the bank statement, difference by difference",
+   "text": "Reconciliation compares your ledger with an external record — the bank statement — for the same date, and explains every difference between them. Differences come in two kinds. Timing differences are normal: a check you recorded that the bank has not yet processed, or a deposit in transit. They resolve themselves when the bank catches up, and they need no journal entry. The second kind is items the bank knows about that your books missed — fees, interest, automatic payments. Those do need journal entries, because the books are incomplete without them. The method is to adjust both sides toward the same true figure: take the statement balance and account for the timing items, take the book balance and record the unrecorded items, and the two adjusted balances must agree. The lesson's caution is absolute: never plug an unexplained difference. Forcing the balances to match with a made-up adjustment hides the real error, corrupts every later reconciliation, and destroys the check that makes reconciliation valuable. Anything still unexplained after checking both lists is an error to hunt down, line by line, until it is found.",
+   "example": "Reconcile the lesson's figures. The bank statement shows $1,970 and the books show $2,050. You find a $50 check you recorded that the bank has not yet processed — an outstanding check, a timing difference. You also find a $30 bank fee on the statement that is not in your books. Adjust the book side: $2,050 − $30 fee = $2,020, and record the $30 fee in the ledger so the books are complete. Adjust the statement side: $1,970 + $50 outstanding check = $2,020. Both sides now agree at $2,020, so the account reconciles. The simpler anchor case works the same way: a $30 fee fully explains a $2,000 ledger against a $1,970 statement — record the fee, and the difference is gone.",
+   "review": "Your books show $2,050, the statement $1,970, and you find a $50 outstanding check and a $30 unrecorded fee. Show both adjusted balances, and say which item needs a journal entry.",
+   "diagram": [
+    "Take statement balance",
+    "Take book balance",
+    "List timing differences",
+    "Record unrecorded items",
+    "Adjusted sides must agree"
+   ]
+  },
+  {
+   "number": 16,
+   "heading": "Applied assignment: balance a ledger and prove it two ways",
+   "text": "This assignment asks you to balance a ledger using fictional information only, graded as accuracy 40%, complete evidence 30%, analysis 20%, and clarity 10%. Balancing means proving two things. First, every journal entry has equal debits and credits. Second, the accounting equation — assets equal liabilities plus equity — still holds at the end. Work in the order a bookkeeper works: record each transaction in the journal first, then post it to the ledger accounts, then total each side. If your trial totals disagree, the instruction is firm: do not adjust a number to force them equal. Instead, re-check each posting against its journal entry until you find the one-sided or mistyped entry causing the gap — the disagreement is information, and forcing it away destroys that information. Finish the assignment by reconciling the cash ledger balance against the fictional bank statement provided, listing each timing difference, such as outstanding checks or deposits in transit, separately from each item that needs a journal entry, such as an unrecorded bank fee. That separation is exactly the distinction the reconciliation lesson taught, and showing it clearly is part of the evidence the grader is looking for.",
+   "example": "Prove the method on the lesson's entry. Buying $300 of supplies with cash is recorded in the journal as a $300 debit to Supplies and a $300 credit to Cash. First proof — the entry balances: debits $300 equal credits $300. Posted to the ledger, Supplies rises $300 and Cash falls $300. Second proof — the equation is undisturbed: one asset rose while another fell by the same amount, so total assets do not change, and assets still equal liabilities plus equity. If a later total disagrees, you would trace each ledger posting back to its journal line rather than nudging a figure — the same discipline you then apply when the cash ledger is reconciled to the statement, item by item.",
+   "review": "Your ledger totals disagree. What do you do instead of adjusting a figure to force them equal, and what two proofs must your finished assignment show?",
+   "diagram": [
+    "Journal each transaction",
+    "Post to ledger accounts",
+    "Total debits and credits",
+    "Check the equation holds",
+    "Reconcile cash to statement"
+   ]
+  },
+  {
+   "number": 17,
+   "heading": "Relative references move when copied; absolute references stay fixed",
+   "text": "Spreadsheet formulas refer to cells, and what happens when a formula is copied depends on the kind of reference it uses. A relative reference changes when the formula is copied: copy a formula down one row and its relative references shift down one row too, so each copy points at its own row's data. That behavior is usually exactly what you want for values that differ per row, like each invoice's amount. An absolute reference stays fixed no matter where the formula is copied, and it is written with dollar signs, like $B$2. Use it for a single shared value — a tax rate or fee rate stored in one cell — that every row must point at. Locking only half the reference is the common mistake: $B2 locks the column but lets the row move when copied down, and B$2 locks the row but lets the column move when copied across. When one cell must stay fixed in every direction, lock both parts. The lesson's caution closes the topic: test copying before relying on the workbook. After copying any formula, click two or three of the copied cells and read them in the formula bar to confirm each one points where you intended.",
+   "example": "Copy a tax formula down invoice rows. An example tax rate of 0.08 sits in cell B2. Invoice amounts sit in A5, A6, and A7: $250, $400, and $150. In C5 enter =A5*$B$2, which gives $250 × 0.08 = $20. Copy C5 down to C6 and C7. The relative reference adjusts — A6, then A7 — so each row uses its own invoice amount, while $B$2 never moves. Results: $400 × 0.08 = $32 and $150 × 0.08 = $12, and the three tax amounts total $20 + $32 + $12 = $64. Had you typed plain B2, copying down would shift it to B3 and B4 — empty or unrelated cells — and the later rows would come out wrong while looking plausible.",
+   "review": "In =A5*$B$2 copied down two rows, which reference changes and which stays fixed — and how do you verify the copies before trusting them?",
+   "diagram": [
+    "Store the rate in one cell",
+    "Write formula with $B$2",
+    "Copy it down the rows",
+    "Relative refs shift",
+    "Check formula bar copies"
+   ]
+  },
+  {
+   "number": 18,
+   "heading": "SUM, AVERAGE, and IF — and how to prove a formula is right",
+   "text": "Three functions do much of a financial spreadsheet's work. SUM totals a range of cells. AVERAGE divides a range's total by how many entries it holds, giving a typical value useful for planning. IF selects between two outputs based on a condition: it tests a statement, displays one result when the condition is true, and another when it is false — the pattern for flags such as 'Over budget' and 'Within budget.' Range notation matters: a colon means the whole range, so B2:B5 includes every cell from B2 through B5. Writing =SUM(B2,B5) with a comma adds only the first and last cells and silently leaves out the middle values — a wrong total that looks perfectly reasonable. The lesson's caution adds that currency formatting does not correct a broken formula; formatting changes appearance, not arithmetic. So validate every formula against known examples. Test a new formula against numbers you can verify by hand, then change one input on purpose and confirm the result moves by exactly the amount it should. If the total does not move when an input changes, the formula is probably adding typed values or the wrong range instead of the cells you edited.",
+   "example": "Run all three functions on four weekly supply costs in B2 through B5: $120, $80, $200, and $100. =SUM(B2:B5) returns $500. =AVERAGE(B2:B5) returns $500 ÷ 4 = $125, a planning figure for next month's supply budget. An IF flag on the monthly total in B6 — =IF(B6>1000,\"Over budget\",\"Within budget\") — displays 'Over budget' when B6 holds $1,150 and 'Within budget' when it holds $900. Now validate: raise B3 from $80 to $180 and the SUM must rise by exactly $100, from $500 to $600. And note the trap: =SUM(B2,B5) would return only $120 + $100 = $220, silently dropping the middle two weeks.",
+   "review": "Why does =SUM(B2,B5) give a different answer from =SUM(B2:B5), and what input-change test proves your SUM is reading the right cells?",
+   "diagram": [
+    "SUM totals the range",
+    "AVERAGE gives the typical",
+    "IF flags a condition",
+    "Colon means whole range",
+    "Test with known numbers"
+   ]
+  },
+  {
+   "number": 19,
+   "heading": "Cash-flow sheets: opening cash plus inflows minus outflows",
+   "text": "A cash-flow sheet tracks cash itself, on dated rows: opening cash, inflows, outflows, and closing cash, where closing cash equals opening cash plus inflows minus outflows. Build it with one row per transaction, a date on every row, and a running formula for closing cash rather than a typed number, so the balance updates itself whenever a row is added or corrected. The discipline that makes the sheet truthful is counting only cash that has actually moved. An invoice you have sent is not an inflow; it belongs in accounts receivable until the customer pays. Recording it early overstates the bank balance and could lead the owner to spend money that is not there yet. When the payment does arrive, enter it once, on the date received. This is why the lesson's caution matters: profit can differ from cash, because invoices may remain unpaid. A business can show a profitable period on paper while its bank balance falls, simply because the sales have not been collected yet. Check the sheet against the bank balance as you work, so the sheet describes the cash the business truly has, not the cash it hopes to have.",
+   "example": "Build one week on the sheet. A small service business starts with $1,200 in the bank. During the week customers pay two invoices, $900 and $600, so total inflows are $1,500. The business pays $800 in rent and $350 for supplies, so total outflows are $1,150. Closing cash is $1,200 + $1,500 − $1,150 = $1,550. The lesson's anchor example checks the same formula: $800 opening plus $1,500 receipts less $1,100 paid yields $1,200 closing. Now the trap: the business also sends a new $700 invoice this week, unpaid. It goes to accounts receivable, not inflows — closing cash stays $1,550 until the $700 actually arrives and is entered once, on that date.",
+   "review": "Opening cash is $1,200, inflows $1,500, outflows $1,150, and a $700 invoice was sent but not paid. What is closing cash, and where does the $700 belong for now?",
+   "diagram": [
+    "Opening cash first",
+    "Date every row",
+    "Add actual inflows",
+    "Subtract actual outflows",
+    "Formula gives closing cash"
+   ]
+  },
+  {
+   "number": 20,
+   "heading": "Applied assignment: build a cash-flow workbook that checks itself",
+   "text": "This assignment asks you to build a cash-flow workbook using fictional information only, graded on accuracy 40%, complete evidence 30%, analysis 20%, and clarity 10%. A complete submission has dated rows for every transaction, separate columns for inflows and outflows, and formulas — not typed totals — for the closing balance on each row, so the balance is produced by the sheet rather than asserted by you. Two techniques from the spreadsheet lessons must appear: at least one absolute reference, such as a fee rate stored in a single cell and locked with dollar signs so copied formulas keep pointing at it, and at least one SUM over a range, written with a colon so every cell in the range is included. In your written summary, name one assumption you made — such as a payment arriving on a set date — and one limitation, such as a customer paying late and shifting cash into the next week. Before submitting, run the lesson's three self-checks: add the inflow column by hand and compare it with your SUM result; change one input amount and confirm the closing balance moves by the same amount; and click a copied formula in two different rows, reading the formula bar to confirm relative references shifted while your locked reference stayed fixed.",
+   "example": "Check the model workbook the way the assignment demands. The fictional business opens with $600, receives $1,400, and pays out $1,250, so the closing formula must produce $600 + $1,400 − $1,250 = $750 entirely on its own — if $750 was typed rather than calculated, the workbook fails its own standard. Add the inflow column by hand and compare it against the SUM cell: they must match. Raise one inflow by $50 and watch closing cash rise to $800; if it does not move, a formula is adding typed values instead of cells. Finally, open a copied fee formula in two rows and confirm the locked rate cell is identical in both while the row references differ — then the workbook is ready.",
+   "review": "Name the three self-checks you run before submitting, and why must the closing balance be a formula rather than a typed $750?",
+   "diagram": [
+    "Dated rows, two columns",
+    "Closing balance as formula",
+    "One locked $ reference",
+    "One SUM over a range",
+    "Run three self-checks"
+   ]
+  },
+  {
+   "number": 21,
+   "heading": "Set up the company first: one chart of accounts, used consistently",
+   "text": "QuickBooks work begins with setup, in a demonstration company for practice — the caution is explicit: do not practice in a real customer account without authorization. Setting up means configuring the chart of accounts and categories before transactions are entered. The chart of accounts is the business's list of accounts, each with one clear name and one type. A sample service business needs accounts across the types: income, expense, asset, and liability accounts, together with equity. Checking and Accounts Receivable are assets; Accounts Payable is a liability; Owner's Equity is equity; service revenue is income; supplies and rent are expenses. The principle that makes setup matter is consistency: when the business buys supplies, the cost goes to Supplies Expense every time — not sometimes to Rent Expense, and not to a second account also called Supplies. Consistent categories are what make the reports at the end of the month mean anything. Two setup mistakes undo that: creating duplicate accounts, such as both 'Supplies' and 'Supplies Expense,' which splits one kind of spending across two places so neither balance shows the full picture; and creating a brand-new account for every single purchase, which has the same fragmenting effect.",
+   "example": "Set up the lesson's fictional cleaning service. Its starter chart of accounts: Checking (asset), Accounts Receivable (asset), Cleaning Equipment (asset), Accounts Payable (liability), Owner's Equity (equity), Cleaning Service Revenue (income), Supplies Expense (expense), and Rent Expense (expense). Eight accounts, each with one name and one type, covering everything the business routinely does. When the service later buys supplies, the cost lands in Supplies Expense — the same account every time — so a month-end report shows total supplies spending in one figure. If a second account named just 'Supplies' also existed, the same spending would be split between two balances and neither report figure could be trusted. Add a new account only when a genuinely different category appears.",
+   "review": "Why does having both 'Supplies' and 'Supplies Expense' corrupt a month-end report, and where must all practice setup and entries happen?",
+   "diagram": [
+    "Use demonstration company",
+    "List accounts by type",
+    "One name per category",
+    "Set up before entries",
+    "Same account every time"
+   ]
+  },
+  {
+   "number": 22,
+   "heading": "Invoices are amounts owed, bills are obligations — neither is cash",
+   "text": "In QuickBooks, a sales invoice creates an amount a customer owes, and a vendor bill represents an obligation to a supplier. The accounts that hold these are accounts receivable — money others owe the business — and accounts payable — money the business owes others. The memory check is simple: receivable means others owe us; payable means we owe others. The caution that governs everything in this lesson is that an invoice does not equal cash collected. Sending an invoice raises accounts receivable, not the bank balance; cash rises only when the customer's payment is recorded against that invoice, which lowers the receivable by the same amount. A partial payment lowers it partially, leaving the true remaining balance visible. Vendor bills mirror the pattern: entering a bill raises accounts payable, and paying the supplier lowers cash and accounts payable together. The error to avoid is recording a customer payment as a new invoice instead of applying it to the open invoice — that double-counts the sale and leaves the balance looking unpaid. Always match each payment to the invoice or bill it settles, and check that the remaining balance matches what the customer or supplier statement shows.",
+   "example": "Follow one invoice and one bill through a week at a fictional repair shop. The shop sends a customer an invoice for $750: accounts receivable rises to $750 — money owed to the shop, not cash in the bank. The customer pays $300. Record the payment against the invoice: cash rises by $300 and accounts receivable falls to $750 − $300 = $450 still owed. The lesson's anchor is the same shape: an unpaid $500 customer invoice creates a $500 accounts receivable balance. In the same week the shop receives a $400 bill from a parts supplier: accounts payable rises to $400. When the shop pays it, cash falls by $400 and accounts payable falls back to $0 — both sides settled, nothing double-counted.",
+   "review": "A customer pays $300 against a $750 invoice. What happens to cash and to accounts receivable, and why must the payment be applied to the invoice rather than entered as a new one?",
+   "diagram": [
+    "Invoice raises receivable",
+    "Payment lowers receivable",
+    "Bill raises payable",
+    "Paying lowers payable",
+    "Match payment to document"
+   ]
+  },
+  {
+   "number": 23,
+   "heading": "Reconcile in QuickBooks and read the reports the reconciliation protects",
+   "text": "Reconciliation in QuickBooks matches the company's records to the bank statement, and the resulting reports — the balance sheet and the income statement among them — are only trustworthy once the underlying accounts reconcile. The method mirrors the manual reconciliation you already learned. Take the bank statement's ending balance and adjust it for timing items: deposits recorded in the books that had not reached the bank by the statement date, and checks written and recorded that had not yet cleared. Then adjust the book balance by entering anything the statement shows that the books missed — a bank charge on the statement, for example, needs an appropriate bookkeeping entry. When the two adjusted figures agree, the account reconciles. Timing items are normal, and they are listed on the reconciliation report so anyone reviewing it can see exactly why the raw statement and book figures differed. If the adjusted figures still disagree, work through the statement line by line against the ledger, checking amounts digit by digit, and look for a transaction entered twice or one never entered. The caution stands: document unresolved differences — record what you find with a proper entry and write down anything that remains, with the date and what you checked, rather than forcing a match.",
+   "example": "Adjust the lesson's bank balance. A fictional shop's bank statement ends at $1,860. One deposit of $90 was recorded in the books but had not reached the bank by the statement date, and two checks totaling $210 were written and recorded but had not cleared. Adjusted bank balance: $1,860 + $90 − $210 = $1,740. The book balance, after entering any bank fees or charges the statement shows that the books missed — the lesson's example is a $20 bank charge needing an entry — must also come to $1,740. When both adjusted figures read $1,740, the account reconciles, and the $90 deposit and $210 of checks appear on the reconciliation report as the explained timing items. If they had not agreed, a digit slip such as $54 recorded as $45 is the kind of find the line-by-line check hunts for.",
+   "review": "A statement ends at $1,860, with a $90 deposit in transit and $210 of uncleared checks. What is the adjusted bank balance, and what do you do with a difference you still cannot explain?",
+   "diagram": [
+    "Start with statement end",
+    "Add deposits in transit",
+    "Subtract uncleared checks",
+    "Enter missed bank charges",
+    "Document any remainder"
+   ]
+  },
+  {
+   "number": 24,
+   "heading": "Applied assignment: demonstrate the full QuickBooks workflow in order",
+   "text": "This assignment asks you to demonstrate the complete workflow using fictional information only, graded on accuracy 40%, complete evidence 30%, analysis 20%, and clarity 10%. The demonstration must follow the order a bookkeeper actually works in: set up the demonstration company and its chart of accounts first, then enter a customer invoice, then enter a vendor bill, then record a payment against each one, and finish by reconciling the bank account against a statement and reviewing the resulting reports. Order matters because each step depends on the one before — there is no invoice to pay until the company and its accounts exist, and no meaningful reconciliation until payments are recorded. In your summary, point to one figure on the balance sheet or income statement and explain which transaction in your demonstration produced it; that explanation is the evidence that you understand what the reports are made of. The self-checks before submitting are specific. Confirm you worked only in the demonstration company, not a real business account. Confirm the invoice balance falls when the payment is applied, rather than a second invoice being created. And confirm the reconciliation uses the statement's ending date and ending balance, with any leftover difference written down and explained instead of forced to zero.",
+   "example": "Trace the demonstration's anchor figures. An invoice entered for $500 shows $500 in accounts receivable — the full amount owed — and it stays there until a payment is applied; the moment the payment is recorded against that invoice, the receivable balance falls by the payment amount. A supplier bill entered in the same demonstration sits in accounts payable until it is paid, then falls the same way. At reconciliation, the statement's ending balance is adjusted for the demonstration's deposits in transit and uncleared checks, and the book side is adjusted for any charges the statement revealed. In the summary, you might point to the accounts receivable figure on the balance sheet and name the exact invoice — and its partial payment — that produced it.",
+   "review": "List the five stages of the workflow demonstration in order, and name the three self-checks you complete before submitting.",
+   "diagram": [
+    "Set up demo company",
+    "Enter customer invoice",
+    "Enter vendor bill",
+    "Record both payments",
+    "Reconcile, review reports"
+   ]
+  },
+  {
+   "number": 25,
+   "heading": "Two statements, two questions: performance over a period, position on a date",
+   "text": "Financial statements answer two different questions. An income statement covers revenues and expenses for a period — a month, a quarter, a year — and its result is profit or loss for that stretch of time: revenues minus expenses. A balance sheet shows assets, debts, and equity on one specific date, a snapshot of what the business owns and owes at that moment. The balance sheet must always balance, because it is the accounting equation in report form: assets equal liabilities plus equity, so equity can always be derived as assets minus liabilities. If a balance sheet you prepare does not balance, an entry is missing or misclassified, and the statements are not ready to share. The caution that ties the two statements together is that reported profit is not identical to cash in the bank. Revenue can be earned through invoices customers have not paid yet; that portion of profit sits in accounts receivable, not in the bank account. So a business can post a strong profit month while holding very little cash. Read the income statement to judge performance over the period, and the balance sheet to see what the business owns and owes on a specific date — and never substitute one statement's answer for the other's question.",
+   "example": "Read both statements for a fictional tutoring business. For the month, revenue is $12,500 and expenses are $2,000 rent, $4,500 wages, and $1,000 supplies, totaling $7,500. The income statement shows net income of $12,500 − $7,500 = $5,000 for that month — a period result. The lesson's anchor agrees: sales of $8,000 minus expenses of $5,000 produce $3,000 profit before other items. The balance sheet on the month's last day shows $18,000 in assets and $7,000 in liabilities, so equity must be $18,000 − $7,000 = $11,000. Now the caution in numbers: if $3,000 of the month's revenue came from unpaid invoices, that $3,000 sits in receivables — the $5,000 profit does not mean $5,000 of extra cash appeared.",
+   "review": "A business reports $5,000 profit but its bank balance barely moved. Which statement explains where the profit is sitting, and what must always be true of the balance sheet?",
+   "diagram": [
+    "Income statement: a period",
+    "Revenue minus expenses",
+    "Balance sheet: one date",
+    "Assets = liabilities + equity",
+    "Profit is not cash"
+   ]
+  },
+  {
+   "number": 26,
+   "heading": "From hours to net pay, with records that can be traced",
+   "text": "Payroll arithmetic has three layers. Gross pay is the amount earned before withholding and deductions — for hourly work, hours worked multiplied by the rate. Deductions and withholdings are then subtracted, line by line. Net pay is what remains: the amount the worker actually receives. A complete pay record for each period shows the hours, the rate, the gross amount, each deduction as its own line, and the net amount, so any figure can be traced and checked later. Records must be organized to stay usable: file each period's records in order, keep the year-end summaries with the matching pay stubs, and store them where only authorized people can reach them, because pay records contain personal information. Two cautions govern the figures themselves. Tax rules depend on jurisdiction and circumstances, so check current official tax guidance rather than copying last year's number when a figure looks wrong. And never fix a past pay record by quietly editing it — record a correction entry that shows what changed and why, so the history stays honest and auditable. Amounts withheld depend on the worker's own situation, which is why the official source, not habit, settles any question about a deduction.",
+   "example": "Run the lesson's pay calculation. A fictional employee works 38 hours at $15 per hour. Gross pay is 38 × $15 = $570. The pay stub lists total withholdings and deductions of $85, shown as example figures for practice. Net pay is $570 − $85 = $485 — the amount the employee actually receives. The lesson's anchor uses the same subtraction at a larger scale: gross $1,200 minus deductions of $250 equals $950 net. The record for this period is complete only when it shows all of it together — 38 hours, the $15 rate, $570 gross, each deduction on its own line adding to $85, and $485 net — filed in order with the period's other records, where only authorized people can reach it.",
+   "review": "An employee works 38 hours at $15 with $85 in deductions. Show gross and net pay, and explain how a later error in this record must be corrected.",
+   "diagram": [
+    "Hours × rate = gross",
+    "List each deduction",
+    "Gross minus deductions",
+    "Net pay received",
+    "File in order, restricted"
+   ]
+  },
+  {
+   "number": 27,
+   "heading": "Break-even: fixed costs divided by the contribution per unit",
+   "text": "Break-even analysis finds the sales volume at which a business exactly covers its costs — no profit, no loss. It rests on three figures. Fixed costs stay the same no matter how much is sold. The sale price is what each unit brings in. Variable cost is what each unit costs to make or deliver. Unit contribution is sale price minus variable cost: the amount each sale contributes toward covering fixed costs. Break-even units equal fixed costs divided by unit contribution. The caution sets the boundary condition: a zero or negative contribution cannot cover fixed costs at any volume — if each sale contributes nothing, or loses money, selling more never gets the business to break-even, and the price or the variable cost must change first. Two practical rules complete the lesson. Always round break-even up to the next whole unit, because a fraction of a unit cannot be sold and rounding down leaves the business slightly short. And recompute the figure whenever a price or a cost changes, instead of relying on an old result — a small rise in variable cost shrinks the contribution and pushes the break-even point up more than intuition suggests.",
+   "example": "Work the lesson's market stall. A fictional vendor pays $3,600 in fixed costs for a season — stall fees and insurance that stay the same however much she sells. Each item sells for $90 and costs $54 in materials and packaging, so contribution is $90 − $54 = $36 per item. Break-even is $3,600 ÷ $36 = 100 items. Check it: 100 items bring in $9,000, variable costs take 100 × $54 = $5,400, and $9,000 − $5,400 = $3,600, exactly the fixed costs — the 101st item is the first that produces profit. The anchor case agrees: $2,000 fixed, $100 price, $60 variable gives a $40 margin and $2,000 ÷ $40 = 50 units. If materials rise to $63, contribution falls to $27 and break-even climbs to $3,600 ÷ $27 = 133.33, so she must sell 134 items.",
+   "review": "Fixed costs are $3,600, price is $90, and variable cost rises from $54 to $63. What happens to contribution and break-even, and why do you round the answer up?",
+   "diagram": [
+    "Fix the fixed costs",
+    "Price minus variable cost",
+    "That is contribution",
+    "Fixed ÷ contribution",
+    "Round up to whole units"
+   ]
+  },
+  {
+   "number": 28,
+   "heading": "Applied assignment: analyze fictional finances that agree with each other",
+   "text": "This assignment asks you to analyze a set of fictional finances, using fictional information only, under the standard grading split: accuracy 40%, complete evidence 30%, analysis 20%, and clarity 10%. A complete analysis presents four pieces built from your fictional figures: an income statement, a balance sheet, a short payroll summary showing hours, rate, gross pay, deductions, and net pay, and a break-even calculation with the fixed costs, price, and variable cost stated up front. The figures must agree with each other — that agreement is the heart of the assignment. The balance sheet must balance, with assets equal to liabilities plus equity. Net pay must equal gross pay minus the deductions you listed. The break-even result must follow from the inputs you stated. Commentary must also be honest about what the numbers say: if the income statement shows a loss, say so plainly and name the largest expense driving it, rather than softening the result. Close with one risk or limitation, such as revenue depending on invoices that have not been collected yet. Before submitting, recompute each headline figure from its parts instead of trusting your first pass, confirm the income statement covers a period while the balance sheet is dated on one day, and confirm no real person's pay or tax information appears anywhere.",
+   "example": "State a loss the lesson's way. Suppose your fictional figures show revenue of $9,000 against expenses of $10,400. The income statement result is $9,000 − $10,400 = a loss of $1,400, and the commentary says exactly that — a loss of $1,400 — then names the largest expense driving it. The rest of the analysis must stay consistent with that story: the payroll summary's net pay equals its gross minus its listed deductions, the balance sheet balances on its stated date, and the break-even calculation divides the stated fixed costs by the contribution from the stated price and variable cost. If any recomputation disagrees with a headline figure, the figure gets corrected before submission — the self-check is recomputing from parts, not re-reading your own totals.",
+   "review": "Which internal agreements must hold across your four analysis pieces, and how do you report a period where expenses exceed revenue?",
+   "diagram": [
+    "Income statement first",
+    "Balance sheet must balance",
+    "Payroll: gross to net",
+    "Break-even from inputs",
+    "Name risk, recompute all"
+   ]
+  },
+  {
+   "number": 29,
+   "heading": "Match the money to the timeline: accessible savings versus investing",
+   "text": "Saving and investing are different tools, chosen by when the money will be needed. Accessible, low-risk savings fits immediate needs: the value is stable and the money can be reached quickly, which is exactly what money for near-term bills requires. The cautionary example is rent due next month — it should not depend on a volatile asset recovering its value in time. Longer-term investments carry risk: money set aside for a goal years away can be invested, accepting that its value will move up and down along the way. Growth in a savings account is modest, and the lesson shows the arithmetic plainly rather than letting anyone imagine otherwise. Diversification — spreading investments across different holdings — means one holding's bad stretch does not decide the whole outcome, but it does not remove risk and cannot promise a gain. Historical performance is likewise not a guarantee of future results. Sequencing matters too: build the emergency fund first, so an unexpected repair never forces you to sell an investment at a bad moment. Sort every amount of money by its timeline — bills due within weeks in accessible savings, distant goals in investments that can tolerate the ups and downs — and the choice of tool follows from the date, not from hope.",
+   "example": "Do the lesson's simple-interest calculation step by step. Suppose $1,000 sits in a savings account for one year at an example rate of 4% simple interest, used only to show the arithmetic. Interest is $1,000 × 0.04 = $40, so the balance after one year is $1,040, assuming no deposits, withdrawals, or fees. That modest $40 is the honest picture of savings growth — the account's job is stability and access, not speed. So the sorting follows: money needed for next month's rent stays in that kind of account, where $1,000 stays $1,000 plus a little interest, while money for a goal several years away is the candidate for investing, with diversification spreading it across holdings and the emergency fund already built underneath both.",
+   "review": "Why does rent due next month belong in accessible savings even though investing might grow it more, and what does diversification protect against without removing risk?",
+   "diagram": [
+    "Sort money by deadline",
+    "Near bills: savings",
+    "Distant goals: investing",
+    "Diversify the holdings",
+    "Emergency fund first"
+   ]
+  },
+  {
+   "number": 30,
+   "heading": "Turn a goal into a monthly step, then review and repair the plan",
+   "text": "An action plan sets a measurable savings goal — a target amount with a deadline — and divides the target by the number of months to get the monthly step. The plan then lives or dies on review: put the review on the calendar, monthly, and compare three numbers each time — the target for today, the actual balance, and the difference between them. A small gap found early is cheap to fix; the same gap found in the final month may be impossible to close. When a shortfall appears, there are three honest responses: spread the shortfall across the remaining months by raising the monthly step, extend the deadline, or reduce the target. What does not work is leaving the plan unchanged and hoping the gap closes itself. The same discipline applies when circumstances change for any reason: when income changes, adjust the monthly step and write the new figure into the plan the same day, so the plan always describes what you are actually doing rather than what you once intended. Use fictional case data for classroom activities, and treat the written, updated plan — not the original hope — as the real plan at every review.",
+   "example": "Size the step and repair a shortfall, the lesson's way. A fictional saver sets a goal of $1,800 in nine months for a certification exam and equipment. The monthly step is $1,800 ÷ 9 = $200. After three months she should hold $600, but she checks and finds $500 — one month she could only save $100. She is $100 behind with six months left. Spreading the shortfall evenly means adding $100 ÷ 6 ≈ $16.67 per month, so she raises her transfer to about $217 and keeps the same deadline. The anchor case shows the basic division: saving $100 monthly for six months targets $600. Notice the review did the work — catching a $100 gap at month three cost about $17 a month to fix; catching it at month eight would have demanded the whole $100 at once.",
+   "review": "You are $100 behind with six months left on a goal. Show the repaired monthly step, and name the two other honest options besides raising the step.",
+   "diagram": [
+    "Target ÷ months = step",
+    "Review monthly on calendar",
+    "Compare target vs actual",
+    "Spread any shortfall",
+    "Write the new step down"
+   ]
+  },
+  {
+   "number": 31,
+   "heading": "Present one connected story whose numbers agree everywhere",
+   "text": "The final presentation — the capstone — explains assumptions, calculations, tradeoffs, and specific next steps using fictional financial data. Its strength comes from connection: a strong capstone walks through one connected story — a budget, a savings goal, a credit safety step, and a business cash-flow summary — with every figure traceable to the slides before it. The savings goal must be built from the budget's actual surplus, not from a rounder number you prefer; the cash-flow summary must use the same business figures throughout. Before presenting, recompute each headline figure from its parts and check that the same number is identical everywhere it appears, because an audience that finds two different versions of one figure stops trusting all of them. Handling questions honestly is part of the professional skill. State your assumptions out loud — the income you assumed, the dates payments arrive, the example rates you used — and name at least one limitation, such as a late customer payment shifting the cash-flow result. And never guarantee future financial outcomes: if someone asks whether the plan will definitely work, the correct answer is that no plan can guarantee an outcome. What you can show is that the arithmetic is right, the assumptions are stated, and the next steps are specific.",
+   "example": "Connect the lesson's slides. The budget slide shows $2,600 of income and $2,350 of spending, so the surplus is $2,600 − $2,350 = $250. The savings slide must build from that same $250 a month: at the full surplus it reaches $250 × 6 = $1,500 in six months — not a larger goal invented for the slide, and not a smaller one that wastes the surplus without explanation. The presentation then adds one credit safety step and a business cash-flow summary, and before presenting, every headline figure is recomputed from its parts: the $250 surplus from its two inputs, the $1,500 from $250 × 6, and each figure checked to read identically wherever it appears. Assumptions are stated aloud, and one limitation — a late payment shifting the cash-flow timing — is named before questions begin.",
+   "review": "Your budget leaves a $250 monthly surplus. What must your savings slide do with that figure, and what do you say when asked whether the plan will definitely work?",
+   "diagram": [
+    "Budget shows the surplus",
+    "Goal built from surplus",
+    "Add credit safety step",
+    "Add cash-flow summary",
+    "Recompute, state limits"
+   ]
+  },
+  {
+   "number": 32,
+   "heading": "Submit the complete fictional financial plan, checked end to end",
+   "text": "The final assignment brings the whole course together in one submission, using fictional information only: a monthly budget built on take-home pay, a measurable savings goal with an amount and a deadline, one credit safety step, and a short business section with a cash-flow summary and a break-even figure. It is graded on accuracy 40%, complete evidence 30%, analysis 20%, and clarity 10%. The governing rule is agreement: every number must agree across sections. If the budget leaves a monthly surplus, the savings goal must be genuinely funded from that surplus rather than exceeding it — a goal the budget cannot fund is not a plan, it is a wish. State your assumptions, show the arithmetic behind each headline figure rather than asserting the figures, and name one risk or limitation together with the step you would take if it happened. Label each section so the reviewer can follow the story from budget to goal to business figures without guessing. The final check before submitting is a recomputation pass: recompute the closing cash, the savings target's monthly step, and the break-even point from their parts, and confirm each matches the figure stated in its section and everywhere else it appears. Correct any mismatch you find and note the change, and confirm no real account numbers, passwords, or personal information about any real person appear anywhere in the plan.",
+   "example": "Run the model's own consistency check. The budget section leaves a $250 monthly surplus. The savings section sets a goal of $1,200 in twelve months, which needs $1,200 ÷ 12 = $100 a month — comfortably funded by the $250 surplus, with room to spare. The business section reports cash figures of $900 opening cash, $2,100 in receipts, and $2,400 in payments, so closing cash must be reported as $900 + $2,100 − $2,400 = $600 — and the final check recomputes exactly that, plus the $100 monthly step and the break-even point from its stated fixed costs, price, and variable cost, confirming each matches its section. Any figure that failed the recomputation would be corrected, with the change noted, before the plan is submitted for instructor review.",
+   "review": "Before submitting, which three figures do you recompute from their parts, and what two things must be true of the savings goal's relationship to the budget?",
+   "diagram": [
+    "Budget on take-home pay",
+    "Goal funded by surplus",
+    "One credit safety step",
+    "Cash flow + break-even",
+    "Recompute all, submit"
+   ]
+  }
+ ]
+}

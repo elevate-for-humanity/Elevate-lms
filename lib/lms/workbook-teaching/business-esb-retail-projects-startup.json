@@ -1,0 +1,304 @@
+{
+ "version": 1,
+ "workbookSlug": "business-esb-retail-projects-startup",
+ "chapters": [
+  {
+   "number": 1,
+   "heading": "A startup begins as a testable concept, not an investment",
+   "text": "Before a startup spends real money, its concept has to survive being written down. A venture concept states who has the problem, in what situation, what the proposed offer delivers, the benefit that customer actually values, and what they do today instead. Broad slogans fail this test because nobody can disprove them; a specific offer \u2014 scheduled bicycle cleaning near a workplace for commuters who dread cleaning a bike after a wet ride \u2014 can be checked against the world. Design thinking gives the founder a sequence: observe customers, define the problem in their terms, generate candidate solutions, prototype the most promising one, and test it for evidence. The prototype at startup scale is an MVP, built to test one important assumption against measurable quality criteria. Founders must also place the venture on its lifecycle \u2014 development, launch, growth, maturity, decline, renewal \u2014 using operating evidence, because each stage needs different decisions. The discipline underneath everything is labeling: observed facts in one column, assumptions in another. Willingness to pay, access to a location, and reliable delivery time are assumptions until a test promotes them. Twenty friends approving an idea is encouragement; five strangers requesting a trial is the beginning of demand evidence. The concept document registers no business and guarantees no success \u2014 it makes the idea clear enough to question before capital is at risk.",
+   "example": "Price the concept before pitching it. A founder models ten half-hour appointments at $30 each: the appointment work alone consumes 10 \u00d7 0.5 = 5 hours, full revenue is 10 \u00d7 $30 = $300, and materials at $6 per service total 10 \u00d7 $6 = $60. The model openly excludes other operating costs, the founder's own compensation, and tax \u2014 naming exclusions is what makes a simple model honest. Then the constraint bites: the location is available for only three hours, which supports six appointments and 6 \u00d7 $30 = $180 of revenue. A startup that discovers this gap on paper redesigns the offer cheaply; a startup that discovers it after signing commitments redesigns expensively. Capacity first, forecast second.",
+   "review": "Which assumption in your concept would cost the most if it proved false, and what is the cheapest test that could check it?",
+   "diagram": [
+    "Observe the customer",
+    "Define the problem",
+    "Prototype the offer",
+    "Test one assumption",
+    "Separate fact from hope",
+    "Invest only on evidence"
+   ]
+  },
+  {
+   "number": 2,
+   "heading": "Founders decide structure, roles, and pay on separate pages",
+   "text": "Startup paperwork confuses three decisions that must be made separately. First, the offering: a product business sells items, a service business performs work, and a hybrid \u2014 like a repair shop charging labor and selling parts \u2014 does both. Second, the ownership structure, which answers who owns the venture, who decides, and how it is legally formed; the offering never dictates it. A sole proprietorship has one owner and no separate entity, so business obligations can affect the owner personally. A partnership shares ownership, with liability shaped by its form and its agreement. An LLC separates the entity from its members and generally provides limited liability, at the cost of formation and ongoing administration. A corporation is a separate entity owned by shareholders under formal governance. No form eliminates all risk, and registering a trade name creates no liability shield at all. Third, the operating roles \u2014 owner, manager, salesperson, operations, bookkeeper \u2014 which in a startup are usually hats worn by one or two people but still need separate names, so that scheduling, customer consent, delivery, payment collection, and reconciliation each have an accountable owner and, where practical, a second pair of eyes. Pay is the fourth page: wages, salary, commission, bonuses, and owner distributions follow different rules, and calling a payment by a convenient label settles nothing about classification or overtime.",
+   "example": "Two calculations every founder should be able to do cold. Wages: a helper works 12 eligible hours at $18 an hour, earning 12 \u00d7 $18 = $216 before deductions or other required adjustments. Commission: a salesperson earns a hypothetical 5 percent on $2,400 of eligible sales, which is 0.05 \u00d7 $2,400 = $120. Notice the word 'eligible' doing heavy work in both lines \u2014 the agreement must define which hours count, which sales form the commission base (booked or collected), and what happens when a sale is refunded. A salary, by contrast, is a fixed amount for a defined period and does not by itself answer overtime questions, and money a founder takes out as an ownership distribution is not wages at all.",
+   "review": "Two co-founders split every task informally. Which three responsibilities still need one named owner each, even in a two-person startup?",
+   "diagram": [
+    "Offering \u2260 ownership",
+    "Compare four structures",
+    "Name roles + authority",
+    "Define each pay basis",
+    "Keep a reviewer separate"
+   ]
+  },
+  {
+   "number": 3,
+   "heading": "Canvas to plan to pitch: the startup's paper trail",
+   "text": "A startup uses three planning documents, and each earns its place. The lean canvas compresses the venture onto one page \u2014 customer problem, segment, offered benefit, purchase channel, key activities, resources, revenue source, major costs \u2014 with an evidence note beside every assumption, so the weakest claim is visible at a glance. The business plan is the working document behind it, connecting the market story to operations and finance in enough detail that a partner or lender can test it. The pitch is a short, audience-shaped selection from the plan: problem, customer, offer, evidence, delivery model, the essential numbers with their units and period, and a specific request tied to a milestone. What unites the three is consistency \u2014 a forecast in the pitch that the operating section of the plan cannot deliver destroys credibility faster than a modest forecast does. Startups also accumulate assets early \u2014 a proposed logo, an original training video, a customer list, a product mechanism \u2014 and a rights register should record each asset's owner, permitted use, restrictions, and supporting evidence from the start, because finding an asset online confers no right to use it, and replacing a logo after launch is far costlier than checking it before. Mark estimates as estimates everywhere; a reviewer who catches one disguised guess discounts everything else on the page.",
+   "example": "The classic startup inconsistency, in numbers: a pitch forecasts twenty Saturday appointments. The plan's operating section allows five hours of delivery, and the pilot measured thirty minutes per appointment with one worker \u2014 capacity is 5 \u00f7 0.5 = 10 appointments, before breaks, setup, or travel. The pitch promises double what the plan can staff. The founder's options are the honest three: cut the forecast to ten, redesign delivery to shorten the appointment, or add capacity and accept its costs. What is not an option is leaving both numbers in the package and hoping different readers never compare pages. Reviewers always compare pages \u2014 that comparison is precisely what a funding or partnership review is.",
+   "review": "Your pitch, plan, and canvas disagree on next month's order forecast. Which document do you correct first, and what evidence settles the number?",
+   "diagram": [
+    "Canvas: assumptions + evidence",
+    "Plan: full working detail",
+    "Pitch: audience selection",
+    "Rights register from day one",
+    "One forecast everywhere"
+   ]
+  },
+  {
+   "number": 4,
+   "heading": "Startup research: small samples, honest limits, real competitors",
+   "text": "A startup cannot afford research that merely looks thorough, so every study starts from a decision: what will we do differently depending on the answer? Frame the question, the information that could answer it, the source of that information, and the method's limits before collecting anything. Primary research \u2014 interviews, observation, a small purchasing test \u2014 is gathered for this exact question and fits the proposed offer tightly, but it speaks for a small group. Secondary research \u2014 published statistics, industry reports \u2014 speaks broadly but was gathered for someone else's question, geography, customer definition, and time period, so verify source, date, population, and method before borrowing a figure. Interview craft matters more than interview count: ask about the last time the person faced the problem and what was difficult, not whether they agree your excellent idea is excellent, and never argue with an answer you dislike. Competitor work compares direct rivals and substitutes \u2014 the supermarket and the delivery subscription compete for the same refill customer as surely as another refill shop does \u2014 using the same customer need and evidence standard for all. SWOT organizes the findings without flattering the founder: strengths and weaknesses live inside the venture; opportunities and threats live outside it. Label counts, quotations, and interpretations separately, and keep the feedback that challenges the idea in the same file as the praise.",
+   "example": "A founder invites thirty people from one commuter group to consider a clear pilot offer, and twelve place a completed order. The observed conversion for that group is 12 \u00f7 30 = 40 percent, reported as 'twelve of thirty invited commuters ordered' \u2014 counts first, rate second. The startup may not report that 40 percent of commuters want the service: the invitation list was chosen, the wording was the founder's, and the timing may have flattered the result. What the test does establish is narrower and more valuable \u2014 this offer, to this group, produced twelve real commitments \u2014 provided the founder also records questions asked, cancellations, and whether twelve orders could actually be delivered well.",
+   "review": "Eight interviewees love your convenience offer, but your only secondary report covers another city. State exactly what you know and what you still do not.",
+   "diagram": [
+    "Decision before data",
+    "Interview past behavior",
+    "Test with a real offer",
+    "Vet secondary sources",
+    "Map rivals + substitutes",
+    "SWOT: inside vs outside"
+   ]
+  },
+  {
+   "number": 5,
+   "heading": "The first campaign: buy customers at a price you can state",
+   "text": "A startup's first acquisition campaign is an experiment with a budget, not a celebration. The plan fixes the audience, offer, channel, budget, schedule, and the measure of success before launch, and the sales records behind it distinguish inquiries, bookings, completed orders, paid orders, and refunds \u2014 because a channel that generates inquiries nobody can fulfill is a liability wearing a costume. The two governing ratios: customer acquisition cost equals total acquisition spending divided by new customers gained in the same period, and average order value equals relevant revenue divided by the orders that produced it. Conversion rate \u2014 purchases divided by the relevant visits or invitations \u2014 tells you where the funnel leaks. Retention is measured separately, on its own denominator: of a defined cohort of first-time buyers, how many bought again within a defined follow-up window, and what did the retention effort cost? Channels are compared on contribution after marketing cost, never on clicks, views, or follower counts, which measure attention the startup may not be able to convert or serve. And neither ratio proves profitability \u2014 delivery costs and overheads still wait below them \u2014 so the founder reports each figure with its formula, its period, and its group definition attached.",
+   "example": "Read a pilot the way an investor would. Acquisition spending totals $120 and produces eight new paying customers, so acquisition cost is $120 \u00f7 8 = $15 per new customer. Revenue from completed paid orders is $480 across sixteen orders, so average order value is $480 \u00f7 16 = $30. The trap: dividing the $120 by all sixteen orders yields $7.50 and calls it acquisition cost \u2014 wrong, because repeat orders are not new customers, and a budget built on $7.50 will run out halfway through the next campaign. The retention line, kept separate: seven of ten first-time buyers purchase again in the follow-up period, an observed repeat rate of 7 \u00f7 10 = 70 percent for that cohort, with the other three unexplained rather than declared lost.",
+   "review": "A channel brings 200 clicks, 4 inquiries, and 1 paid order. Which numbers decide whether it survives, and which number is decoration?",
+   "diagram": [
+    "Fix audience + budget",
+    "Track funnel stages",
+    "CAC on new customers only",
+    "AOV on paid orders",
+    "Retention: own denominator",
+    "Keep channels on contribution"
+   ]
+  },
+  {
+   "number": 6,
+   "heading": "First sales, first complaints: process and authority at a startup",
+   "text": "In a startup the founder is the sales process, which makes writing the process down more important, not less. Chart the customer's path through the channels you actually use \u2014 a physical location, a website or booking form, a partner referral \u2014 and define each stage: inquiry, questions and listening, product evidence, a recommendation matched to the customer's situation, a clear close, confirmation, delivery, payment, and follow-up. A submitted form is an inquiry, not a sale; counting it as one inflates every later decision. Support follows a fact discipline from the first complaint onward: establish what was agreed and what happened, acknowledge the specific concern, verify details privately, and offer the options the business's real policy permits. Exceptions will arrive early \u2014 a return requested after the stated window, a customer certain a salesperson promised more than the offer includes. The founder's rule is to refer any decision beyond their stated authority to the person who holds it, explain the next step and its timing honestly, and never buy peace with an unauthorized refund promise or a confrontation. Log every exception against the process stage that produced it; in a young business, three similar complaints are not three difficult customers \u2014 they are one broken step announcing itself.",
+   "example": "A customer insists a booking was made; the schedule shows nothing. Work it as the process prescribes. Verify first: did the business receive the inquiry, and was a confirmation ever sent? If the form arrived but no confirmation was issued, the appointment was never confirmed, and the customer is told exactly that \u2014 plainly, with the check described. Then resolve within the offer's terms using real capacity, not goodwill fiction: offer the nearest genuinely available appointment. Close the loop in the record, noting the failure at the confirmation stage. The startup lesson is structural: add an automatic confirmation and a daily schedule-versus-inquiries check now, while volume is small, rather than apologizing at scale later.",
+   "review": "A customer demands a refund your policy does not allow and you cannot authorize. Script your three moves: verify, explain, and what else?",
+   "diagram": [
+    "Map the buying path",
+    "Confirm before counting",
+    "Listen, then verify facts",
+    "Offer policy options only",
+    "Escalate beyond authority",
+    "Log the process fault"
+   ]
+  },
+  {
+   "number": 7,
+   "heading": "Startup operations when systems fail: know your inputs cold",
+   "text": "A young business discovers its production inputs the hard way unless it lists them first: materials, labor, equipment, space, methods, supporting services \u2014 and information. For a retail startup, the catalog, live prices, stock records, and payment authorization are inputs as real as the goods on the shelf, each with a quantity, quality, timing, and source that can fail independently. Production choices made at founding \u2014 deliver in-house, outsource a defined output, or mix the two \u2014 should be compared on complete scope: setup, delivery, inspection, and changes included, capacity and lead time stated, quality expectations and failure responsibilities assigned. A low unit quote that excludes half the work is not cheaper; an in-house plan that assumes skills the team lacks is not safer. The outage plan grows directly from the input list. It names the verified source of prices and stock to trust when systems are down, the offline work that is permitted, the escalation contact, and the reconciliation that will match every manual action back to the system afterward. Two prohibitions protect customers absolutely: card numbers are never written into notes to be charged later, and a transaction is never described as successful when authorization was unavailable. Sell only what verified stock and verified prices support, and say so plainly.",
+   "example": "Compare two ways to produce a first batch of fifty tote bags, on one basis. An outside provider quotes $5 per bag plus a $100 setup charge: 50 \u00d7 $5 + $100 = $350, before any excluded costs such as delivery. The in-house estimate lists $150 of materials, $360 of labor, and $40 of equipment use: $150 + $360 + $40 = $550. The $200 gap is real only if both figures describe the same bag, the same features, and the same included work \u2014 so the founder lists each side's exclusions before choosing. Perhaps the quote omits a required feature, or the in-house plan assumes sewing capacity the team does not have. The decision that survives is the one whose assumptions were written down while they could still be challenged.",
+   "review": "Your payment system fails mid-market-day. Which verified sources do you work from, which two things do you refuse to do, and what happens when the system returns?",
+   "diagram": [
+    "List every input",
+    "Compare full-scope costs",
+    "Name verified sources",
+    "Define permitted offline work",
+    "Escalate + protect cards",
+    "Reconcile every action"
+   ]
+  },
+  {
+   "number": 8,
+   "heading": "A startup's first display: merchandising as a measurable test",
+   "text": "For a startup, shelf and table space are media bought with inventory, so a display is planned like a campaign. The merchandising plan assigns each product its space and quantity in a planogram, sets signage that states the benefit, the offer's scope, and the accurate price, and arranges placement along the customer's natural flow without obstructing access for any shopper. Replenishment is part of the design: a display that empties by midday and is never refilled is a photograph of a plan, not a plan. Evaluation borrows the marketing plan's measures and its honesty. Define the goal before the display goes up \u2014 a stated number of qualified pilot orders within the service area is a goal; 'visibility' is not \u2014 then track conversion from passing customers to buyers, completed paid orders, and contribution, alongside availability and compliance with the planogram. Attention from outside the service area, or praise for a beautiful arrangement of out-of-stock goods, does not advance the goal. Two defects override any sales result and are corrected immediately: signage that misstates price, and a layout that blocks access. Both break the customer's trust at the precise moment the display exists to earn it, and a startup has no reserve of reputation to spend on either.",
+   "example": "Evaluate a one-week display test with campaign arithmetic. All costs assigned to the test total $90, and it produces six new paying customers: acquisition cost is $90 \u00f7 6 = $15 per new customer. Set that beside the test's other candidate headline \u2014 hundreds of views and warm comments, with no qualified inquiries. The views cannot pay the stall fee; the $15 figure at least enters the real comparison against the venture's other channels, provided revenue, delivery costs, and refunds are examined before anyone calls the display profitable. The founder records both measures, the spending, and the next decision in the campaign file, because the second test \u2014 one message or placement changed, conditions held similar \u2014 is where a startup actually learns.",
+   "review": "Your display doubles foot traffic and sells nothing extra. Name three checks \u2014 stock, signage, and one more \u2014 before you blame the product.",
+   "diagram": [
+    "Goal: orders, not views",
+    "Planogram the space",
+    "Signage accurate + clear",
+    "Access never blocked",
+    "Replenish to the plan",
+    "Score conversion + cost"
+   ]
+  },
+  {
+   "number": 9,
+   "heading": "Pricing the first offer: margin, markup, and the discount test",
+   "text": "Startup pricing errors usually come from vocabulary, not arithmetic. Selling price is what the customer pays before any treatment of taxes or fees the transaction requires. Unit cost is the cost assigned to one unit. Gross profit is sales less cost of goods sold; contribution deducts every variable cost your calculation includes \u2014 which is why the cost definition must be stated before two offers' margins can be compared at all. Markup divides price minus cost by cost; gross margin divides the same difference by price; and a target margin sets price directly as cost divided by one minus the target margin. A discount then does its quiet damage: the price falls, the unit cost does not, and the whole reduction lands on gross profit per unit unless costs change too. So a promotion is judged on total gross profit across equal periods \u2014 with returns, stock availability, and campaign cost accounted for \u2014 never on the excitement of a unit-sales spike. A young business discounting to 'get traction' should be able to state, in advance, the volume at which the promotion merely equals the full-price result. If that volume exceeds capacity or any plausible demand, the discount is a donation, and the founder should make it knowingly or not at all.",
+   "example": "Take the workbook's reference product: cost $30, price $50, gross profit $20 per unit. Markup is $20 \u00f7 $30 = 66.7 percent; gross margin is $20 \u00f7 $50 = 40 percent. A 10 percent discount moves the price to $45 and gross profit to $15 \u2014 a 25 percent profit cut bought with a 10 percent price cut. Break-even for the promotion: full-price sales of 10 units earn 10 \u00d7 $20 = $200, so discounted sales must reach $200 \u00f7 $15 = 13.33, meaning 14 whole units, before the promotion earns one extra dollar of gross profit. A founder who sells 12 discounted units has grown volume 20 percent and shrunk gross profit to 12 \u00d7 $15 = $180. The chart on the wall should show 14, not 12, as the target.",
+   "review": "Why does a 10 percent price discount require far more than a 10 percent volume increase to break even on gross profit?",
+   "diagram": [
+    "Define unit cost first",
+    "Margin uses price",
+    "Markup uses cost",
+    "Discount hits profit fully",
+    "Compute promotion break-even",
+    "Compare total gross profit"
+   ]
+  },
+  {
+   "number": 10,
+   "heading": "First stock order: receiving discipline and the reorder rule",
+   "text": "A startup's opening inventory is usually its largest early cash commitment, which makes receiving a financial control, not a delivery ritual. Each delivery is reconciled four ways before the stock is accepted as saleable: what the purchase order promised, what the delivery record claims, what the physical count finds, and what condition it is in. Damaged or suspect units are quarantined and excluded from saleable stock, and every discrepancy is documented with its evidence rather than absorbed by quietly editing a quantity \u2014 a stock record that has been 'fixed' without a note cannot be trusted by the next person, who is often the founder at midnight. Replenishment follows a stated rule. The reorder point is expected demand during the supplier's lead time plus safety stock, and the decision uses the full inventory position: stock on hand, minus units committed to customer orders, plus confirmed incoming stock. This is the production-input discipline in retail dress \u2014 every critical input named by quantity, quality, timing, and source, with the key supplier dependency and a contingency identified before the dependency fails. A startup that counts honestly and orders on the rule can explain its shelf to a customer, a lender, or itself; one that orders on anxiety alternates between empty shelves and a stockroom full of unsold cash.",
+   "example": "Work a first reorder decision end to end. A product's expected demand during the supplier's lead time is 40 units, and the founder holds 10 units of safety stock, so the reorder point is 40 + 10 = 50 units of inventory position. The shelf count reads 58 \u2014 apparently safe. But 12 of those units are already committed to customer orders, so the uncommitted position is 58 \u2212 12 = 46, below the reorder point: the order goes out today. Cross-check the position against production logic as well: at a measured rate of ten acceptable units per hour with three hours available, in-house supply supports 30 units \u2014 a useful ceiling to know before promising a customer that a stockout will be covered by making more.",
+   "review": "A delivery arrives two units short and one unit damaged. What do you record, what enters saleable stock, and what never gets silently adjusted?",
+   "diagram": [
+    "Order \u2192 delivery \u2192 count",
+    "Inspect condition",
+    "Quarantine the damaged",
+    "Position = on hand \u2212 committed",
+    "Reorder point triggers order",
+    "Document every discrepancy"
+   ]
+  },
+  {
+   "number": 11,
+   "heading": "Fulfillment for a young business: pickup, transfer, and trust",
+   "text": "Every fulfilled order is a promise kept in public, and startups live or die on the first hundred of them. Map fulfillment as a chain with no unowned links: order received and verified, availability checked, item obtained or prepared, quality checked, packed or scheduled, dispatched or handed over, completion confirmed, exceptions resolved. Omnichannel selling stretches that chain across locations \u2014 shelf, stockroom, a second store, authorized off-site stock \u2014 coordinated through available-to-promise figures, reservations, picking, customer notification, and handoff. The record behind it must distinguish three quantities that founders constantly merge: units physically present, units committed to earlier orders, and units unavailable while damaged or under review. Only the first minus the other two can be promised. A store transfer follows the same logic between branches: the sending store verifies and reserves real stock, the receiving store confirms arrival and condition, and the customer hears one coherent promise, not two stores' separate hopes. Distribution choices \u2014 customer pickup, direct delivery, shipping, a third-party service \u2014 trade cost against control, timing, and accountability, and every delivery estimate must include preparation time, not just travel. Silent substitution is the unforgivable shortcut: the wrong color delivered on time is still the wrong order.",
+   "example": "A seller's storage holds eighty notebooks; twenty are committed to earlier orders and five are set aside for a condition review. Available to promise is 80 \u2212 20 \u2212 5 = 55. A customer asking for seventy today gets an honest split \u2014 fifty-five now, or a clearly disclosed later delivery for the full quantity \u2014 because the alternative, promising seventy and failing publicly, costs a startup more than a smaller sale. Then the pick-face test: the order wants ten blue notebooks and the shelf offers eight blue and two green. Ten items, wrong order. The picker verifies the order, checks the stockroom and the other location for blue stock, and only then follows the approved route \u2014 an authorized substitution the customer accepts, or a revised promise \u2014 recording which one happened and why.",
+   "review": "A pickup customer arrives and one of two reserved units is damaged. Walk the next four steps without inventing stock or substituting silently.",
+   "diagram": [
+    "Verify + reserve stock",
+    "Search every location",
+    "Pick + quality check",
+    "Transfer with confirmation",
+    "Notify + hand off",
+    "Confirm completion"
+   ]
+  },
+  {
+   "number": 12,
+   "heading": "Protect people, then stock: hazards and shrinkage in a startup",
+   "text": "Quality, safety, and compliance overlap in a small business, but they are not synonyms, and a founder who treats them as one checklist will miss obligations in all three. Quality asks whether the output meets its defined requirements. Safety asks how harm is prevented and controlled. Compliance asks which rules genuinely apply to this activity, product, location, and workforce \u2014 a question whose real answers come from the applicable requirements and qualified reviewers, not from a general lesson. On the floor, hazard response runs in a fixed order: protect people, control the scene within your training and the site's emergency procedures, notify who must be notified, and write a factual record. A spill near electrical equipment or a carton blocking an exit is never traded against a sales target, and no one attempts an unfamiliar response task because the shop is busy. Shrinkage \u2014 inventory loss \u2014 is investigated with the same restraint. Its causes include theft, receiving errors, damage, vendor discrepancies, and transaction mistakes, and the evidence differs by cause, so the founder examines records and segregates suspect stock without accusing individuals or confronting anyone. Prevention beats inspection: define the required result, the steps that affect it, the checks, and the retained records up front, and when a failure repeats, investigate the process cause rather than re-correcting units forever.",
+   "example": "A sample audit finds five mismatched packages in one hundred \u2014 an observed rate of 5 \u00f7 100 = 5 percent. The startup response has three layers. Correct: segregate and fix the five known packages under procedure. Investigate: trace where order, pack, and label steps hand off to each other, since the mismatch was born at a handoff, not inside a package. Prove: introduce a check comparing the order identifier with the package before dispatch, then gather evidence from its actual use \u2014 the process earns the word 'fixed' when the mismatches stop appearing, not when the checklist is printed. Note what the 5 percent is not: a target, a tolerance, or a fact about any other business. It is one sample, honestly labeled, driving one process repair.",
+   "review": "Stock is short and a team member looks nervous. What does the evidence-first rule require you to do \u2014 and forbid you to do?",
+   "diagram": [
+    "People before property",
+    "Follow site procedures",
+    "Notify + record facts",
+    "Loss: examine evidence",
+    "Never accuse or confront",
+    "Fix the process cause"
+   ]
+  },
+  {
+   "number": 13,
+   "heading": "At the till: pricing discipline a startup can defend",
+   "text": "The checkout desk concentrates a startup's pricing promises into one printed receipt, so its rules are exact. Selling price is what the customer pays before any treatment of taxes or fees required by the transaction. Gross profit on a unit is that price minus its assigned unit cost. Markup expresses the profit against cost \u2014 profit divided by cost \u2014 while margin expresses it against the selling price \u2014 profit divided by price \u2014 and a founder quoting 'our markup is 40 percent' when the figure is a margin will misprice the next product. To price from a target margin, divide cost by one minus the target margin. In this workbook's simulation, discounts reduce the price before the fictional tax is calculated, and the tax rate in exercises is a training assumption, not advice about any real obligation. The receipt separates net sale, tax, and total because the three amounts have different owners: the sale is the business's revenue, while tax collected is held for the transaction's tax treatment and is never revenue, however good it looks in the day's totals. State which costs a margin includes, round deliberately, and confirm that customers value the offer at the price the arithmetic demands \u2014 a correct calculation for an offer nobody wants is still a failed price.",
+   "example": "Run the desk's reference transaction both ways. Cost $12, price $20: gross profit is $8, markup is $8 \u00f7 $12 = 66.67 percent, and margin is $8 \u00f7 $20 = 40 percent \u2014 one profit, two percentages, each correct only under its own name. Through the register at the simulation's fictional 7 percent tax with no discount: tax is 0.07 \u00d7 $20 = $1.40 and the customer pays $21.40, of which the business records $20 as its sale. Now discount first, as the simulation requires: a 10 percent discount sets the price at $18, tax becomes 0.07 \u00d7 $18 = $1.26, and the total is $19.26. Reverse the order \u2014 taxing $20 and discounting after \u2014 and the customer is overcharged; sequence is part of accuracy.",
+   "review": "A partner says, 'We made $21.40 on that sale.' Correct the sentence, naming what each part of the $21.40 actually is.",
+   "diagram": [
+    "Profit = price \u2212 cost",
+    "Markup divides by cost",
+    "Margin divides by price",
+    "Discount, then tax",
+    "Receipt splits three amounts",
+    "Tax is never revenue"
+   ]
+  },
+  {
+   "number": 14,
+   "heading": "Two statements every founder must read without flinching",
+   "text": "A startup founder reads financial statements to answer two different questions, and the statements punish anyone who swaps them. The income statement covers a period: for a retailer, sales net of returns, minus cost of goods sold, gives gross profit, and operating expenses then bring it to the operating result \u2014 what the trading earned or lost across those weeks. The balance sheet freezes one date: assets on one side, liabilities and equity on the other, locked together by assets equal liabilities plus equity. The cash-flow statement, tracking actual money movement across a period, is the bridge founders forget until a profitable month bounces a payment. Three distinctions keep the reading honest. Equity is a residual \u2014 what would remain if assets settled liabilities at their recorded amounts \u2014 not a bank balance available to spend. Assets include inventory, receivables, and equipment, whose recorded values are not promises of instant cash. And transactions are classified by substance: loan proceeds raise cash and raise liabilities together, and are never revenue; a customer paying an old invoice converts a receivable into cash without creating new income. Check each report's period, basis, and inclusions before comparing it with anything, including last month's version of itself.",
+   "example": "Hold the two statements apart with the workbook's figures. Position at a date: assets $12,000, liabilities $4,500, so equity is $12,000 \u2212 $4,500 = $7,500. Performance over a period: revenue $8,000 against included expenses of $6,200 leaves $1,800 before omitted items. A founder who reads '$7,500 of equity and $1,800 of profit' as '$9,300 available' has invented money twice \u2014 the equity is embodied in whatever the assets are, and the period result says nothing about when customers paid. The statements are consistent with a cash crisis and consistent with comfort; only the cash schedule, with its dates, can say which. That is not a defect in the statements \u2014 it is the founder using each tool for its own question.",
+   "review": "Your income statement shows a profit and your balance sheet shows growing equity, yet rent is due Friday. Which report do you open next, and why?",
+   "diagram": [
+    "Period: income statement",
+    "Net sales \u2192 gross profit",
+    "Minus operating expenses",
+    "One date: balance sheet",
+    "Assets = L + equity",
+    "Cash flow tells timing"
+   ]
+  },
+  {
+   "number": 15,
+   "heading": "Staff the break-even point, not the hope: capacity planning",
+   "text": "Break-even tells a startup how much it must sell; capacity planning tells it whether that amount can physically be sold, and the second answer disciplines the first. Classify costs inside a stated period and activity range: fixed costs hold steady across that range, variable costs move with each unit, and hybrid costs are classified by their actual behavior in the scenario rather than by habit. Contribution per unit \u2014 price minus variable cost per unit \u2014 is the engine: total contribution pays the fixed costs, and break-even units equal fixed costs divided by contribution per unit, always rounded up when the division leaves a fraction, because a fractional unit cannot be sold and rounding down plans a shortfall. Then confront the result with the rota. Feasible volume is capped by staffed hours, service rate per worker, breaks, skill mix, and safe workload; a break-even point beyond staffed capacity is not a target but a redesign brief \u2014 change price, costs, hours, or the offer itself. Demand is the third check: the model assumes buyers exist for the required quantity, which only market evidence can support. Used this way, break-even is a gap detector between plan and reality. It certifies nothing about guaranteed sales, total profitability, or having cash on the day a bill lands.",
+   "example": "A service sells at $30 with $10 of variable cost per unit and $600 of fixed costs for the period. Contribution is $20, so break-even is $600 \u00f7 $20 = 30 units \u2014 confirmed by the full check: 30 \u00d7 $30 = $900 of revenue against 30 \u00d7 $10 = $300 variable plus $600 fixed, exactly $900 of cost. Push fixed costs to $650 and the division gives 32.5: the target becomes 33 whole units, since 32 units contribute only $640 while 33 contribute $660. Now staff it. If the rota \u2014 hours, breaks, and a safe service rate \u2014 supports only 30 completed units in the period, the honest conclusion is that this cost structure cannot break even as staffed, and the founder changes an assumption instead of exhorting the team.",
+   "review": "Break-even is 33 units and staffed capacity is 30. List the four assumptions you could change, and the risk attached to each.",
+   "diagram": [
+    "Sort fixed vs variable",
+    "Contribution per unit",
+    "Divide \u2192 break-even units",
+    "Round fractions up",
+    "Test against the rota",
+    "Test against demand"
+   ]
+  },
+  {
+   "number": 16,
+   "heading": "Cash is a calendar: forecasting receipts, payments, and the gap",
+   "text": "Startups rarely die of unprofitability on paper; they die of a Tuesday. Cash flow is the discipline of dates: revenue is earned when the transaction occurs, but cash arrives when the customer pays, and some payments leave the account without being that period's expense at all. A cash forecast is therefore built as a schedule \u2014 opening balance, receipts placed at their expected collection dates, payments placed at their due dates, closing balance \u2014 with uncertain inflows flagged as uncertain rather than quietly promoted to fact. Supplier terms and stock levels are cash decisions in disguise: paying early, ordering deep, or letting receivables drift all move the same finite balance. A bill is never 'rescheduled' unilaterally; extending a due date requires the supplier's agreement. Working capital frames the longer view \u2014 current assets minus current liabilities \u2014 but must be read by composition. Cash spends today; receivables spend when collected; inventory spends when sold. A business can post a comfortable working-capital figure while holding almost no spendable money this week, which is why the forecast works from the dated schedule and uses the ratio only as background. The founder's job is to see the shortfall while it is still a forecast, when options exist, rather than at the bank, when they do not.",
+   "example": "One period, computed plainly: opening cash $1,000, receipts $600, payments $900, closing cash $1,000 + $600 \u2212 $900 = $700. An unpaid invoice of $400, however reliable the customer, adds nothing to that $700 \u2014 it enters a later week's schedule at its expected date, marked as an expectation. Alongside it, working capital: current assets $4,500 minus current liabilities $2,500 equals $2,000. If most of those current assets are inventory and receivables, the business simultaneously owns $2,000 of working capital and $700 of cash, and Friday's obligations must be tested against the $700. Two true numbers, two different questions \u2014 the forecast fails only when the founder answers the cash question with the working-capital number.",
+   "review": "A profitable invoice will be paid next month, after rent is due this month. Show exactly where that invoice appears in this month's cash forecast.",
+   "diagram": [
+    "Open with real cash",
+    "Receipts at expected dates",
+    "Payments at due dates",
+    "Close = open + in \u2212 out",
+    "Flag uncertain inflows",
+    "WC by composition"
+   ]
+  },
+  {
+   "number": 17,
+   "heading": "Buying equipment on evidence: ROI, suppliers, and make-or-buy",
+   "text": "Equipment is where startup optimism goes to be audited, so the evaluation starts with definitions. ROI is net gain divided by investment cost, over a stated period \u2014 one year in this workbook's practice cases \u2014 and net gain means proceeds after the investment and every other included cost have been accounted for. State the investment's scope, the costs inside the gain, and the horizon before computing anything, because two ROI figures built on different definitions cannot be ranked. Proceeds are not gain, forecasts are not observations, and a missing cost is not a rounding error; each silently manufactures percentage points. The percentage, once honest, is still only one witness. Equipment and supplier decisions are compared on consistent assumptions plus measurable service criteria: capacity delivered, reliability, lead time and delivery certainty, terms, and the cash profile \u2014 when money leaves versus when the benefit arrives. Make-versus-buy follows the same rules, comparing the full in-house cost against the full bought-in cost for the identical output. A cheaper supplier with erratic delivery can cost more in stockouts and apologies than a dearer one who never misses, and a higher-ROI option that demands cash the forecast does not have is not an option at all. The deliverable is a comparison a skeptic can re-perform, not a winning number.",
+   "example": "The workbook's reference project: $1,000 invested, $1,250 returned, no other costs assumed. Net gain is $1,250 \u2212 $1,000 = $250 and ROI is $250 \u00f7 $1,000 = 25 percent for the stated period. The seductive error is reporting $1,250 \u00f7 $1,000 = 125 percent \u2014 proceeds masquerading as gain. Restore one omitted $100 cost and the honest figure becomes ($250 \u2212 $100) \u00f7 $1,000 = 15 percent. Ten points of ROI were never performance; they were bookkeeping. Finally, place two offers side by side \u2014 25 percent over a full year versus 15 percent over a different span, with different risk and cash timing \u2014 and the correct founder response is not to pick the larger number but to demand the missing facts that would make the two comparable.",
+   "review": "Two equipment quotes differ in price, delivery reliability, and payment timing. Build the comparison table's column headings before you touch the numbers.",
+   "diagram": [
+    "Define scope + horizon",
+    "Subtract all included costs",
+    "ROI = net gain \u00f7 cost",
+    "Audit for omitted costs",
+    "Score service criteria",
+    "Check the cash profile"
+   ]
+  },
+  {
+   "number": 18,
+   "heading": "The funding ask: a startup budget a stranger can verify",
+   "text": "A funding package persuades by being checkable. Its budget separates one-time setup costs from recurring operating costs and from the reserve of operating cash that carries the venture until receipts arrive, and every significant line carries its source, date, and scope so a reviewer can test it instead of trusting it. Categories are policed for double counting \u2014 an item inside setup does not reappear as equipment unless it is genuinely a second cost. The funding gap is then a single honest subtraction: total required cash minus committed available cash. Committed is enforced strictly \u2014 owner funds in hand and approved facilities count; a grant application, a pending loan, and enthusiastic customer interest do not, however likely they feel. Timing is drawn explicitly, matching the dates money becomes available against the dates costs fall due, because a package can balance annually and still fail in March. Sources are compared on their real differences \u2014 bootstrapping, debt, equity, crowdfunding, and grants differ in repayment, ownership dilution, eligibility, timing, and obligations \u2014 and each amount in the package is classified as what it is: borrowing, owner contribution, or operating revenue. Readiness is the ability to explain all of this calmly; it is not, and never claims to be, a guarantee of approval.",
+   "example": "Assemble the package and then attack it. Setup $1,200, equipment $800, opening inventory $600, initial operating cash $1,000 \u2014 total planned need $1,200 + $800 + $600 + $1,000 = $3,600. Committed owner funds are $1,400, leaving a gap of $3,600 \u2212 $1,400 = $2,200. A verified equipment quote then rises $200: need becomes $3,800 and the gap $2,400, funds unchanged. The founder's legitimate responses are to narrow the launch scope, re-phase the timing, seek a real commitment, or contribute more \u2014 each with its consequences shown. The illegitimate response is cosmetic: booking the unawarded grant as received, or deleting a necessary cost so the spreadsheet closes. Reviewers fund founders whose numbers survive attack, and the first attacker should be the founder.",
+   "review": "Your package balances only if a pending grant is counted as received. Rebuild the gap honestly and name two legitimate ways to close it.",
+   "diagram": [
+    "Itemize setup costs",
+    "Add recurring + reserve",
+    "Verify quotes + dates",
+    "Count committed funds only",
+    "Gap = need \u2212 committed",
+    "Compare sources honestly"
+   ]
+  },
+  {
+   "number": 19,
+   "heading": "From pitch lab to launch team: coaching people who run the shop",
+   "text": "Launch readiness is a people problem wearing a paperwork costume. The pitch discipline from the lab \u2014 a two-minute, evidence-based account of customer, problem, offer, delivery, numbers, and request, with uncertainties stated rather than hidden \u2014 becomes the team's internal standard: claims are reviewable, corrections are recorded, and feedback is sorted by whether it concerns customer need, delivery, finance, or risk. Coaching applies the same standard on the shop floor. A supervisor sets expectations explicitly, verifies understanding instead of assuming it, supports safe work, delegates within the authority of each role with a clear escalation path, and gives feedback anchored in specific observed evidence. The mislabeled promotion and the skipped discrepancy note are coaching material precisely because they are observable: each conversation names the behavior, its consequence for customers or stock records, the agreed correction, and a review date. Career planning mirrors coaching from the other side: map the target role's requirements against skills already demonstrated, identify the gap, and sequence practice, feedback, and learning to close it. Nobody is promised a promotion on the strength of a workbook; what the workbook produces is documented evidence \u2014 of judgment, reliability, and corrected mistakes \u2014 that a real decision can rest on.",
+   "example": "Hear a claim made reviewable, the pitch-lab way: 'We propose scheduled cleaning appointments for commuters who report difficulty finding time for that task. Our first test offers a limited set of appointments through a neighborhood partner, subject to permission to use that channel and location. We will measure requests, completed appointments, and customer feedback against our stated decision rule.' Every sentence can be checked, and the largest uncertainty \u2014 whether commuters will pay \u2014 is assigned to a test rather than disguised as a conclusion. Contrast the coaching version of the same standard: not 'the new associate is careless,' but 'on Tuesday, three promotion labels showed the wrong price; here is the labeling sequence; show me the next one, and we will review Friday.' Evidence in, improvement out.",
+   "review": "A reviewer asks why customers will pay your price and you have no payment evidence yet. Compose the honest three-part answer: what you have, what is uncertain, what happens next.",
+   "diagram": [
+    "Pitch: claim + evidence",
+    "State the uncertainty",
+    "Assign it a test",
+    "Coach on observed facts",
+    "Agree correction + date",
+    "Build the readiness list"
+   ]
+  },
+  {
+   "number": 20,
+   "heading": "Launch month: the integrated plan, stress-tested before it is lived",
+   "text": "The capstone operates a fictional refill shop for one simulated month, then ports the same plan to a service business, to prove the founder can run the whole system at once. Integration is the standard: the plan's sections must agree with each other, because each one spends the others' assumptions. Demand evidence sizes the sales forecast; the forecast must fit capacity, inventory, and staffing; the units must produce the margin at the stated price and costs; the margin must survive translation into a dated cash forecast; and the cash forecast must be covered by funding that is committed, not hoped for. The package therefore contains the customer journey, one channel experiment, a fulfillment map, a quality checklist, startup needs, unit economics, a cash forecast, and the funding status of every source, with formulas shown and exclusions named. Original calculations, decisions, and corrections are preserved, so a reviewer can trace any conclusion back to its source and watch what a changed condition does to the rest of the plan. And something must change: the tabletop introduces a disruption \u2014 demand shortfall, late payment, reduced capacity \u2014 and the plan earns its grade by absorbing it through decisions made in advance, not improvisation. A plan consistent on its best day and silent about its worst is half a plan.",
+   "example": "Catch the capstone's planted contradiction before the month does. Price $40, variable cost $16, contribution $24 per unit; fixed costs $720 a month; break-even $720 \u00f7 $24 = 30 units. Fulfillment capacity for the month is 20 units. The plan as written loses money at full capacity, and increasing advertising spend would only sell deeper into an unfillable promise. The correction must move a real variable \u2014 capacity, price, variable cost, fixed cost, or the offer itself \u2014 and then be re-checked against customer acceptance. The cash line stays in its own lane throughout: opening $500, receipts $900, payments $1,100, projected closing $500 + $900 \u2212 $1,100 = $300, a statement about timing that neither confirms nor denies the month's profit.",
+   "review": "During your simulated month, your main supplier fails in week two. Which four plan sections change immediately, and in what order do you revise them?",
+   "diagram": [
+    "Journey + channel test",
+    "Fulfillment + quality map",
+    "Unit economics check",
+    "Cash forecast by dates",
+    "Funding status per source",
+    "Disrupt, revise, document"
+   ]
+  }
+ ]
+}

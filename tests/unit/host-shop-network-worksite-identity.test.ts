@@ -17,7 +17,7 @@ vi.mock('@/lib/programs/host-shops', () => ({
   }],
 }));
 
-import { getHostShopNetwork } from '@/lib/programs/host-shop-network';
+import { getHostShopNetwork, publicPhoneForApprovedHostShop } from '@/lib/programs/host-shop-network';
 
 it('does not attach a curated profile to a same-name shop at another worksite', async () => {
   const shops = await getHostShopNetwork();
@@ -30,4 +30,13 @@ it('does not attach a curated profile to a same-name shop at another worksite', 
     programs: ['cosmetology-apprenticeship'],
   }));
   expect(shops[0].gallery).toEqual([]);
+});
+
+
+it('restores the same approved identity’s public directory phone without borrowing another shop’s contact', () => {
+  const approved = { id: 'approved-shop', phone: '' };
+  expect(publicPhoneForApprovedHostShop(approved, { id: 'approved-shop', phone: '3175550100' })).toBe('3175550100');
+  expect(publicPhoneForApprovedHostShop(approved, { id: 'other-shop', phone: '3175550101' })).toBe('');
+  expect(publicPhoneForApprovedHostShop(approved)).toBe('');
+  expect(publicPhoneForApprovedHostShop({ ...approved, phone: '3175550102' }, { id: 'approved-shop', phone: '3175550100' })).toBe('3175550102');
 });

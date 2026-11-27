@@ -51,3 +51,9 @@ it('never renders operational contact fields in the public profile source', () =
   );
   expect(source).not.toMatch(/\b(?:approved|shop)\.(?:email|supervisor)\b/);
 });
+
+
+it('uses the identity-bound public phone projection on individual profiles', () => {
+  const source = readFileSync('apps/marketing/app/host-shops/[slug]/page.tsx', 'utf8');
+  expect(source).toContain('phone: publicPhoneForApprovedHostShop(approvedRecord, entry)');
+});

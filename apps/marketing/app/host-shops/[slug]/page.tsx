@@ -1,4 +1,4 @@
-import { getHostShopNetwork } from '@/lib/programs/host-shop-network';
+import { getHostShopNetwork, publicPhoneForApprovedHostShop } from '@/lib/programs/host-shop-network';
 import { IMAGE_LOADING_BLUR } from '@/lib/ui/blur-placeholder';
 import { curateShopGallery } from '@/lib/partners/curated-shop-media';
 import type { Metadata } from 'next';
@@ -117,9 +117,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function HostShopProfilePage({ params }: PageProps) {
   const { slug } = await params;
   const [profile, approvedRecord, network] = await Promise.all([getPublicHostShopBySlug(slug), getApprovedShopByPublicSlug(slug), getHostShopNetwork()]);
-  const entry = network.find((shop) => shop.slug === slug || shop.id === approvedRecord?.id);
+  const entry = network.find((shop) => shop.id === approvedRecord?.id) ?? network.find((shop) => shop.slug === slug);
   const approved = approvedRecord && entry ? {
     ...approvedRecord,
+    phone: publicPhoneForApprovedHostShop(approvedRecord, entry),
     description: entry.description,
     mediaGallery: entry.gallery,
     videoUrl: entry.videoUrl,

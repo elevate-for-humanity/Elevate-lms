@@ -14,6 +14,15 @@ import { getApprovedShops, type HostShop } from '@/lib/programs/host-shops';
 import type { HostShopNetworkEntry } from '@/lib/programs/host-shop-network-types';
 export type { HostShopNetworkEntry } from '@/lib/programs/host-shop-network-types';
 
+/** Reuse only the public directory projection for the exact approved identity.
+ * Operational application contact fields must never be used as a fallback. */
+export function publicPhoneForApprovedHostShop(
+  approved: Pick<HostShop, 'id' | 'phone'>,
+  entry?: Pick<HostShopNetworkEntry, 'id' | 'phone'>,
+): string {
+  return approved.phone || (entry?.id === approved.id ? entry.phone : '') || '';
+}
+
 function identityKey(value: string) {
   return value
     .toLowerCase()

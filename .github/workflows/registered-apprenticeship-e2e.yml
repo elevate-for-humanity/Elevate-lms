@@ -1,7 +1,4 @@
 name: Registered Apprenticeship E2E
-concurrency:
-group: ${{ github.workflow }}-${{ github.ref }}
-cancel-in-progress: true
 
 on:
   pull_request:
@@ -277,6 +274,7 @@ jobs:
       - name: Provision disposable Host Shop + Apprentice identities
         run: node scripts/qa/provision-apprenticeship-e2e.mjs provision
       - name: Require all nine roles so authenticated tests cannot silently skip
+        id: portal-identities
         run: |
           node --test scripts/qa/require-portal-e2e-identities.test.mjs scripts/qa/write-private-state.test.mjs
           node scripts/qa/require-portal-e2e-identities.mjs
@@ -286,12 +284,12 @@ jobs:
       # playback of the published LMS video and learner full-screen layout.
       # Provisioned QA credentials are mandatory: missing data FAILS, never skips.
       - name: Verify authenticated HVAC course video playback and full-screen layout on devices
-        if: ${{ !cancelled() && !inputs.employer_only && ((github.event_name == 'workflow_dispatch' && inputs.component == 'lms' && inputs.deployed_sha != '' && inputs.deployment_run_id != '') || (github.event_name == 'workflow_run' && github.event.workflow_run.name == 'Deploy LMS automatically on Google' && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'workflow_dispatch' && github.event.workflow_run.head_branch == 'main')) }}
+        if: ${{ !cancelled() && steps.portal-identities.outcome == 'success' && !inputs.employer_only && ((github.event_name == 'workflow_dispatch' && inputs.component == 'lms' && inputs.deployed_sha != '' && inputs.deployment_run_id != '') || (github.event_name == 'workflow_run' && github.event.workflow_run.name == 'Deploy LMS automatically on Google' && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'workflow_dispatch' && github.event.workflow_run.head_branch == 'main')) }}
         env:
           PLAYWRIGHT_BASE_URL: https://lms.elevateforhumanity.org
           EXPECTED_LMS_SHA: ${{ inputs.deployed_sha || github.event.workflow_run.head_sha }}
           PLAYWRIGHT_HTML_OUTPUT_DIR: playwright-report/hvac-lms-playback
-        run: pnpm exec playwright test tests/e2e/hvac-live-lesson-playback.spec.ts --reporter=line,html --config playwright.config.ts --output=test-results/hvac-lms-playback --trace retain-on-failure --project=desktop-chrome --project=laptop-chrome --project=tablet-chrome --project=iphone-webkit --project=android-chrome
+        run: pnpm exec playwright test tests/e2e/hvac-live-lesson-playback.spec.ts --reporter=line,html --config playwright.config.ts --output=test-results/hvac-lms-playback --trace off --project=desktop-chrome --project=laptop-chrome --project=tablet-chrome --project=iphone-webkit --project=android-chrome
       - name: Preserve authenticated LMS playback and full-screen acceptance evidence
         if: ${{ always() && !inputs.employer_only && ((github.event_name == 'workflow_dispatch' && inputs.component == 'lms') || (github.event_name == 'workflow_run' && github.event.workflow_run.name == 'Deploy LMS automatically on Google')) }}
         uses: actions/upload-artifact@v7
@@ -303,11 +301,11 @@ jobs:
           retention-days: 14
           if-no-files-found: ignore
       - name: Verify employer onboarding persistence and private documents after deployment
-        if: github.event_name == 'workflow_run' || inputs.deployment_run_id != ''
+        if: ${{ !cancelled() && steps.portal-identities.outcome == 'success' && (github.event_name == 'workflow_run' || inputs.deployment_run_id != '') }}
         env:
           PLAYWRIGHT_BASE_URL: https://lms.elevateforhumanity.org
           PLAYWRIGHT_HTML_OUTPUT_DIR: playwright-report/employer-onboarding
-        run: pnpm exec playwright test tests/e2e/employer-onboarding.spec.ts --reporter=html,github --config playwright.config.ts --output=test-results/employer-onboarding --trace retain-on-failure --project=desktop-chrome --project=iphone-webkit
+        run: pnpm exec playwright test tests/e2e/employer-onboarding.spec.ts --reporter=html,github --config playwright.config.ts --output=test-results/employer-onboarding --trace off --project=desktop-chrome --project=iphone-webkit
       - name: Upload employer onboarding evidence immediately
         if: ${{ always() && (github.event_name == 'workflow_run' || inputs.deployment_run_id != '') }}
         uses: actions/upload-artifact@v7
@@ -323,25 +321,25 @@ jobs:
       # The complete HVAC film runs in hvac-public-playback, where the iPhone
       # profile uses macOS media codecs. Keep portal and hydration checks here.
       - name: Verify public hydration, startup stability and audible-media exclusivity
-        if: ${{ !cancelled() && !inputs.employer_only }}
+        if: ${{ !cancelled() && steps.portal-identities.outcome == 'success' && !inputs.employer_only }}
         env:
           PLAYWRIGHT_HTML_OUTPUT_DIR: playwright-report/public-runtime
-        run: pnpm exec playwright test tests/e2e/public-runtime-acceptance.spec.ts --config playwright.config.ts --output=test-results/public-runtime --project=desktop-chrome --project=tablet-chrome --project=iphone-webkit --project=android-chrome
+        run: pnpm exec playwright test tests/e2e/public-runtime-acceptance.spec.ts --config playwright.config.ts --output=test-results/public-runtime --trace off --project=desktop-chrome --project=tablet-chrome --project=iphone-webkit --project=android-chrome
       - name: Certify Studio sign-in and fonts on all devices
-        if: ${{ !cancelled() && !inputs.employer_only }}
+        if: ${{ !cancelled() && steps.portal-identities.outcome == 'success' && !inputs.employer_only }}
         env:
           PLAYWRIGHT_HTML_OUTPUT_DIR: playwright-report/studio
-        run: pnpm exec playwright test tests/e2e/portal-responsive-design.spec.ts --grep "Admin session opens Studio and optional external browser tools remain usable on the active device" --config playwright.config.ts --output=test-results/studio --trace retain-on-failure --project=desktop-chrome --project=laptop-chrome --project=tablet-chrome --project=iphone-webkit --project=android-chrome
+        run: pnpm exec playwright test tests/e2e/portal-responsive-design.spec.ts --grep "Admin session opens Studio and optional external browser tools remain usable on the active device" --config playwright.config.ts --output=test-results/studio --trace off --project=desktop-chrome --project=laptop-chrome --project=tablet-chrome --project=iphone-webkit --project=android-chrome
       - name: Run authenticated production functional E2E
-        if: ${{ !cancelled() && !inputs.employer_only }}
+        if: ${{ !cancelled() && steps.portal-identities.outcome == 'success' && !inputs.employer_only }}
         env:
           PLAYWRIGHT_HTML_OUTPUT_DIR: playwright-report/functional
-        run: pnpm exec playwright test tests/e2e/registered-apprenticeship-authenticated.spec.ts --config playwright.config.ts --output=test-results/functional --project=desktop-chrome
+        run: pnpm exec playwright test tests/e2e/registered-apprenticeship-authenticated.spec.ts --config playwright.config.ts --output=test-results/functional --trace off --project=desktop-chrome
       - name: Run authenticated cross-device responsive design certification
-        if: ${{ !cancelled() && !inputs.employer_only }}
+        if: ${{ !cancelled() && steps.portal-identities.outcome == 'success' && !inputs.employer_only }}
         env:
           PLAYWRIGHT_HTML_OUTPUT_DIR: playwright-report/responsive
-        run: pnpm exec playwright test tests/e2e/portal-responsive-design.spec.ts --config playwright.config.ts --output=test-results/responsive --project=desktop-chrome --project=laptop-chrome --project=tablet-chrome --project=iphone-webkit --project=android-chrome
+        run: pnpm exec playwright test tests/e2e/portal-responsive-design.spec.ts --config playwright.config.ts --output=test-results/responsive --trace off --project=desktop-chrome --project=laptop-chrome --project=tablet-chrome --project=iphone-webkit --project=android-chrome
       - name: Require the attested release to remain live through acceptance
         if: ${{ !cancelled() && inputs.deployment_run_id != '' }}
         env:

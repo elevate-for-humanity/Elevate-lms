@@ -103,7 +103,7 @@ test('focused employer acceptance shares the lock for the dedicated live employe
   }
   for (const name of ['Verify public hydration', 'Certify Studio sign-in', 'Run authenticated production functional', 'Run authenticated cross-device']) {
     const step = job.slice(job.indexOf('- name: '+name)).split('\n      - name:')[0];
-    assert.match(step, /success\(\) && !inputs.employer_only/);
+    assert.match(step, /!cancelled\(\) && steps\.portal-identities\.outcome == 'success' && !inputs.employer_only/);
   }
 });
 
@@ -149,7 +149,7 @@ test('LMS course playback is not skipped by the Marketing-film admission gate', 
   assert.ok(section, 'Missing independent LMS playback step');
   const condition = section.match(/^        if: \$\{\{ (.+) \}\}$/m)?.[1];
   assert.ok(condition, 'Missing signed-release admission condition');
-  const check = (inputs, passed = true) => Function('inputs', 'success', 'return (' + condition + ');')(inputs, () => passed);
+  const check = (inputs, passed = true) => Function('inputs', 'github', 'steps', 'cancelled', 'return (' + condition.replaceAll('steps.portal-identities', "steps['portal-identities']") + ');')({deployment_run_id:'123', deployed_sha:'a'.repeat(40), ...inputs}, {event_name:'workflow_dispatch'}, {'portal-identities': {outcome: passed ? 'success' : 'failure'}}, () => false);
   assert.equal(check({component: 'lms'}), true);
   assert.equal(check({component: 'lms', employer_only: true}), false);
   assert.equal(check({component: 'marketing'}), false);
@@ -244,4 +244,22 @@ test('isolated QA cleanup deletes and verifies disposable career resumes before 
     'QA resumes must be deleted and read back before disposable profile cleanup');
   assert.ok(cleanup.includes('if (remainingResumes?.length) {'));
   assert.ok(cleanup.includes("throw new Error('QA learner resume cleanup left disposable learner rows')"));
+});
+
+
+test('production browsers require successful identity preflight and never run after missing setup', () => {
+  const sections = job.split(/(?=^      - name: )/m).filter(section => /^        run: pnpm exec playwright test /m.test(section));
+  assert.equal(sections.length, 6);
+  assert.match(job, /- name: Require all nine roles so authenticated tests cannot silently skip\n        id: portal-identities/);
+  for (const section of sections) {
+    const expression = section.match(/^        if: \$\{\{ (.+) \}\}$/m)?.[1];
+    assert.ok(expression);
+    const evaluate = Function('inputs', 'github', 'steps', 'cancelled', 'return (' + expression.replaceAll('steps.portal-identities', "steps['portal-identities']") + ');');
+    const inputs = {component:'lms', deployed_sha:'a'.repeat(40), deployment_run_id:'123', employer_only:false};
+    const github = {event_name:'workflow_dispatch', event:{workflow_run:{}}};
+    for (const outcome of ['skipped', 'failure', 'cancelled', 'success']) {
+      assert.equal(Boolean(evaluate(inputs, github, {'portal-identities':{outcome}}, () => false)), outcome === 'success');
+    }
+    assert.equal(Boolean(evaluate(inputs, github, {'portal-identities':{outcome:'success'}}, () => true)), false);
+  }
 });

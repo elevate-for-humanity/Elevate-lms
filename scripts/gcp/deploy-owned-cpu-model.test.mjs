@@ -4,7 +4,7 @@ import {privateCpuDeploymentArguments,reviewPrivateModelPolicy,preflightPrivateC
 const admin='elevate-admin-runtime@elegant-racer-299721.iam.gserviceaccount.com';
 test('CPU release is immutable, bounded, keeps one warm instance and never enables public access or GPUs',()=>{
  const args=privateCpuDeploymentArguments('sha256:'+'a'.repeat(64));
- for(const pair of [['--region','us-east1'],['--cpu','4'],['--memory','8Gi'],['--concurrency','1'],['--max-instances','2'],['--min','1'],['--min-instances','1']])assert.equal(args[args.indexOf(pair[0])+1],pair[1]);
+ for(const pair of [['--region','us-east1'],['--cpu','8'],['--memory','16Gi'],['--concurrency','2'],['--max-instances','3'],['--min','1'],['--min-instances','1']])assert.equal(args[args.indexOf(pair[0])+1],pair[1]);
  assert.ok(!args.some(arg=>/allow-unauthenticated|invoker-iam|--gpu|allUsers/.test(arg)));
  assert.ok(args.includes('--cpu-boost'));
  assert.ok(!args.includes('--no-cpu-boost'));

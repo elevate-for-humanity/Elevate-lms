@@ -2,6 +2,7 @@
 // Fails when an apps/*/app/api route exports a mutating handler without a recognized auth guard.
 import fs from 'node:fs';
 import path from 'node:path';
+import { hasCleaningProviderMutationGuard } from './cleaning-provider-route-contract.mjs';
 
 const root = process.cwd();
 const GUARDS = ['requireRole', 'apiRequireAdmin', 'apiRequireDevStudio', 'getCurrentUser',
@@ -42,11 +43,19 @@ const files = fs.readdirSync(appsDir, { withFileTypes: true })
   .flatMap((dir) => walk(dir));
 
 const offenders = [];
+const providerGuardSources = Object.fromEntries([
+  ['proof', 'lib/cleaning/provider-email-proof.ts'],
+  ['verification', 'lib/cleaning/provider-email-verification.ts'],
+].map(([key, file]) => {
+  const absolute = path.join(root, file);
+  return [key, fs.existsSync(absolute) ? fs.readFileSync(absolute, 'utf8') : ''];
+}));
 for (const file of files) {
   const source = sourceWithReexports(file);
   const methods = [...new Set([...source.matchAll(new RegExp(MUTATING, 'g'))].map((m) => m[1] || m[2]))];
   if (!methods.length) continue;
-  if (!GUARDS.some((guard) => new RegExp(`\\b${guard}\\b`).test(source))) {
+  if (!GUARDS.some((guard) => new RegExp(`\\b${guard}\\b`).test(source)) &&
+      !hasCleaningProviderMutationGuard(source, providerGuardSources)) {
     offenders.push(`${path.relative(root, file)} [${methods.join(',')}]`);
   }
 }

@@ -139,19 +139,29 @@ describe('canonical AI provider authority', () => {
     }
   });
 
-  it('rejects a caller attempting to override the configured provider', async () => {
+  it('serves a mismatched provider preference from the configured provider instead of failing', async () => {
     vi.stubEnv('AI_PROVIDER', 'elevate');
     vi.stubEnv('ELEVATE_LLM_URL', 'https://configured-provider.test');
     vi.stubEnv('ELEVATE_LLM_SECRET', 'test-secret');
+    vi.stubEnv('OPENAI_API_KEY', 'external-key-must-not-be-used');
+    const request = vi.fn().mockResolvedValue(new Response(JSON.stringify({
+      model: 'elevate-local', choices: [{ message: { content: 'owned response' } }],
+    }), { status: 200, headers: { 'content-type': 'application/json' } }));
+    vi.stubGlobal('fetch', request);
     const { aiChat } = await import('@/lib/ai/ai-service');
-    const { runWithPaidInferenceContext } = await import('@/lib/ai/paid-inference-context');
 
-    await expect(
-      runWithPaidInferenceContext('test-provider-override', () => aiChat({
-        provider: 'openai',
-        messages: [{ role: 'user', content: 'test' }],
-      })),
-    ).rejects.toThrow('Provider override "openai" is not allowed');
+    const result = await aiChat({
+      provider: 'openai',
+      messages: [{ role: 'user', content: 'test' }],
+    });
+
+    // The configured canonical provider serves the request; the receipt
+    // names the provider that actually answered, and the preferred
+    // external provider is never called.
+    expect(result.provider).toBe('elevate');
+    expect(result.content).toBe('owned response');
+    expect(request).toHaveBeenCalledTimes(1);
+    expect(String(request.mock.calls[0]?.[0])).toContain('configured-provider.test');
   });
 
   it('routes owned-only work to Elevate even when the canonical provider is commercial', async () => {

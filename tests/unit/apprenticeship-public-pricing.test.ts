@@ -1,5 +1,6 @@
 import {beforeEach,describe,expect,it,vi} from 'vitest';
 import {NextRequest} from 'next/server';
+import {programInstallmentTerms} from '@/lib/programs/installment-terms';
 const fixture=vi.hoisted(()=>({row:{title:'Nail Technician Apprenticeship',price:6000,tuition:6000,total_cost:6000},tables:[] as string[]}));
 vi.mock('@/lib/api/withRateLimit',()=>({applyRateLimit:async()=>null}));
 vi.mock('@/lib/supabase/public',()=>({createPublicClient:()=>({from:(table:string)=>{fixture.tables.push(table);const query={select:()=>query,eq:()=>query,maybeSingle:async()=>({data:fixture.row,error:null})};return query;}})}));
@@ -19,4 +20,19 @@ describe('apprenticeship public price authority',()=>{
    const result=await GET(new NextRequest('https://www.elevateforhumanity.org/api/programs/pricing?slug=barber-apprenticeship'));
    expect(await result.json()).toMatchObject({tuition_cents:498000,deposit_default_cents:60000,payment_frequency:'weekly',payment_weeks:29});
  });
+});
+
+it('quotes the same HVAC tuition and deposit as checkout', async () => {
+  fixture.row = { title: 'HVAC Technician', price: 5000, tuition: 4995, total_cost: 4995 };
+  fixture.tables = [];
+  const response = await GET(new NextRequest('https://www.elevateforhumanity.org/api/programs/pricing?slug=hvac-technician'));
+  const checkout = programInstallmentTerms('hvac-technician', 500000);
+  expect(await response.json()).toMatchObject({
+    source: 'programs',
+    tuition_cents: 500000,
+    deposit_default_cents: checkout.downPaymentCents,
+    deposit_min_cents: 125000,
+    payment_frequency: checkout.cadence,
+  });
+  expect(fixture.tables).toEqual(['programs']);
 });

@@ -15,7 +15,11 @@ vi.mock('@/lib/integrations/quickbooks-client', () => ({
 vi.mock('server-only', () => ({}));
 
 import { findInvoiceForScheduleWeek } from '@/lib/billing/apprentice-invoice-batch';
-import { resolvePayPalPaymentTarget } from '@/lib/billing/paypal-payment-sync';
+import {
+  resolvePayPalPaymentTarget,
+  scheduleAdvancedPastWeek,
+  syncPayPalPaymentToQuickBooks,
+} from '@/lib/billing/paypal-payment-sync';
 
 const source = (path: string) => readFileSync(path, 'utf8');
 
@@ -216,6 +220,169 @@ describe('reconcile is the single writer', () => {
   });
 });
 
+describe('Devin follow-up: voided invoices are terminal, not payment targets', () => {
+  it('ignores a voided fallback invoice found by its idempotency key', async () => {
+    const voided = { ...fallbackRow, status: 'void' };
+    const found = await findInvoiceForScheduleWeek(fakeDb([voided]) as any, {
+      scheduleId: 'schedule-1',
+      amountCents: 10000,
+      weekStart: '2026-11-23',
+    });
+    expect(found).toBeNull();
+  });
+
+  it('ignores a voided invoice found by schedule and due date', async () => {
+    const voided = {
+      id: 'inv-void',
+      provider_invoice_id: 'qb-300',
+      invoice_number: '2071-DP',
+      total_cents: 10000,
+      status: 'void',
+      due_at: '2026-11-25',
+      billing_schedule_id: 'schedule-1',
+      idempotency_key: 'other-key',
+      created_at: '2026-11-25T10:00:00.000Z',
+    };
+    const found = await findInvoiceForScheduleWeek(fakeDb([voided]) as any, {
+      scheduleId: 'schedule-1',
+      amountCents: 10000,
+      weekStart: '2026-11-23',
+    });
+    expect(found).toBeNull();
+  });
+
+  it('returns the replacement invoice when the voided one is skipped', async () => {
+    const voided = { ...fallbackRow, status: 'void', created_at: '2026-11-23T09:00:00.000Z' };
+    const replacement = {
+      ...fallbackRow,
+      id: 'inv-replacement',
+      provider_invoice_id: 'qb-301',
+      invoice_number: '2072-DP',
+      status: 'open',
+      created_at: '2026-11-24T09:00:00.000Z',
+    };
+    const found = await findInvoiceForScheduleWeek(fakeDb([voided, replacement]) as any, {
+      scheduleId: 'schedule-1',
+      amountCents: 10000,
+      weekStart: '2026-11-23',
+    });
+    expect(found?.id).toBe('inv-replacement');
+  });
+
+  it('creates a replacement invoice instead of failing when the only invoice is voided', async () => {
+    const voided = { ...fallbackRow, status: 'void' };
+    const target = await resolvePayPalPaymentTarget(fakeDb([voided]) as any, schedule, payment);
+    expect(target).toEqual({ action: 'create' });
+  });
+});
+
+describe('Devin follow-up: schedule advancement uses the week end, not its Monday', () => {
+  it('advances a Monday-anchored schedule that has not moved past the week', () => {
+    expect(scheduleAdvancedPastWeek('2026-11-23', '2026-11-23')).toBe(false);
+  });
+
+  it('skips a Monday-anchored schedule already advanced to next week', () => {
+    expect(scheduleAdvancedPastWeek('2026-11-30', '2026-11-23')).toBe(true);
+  });
+
+  it('advances a Wednesday-anchored schedule whose due date is inside the week', () => {
+    // The old Monday comparison reported this as already advanced, so the
+    // installment was never consumed and the schedule stalled.
+    expect(scheduleAdvancedPastWeek('2026-11-25', '2026-11-23')).toBe(false);
+  });
+
+  it('skips a Wednesday-anchored schedule already advanced to next week', () => {
+    expect(scheduleAdvancedPastWeek('2026-12-02', '2026-11-23')).toBe(true);
+  });
+
+  it('treats the week’s Sunday as still inside the week', () => {
+    expect(scheduleAdvancedPastWeek('2026-11-29', '2026-11-23')).toBe(false);
+  });
+
+  it('treats a missing next invoice date as not advanced', () => {
+    expect(scheduleAdvancedPastWeek(null, '2026-11-23')).toBe(false);
+    expect(scheduleAdvancedPastWeek(undefined, '2026-11-23')).toBe(false);
+  });
+});
+
+describe('Devin follow-up: duplicate PayPal payments are recorded for refund review', () => {
+  /** Table-aware fake DB: per-table rows plus the refund-review insert. */
+  class FakeTableDb {
+    constructor(private tables: Record<string, InvoiceRow[]>) {}
+
+    from(table: string) {
+      const rows = this.tables[table] || (this.tables[table] = []);
+      const query: any = new FakeQuery(rows);
+      query.insert = (row: InvoiceRow) => {
+        const duplicate = rows.some(
+          (existing) =>
+            existing.provider === row.provider &&
+            existing.provider_event_id === row.provider_event_id,
+        );
+        if (duplicate) {
+          return {
+            select: () => ({
+              single: () => ({ data: null, error: { code: '23505', message: 'duplicate key' } }),
+            }),
+          };
+        }
+        rows.push({ ...row, id: `evt-${rows.length + 1}` });
+        return {
+          select: () => ({ single: () => ({ data: { id: `evt-${rows.length}` }, error: null }) }),
+        };
+      };
+      return query;
+    }
+  }
+
+  const paidFallback = { ...fallbackRow, status: 'paid' };
+  const scheduleRow = {
+    id: 'schedule-1',
+    amount_cents: 10000,
+    collection_provider: 'paypal',
+    provider_subscription_id: 'I-SUB-1',
+    next_invoice_date: '2026-11-23',
+    remaining_invoices: 10,
+  };
+
+  it('persists an idempotent refund-review record for the double payment', async () => {
+    const db = new FakeTableDb({
+      billing_invoices: [paidFallback],
+      billing_schedules: [scheduleRow],
+      billing_provider_events: [],
+    });
+    const result = await syncPayPalPaymentToQuickBooks(db as any, payment);
+    expect(result).toEqual({ scheduleId: 'schedule-1', alreadyProcessed: true, duplicateSkipped: true });
+    const events = (db as any).tables.billing_provider_events;
+    expect(events).toHaveLength(1);
+    expect(events[0]).toMatchObject({
+      provider: 'paypal',
+      provider_event_id: 'paypal-refund-review:PAY-1',
+      event_type: 'payment.duplicate',
+      resource_id: 'PAY-1',
+      status: 'processing',
+    });
+    expect(events[0].payload).toMatchObject({
+      billingScheduleId: 'schedule-1',
+      paymentId: 'PAY-1',
+      amountCents: 10000,
+      invoiceId: 'inv-fallback',
+    });
+  });
+
+  it('records the refund review exactly once when the payment is retried', async () => {
+    const db = new FakeTableDb({
+      billing_invoices: [paidFallback],
+      billing_schedules: [scheduleRow],
+      billing_provider_events: [],
+    });
+    await syncPayPalPaymentToQuickBooks(db as any, payment);
+    const second = await syncPayPalPaymentToQuickBooks(db as any, payment);
+    expect(second.duplicateSkipped).toBe(true);
+    expect((db as any).tables.billing_provider_events).toHaveLength(1);
+  });
+});
+
 describe('redesign wiring', () => {
   it('runs reconcile before the fallback in the Monday job', () => {
     const scheduler = source('.github/workflows/cron-scheduler.yml');
@@ -247,5 +414,29 @@ describe('redesign wiring', () => {
     const provider = source('lib/billing/providers/quickbooks.ts');
     expect(sync).toContain('billingScheduleId: schedule.id');
     expect(provider).toContain('billing_schedule_id: input.billingScheduleId');
+  });
+
+  it('records a duplicate PayPal payment as a refund review instead of only logging it', () => {
+    const sync = source('lib/billing/paypal-payment-sync.ts');
+    expect(sync).toContain('paypal-refund-review:');
+    expect(sync).toContain("event_type: 'payment.duplicate'");
+    expect(sync).toContain('recordDuplicatePaymentForRefundReview');
+  });
+
+  it('retries the invoice email when a rerun finds a fallback invoice whose email failed', () => {
+    const fallback = source('apps/admin/app/api/cron/generate-apprentice-invoices/route.ts');
+    expect(fallback).toContain("startsWith('apprentice-fallback:')");
+    expect(fallback).toContain('deliverInvoiceEmailAndAdvance');
+  });
+
+  it('treats voided invoices as terminal in the duplicate detector', () => {
+    const detector = source('lib/billing/apprentice-invoice-batch.ts');
+    expect(detector).toContain(".neq('status', 'void')");
+  });
+
+  it('advances a schedule past the week end, not past its Monday', () => {
+    const sync = source('lib/billing/paypal-payment-sync.ts');
+    expect(sync).toContain('scheduleAdvancedPastWeek');
+    expect(sync).toContain('billingWeekEnd(weekStart)');
   });
 });

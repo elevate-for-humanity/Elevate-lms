@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { DocumentSignatureBlock } from '@/components/documents';
-import { ACHIEVE_HOLDER_ID, achieveCnaAgreements, achieveDocumentVersion, hasCurrentAchieveSignature } from '@/lib/program-holder/achieve-cna-agreements';
+import { ACHIEVE_HOLDER_ID, achieveCnaAgreements, achieveCnaRevisionId, achieveDocumentVersion, hasCurrentAchieveSignature } from '@/lib/program-holder/achieve-cna-agreements';
 import FullProgramHostAgreement from '@/components/program-holder/FullProgramHostAgreement';
 import { PrintDocumentControl } from '@/components/program-holder/PrintDocumentControl';
 import { ProgramHolderPaymentAddendum } from '@/components/program-holder/ProgramHolderPaymentAddendum';
@@ -21,6 +21,7 @@ export default async function FullOnboardingFormsPage() {
     <Link className="inline-flex min-h-12 items-center font-bold text-blue-800 underline" href="/program-holder/non-compete">Read your confidentiality, non-compete and non-solicitation obligations</Link>
     <p className="text-sm">The full master terms below support your assigned MOU. Your executed individual agreement and addenda control any specific exceptions; this page does not recreate an absent original.</p><FullProgramHostAgreement /></main>;
   const packet = achieveCnaAgreements(holder.features);
+  const revisionId = achieveCnaRevisionId(holder.features);
   const ndaSigned = hasCurrentAchieveSignature(holder.features, 'nda', packet?.digest);
   const approved = holder.approved_at && ['active', 'approved', 'approved_pending_mou'].includes(holder.status);
   return (
@@ -34,12 +35,12 @@ export default async function FullOnboardingFormsPage() {
       </div>
       <section className="space-y-3 rounded-xl border bg-white p-5">
         <h2 className="text-xl font-bold">Current CNA confidentiality agreement</h2>
-        {packet ? <p className="whitespace-pre-wrap">{packet.nda}</p> : (
+        {packet?.signingArtifactComplete ? <p className="whitespace-pre-wrap">{packet.nda}</p> : (
           <p>Signing opens when Elevate publishes the finalized confidentiality agreement.</p>
         )}
         {ndaSigned && <p className="font-semibold">Your signature for this NDA is recorded.</p>}
-        {packet && approved && !ndaSigned && context.mode === 'holder' && (
-          <DocumentSignatureBlock agreementType="nda" agreementVersion={achieveDocumentVersion('nda', packet.digest)}
+        {packet?.signingArtifactComplete && revisionId && approved && !ndaSigned && context.mode === 'holder' && (
+          <DocumentSignatureBlock agreementType="nda" agreementVersion={achieveDocumentVersion('nda', packet.digest, revisionId)}
             buttonLabel="Sign the CNA NDA" nextUrl="/program-holder/documents" />
         )}
         <Link className="block font-bold text-blue-700 underline" href="/program-holder/sign-mou">Review the current CNA MOU and Schedule A</Link>

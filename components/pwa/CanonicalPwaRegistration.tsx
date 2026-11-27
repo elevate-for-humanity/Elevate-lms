@@ -8,7 +8,19 @@ import {
   clearPwaInstallPrompt,
 } from '@/lib/pwa/install-prompt';
 
+// Sibling applications share an origin (Elevate Mail lives on the Admin
+// origin under /mail/). Their workers and caches are their own install
+// identity: one application's registration pass must never unregister or
+// purge a sibling, or installing/using one app would break the other.
+// The sibling sets are derived inside removeStaleWorkers, not at module
+// scope: they are only needed in a real browser with the registry loaded.
 async function removeStaleWorkers(workerPath: string, cachePrefix: string) {
+  const knownWorkerPaths = new Set<string>(
+    Object.values(PWA_APPLICATIONS).map((app) => app.workerPath),
+  );
+  const knownCachePrefixes = Object.values(PWA_APPLICATIONS).map(
+    (app) => app.cachePrefix,
+  );
   const registrations = await navigator.serviceWorker.getRegistrations();
   await Promise.all(registrations.map(async (registration) => {
     const worker = registration.active ?? registration.waiting ?? registration.installing;
@@ -17,7 +29,10 @@ async function removeStaleWorkers(workerPath: string, cachePrefix: string) {
       return;
     }
     const script = new URL(worker.scriptURL);
-    if (script.origin !== window.location.origin || script.pathname !== workerPath) {
+    if (
+      script.origin !== window.location.origin ||
+      (script.pathname !== workerPath && !knownWorkerPaths.has(script.pathname))
+    ) {
       await registration.unregister();
     }
   }));
@@ -26,19 +41,37 @@ async function removeStaleWorkers(workerPath: string, cachePrefix: string) {
     const names = await caches.keys();
     await Promise.all(
       names
-        .filter((name) => name.startsWith('elevate-') && !name.startsWith(cachePrefix))
+        .filter(
+          (name) =>
+            name.startsWith('elevate-') &&
+            !name.startsWith(cachePrefix) &&
+            !knownCachePrefixes.some((prefix) => name.startsWith(prefix)),
+        )
         .map((name) => caches.delete(name)),
     );
   }
 }
 
-async function purgeBrokenPwaState() {
+async function purgeBrokenPwaState(workerPath: string, cachePrefix: string) {
+  // Reset only the failing application's own state. On single-application
+  // origins this is everything there is; on the shared Admin origin it
+  // leaves sibling applications (and the workspace launchers) intact.
   const registrations = await navigator.serviceWorker.getRegistrations();
-  await Promise.all(registrations.map((registration) => registration.unregister()));
+  await Promise.all(registrations.map(async (registration) => {
+    const worker = registration.active ?? registration.waiting ?? registration.installing;
+    if (!worker) {
+      await registration.unregister();
+      return;
+    }
+    const script = new URL(worker.scriptURL);
+    if (script.origin !== window.location.origin || script.pathname === workerPath) {
+      await registration.unregister();
+    }
+  }));
 
   if ('caches' in window) {
     const names = await caches.keys();
-    await Promise.all(names.filter((name) => name.startsWith('elevate-')).map((name) => caches.delete(name)));
+    await Promise.all(names.filter((name) => name.startsWith(cachePrefix)).map((name) => caches.delete(name)));
   }
 }
 
@@ -77,7 +110,7 @@ export function CanonicalPwaRegistration({ application }: { application: PwaAppl
         // Extra page probes and an immediate update duplicate that work and can
         // race navigation in WebKit on every dashboard mount.
         const registration = await navigator.serviceWorker.register(config.workerPath, {
-          scope: '/',
+          scope: config.scope,
           updateViaCache: 'none',
         });
 
@@ -122,7 +155,7 @@ export function CanonicalPwaRegistration({ application }: { application: PwaAppl
         // A registration exception must not leave an obsolete worker controlling
         // the installed app. Reset PWA state so the next navigation uses network.
         try {
-          await purgeBrokenPwaState();
+          await purgeBrokenPwaState(config.workerPath, config.cachePrefix);
         } catch {
           // Browser cleanup is best-effort; never block the application shell.
         }

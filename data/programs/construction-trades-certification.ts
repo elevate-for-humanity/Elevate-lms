@@ -9,7 +9,7 @@ export const CONSTRUCTION_TRADES: ProgramSchema = {
   sector: 'skilled-trades',
   category: 'Construction',
   programType: 'workforce',
-  heroImage: '/images/pexels/electrical.webp',
+  heroImage: '/images/refresh-20261014/construction.webp',
   heroImageAlt: 'Construction trades students in safety gear on a job site',
   videoSrc: '/videos/hvac-hero-final.mp4',
   deliveryMode: 'hybrid',

@@ -1,5 +1,6 @@
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
-import { assets, url } from '@/lib/utils/url-factory';
+import { organization } from '@/lib/config/organization';
+import { url } from '@/lib/utils/url-factory';
 // Structured Data (JSON-LD) for SEO
 
 export const organizationSchema = {
@@ -8,25 +9,22 @@ export const organizationSchema = {
   name: PLATFORM_DEFAULTS.orgName,
   alternateName: 'Elevate For Humanity Career & Technical Institute',
   url: PLATFORM_DEFAULTS.siteUrl,
-  logo: assets.logo,
+  logo: `${PLATFORM_DEFAULTS.siteUrl}/images/Elevate_for_Humanity_logo_81bf0fab.jpg`,
   description:
-    'Free career training in healthcare, skilled trades, and business. Get trained, get hired, get paid. No cost, no debt.',
+    'Career and technical education provider connecting learners with training, registered apprenticeships, testing and credential pathways, workforce funding navigation, employers, and supportive services.',
   address: {
     '@type': 'PostalAddress',
-    addressLocality: 'Indianapolis',
-    addressRegion: 'IN',
-    addressCountry: 'US',
+    ...organization.postalAddress,
   },
   contactPoint: {
     '@type': 'ContactPoint',
     telephone: '+1-463-240-1404',
     contactType: 'Admissions',
-    email: 'info@www.elevateforhumanity.org',
+    email: organization.email,
   },
   sameAs: [
     'https://www.facebook.com/61578240192934/',
     'https://www.linkedin.com/company/elevate-for-humanity',
-    '',
   ],
 };
 

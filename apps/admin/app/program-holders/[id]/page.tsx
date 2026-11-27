@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import { notFound, redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Building2, Mail, Phone, ShieldCheck, Users, BookOpen, ArrowLeft } from 'lucide-react';
+import { ACHIEVE_HOLDER_ID } from '@/lib/program-holder/achieve-holder';
 import { requireRole } from '@/lib/auth/require-role';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { BUSINESS_REGISTRATION_GUIDANCE, programHolderDocumentStatus, programHolderRequirementStatus } from '@/lib/program-holder/document-requirements';
@@ -10,6 +11,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { ProgramHolderBankingReview } from './ProgramHolderBankingReview';
 import { ProgramHolderAdminDocumentUpload } from './ProgramHolderAdminDocumentUpload';
 import { OpenPortalPreviewButton } from '@/components/admin/OpenPortalPreviewButton';
+import { AssignApplicantsPanel } from './AssignApplicantsPanel';
 
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
@@ -81,6 +83,11 @@ export default async function ProgramHolderDetailPage({
     .not('call_notes', 'is', null)
     .order('updated_at', { ascending: false })
     .limit(50);
+  const { count: assignedApplicantsCount } = await db
+    .from('program_holder_students')
+    .select('id', { count: 'exact', head: true })
+    .eq('program_holder_id', id)
+    .in('status', ['applied', 'applicant', 'pending']);
   const learnerByUserId = new Map(learners.map((learner: any) => [learner.user_id, learner]));
 
   const canDecide = ['admin', 'super_admin'].includes(String(profile.role ?? ''));
@@ -173,6 +180,11 @@ export default async function ProgramHolderDetailPage({
           <div className="rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm font-bold text-rose-800">
             {messages.error}
           </div>
+        )}
+        {id === ACHIEVE_HOLDER_ID && canDecide && (
+          <Link href={`/program-holders/${id}/cna-agreements`} className="inline-block rounded-lg border bg-white px-4 py-2 font-bold text-blue-800">
+            Publish Achieve CNA agreements
+          </Link>
         )}
         {messages.success && (
           <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm font-bold text-emerald-800">
@@ -378,6 +390,20 @@ export default async function ProgramHolderDetailPage({
           )}
         </section>
 
+        {canDecide && (
+          <AssignApplicantsPanel
+            holderId={id}
+            holderName={displayName}
+            programs={(programs ?? [])
+              .filter((program: any) => program?.slug)
+              .map((program: any) => ({
+                id: program.id,
+                slug: program.slug,
+                title: program.title || program.name || program.slug,
+              }))}
+            assignedCount={assignedApplicantsCount ?? 0}
+          />
+        )}
         {canDecide && <ProgramHolderBankingReview holderId={id} />}
         {canDecide && <ProgramHolderAdminDocumentUpload holderId={id} />}
         <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">

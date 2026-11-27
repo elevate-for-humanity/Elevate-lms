@@ -46,7 +46,7 @@ function wrap(body: string): string {
   ${body}
   <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 32px 0;">
   <p style="font-size: 12px; color: #94a3b8; text-align: center; margin: 0;">
-    ${PLATFORM_DEFAULTS.orgName} &nbsp;|&nbsp; 8888 Keystone Crossing, Suite 1300, Indianapolis, IN 46240<br>
+    ${PLATFORM_DEFAULTS.orgName} &nbsp;|&nbsp; 120 East Market Street, Suite 930, Indianapolis, IN 46204<br>
     <a href="${SITE_URL}/unsubscribe" style="color: #94a3b8;">Unsubscribe</a>
   </p>
 </body>

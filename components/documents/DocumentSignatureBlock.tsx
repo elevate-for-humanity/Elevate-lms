@@ -13,6 +13,7 @@ type Props = {
   agreementVersion?: string;
   nextUrl?: string;
   buttonLabel?: string;
+  renewalLicenseId?: string | null;
 };
 
 export function DocumentSignatureBlock({
@@ -20,6 +21,7 @@ export function DocumentSignatureBlock({
   agreementVersion = '1.0',
   nextUrl = '/lms/dashboard',
   buttonLabel = 'Sign & Continue',
+  renewalLicenseId,
 }: Props) {
   const router = useRouter();
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -31,6 +33,15 @@ export function DocumentSignatureBlock({
   const [acknowledged, setAcknowledged] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+
+  useEffect(() => {
+    // A changed agreement or revocation must not inherit an old acknowledgment.
+    setAcknowledged(false);
+    setLegalName('');
+    setTypedName('');
+    setDrawnSignature(null);
+    padRef.current?.clear();
+  }, [agreementVersion, renewalLicenseId]);
 
   useEffect(() => {
     if (method !== 'drawn' || !canvasRef.current) return;
@@ -65,6 +76,7 @@ export function DocumentSignatureBlock({
       const result = await signAgreement({
         agreementType,
         agreementVersion,
+        renewalLicenseId: renewalLicenseId ?? undefined,
         method,
         typedName: method === 'typed' ? typedName.trim() : legalName.trim(),
         signature: method === 'drawn' ? drawnSignature ?? undefined : undefined,

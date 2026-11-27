@@ -97,3 +97,36 @@ Supabase project.
 - Seed data: published programs and pricing, published HVAC course media, and the QA learner.
 - Optional: `E2E_DB_LIFECYCLE=1` enables `enrollment-lifecycle.spec.ts`. It writes, then deletes,
   disposable records.
+
+## Isolated portal prerequisites repaired on 2026-11-24
+
+Run `45443372517` exposed missing prerequisites in shard 4. Every desktop shard now
+runs the existing `provision-apprenticeship-e2e.mjs` lifecycle as well as the general
+portal and learner/holder lifecycles. Its `GITHUB_ENV` outputs provide a dedicated
+admitted apprentice and its assigned Host Shop; static account credentials are
+not evidence of a current placement, registered standard, or certificate fixture.
+All three cleanups run independently with `always()` and verify their own run IDs.
+
+Job Ready also requires `scorm_packages`, `scorm_enrollments`, and `scorm_tracking`.
+Those tables were absent from isolated project `isdgjcdabhxxozarmxta`. The scoped
+repair is `scripts/qa/20261124183454_restore_isolated_qa_scorm_contract.sql`, kept
+outside production migrations. It requires the independently installed private QA
+project identity, the QA tenant, and absence of all three tables. It must not be
+replayed over existing tables or applied to production.
+
+The repair recreates the current production column, constraint, grant, ownership,
+and privileged-session MFA contracts, with the same built-in UUID-v4 generator
+used by the QA bootstrap. It registers the seven existing packages from
+`scripts/sql/activate-job-ready.sql`; it copies no learner progress and makes no
+changes to the Job Ready application access rules. `qa-scorm-contract.test.ts`
+executes the SQL in Postgres and checks persistence, cross-user denial, privileges,
+MFA, cleanup cascades, and refusal of an unverified or existing environment.
+
+The focused QA migration was applied as version `20261124183853`, name
+`restore_isolated_qa_scorm_contract`. Its source SHA-256 is
+`9881e10d09116f0480a0d842dc4306edde3972c2463022373987f89f4f940759`.
+Readback verified 38 columns, 17 policies, 25 grants, all three RLS settings,
+seven active packages, and zero learner progress/tracking rows. The recorded
+statement bytes and fingerprint match the reviewed source. This verifies the
+database prerequisite; the full browser suite must still pass on the release
+commit, including hosted course launch and saved-state reopening.

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { EMT_INQUIRY_HREF, isEmtInquiryOnly } from '@/lib/programs/emt-inquiry-only';
 import { useApplicationDraft } from '@/hooks/useApplicationDraft';
 import {
   TRANSFER_HOURS_EVIDENCE_ACCEPT,
@@ -241,6 +242,10 @@ export default function StudentApplicationForm({
     const resumed = lockedProgram
       ? { ...savedData.form, program: initialProgram, ...(initialHostShopName ? { hasHostShop: 'yes', hostShopName: initialHostShopName } : {}) }
       : savedData.form;
+    if (isEmtInquiryOnly(resumed.program)) {
+      router.push(EMT_INQUIRY_HREF);
+      return;
+    }
     setForm(resumed.program.includes('apprenticeship') ? { ...resumed, fundingSource: 'self_pay' } : resumed);
     setWorkOneAcknowledged(savedData.workOneAcknowledged);
     setApprenticeshipFundingConfirmed(Boolean(savedData.apprenticeshipFundingConfirmed));
@@ -299,6 +304,10 @@ export default function StudentApplicationForm({
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (isEmtInquiryOnly(form.program)) {
+      router.push(EMT_INQUIRY_HREF);
+      return;
+    }
     setResult(null);
 
     if (paymentRequired) {
@@ -401,6 +410,10 @@ export default function StudentApplicationForm({
       }
 
       const { res, data } = await postApplication(payload, submissionKey);
+      if (res.status === 409 && data.inquiryUrl === EMT_INQUIRY_HREF) {
+        router.push(EMT_INQUIRY_HREF);
+        return;
+      }
       if (res.ok && (data.ok === true || data.success === true) && (data.id || data.applicationId || data.referenceNumber)) {
         clearDraft();
         const duplicateWarning = data.duplicateWarning || undefined;

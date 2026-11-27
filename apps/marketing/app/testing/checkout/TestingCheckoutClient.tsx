@@ -46,7 +46,8 @@ export default function TestingCheckoutClient({
   initialProvider: string;
   initialExam: string;
 }) {
-  const fieldId = useId();
+  const providerId = useId();
+  const quantityId = useId();
   const defaultProvider = providers.find((p) => p.key === initialProvider) ?? providers[0] ?? null;
   const [providerKey, setProviderKey] = useState(defaultProvider?.key ?? '');
   const [examName, setExamName] = useState(() => {
@@ -217,9 +218,9 @@ export default function TestingCheckoutClient({
       <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7">
         <h2 className="text-2xl font-black text-slate-950">1. Select provider and exam</h2>
 
-        <label htmlFor={fieldId + "-provider"} className="mt-5 block text-base font-bold text-slate-800">Testing provider</label>
+        <label htmlFor={providerId} className="mt-5 block text-base font-bold text-slate-800">Testing provider</label>
         <select
-          id={fieldId + "-provider"}
+          id={providerId}
           value={providerKey}
           onChange={(event) => changeProvider(event.target.value)}
           className="mt-2 w-full rounded-xl border border-slate-300 bg-white px-4 py-3.5 text-base"
@@ -303,9 +304,9 @@ export default function TestingCheckoutClient({
         </div>
 
         <div className="mt-7">
-          <label htmlFor={fieldId + "-quantity"} className="block text-base font-bold text-slate-800">Number of test takers</label>
+          <label htmlFor={quantityId} className="block text-base font-bold text-slate-800">Number of test takers</label>
           <input
-            id={fieldId + "-quantity"}
+            id={quantityId}
             type="number"
             min={1}
             max={100}

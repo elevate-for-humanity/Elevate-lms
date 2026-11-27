@@ -137,7 +137,7 @@ export default function EmployerAgreementPage() {
           <p>
             {PLATFORM_DEFAULTS.orgName} — Program Director
             <br />
-            6331 N Keystone Ave, Suite D, Indianapolis, IN 46220
+            120 East Market Street, Suite 930, Indianapolis, IN 46204
             <br />
             Email: info@elevateforhumanity.org · Phone: {PLATFORM_DEFAULTS.mainPhone}
           </p>

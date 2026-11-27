@@ -30,6 +30,12 @@ export interface TeamMember {
   image_url: string | null;
   email: string | null;
   linkedin_url: string | null;
+  credentials?: string[] | null;
+}
+
+export interface TeamMembersResult {
+  members: TeamMember[];
+  error: string | null;
 }
 
 export interface SuccessStory {
@@ -117,33 +123,49 @@ export async function getTestimonials(options?: {
 }
 
 // Fetch team members
+export async function getTeamMembersResult(options?: {
+  department?: string;
+  limit?: number;
+}): Promise<TeamMembersResult> {
+  try {
+    const supabase = await createClient();
+
+    let query = supabase
+      .from('team_members')
+      .select('*')
+      .eq('is_active', true)
+      .order('display_order', { ascending: true });
+
+    if (options?.department) {
+      query = query.eq('department', options.department);
+    }
+    if (options?.limit) {
+      query = query.limit(options.limit);
+    }
+
+    const { data, error } = await query;
+
+    if (error) {
+      logger.error('Error fetching team members:', error);
+      return { members: [], error: error.message };
+    }
+
+    return { members: data || [], error: null };
+  } catch (error) {
+    logger.error('Error fetching team members:', error);
+    return {
+      members: [],
+      error: error instanceof Error ? error.message : 'Unknown team member query failure',
+    };
+  }
+}
+
 export async function getTeamMembers(options?: {
   department?: string;
   limit?: number;
 }): Promise<TeamMember[]> {
-  const supabase = await createClient();
-
-  let query = supabase
-    .from('team_members')
-    .select('*')
-    .eq('is_active', true)
-    .order('display_order', { ascending: true });
-
-  if (options?.department) {
-    query = query.eq('department', options.department);
-  }
-  if (options?.limit) {
-    query = query.limit(options.limit);
-  }
-
-  const { data, error } = await query;
-
-  if (error) {
-    logger.error('Error fetching team members:', error);
-    return [];
-  }
-
-  return data || [];
+  const result = await getTeamMembersResult(options);
+  return result.members;
 }
 
 // Fetch success stories

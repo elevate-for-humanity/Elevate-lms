@@ -190,9 +190,18 @@ test('provision-learner-program-holder-e2e.mjs: production enrollments are waive
 test('provision-learner-program-holder-e2e.mjs: cleanup deletes trigger-derived rows for both enrollments', () => {
   const source = readScript('provision-learner-program-holder-e2e.mjs');
   const deletes = (table) => new RegExp(`db\\.from\\('${table}'\\)\\s*\\.delete\\(\\)`).test(source);
-  for (const table of ['course_enrollments', 'program_holder_students', 'notification_outbox', 'platform_events']) {
+  for (const table of ['course_enrollments', 'program_holder_students', 'notification_outbox', 'platform_events', 'staff_notifications', 'rapids_action_queue', 'notifications']) {
     assert.ok(deletes(table), `cleanup should delete ${table}`);
   }
+});
+
+test('alert triggers suppress disposable fixtures at the source (Blocker A)', () => {
+  const migration = readFileSync(new URL('../../supabase/migrations/20261126173000_suppress_qa_fixture_alerts.sql', import.meta.url), 'utf8');
+  for (const fn of ['enqueue_active_apprentice_for_rapids', 'notify_program_holder_on_enrollment']) {
+    assert.ok(migration.includes(`create or replace function public.${fn}()`), `${fn} must be recreated`);
+  }
+  assert.ok(migration.includes("new.source = 'qa-e2e'"), 'fixture source guard');
+  assert.ok(migration.includes("new.email like '%@qa.invalid'"), 'fixture email guard');
 });
 
 test('provision-remaining-portal-e2e.mjs: cleanup deletes the application platform event', () => {

@@ -394,6 +394,6 @@ export async function getAppointmentsNeedingReminders(
 export const APPOINTMENT_CONTACT = {
   phone: PLATFORM_DEFAULTS.supportPhone,
   email: 'info@elevateforhumanity.org',
-  address: '8888 Keystone Crossing Suite 1300, Indianapolis, IN 46240',
+  address: '120 East Market Street, Suite 930, Indianapolis, IN 46204',
   hours: 'Monday-Friday, 9:00 AM - 5:00 PM EST',
 };

@@ -4,6 +4,7 @@
  */
 
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { organization } from '@/lib/config/organization';
 import {
   Organization,
   WithContext,
@@ -22,20 +23,18 @@ export const organizationSchema: WithContext<Organization> = {
   '@type': 'Organization',
   name: PLATFORM_DEFAULTS.orgName,
   url: baseUrl,
-  logo: `${baseUrl}/images/logo.png`,
+  logo: `${baseUrl}/images/Elevate_for_Humanity_logo_81bf0fab.jpg`,
   description:
     'Career training, registered apprenticeship support, credential preparation, and program-specific workforce funding pathways in Indiana.',
   address: {
     '@type': 'PostalAddress',
-    addressLocality: 'Indianapolis',
-    addressRegion: 'IN',
-    addressCountry: 'US',
+    ...organization.postalAddress,
   },
   contactPoint: {
     '@type': 'ContactPoint',
-    telephone: `+1-${PLATFORM_DEFAULTS.mainPhone}`,
+    telephone: '+14632401404',
     contactType: 'Admissions',
-    email: `info@${PLATFORM_DEFAULTS.canonicalDomain}`,
+    email: organization.email,
   },
   sameAs: [
     'https://www.facebook.com/61578240192934/',
@@ -50,12 +49,12 @@ export const educationalOrganizationSchema: WithContext<EducationalOrganization>
   '@type': 'EducationalOrganization',
   name: PLATFORM_DEFAULTS.orgName,
   url: baseUrl,
+  logo: `${baseUrl}/images/Elevate_for_Humanity_logo_81bf0fab.jpg`,
   description: 'Workforce development and career training programs',
+  telephone: '+14632401404',
   address: {
     '@type': 'PostalAddress',
-    addressLocality: 'Indianapolis',
-    addressRegion: 'IN',
-    addressCountry: 'US',
+    ...organization.postalAddress,
   },
 };
 
@@ -125,7 +124,7 @@ export function generateArticleSchema(article: {
       name: PLATFORM_DEFAULTS.orgName,
       logo: {
         '@type': 'ImageObject',
-        url: `${baseUrl}/images/logo.png`,
+        url: `${baseUrl}/images/Elevate_for_Humanity_logo_81bf0fab.jpg`,
       },
     },
     datePublished: article.datePublished,

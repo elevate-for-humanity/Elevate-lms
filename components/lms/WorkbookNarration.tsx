@@ -3,7 +3,11 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNaturalVoice } from '@/components/voice/useNaturalVoice';
 import { narrationChunks } from '@/lib/lms/workbook-slides';
 
-export default function WorkbookNarration({ text }: { text: string }) {
+export default function WorkbookNarration({ text, title = 'PARIS · Your workbook guide', description }: {
+  text: string;
+  title?: string;
+  description?: string;
+}) {
   const { play, stop, pause, resume, isPlaying, isPaused, isLoading, error } = useNaturalVoice();
   const [guided, setGuided] = useState(false);
   const [caption, setCaption] = useState('');
@@ -45,7 +49,7 @@ export default function WorkbookNarration({ text }: { text: string }) {
       aria-label="PARIS narration"
       className="my-5 rounded-2xl border border-stone-300 bg-white p-4 text-stone-950"
     >
-      <p className="font-bold">PARIS · Your workbook guide</p>
+      <p className="font-bold">{title}</p>
       <div className="mt-3 flex flex-wrap gap-3">
         <button
           type="button"
@@ -94,8 +98,7 @@ export default function WorkbookNarration({ text }: { text: string }) {
         </button>
       </div>
       <p className="mt-3 text-sm">
-        Once started, PARIS reads each screen as you move through it, then waits while you write.
-        Your private answers are never read aloud.
+        {description || 'Once started, PARIS reads each screen as you move through it, then waits while you write. Your private answers are never read aloud.'}
       </p>
       {error && (
         <p role="alert" className="mt-3 text-red-700">

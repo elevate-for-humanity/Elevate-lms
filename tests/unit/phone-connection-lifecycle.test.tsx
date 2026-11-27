@@ -1,10 +1,10 @@
 vi.mock('@/components/communications/DashboardVideoCalls', () => ({ DashboardVideoCalls: () => null }));
 import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-const mock = vi.hoisted(() => ({ create:vi.fn(), newCall:vi.fn(), ringStart:vi.fn(), ringStop:vi.fn(), audioCleanup:vi.fn(), unlock:vi.fn().mockResolvedValue(true), handlers:{} as Record<string,(value?: any)=>void> }));
+const mock = vi.hoisted(() => ({ create:vi.fn(), newCall:vi.fn(), ringStart:vi.fn(() => Promise.resolve('ringing')), ringStop:vi.fn(), audioCleanup:vi.fn(), statusCleanup:vi.fn(), statusHandlers:[] as Array<(status: string) => void>, unlock:vi.fn().mockResolvedValue(true), handlers:{} as Record<string,(value?: any)=>void> }));
 vi.mock('@/lib/phone/browser-client',()=>({createPhoneClient:mock.create,phoneDestination:(value:string)=>value}));
 vi.mock('@/lib/notifications/push-client',()=>({getPushNotificationClient:vi.fn()}));
-vi.mock('@/lib/notifications/audio-unlock',()=>({installAudioUnlock:()=>mock.audioCleanup,startRingtone:mock.ringStart,stopRingtone:mock.ringStop,unlockAudio:mock.unlock}));
+vi.mock('@/lib/notifications/audio-unlock',()=>({installAudioUnlock:()=>mock.audioCleanup,startRingtone:mock.ringStart,stopRingtone:mock.ringStop,unlockAudio:mock.unlock,onRingtoneStatusChange:(listener:(status:string)=>void)=>{mock.statusHandlers.push(listener);return mock.statusCleanup;}}));
 vi.mock('@/components/program-holder/ProgramHolderPhoneIntroduction',()=>({ProgramHolderPhoneIntroduction:()=>null}));
 import { ProgramHolderPhone } from '@/components/program-holder/ProgramHolderPhone';
 const data={readOnly:false,phoneNumber:'',system:{name:'Isolated fixture',timezone:'UTC',status:'active'},
@@ -16,7 +16,7 @@ let laterHeartbeat:(response:Response)=>void;
 let disconnectOk:boolean;
 beforeEach(()=>{
   mock.ringStart.mockClear();mock.ringStop.mockClear();mock.audioCleanup.mockClear();mock.unlock.mockClear();
-  mock.handlers={};disconnectOk=true;let heartbeats=0;
+  mock.statusCleanup.mockClear();mock.statusHandlers=[];mock.handlers={};disconnectOk=true;let heartbeats=0;
   mock.newCall.mockResolvedValue({id:'outbound-call'});
   mock.create.mockResolvedValue({on:(event:string,callback:any)=>{mock.handlers[event]=callback;},
     newCall:mock.newCall,connect:async()=>{mock.handlers.ready();},disconnect:vi.fn().mockResolvedValue(undefined)});
@@ -44,6 +44,54 @@ describe('phone connection lifecycle',()=>{
     mock.ringStop.mockClear();cleanup();
     expect(mock.ringStop).toHaveBeenCalled();
     expect(mock.audioCleanup).toHaveBeenCalledOnce();
+    expect(mock.statusCleanup).toHaveBeenCalledOnce();
+  });
+  it('starts the SIP fallback ringtone when the primary beep cannot start',async()=>{
+    await connected();
+    mock.ringStart.mockResolvedValueOnce('unavailable');
+    const playRingtone=vi.fn();
+    await act(async()=>mock.handlers.call({call:{id:'fallback',state:'ringing',direction:'inbound',playRingtone}}));
+    await waitFor(()=>expect(playRingtone).toHaveBeenCalled());
+  });
+  it('shows a tap-anywhere hint while the ring is pending and hides it once the beep starts',async()=>{
+    await connected();
+    mock.ringStart.mockResolvedValueOnce('pending');
+    const stopRingtone=vi.fn();
+    const playRingtone=vi.fn();
+    await act(async()=>mock.handlers.call({call:{id:'pending-ring',state:'ringing',direction:'inbound',playRingtone,stopRingtone}}));
+    await waitFor(()=>expect(playRingtone).toHaveBeenCalled());
+    const emitStatus=mock.statusHandlers.at(-1);
+    if(!emitStatus)throw new Error('expected a ringtone status listener');
+    await act(async()=>{emitStatus('pending');});
+    expect(screen.getByText('Tap anywhere to hear the ring.')).toBeTruthy();
+    await act(async()=>{emitStatus('ringing');});
+    expect(screen.queryByText('Tap anywhere to hear the ring.')).toBeNull();
+    expect(stopRingtone).toHaveBeenCalled();
+  });
+  it('plays the actual inbound ringtone from the Test ring button and stops it on demand',async()=>{
+    await connected();
+    mock.ringStart.mockClear();
+    fireEvent.click(screen.getByRole('tab',{name:'Settings'}));
+    fireEvent.click(screen.getByRole('button',{name:'Test ring'}));
+    await screen.findByRole('button',{name:'Stop test ring'});
+    expect(mock.ringStart).toHaveBeenCalled();
+    expect(screen.getByText('Test ring playing — you should hear a repeating beep.')).toBeTruthy();
+    fireEvent.click(screen.getByRole('button',{name:'Stop test ring'}));
+    await screen.findByRole('button',{name:'Test ring'});
+    expect(mock.ringStop).toHaveBeenCalled();
+    expect(screen.getByText('Test ring stopped.')).toBeTruthy();
+  });
+  it('stops the test ring automatically after five seconds',async()=>{
+    await connected();
+    vi.useFakeTimers();
+    fireEvent.click(screen.getByRole('tab',{name:'Settings'}));
+    fireEvent.click(screen.getByRole('button',{name:'Test ring'}));
+    await act(async()=>{});
+    expect(screen.getByRole('button',{name:'Stop test ring'})).toBeTruthy();
+    mock.ringStop.mockClear();
+    await act(async()=>{await vi.advanceTimersByTimeAsync(5000);});
+    expect(screen.getByRole('button',{name:'Test ring'})).toBeTruthy();
+    expect(mock.ringStop).toHaveBeenCalled();
   });
   it('preserves silent mode without starting either incoming ringtone',async()=>{
     vi.mocked(fetch).mockImplementationOnce(async()=>Response.json({...data,extension:{...data.extension,ringMode:'silent'}}));
@@ -119,7 +167,11 @@ describe('phone connection lifecycle',()=>{
   });
   it('opens to the dial pad before availability settings',async()=>{
     await connected();
-    const dial=screen.getByRole('heading',{name:'Dial pad'});const settings=screen.getByRole('heading',{name:'Availability and ringing'});
+    const dial=screen.getByRole('heading',{name:'Dial pad'});
+    // Availability settings live in the Settings tab; the dial pad stays
+    // first in the document and the ring mode is reachable from the tab.
+    fireEvent.click(screen.getByRole('tab',{name:'Settings'}));
+    const settings=screen.getByRole('heading',{name:'Availability and ringing'});
     expect(Boolean(dial.compareDocumentPosition(settings)&Node.DOCUMENT_POSITION_FOLLOWING)).toBe(true);
     expect(screen.getByRole('button',{name:'Ring on'}).getAttribute('aria-pressed')).toBe('true');
     expect(screen.getByRole('button',{name:'Vibrate'})).toBeTruthy();

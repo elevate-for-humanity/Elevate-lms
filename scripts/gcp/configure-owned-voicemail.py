@@ -44,13 +44,13 @@ def operator_route(system,owner):
         ' same => n,Set(CALLERID(name)=Elevate for Humanity)\n'
         ' same => n,Set(CALLERID(num)=+14632401404)\n'
         ' same => n,Set(ELEVATE_OWNER_ACCEPTED=0)\n'
-        ' same => n,Dial(PJSIP/'+FORWARD_NUMBER+'@twilio,25,U(elevate-owner-accept))\n'
+        ' same => n,Dial(PJSIP/'+FORWARD_NUMBER+'@twilio,20,U(elevate-owner-accept))\n'
         ' same => n,Set(CALLERID(name)=${ELEVATE_ORIGINAL_NAME})\n'
         ' same => n,Set(CALLERID(num)=${ELEVATE_ORIGINAL_NUMBER})\n'
         ' same => n,GotoIf($["${ELEVATE_OWNER_ACCEPTED}"="1"]?done)\n'
         ' same => n(voicemail),VoiceMail('+admin+'@elevate,u)') + (
         '[elevate-owner-accept]\n'
-        'exten => s,1,Read(ELEVATE_ACCEPT,custom/elevate-owner-call,1,,1,8)\n'
+        'exten => s,1,Read(ELEVATE_ACCEPT,custom/elevate-owner-call,1,,1,15)\n'
         ' same => n,GotoIf($["${ELEVATE_ACCEPT}"="1"]?accepted)\n'
         ' same => n,Set(GOSUB_RESULT=CONTINUE)\n'
         ' same => n,Return()\n'
@@ -228,7 +228,7 @@ def configure():
         if route!=base:
             forwarding=operator_plan
             whisper=run(['docker','exec','pbx_asterisk_1','asterisk','-rx','dialplan show s@elevate-owner-accept'])
-            if 'Dial(PJSIP/'+FORWARD_NUMBER+'@twilio,25,U(elevate-owner-accept))' not in forwarding or 'custom/elevate-owner-call' not in whisper or 'MASTER_CHANNEL(ELEVATE_OWNER_ACCEPTED)' not in whisper:
+            if 'Dial(PJSIP/'+FORWARD_NUMBER+'@twilio,20,U(elevate-owner-accept))' not in forwarding or 'custom/elevate-owner-call' not in whisper or 'MASTER_CHANNEL(ELEVATE_OWNER_ACCEPTED)' not in whisper:
                 raise ValueError('operator_forwarding_readback_failed')
     except Exception:
         main.write_text(prior);modules.write_text(prior_modules)

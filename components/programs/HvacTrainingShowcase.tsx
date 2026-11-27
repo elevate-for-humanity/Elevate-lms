@@ -59,8 +59,8 @@ export function HvacLabHero() {
     <figure className="w-full border-b-4 border-orange-500 bg-white text-slate-950" data-hvac-photo-hero>
       <div className={HERO_IMAGE_FRAME}>
         <Image
-          src="/images/hvac-training-vibrant-2026.webp"
-          alt="HVAC technicians examining an air-conditioning system"
+          src="/images/hvac-hero.webp"
+          alt="HVAC technician inspecting an air-conditioning unit"
           fill
           priority
           sizes="100vw"
@@ -98,7 +98,7 @@ export function HvacProgramFilm({ assistance = true }: { assistance?: boolean })
           controls
           playsInline
           preload="metadata"
-          poster="/images/hvac-training-vibrant-2026.webp"
+          poster="/images/hvac-hero.webp"
           width={720}
           height={900}
           className="mx-auto block aspect-[4/5] h-auto w-full max-w-[24rem] rounded-xl bg-slate-950 object-contain"

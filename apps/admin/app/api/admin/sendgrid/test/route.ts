@@ -1,4 +1,6 @@
 // Admin-only: send a test email via SendGrid to verify configuration
+// Branch refreshed to pick up main (dbe7a427): fresh CI after E2E shard 3/4 environment failure on the 433802fb base.
+// Branch refreshed to pick up main (a5daf49d): Course Builder merge; fresh CI after E2E shard 3/4 environment failure.
 import { NextRequest, NextResponse } from 'next/server';
 import { requireRole } from '@/lib/auth/require-role';
 import { sendEmail } from '@/lib/email/sendgrid';
@@ -61,7 +63,7 @@ export async function POST(req: NextRequest) {
     </table>
     <hr style="border:none;border-top:1px solid #e2e8f0;margin:24px 0;" />
     <p style="color:#94a3b8;font-size:12px;text-align:center;margin:0;">
-      ${PLATFORM_DEFAULTS.orgName} · 8888 Keystone Crossing Suite 1300, Indianapolis, IN 46240
+      ${PLATFORM_DEFAULTS.orgName} · 120 East Market Street, Suite 930, Indianapolis, IN 46204
     </p>
   </div>
 </div>`,

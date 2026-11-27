@@ -1,3 +1,4 @@
+import { EMT_INQUIRY_HREF, EMT_INQUIRY_MESSAGE, isEmtInquiryOnly } from '@/lib/programs/emt-inquiry-only';
 import { IMAGE_LOADING_BLUR } from '@/lib/ui/blur-placeholder';
 import type { Metadata } from 'next';
 import Image from 'next/image';
@@ -21,6 +22,13 @@ export async function generateMetadata({
   params: Promise<{ program: string }>;
 }): Promise<Metadata> {
   const { program } = await params;
+  if (isEmtInquiryOnly(program)) {
+    return {
+      title: 'Emergency Medical Technician (EMT) Training Inquiry',
+      description: EMT_INQUIRY_MESSAGE,
+      alternates: { canonical: `${PLATFORM_DEFAULTS.siteUrl}/programs/emt-apprenticeship` },
+    };
+  }
   const source = await loadProgramMetadataSource(program);
   if (!source) return { robots: { index: false, follow: false } };
 
@@ -64,6 +72,23 @@ export default async function PublicProgramPage({
   const resolved = loaded.program;
   if (resolved.slug !== program) {
     permanentRedirect(`/programs/${resolved.slug}`);
+  }
+
+  if (isEmtInquiryOnly(resolved.slug)) {
+    return (
+      <main className="mx-auto max-w-4xl px-4 py-16">
+        <p className="text-sm font-bold uppercase tracking-wide text-slate-600">Inquiry only</p>
+        <h1 className="mt-3 text-4xl font-black text-slate-950">Emergency Medical Technician (EMT) Training</h1>
+        <p className="mt-5 text-lg text-slate-800">{EMT_INQUIRY_MESSAGE}</p>
+        <p className="mt-4 max-w-2xl text-slate-700">
+          We are verifying the training provider, approved course hours, clinical placements and certification exam eligibility.
+          You can ask us for an update. An inquiry is not an application and does not reserve a seat.
+        </p>
+        <Link href={EMT_INQUIRY_HREF} className="mt-6 inline-flex min-h-12 items-center rounded-xl bg-slate-950 px-6 font-bold text-white">
+          Ask About EMT Training
+        </Link>
+      </main>
+    );
   }
 
   const price = Number.parseInt(resolved.selfPayCost.replace(/[^0-9]/g, ''), 10);

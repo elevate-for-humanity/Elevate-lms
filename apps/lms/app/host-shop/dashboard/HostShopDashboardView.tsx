@@ -2,6 +2,7 @@ import { hostShopPreviewMemberId } from '@/lib/partners/host-shop-preview-member
 import { HOST_SHOP_PREVIEW_MARKER } from '@/lib/partners/host-shop-preview-marker';
 import { hostShopPortfolioPhotos } from '@/lib/partners/curated-shop-media';
 import HostShopStudentInvitation from '@/components/host-shop/HostShopStudentInvitation';
+import PracticalServicesCard from '@/components/apprenticeship/PracticalServicesCard';
 import { hostShopStudentPrograms } from '@/lib/partners/host-shop-student-links';
 import { getHostShopReadinessItems } from '@/lib/partners/host-shop-readiness';
 import HostShopWelcome from '@/components/host-shop/HostShopWelcome';
@@ -284,6 +285,22 @@ export default async function HostShopDashboardView() {
             </Link>
           ))}
         </section>
+        <PracticalServicesCard
+          heading="Practical services recorded"
+          totalsLine={
+            board.practicalServicesTotal > 0
+              ? `${board.practicalServicesTotal} verified ${board.practicalServicesTotal === 1 ? 'service' : 'services'} recorded across your apprentices`
+              : 'No verified services recorded yet'
+          }
+          percent={null}
+          recentEntries={board.practicalRecentEntries}
+          perApprentice={board.apprentices.map((apprentice) => ({
+            name: apprentice.name,
+            verified: apprentice.practical?.verified || 0,
+          }))}
+          note="Services are recorded by you or the assigned supervisor after observing the complete safe workflow, and count toward each apprentice's hands-on practice targets. Students cannot check off their own services. These counts do not award Appendix A competencies, workplace hours, or RTI credit."
+          primaryLink={{ href: '/host-shop/dashboard/practical-log', label: 'Record a service' }}
+        />
         <section className="rounded-2xl bg-white p-5 shadow-sm">
           <h2 className="text-lg font-black">What would you like to do?</h2>
           <div className="mt-4 flex flex-wrap gap-3">

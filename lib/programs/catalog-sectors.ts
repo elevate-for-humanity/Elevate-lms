@@ -34,7 +34,7 @@ const SECTOR_PRESENTATION: Record<
   trades: {
     title: 'Skilled Trades',
     href: '/programs/skilled-trades',
-    image: '/images/hvac-training-vibrant-2026.webp',
+    image: '/images/hvac-hero.webp',
     description:
       'HVAC, Electrical, Welding, Plumbing, and Construction. Earn industry certifications and start working.',
   },

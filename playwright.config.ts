@@ -69,6 +69,14 @@ if (process.env.QA_CROSS_SHOP_ACCEPTANCE === '1') {
   SPECS.lms.push('host-shop-cross-shop-production.spec.ts');
 }
 
+// The isolated QA database currently contains only the HVAC orientation
+// fixture. Full-course acceptance requires the actual 17 lessons, four quizzes
+// and authenticated progress schema, plus the disposable learner lifecycle.
+// The trusted LMS deployment acceptance step opts in and requires an exact SHA.
+if (process.env.QA_HVAC_SIMULATION_ACCEPTANCE === '1') {
+  SPECS.lms.push('hvac-course-simulation.spec.ts');
+}
+
 // Production acceptance specs with hard-coded production origins. They run only
 // when a workflow explicitly targets a deployed environment.
 const LIVE_ONLY_SPECS = ['public-runtime-acceptance.spec.ts'];
@@ -113,10 +121,13 @@ const projects: Project[] = apps.flatMap((app) =>
 
 // Specs that also call a peer app's local origin (cross-app redirects/APIs).
 const PEER_APPS: Record<string, E2EApp[]> = {
+  'complete-platform.spec.ts': ['lms'],
   'program-e2e-flows.spec.ts': ['lms'],
   'portal-responsive-design.spec.ts': ['admin', 'marketing'],
   'program-holder.spec.ts': ['marketing'],
   'registered-apprenticeship-authenticated.spec.ts': ['admin'],
+  'student-login-flow.spec.ts': ['marketing'],
+  'jordan-magic-link.spec.ts': ['marketing'],
 };
 
 // CLI file filters (e.g. `playwright test tests/e2e/admin-portal.spec.ts`) only
@@ -175,6 +186,9 @@ const DEV_SERVER_HEAP_MB: Record<E2EApp, number> = {
 const webServer: PlaywrightTestConfig['webServer'] = apps
   .filter((app) => usesLocalDevServer(app) && requested.has(app))
   .map((app) => ({
+    // Prefix Next.js stderr with the app name so RSC aborts and ECONNRESET
+    // are attributable to Marketing, Admin, or LMS instead of [WebServer].
+    name: `next-${app}`,
     // Run the workspace's own dev script (and predev asset sync) on its port.
     command: `pnpm --filter ${E2E_APPS[app].workspace} dev --port ${E2E_APPS[app].port}`,
     url: `${appOrigin(app)}${E2E_APPS[app].readyPath}`,

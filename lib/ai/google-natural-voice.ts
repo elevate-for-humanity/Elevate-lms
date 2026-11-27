@@ -1,4 +1,18 @@
 import { WEBSITE_SPEAKERS } from '@/lib/website-builder/design-choices';
+
+/**
+ * Raised when this deployment has no Google speech credential at all (no
+ * attached Cloud Run identity and no API key). That is a deployment state,
+ * not a provider failure: callers answer it with a graceful availability
+ * response instead of reporting a transient outage.
+ */
+export class GoogleSpeechNotConfiguredError extends Error {
+  constructor() {
+    super('Google Cloud speech is not configured');
+    this.name = 'GoogleSpeechNotConfiguredError';
+  }
+}
+
 /** Cloud Run uses its attached service identity; local runtimes may use an API key. */
 export async function generateGoogleNaturalVoice(text: string, speaker = 'warm'): Promise<ArrayBuffer> {
   const headers: Record<string, string> = { 'Content-Type': 'application/json' };
@@ -17,7 +31,7 @@ export async function generateGoogleNaturalVoice(text: string, speaker = 'warm')
     headers.Authorization = `Bearer ${token.access_token}`;
   } else {
     const key = process.env.GOOGLE_CLOUD_API_KEY?.trim();
-    if (!key) throw new Error('Google Cloud speech is not configured');
+    if (!key) throw new GoogleSpeechNotConfiguredError();
     headers['x-goog-api-key'] = key;
   }
   const response = await fetch('https://texttospeech.googleapis.com/v1/text:synthesize', {

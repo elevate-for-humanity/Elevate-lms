@@ -54,6 +54,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const entry = network.find((shop) => shop.slug === slug || shop.id === approvedRecord?.id);
   const approved = approvedRecord && entry ? {
     ...approvedRecord,
+    // The network entry resolves the independently sourced curated public
+    // number (featured partner) when the approved record itself carries no
+    // database-sourced public phone. The database number stays primary;
+    // application contact data never reaches this merge.
+    phone: approvedRecord.phone || entry.phone || '',
     description: entry.description,
     mediaGallery: entry.gallery,
     videoUrl: entry.videoUrl,
@@ -120,6 +125,11 @@ export default async function HostShopProfilePage({ params }: PageProps) {
   const entry = network.find((shop) => shop.slug === slug || shop.id === approvedRecord?.id);
   const approved = approvedRecord && entry ? {
     ...approvedRecord,
+    // The network entry resolves the independently sourced curated public
+    // number (featured partner) when the approved record itself carries no
+    // database-sourced public phone. The database number stays primary;
+    // application contact data never reaches this merge.
+    phone: approvedRecord.phone || entry.phone || '',
     description: entry.description,
     mediaGallery: entry.gallery,
     videoUrl: entry.videoUrl,
@@ -204,7 +214,6 @@ export default async function HostShopProfilePage({ params }: PageProps) {
             <h1 className="mt-4 break-words text-3xl font-black tracking-tight text-slate-950 sm:text-4xl">{approved.name}</h1>
             {approved.description ? <p className="mt-5 max-w-2xl text-base leading-7 text-slate-600 sm:text-lg sm:leading-8">{approved.description}</p> : null}
             {programs.length ? <div className="mt-5 flex flex-wrap gap-2">{programs.map((program) => <span key={program} className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-black text-slate-800 shadow-sm">{programLabel(program)}</span>)}</div> : null}
-            {approved.supervisor ? <p className="mt-4 text-sm font-semibold text-slate-600">Approved supervisor: <span className="text-slate-950">{approved.supervisor}</span></p> : null}
             <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
               {approved.phone ? <a href={`tel:${approved.phone.replace(/[^0-9+]/g, '')}`} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-brand-red-600 px-5 py-3 text-sm font-extrabold text-white sm:justify-start"><Phone className="h-4 w-4" /> Call {approved.phone}</a> : null}
               {mapUrl ? <a href={mapUrl} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-extrabold text-slate-900 sm:justify-start"><Navigation className="h-4 w-4" /> Approved Worksite Map</a> : null}

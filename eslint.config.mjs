@@ -114,6 +114,9 @@ export default tseslint.config(
       'playwright-report/**',
       'scripts/**',
       'public/**/*.js',
+      // Vendored pdfjs-dist worker (see WorkbookPdfPage) — a third-party
+      // build artifact, not authored source.
+      '**/public/pdf.worker.min.mjs',
       'lib/autopilot/*.js',
       'server/**',
       'tools/**',

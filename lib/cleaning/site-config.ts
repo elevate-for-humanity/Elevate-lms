@@ -1,8 +1,11 @@
 import type { TenantSiteConfig } from '@/lib/tenant/site-types';
 import { CLEANING_MEMBERSHIP } from './pricing';
 
-/** Apply only after the matching renderer is deployed. Preserves unrelated content. */
-export function prepareCleaningSiteConfig(current: TenantSiteConfig, enableCommerce = false): TenantSiteConfig {
+/** Provider enrollment can be prepared without opening bookings or payments. */
+export function prepareCleaningProviderOnboardingConfig(
+  current: TenantSiteConfig,
+  enableOnboarding = false,
+): TenantSiteConfig {
   const config = structuredClone(current);
   if (!config.pages?.some(page => page.slug === '/join-network')) throw new Error('Cleaning network application page is required.');
   const application = config.pages.find(page => page.slug === '/join-network')!;
@@ -13,6 +16,22 @@ export function prepareCleaningSiteConfig(current: TenantSiteConfig, enableComme
     if (fields.length >= 20) throw new Error('Application field limit reached. Review before adding hourly pay.');
     fields.push({ name: 'requested_hourly_rate', type: 'provider_rate', label: 'Requested pay per cleaner-hour (USD)', required: false });
   }
+  const providerPage = config.pages.find(page => page.slug === '/provider');
+  if (providerPage && !providerPage.sections.some(section => section.type === 'cleaning_provider'))
+    throw new Error('An existing provider page needs manual reconciliation.');
+  if (!providerPage) config.pages.push({
+    id: 'cleaning-provider', slug: '/provider', title: 'Provider Account', navLabel: 'Provider Account', showInNavigation: true,
+    sections: [{ id: 'cleaning-provider', type: 'cleaning_provider', visible: true, content: {}, settings: {} }],
+  });
+  config.meta = { ...config.meta, cleaningProviderOnboardingEnabled: enableOnboarding };
+  return config;
+}
+
+/** Apply only after the matching renderer and paid-commerce prerequisites are verified. */
+export function prepareCleaningSiteConfig(current: TenantSiteConfig, enableCommerce = false): TenantSiteConfig {
+  const config = prepareCleaningProviderOnboardingConfig(
+    current, enableCommerce || current.meta?.cleaningProviderOnboardingEnabled === true,
+  );
   const membershipPage = config.pages.find(page => page.slug === '/memberships');
   if (membershipPage && !membershipPage.sections.some(section => section.type === 'cleaning_membership'))
     throw new Error('An existing membership page needs manual reconciliation.');
@@ -21,7 +40,7 @@ export function prepareCleaningSiteConfig(current: TenantSiteConfig, enableComme
     seo: { title: 'Cleaning Membership | 2Exclusive Platinum Cleaning', description: 'Compare pay-as-you-go cleaning with the optional $19 monthly Platinum Cleaning Membership.' },
     sections: [{ id: 'cleaning-membership-plans', type: 'cleaning_membership', visible: true, content: {}, settings: {} }],
   });
-  for (const page of [{ id:'cleaning-booking',slug:'/book-cleaning',title:'Book Cleaning',type:'cleaning_booking' as const,show:true },{id:'cleaning-provider',slug:'/provider',title:'Provider Account',type:'cleaning_provider' as const,show:true},{id:'cleaning-offer',slug:'/accept-job',title:'Review Job Offer',type:'cleaning_offer' as const,show:false}]) {
+  for (const page of [{ id:'cleaning-booking',slug:'/book-cleaning',title:'Book Cleaning',type:'cleaning_booking' as const,show:true },{id:'cleaning-offer',slug:'/accept-job',title:'Review Job Offer',type:'cleaning_offer' as const,show:false}]) {
     const existing=config.pages.find(item=>item.slug===page.slug);
     if(existing&&!existing.sections.some(section=>section.type===page.type))throw new Error('Existing cleaning page needs manual reconciliation.');
     if(!existing)config.pages.push({id:page.id,slug:page.slug,title:page.title,navLabel:page.title,showInNavigation:page.show,sections:[{id:page.id,type:page.type,visible:true,content:{},settings:{}}]});

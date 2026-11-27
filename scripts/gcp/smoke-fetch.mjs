@@ -1,10 +1,36 @@
+import { get } from 'node:http';
+import { text } from 'node:stream/consumers';
+
+// Built-in fetch can replace a supplied Host header with the socket authority.
+// Send tenant and internal-host probes directly to the local published port.
+function fetchLoopbackWithHost(url, { headers, signal }) {
+  const target = new URL(url);
+  if (target.protocol !== 'http:' || target.hostname !== '127.0.0.1') {
+    throw new Error('Smoke Host header probes require an HTTP loopback destination');
+  }
+  return new Promise((resolve, reject) => {
+    const request = get(target, { headers, signal, agent: false }, response => {
+      resolve({
+        status: response.statusCode,
+        text: () => text(response),
+        json: async () => JSON.parse(await text(response)),
+      });
+    });
+    request.once('error', (error) => {
+      reject(error.name === 'AbortError' ? error : new TypeError('fetch failed', { cause: error }));
+    });
+  });
+}
+
 /** A referenced deadline bounds smoke HTTP headers and body reads.
  * AbortSignal.timeout() has an unref'ed timer: a pending top-level fetch
  * otherwise lets Node exit with code 13 before the intended deadline.
  */
-export async function fetchSmoke(url, options = {}, timeoutMs = 10000, responseType = 'json', fetchImpl = globalThis.fetch) {
+export async function fetchSmoke(url, options = {}, timeoutMs = 10000, responseType = 'json', fetchImpl) {
   if (!Number.isInteger(timeoutMs) || timeoutMs < 1 || timeoutMs > 120000) throw new RangeError('Smoke timeout must be 1..120000 ms');
   if (!['json', 'text'].includes(responseType)) throw new TypeError('Unsupported smoke response type');
+  const path = new URL(url).pathname;
+  const request = fetchImpl ?? (options.headers?.host ? fetchLoopbackWithHost : globalThis.fetch);
   const controller = new AbortController();
   let deadline;
   let responseStatus = null;
@@ -12,7 +38,7 @@ export async function fetchSmoke(url, options = {}, timeoutMs = 10000, responseT
   const timeout = new Promise((_, reject) => {
     deadline = setTimeout(() => {
       controller.abort();
-      const error = new Error('Smoke HTTP response timed out after ' + timeoutMs + ' ms');
+      const error = new Error(`Smoke HTTP response for ${path} timed out after ${timeoutMs} ms`);
       error.headersReceived = headersReceived;
       error.responseStatus = responseStatus;
       reject(error);
@@ -21,19 +47,14 @@ export async function fetchSmoke(url, options = {}, timeoutMs = 10000, responseT
   try {
     return await Promise.race([
       (async () => {
-        const response = await fetchImpl(url, {...options,signal:controller.signal});
+        const response = await request(url, {...options,signal:controller.signal});
         headersReceived = true;
         responseStatus = response.status;
-        // Preserve real application response bodies (including HTTP 503
-        // dependency diagnostics). If the body stalls, the timeout carries
-        // responseStatus and headersReceived, so no later retry may hide it.
         return {status:response.status,body:await response[responseType]()};
       })(),
       timeout,
     ]);
   } catch (error) {
-    // Distinguish a connect failure from a body-read timeout. A response
-    // that already supplied headers must never become a retryable absence.
     if (error instanceof Error && error.headersReceived === undefined) {
       error.headersReceived = headersReceived;
       error.responseStatus = responseStatus;

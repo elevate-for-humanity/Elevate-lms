@@ -330,8 +330,10 @@ export async function getApprovedShops(program?: ProgramKey): Promise<HostShop[]
   // whose display names differ. An active, opted-in relationship that explicitly
   // names both IDs is stronger than spelling; still require a unique full worksite.
   const linkedActiveAliases = new Set<string>();
-  const approvedActiveShops = activeShopBacked.filter(isPubliclyListedHostShop);
-  for (const shop of existing) {
+  const isEligiblePublicShop = (shop: HostShop) =>
+    isPubliclyListedHostShop(shop) && !archivedNames.has(businessKey(shop.name));
+  const approvedActiveShops = activeShopBacked.filter(isEligiblePublicShop);
+  for (const shop of existing.filter(isEligiblePublicShop)) {
     const linked = approvedActiveShops.filter(activeShop => sameWorksite(shop, activeShop) &&
       optedInLinks.some(link => link.application_id === shop.id && link.shop_id === activeShop.id));
     if (linked.length !== 1) continue;
@@ -341,6 +343,9 @@ export async function getApprovedShops(program?: ProgramKey): Promise<HostShop[]
     if (owners.length !== 1) continue;
     shop.programs = [...new Set([...shop.programs, ...duplicate.programs])];
     shop.primaryProgram ??= shop.programs[0];
+    // This website was already public on the eligible active listing. Never
+    // transfer operational phone or email to the surviving application.
+    shop.website ||= duplicate.website;
     shop.publicSlugAliases = [...new Set([
       ...(shop.publicSlugAliases ?? []), ...(duplicate.publicSlugAliases ?? []),
       ...(duplicate.publicSlug ? [duplicate.publicSlug] : []),
@@ -420,7 +425,7 @@ export async function getApprovedShops(program?: ProgramKey): Promise<HostShop[]
 
   const all = [...alreadyListed, ...partnerBacked]
     .map(shop => ({ ...shop, ...normalizeHostShopAddress(shop) }))
-    .filter(shop => isPubliclyListedHostShop(shop) && !archivedNames.has(businessKey(shop.name)))
+    .filter(isEligiblePublicShop)
     // Application email is used above only to reject synthetic records. These
     // operational rows contain no independently verified publication consent.
     .map(shop => ({ ...shop, email: '' }));

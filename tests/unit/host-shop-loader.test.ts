@@ -63,6 +63,38 @@ describe('approved host directory data', () => {
     fixture.rows.host_shops.data![0].address = '2049 Veterans Memorial Pkwy S, Suite 9';
     expect(await getApprovedShops()).toHaveLength(2);
   });
+  it('does not let an archived application absorb an eligible active worksite or its URL', async () => {
+    linkedExecutiveWorksite();
+    fixture.rows.partners.data = [{ name: 'Executive Cutz' }];
+    const all = await getApprovedShops();
+    expect(all).toHaveLength(1);
+    expect(all[0]).toMatchObject({
+      id: '787ce25f-0000', publicSlug: 'executive-cuts-787ce25f',
+      programs: ['cosmetology-apprenticeship'],
+    });
+    expect(await getApprovedShopByPublicSlug('executive-cutz-5e8e1f9a')).toBeNull();
+    expect((await getApprovedShopByPublicSlug('executive-cuts-787ce25f'))?.id).toBe('787ce25f-0000');
+  });
+  it('does not inherit occupations or a website from an archived active alias', async () => {
+    linkedExecutiveWorksite();
+    fixture.rows.partners.data = [{ name: 'Executive Cuts' }];
+    fixture.rows.host_shops.data![0].website = 'https://retired.example.test';
+    const all = await getApprovedShops();
+    expect(all).toHaveLength(1);
+    expect(all[0]).toMatchObject({ id: '5e8e1f9a-0000', programs: ['barber-apprenticeship'] });
+    expect(all[0].website).toBeUndefined();
+    expect(await getApprovedShopByPublicSlug('executive-cuts-787ce25f')).toBeNull();
+  });
+  it('preserves an eligible public website on canonical and old URLs without copying operational contacts', async () => {
+    linkedExecutiveWorksite();
+    fixture.rows.host_shops.data![0].website = 'https://executive.example.test';
+    fixture.rows.host_shops.data![0].phone = '3175550199';
+    for (const slug of ['executive-cutz-5e8e1f9a', 'executive-cuts-787ce25f']) {
+      expect(await getApprovedShopByPublicSlug(slug)).toMatchObject({
+        id: '5e8e1f9a-0000', website: 'https://executive.example.test', phone: '', email: '',
+      });
+    }
+  });
   it('uses public programme approvals without duplicating the operational shop', async () => {
     const all = await getApprovedShops();
     expect(all).toHaveLength(2);

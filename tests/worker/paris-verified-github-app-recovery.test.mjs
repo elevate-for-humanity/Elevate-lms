@@ -10,8 +10,12 @@ test('source-free 401s are eligible for one verified App recovery',()=>{
  for(const error_code of [
   'PARIS_PATCH_FAILED: GitHub API 401 for /contents/apps/admin/page.ts: Bad credentials',
   'GitHub API 403 for /git/refs: Resource not accessible by personal access token',
-  'PARIS_PATCH_FAILED: GitHub code search failed: 401'
+  'PARIS_PATCH_FAILED: GitHub code search failed: 401',
+  'GITHUB_BRANCH_AUTHORITY_CHECK_HTTP_403',
+  'PARIS_PATCH_FAILED: GITHUB_BRANCH_AUTHORITY_CHECK_HTTP_403'
  ]) assert.equal(canRetryVerifiedGithubAppRepair({...base,error_code}),true);
+ for(const error_code of ['GITHUB_BRANCH_AUTHORITY_CHECK_HTTP_502','GITHUB_BRANCH_AUTHORITY_CHECK_HTTP_403 extra'])
+  assert.equal(canRetryVerifiedGithubAppRepair({...base,error_code}),false);
 });
 
 test('no source job or third attempt can be revived automatically',()=>{

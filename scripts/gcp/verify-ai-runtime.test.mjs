@@ -77,7 +77,7 @@ test('owned health cancellation covers identity acquisition and prevents a later
 });
 
 test('model startup diagnostics retain categories without printing model keys or arbitrary logs',()=>{
- const entries=['MODEL_BOUNDED_EIGHT_GIB_MEMORY_REQUIRED','MODEL_CHECKSUM_FAILED','MODEL_AUTHENTICATION_CONFIGURATION_REQUIRED'].map(code=>({textPayload:code+' private-value'}));
+ const entries=['MODEL_BOUNDED_SIXTEEN_GIB_MEMORY_REQUIRED','MODEL_CHECKSUM_FAILED','MODEL_AUTHENTICATION_CONFIGURATION_REQUIRED'].map(code=>({textPayload:code+' private-value'}));
  const result=classifyRuntimeErrors(entries);
  assert.deepEqual(result.map(x=>x.category),['model_memory_boundary','model_checksum','model_authentication_configuration']);
  assert.ok(!JSON.stringify(result).includes('private-value'));

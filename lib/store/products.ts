@@ -12,6 +12,7 @@ export type ProductCategory =
   | 'certification-prep'
   | 'scorm-package'
   | 'physical-product'
+  | 'license'
   | 'template';
 
 export interface StoreProduct {

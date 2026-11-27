@@ -220,7 +220,7 @@ export const VIDEO_REGISTRY: Record<string, VideoRecord> = {
     title: 'HVAC technician training',
     description: 'Dedicated HVAC program hero.',
     video_url: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-hvac-technician.mp4',
-    thumbnail_url: '/images/hvac-training-vibrant-2026.webp',
+    thumbnail_url: '/images/hvac-hero.webp',
     duration: 'PT32.28S',
     upload_date: '2026-03-07',
     category: 'Skilled Trades',

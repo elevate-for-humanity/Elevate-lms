@@ -37,7 +37,7 @@ export type DetailedMOUPDFData = {
 const SPONSOR = '2Exclusive LLC-S (DBA: ' + PLATFORM_DEFAULTS.orgName + ' Technical and Career Institute)';
 const SPONSOR_SIGNER = 'Elizabeth Greene';
 const SPONSOR_TITLE = 'Founder & Chief Executive Officer';
-const ADDRESS = '8888 Keystone Crossing, Suite 1300, Indianapolis, IN 46240';
+const ADDRESS = '120 East Market Street, Suite 930, Indianapolis, IN 46204';
 const PHONE = PLATFORM_DEFAULTS.supportPhone;
 const EMAIL = 'elevate4humanityedu@gmail.com';
 

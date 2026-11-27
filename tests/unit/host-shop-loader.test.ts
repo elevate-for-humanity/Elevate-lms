@@ -1,10 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 type QueryResult = { data: Record<string, unknown>[] | null; error: { message: string } | null };
-type QueryBuilder = { select: () => QueryBuilder; eq: () => QueryBuilder; in: () => QueryBuilder; or: (filter: string) => QueryBuilder; order: () => QueryBuilder; then: (resolve: (result: QueryResult) => unknown) => Promise<unknown> };
+type QueryBuilder = { select: () => QueryBuilder; eq: () => QueryBuilder; in: () => QueryBuilder; not: () => QueryBuilder; or: (filter: string) => QueryBuilder; order: () => QueryBuilder; then: (resolve: (result: QueryResult) => unknown) => Promise<unknown> };
 const fixture = vi.hoisted(() => ({ rows: {} as Record<string, QueryResult>, filters: [] as string[] }));
 vi.mock('@/lib/supabase/admin', () => ({ requireAdminClient: async () => ({
   from: (table: string) => {
-    const query: QueryBuilder = { select: () => query, eq: () => query, in: () => query,
+    const query: QueryBuilder = { select: () => query, eq: () => query, in: () => query, not: () => query,
       or: (filter: string) => { fixture.filters.push(filter); return query; },
       order: () => query,
       then: (resolve: (result: QueryResult) => unknown) => Promise.resolve(fixture.rows[table]).then(resolve),
@@ -19,7 +19,7 @@ describe('approved host directory data', () => {
     fixture.filters = [];
     fixture.rows = {
       host_shops: { data: [], error: null },
-      partners: { data: [], error: null },
+      partners: { data: [], error: null }, host_shop_partnerships: { data: [], error: null },
       barbershop_partner_applications: { data: [{ id: 'barber-1', shop_legal_name: 'Style and Scissors', shop_city: 'Indianapolis' }], error: null },
       host_shop_applications: { data: [{ id: 'host-2', shop_name: 'Unclassified studio', intake: {}, approved_by: null }], error: null },
       public_host_shops: { data: [{ id: 'profile-1', public_slug: 'style-and-scissors-hair-salon', display_name: 'Style and Scissors', programs: ['cosmetology', 'barber', 'nail_technician'] }], error: null },
@@ -42,8 +42,42 @@ describe('approved host directory data', () => {
     expect(await getApprovedShops('nail')).toHaveLength(1);
     expect(await getApprovedShops('esthetician')).toHaveLength(0);
   });
+  it('keeps eligible application-backed shops visible without publishing their intake numbers', async () => {
+    fixture.rows.barbershop_partner_applications.data![0].contact_phone = '3175550111';
+    fixture.rows.host_shop_applications.data![0].phone = '3175550112';
+    fixture.rows.public_host_shops.data![0].phone = '3175550113';
+
+    const unsourced = await getApprovedShops();
+    expect(unsourced.map(({ id, phone }) => ({ id, phone }))).toEqual([
+      { id: 'barber-1', phone: '' },
+      { id: 'host-2', phone: '' },
+    ]);
+
+    fixture.rows.public_host_shops.data![0].source_url = 'https://shop.example.test/contact';
+    const sourced = await getApprovedShopByPublicSlug('style-and-scissors-hair-salon');
+    expect(sourced).toMatchObject({ id: 'barber-1', phone: '3175550113' });
+  });
   it('resolves an approved shop profile by its published link', async () => {
     expect((await getApprovedShopByPublicSlug('style-and-scissors-hair-salon'))?.id).toBe('barber-1');
+  });
+  it('preserves the prior application URL for an explicitly linked public profile', async () => {
+    fixture.rows.partners.data = [{
+      id: 'partner-linked', public_slug: 'new-approved-name', programs: ['cosmetology'],
+      address: '120 E Market St, Suite 930',
+    }];
+    fixture.rows.host_shop_partnerships.data = [{ partner_id: 'partner-linked', application_id: 'barber-1' }];
+    fixture.rows.public_host_shops.data = [{
+      id: 'partner-linked', public_slug: 'new-approved-name', display_name: 'New Approved Name',
+      public_profile_published_at: '2026-11-25T00:00:00Z', city: 'Indianapolis', state: 'IN', zip: '46204',
+    }];
+
+    const shop = await getApprovedShopByPublicSlug('style-and-scissors-barber1');
+    expect(shop).toMatchObject({
+      id: 'barber-1',
+      publicSlug: 'new-approved-name',
+      address: '120 E Market St, Suite 930',
+      programs: ['barber-apprenticeship', 'cosmetology-apprenticeship'],
+    });
   });
   it('reports a directory query failure rather than showing a false empty category', async () => {
     fixture.rows.public_host_shops = { data: null, error: { message: 'unavailable' } };
@@ -63,7 +97,7 @@ describe('approved host directory data', () => {
 
 it('does not treat a saved public media profile as formal approval', async () => {
   fixture.rows = {
-    host_shops: { data: [], error: null }, partners: { data: [], error: null },
+    host_shops: { data: [], error: null }, partners: { data: [], error: null }, host_shop_partnerships: { data: [], error: null },
     barbershop_partner_applications: { data: [], error: null },
     host_shop_applications: { data: [], error: null },
     public_host_shops: { data: [{ id: 'pending', display_name: 'Pending Salon', public_slug: 'pending-salon', programs: ['cosmetology'] }], error: null },
@@ -73,7 +107,7 @@ it('does not treat a saved public media profile as formal approval', async () =>
 
 it.each(['Marvelous Cuts', 'Marvelouz Cutz', 'Marvelous-Cuts'])('excludes the owner-removed business %s even if an old approval remains', async (name) => {
   fixture.rows = {
-    host_shops: { data: [], error: null }, partners: { data: [], error: null },
+    host_shops: { data: [], error: null }, partners: { data: [], error: null }, host_shop_partnerships: { data: [], error: null },
     barbershop_partner_applications: { data: [{ id: 'old', shop_legal_name: name }], error: null },
     host_shop_applications: { data: [], error: null }, public_host_shops: { data: [], error: null },
   };

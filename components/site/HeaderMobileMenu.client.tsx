@@ -233,7 +233,7 @@ export default function HeaderMobileMenu({ items, programApplyLinks = {} }: Head
               </div>
             </div>
 
-            <nav className="min-h-0 flex-1 overflow-y-auto overscroll-contain bg-white px-3 py-2" aria-label="Site navigation">
+            <nav className="min-h-0 flex-1 overflow-y-auto overscroll-contain bg-white px-3 py-2" aria-label="Mobile navigation">
               {items.map((item) => {
                 const sectionKey = item.id ?? item.name;
                 const hasSubItems = Boolean(item.subItems?.length);

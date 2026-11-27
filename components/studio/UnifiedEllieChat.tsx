@@ -27,6 +27,7 @@ import {
   XCircle,
 } from 'lucide-react';
 import { getAdminUrl } from '@/lib/config/admin-url';
+import { OWNED_STUDIO_PROVIDER } from '@/lib/devstudio/owned-provider-policy';
 import { useNaturalVoice } from '@/components/voice/useNaturalVoice';
 import { getStudioVoiceMode, setStudioVoiceMode } from '@/lib/devstudio/studio-voice-preferences';
 import {
@@ -85,27 +86,6 @@ interface ChatMessage {
     message: string;
   };
 }
-
-type StudioProvider =
-  | 'auto'
-  | 'elevate'
-  | 'cloudflare'
-  | 'xai'
-  | 'openai'
-  | 'anthropic'
-  | 'gemini'
-  | 'groq';
-
-const STUDIO_PROVIDER_LABELS: Record<StudioProvider, string> = {
-  auto: 'Paris · Private model',
-  elevate: 'Elevate AI',
-  cloudflare: 'Cloudflare AI',
-  xai: 'Grok / xAI',
-  openai: 'ChatGPT',
-  anthropic: 'Claude',
-  gemini: 'Gemini',
-  groq: 'Groq',
-};
 
 interface UnifiedEllieChatProps {
   attachmentInputId?: string;
@@ -709,8 +689,6 @@ export default function UnifiedEllieChat({
   const [loading, setLoading] = useState(false);
   const [health, setHealth] = useState('checking…');
   const [aiOk, setAiOk] = useState<boolean | null>(null);
-  const [availableProviders, setAvailableProviders] = useState<Record<string, boolean>>({});
-  const [selectedProvider, setSelectedProvider] = useState<StudioProvider>('auto');
   const [showActivity, setShowActivity] = useState(false);
   const messagesViewportRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -873,27 +851,17 @@ export default function UnifiedEllieChat({
   }
 
   useEffect(() => {
-    fetchAiHealth().then(({ ok, label, providers }) => {
+    fetchAiHealth().then(({ ok, label }) => {
       setAiOk(ok);
       setHealth(label);
-      setAvailableProviders(providers);
     });
   }, []);
 
   useEffect(() => {
-    const saved = window.localStorage.getItem('elevate:studio:provider') as StudioProvider | null;
-    // Auto selects the owned CPU model. Keep legacy owned selections on that
-    // same path; external inference always requires an explicit selection.
-    if (saved === 'elevate' || !saved) {
-      setSelectedProvider('auto');
-      return;
-    }
-    if (saved in STUDIO_PROVIDER_LABELS) setSelectedProvider(saved);
+    // Remove pre-policy vendor preferences so a reload cannot restore an
+    // external selection that the owned-only API rejects.
+    window.localStorage.removeItem('elevate:studio:provider');
   }, []);
-
-  useEffect(() => {
-    window.localStorage.setItem('elevate:studio:provider', selectedProvider);
-  }, [selectedProvider]);
 
   useEffect(() => {
     const viewport = messagesViewportRef.current;
@@ -1132,7 +1100,7 @@ export default function UnifiedEllieChat({
               conversationId: canonicalConversationId,
               fileContext,
               documentsContext: attachment?.context,
-              provider: selectedProvider === 'auto' ? undefined : selectedProvider,
+              provider: OWNED_STUDIO_PROVIDER,
               onToken: (token) => {
                 spokenText += token;
                 setMessages((prev) => {
@@ -1243,7 +1211,7 @@ export default function UnifiedEllieChat({
         </div>
       )}
 
-      {aiOk === false && (selectedProvider === 'auto' || selectedProvider === 'elevate') && (
+      {aiOk === false && (
         <div className="flex shrink-0 items-start gap-2 border-b border-amber-200 bg-amber-50 px-4 py-3 text-xs text-amber-900">
           <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
           <p>
@@ -1266,25 +1234,14 @@ export default function UnifiedEllieChat({
           </label>
           <select
             id="studio-ai-provider"
-            value={selectedProvider}
-            onChange={(event) => setSelectedProvider(event.target.value as StudioProvider)}
-            className="min-h-9 rounded-lg border border-slate-300 bg-white px-3 text-xs font-bold text-slate-800"
+            value={OWNED_STUDIO_PROVIDER}
+            disabled
+            className="min-h-9 rounded-lg border border-slate-300 bg-white px-3 text-xs font-bold text-slate-800 disabled:cursor-default disabled:opacity-100"
           >
-            {(Object.keys(STUDIO_PROVIDER_LABELS) as StudioProvider[]).map((provider) => (
-              <option
-                key={provider}
-                value={provider}
-                disabled={provider !== 'auto' && !availableProviders[provider]}
-              >
-                {STUDIO_PROVIDER_LABELS[provider]}
-                {provider !== 'auto' && !availableProviders[provider] ? ' — unavailable' : ''}
-              </option>
-            ))}
+            <option value={OWNED_STUDIO_PROVIDER}>Elevate-owned AI</option>
           </select>
           <span className="hidden truncate text-xs text-slate-500 sm:inline">
-            {selectedProvider === 'auto'
-              ? health
-              : `${STUDIO_PROVIDER_LABELS[selectedProvider]} selected`}
+            {health}
           </span>
           <button
             type="button"

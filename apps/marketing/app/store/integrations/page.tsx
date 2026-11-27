@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
-import { Plug, Circle, Code, Zap, Database, Mail, CreditCard, Users } from 'lucide-react';
+import { Plug, Circle, Code, Zap, Database, Mail, Users } from 'lucide-react';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const dynamic = 'force-dynamic';
@@ -149,7 +149,6 @@ export default async function IntegrationsPage() {
           <h2 className="text-3xl font-bold text-center mb-12">Built-In Integrations</h2>
           <div className="grid md:grid-cols-3 gap-6">
             {[
-              { icon: CreditCard, name: 'Stripe', description: 'Payment processing and subscriptions', color: 'blue' },
               { icon: Mail, name: 'Resend', description: 'Transactional email delivery', color: 'green' },
               { icon: Database, name: 'Supabase', description: 'PostgreSQL database and auth', color: 'emerald' },
               { icon: Code, name: 'Google Cloud Run', description: 'Container hosting and deployment', color: 'teal' },

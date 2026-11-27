@@ -20,7 +20,7 @@ export default function MinorityCertificationPanel() {
   const [taxId, setTaxId] = useState('');
   const [uei, setUei] = useState('');
   const [naicsCodes, setNaicsCodes] = useState('611430, 611519');
-  const [businessAddress, setBusinessAddress] = useState('8888 Keystone Crossing, Suite 1300, Indianapolis, IN 46240');
+  const [businessAddress, setBusinessAddress] = useState('120 East Market Street, Suite 930, Indianapolis, IN 46204');
   const [contactEmail, setContactEmail] = useState('info@elevateforhumanity.org');
   const [contactPhone, setContactPhone] = useState(PLATFORM_DEFAULTS.supportPhone);
   const [certifyingAgency, setCertifyingAgency] = useState('Indiana IOT MWBE');

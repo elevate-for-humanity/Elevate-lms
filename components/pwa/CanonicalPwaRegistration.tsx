@@ -8,36 +8,19 @@ import {
   clearPwaInstallPrompt,
 } from '@/lib/pwa/install-prompt';
 
-// Sibling applications on the same origin own their registrations. The
-// phone app (scope /phone/) is the case that matters: unregistering its
-// worker from an Admin page would delete the push subscription that wakes
-// the phone for an incoming call. Cleanup therefore only removes workers
-// and caches that belong to no known Elevate application; each application
-// still retires its own previous versions through its worker's activate
-// handler and the update flow below.
-// The sibling sets are derived lazily, never at module scope: they are
-// only needed inside a real browser registration pass with the registry
-// loaded, and module-scope derivation breaks VM-based test harnesses that
-// evaluate this file with a stubbed registry.
-function knownWorkerPaths(): Set<string> {
-  return new Set(Object.values(PWA_APPLICATIONS).map((app) => app.workerPath));
-}
-
-function knownCachePrefixes(): string[] {
-  return Object.values(PWA_APPLICATIONS).map((app) => app.cachePrefix);
-}
-
-function isKnownWorker(scriptURL: string): boolean {
-  try {
-    return knownWorkerPaths().has(new URL(scriptURL).pathname);
-  } catch {
-    return false;
-  }
-}
-
+// Sibling applications share an origin (Elevate Mail lives on the Admin
+// origin under /mail/). Their workers and caches are their own install
+// identity: one application's registration pass must never unregister or
+// purge a sibling, or installing/using one app would break the other.
+// The sibling sets are derived inside removeStaleWorkers, not at module
+// scope: they are only needed in a real browser with the registry loaded.
 async function removeStaleWorkers(workerPath: string, cachePrefix: string) {
-  const KNOWN_WORKER_PATHS = knownWorkerPaths();
-  const KNOWN_CACHE_PREFIXES = knownCachePrefixes();
+  const knownWorkerPaths = new Set<string>(
+    Object.values(PWA_APPLICATIONS).map((app) => app.workerPath),
+  );
+  const knownCachePrefixes = Object.values(PWA_APPLICATIONS).map(
+    (app) => app.cachePrefix,
+  );
   const registrations = await navigator.serviceWorker.getRegistrations();
   await Promise.all(registrations.map(async (registration) => {
     const worker = registration.active ?? registration.waiting ?? registration.installing;
@@ -46,11 +29,10 @@ async function removeStaleWorkers(workerPath: string, cachePrefix: string) {
       return;
     }
     const script = new URL(worker.scriptURL);
-    if (script.origin !== window.location.origin) {
-      await registration.unregister();
-      return;
-    }
-    if (!KNOWN_WORKER_PATHS.has(script.pathname)) {
+    if (
+      script.origin !== window.location.origin ||
+      (script.pathname !== workerPath && !knownWorkerPaths.has(script.pathname))
+    ) {
       await registration.unregister();
     }
   }));
@@ -62,7 +44,8 @@ async function removeStaleWorkers(workerPath: string, cachePrefix: string) {
         .filter(
           (name) =>
             name.startsWith('elevate-') &&
-            !KNOWN_CACHE_PREFIXES.some((prefix) => name.startsWith(prefix)),
+            !name.startsWith(cachePrefix) &&
+            !knownCachePrefixes.some((prefix) => name.startsWith(prefix)),
         )
         .map((name) => caches.delete(name)),
     );
@@ -70,30 +53,25 @@ async function removeStaleWorkers(workerPath: string, cachePrefix: string) {
 }
 
 async function purgeBrokenPwaState(workerPath: string, cachePrefix: string) {
-  const KNOWN_CACHE_PREFIXES = knownCachePrefixes();
+  // Reset only the failing application's own state. On single-application
+  // origins this is everything there is; on the shared Admin origin it
+  // leaves sibling applications (and the workspace launchers) intact.
   const registrations = await navigator.serviceWorker.getRegistrations();
   await Promise.all(registrations.map(async (registration) => {
     const worker = registration.active ?? registration.waiting ?? registration.installing;
-    // Reset only this application's state (plus ownerless legacy workers);
-    // a sibling application's registration and push subscription survive.
-    if (!worker || !isKnownWorker(worker.scriptURL) ||
-        new URL(worker.scriptURL).pathname === workerPath) {
+    if (!worker) {
+      await registration.unregister();
+      return;
+    }
+    const script = new URL(worker.scriptURL);
+    if (script.origin !== window.location.origin || script.pathname === workerPath) {
       await registration.unregister();
     }
   }));
 
   if ('caches' in window) {
     const names = await caches.keys();
-    await Promise.all(
-      names
-        .filter(
-          (name) =>
-            name.startsWith(cachePrefix) ||
-            (name.startsWith('elevate-') &&
-              !KNOWN_CACHE_PREFIXES.some((prefix) => name.startsWith(prefix))),
-        )
-        .map((name) => caches.delete(name)),
-    );
+    await Promise.all(names.filter((name) => name.startsWith(cachePrefix)).map((name) => caches.delete(name)));
   }
 }
 

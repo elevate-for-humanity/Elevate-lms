@@ -397,7 +397,7 @@ export function getEnrollmentTracks(
       available: true as const,
     },
     selfPay: {
-      label: 'Self-Pay — All States',
+      label: 'Self-Pay Tuition',
       cost: p.selfPayCost,
       description:
         'Review the published tuition and currently available checkout options. Provider-specific installment terms are shown at checkout.',

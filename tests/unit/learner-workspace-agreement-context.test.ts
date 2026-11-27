@@ -55,7 +55,7 @@ describe('learner participation requirements stay separate from employment agree
     expect(workspace.agreements.map(agreement => agreement.type)).toEqual(['enrollment', 'handbook', 'data_sharing', 'mou', 'apprenticeship_agreement']);
   });
   it('preserves the separate employment agreement registry', () => {
-    expect(getRequiredAgreements('instructor').map(agreement => agreement.type)).toEqual(['staff_agreement']);
+    expect(getRequiredAgreements('instructor').map(agreement => agreement.type)).toEqual(['staff_agreement', 'instructor_curriculum_ip']);
     expect(getRequiredAgreements('program_holder').map(agreement => agreement.type)).toEqual(['program_holder_mou']);
     expect(getRequiredAgreements('employer').map(agreement => agreement.type)).toEqual(['employer_agreement']);
   });

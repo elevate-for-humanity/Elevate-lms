@@ -4,11 +4,13 @@
  * This validates test infrastructure only; it never reads/logs secret values
  * or contacts (or writes to) Supabase/Google production.
  */
-export function auditE2EServiceConfiguration(env = process.env) {
+export function auditE2EServiceConfiguration(env = process.env, { infrastructureOnly = false } = {}) {
   const required = [
     'NEXT_PUBLIC_SUPABASE_URL',
     'NEXT_PUBLIC_SUPABASE_ANON_KEY',
     'SUPABASE_SERVICE_ROLE_KEY',
+  ];
+  if (!infrastructureOnly) required.push(
     'TEST_ADMIN_EMAIL', 'TEST_ADMIN_PASSWORD',
     'TEST_STUDENT_EMAIL', 'TEST_STUDENT_PASSWORD',
     'TEST_PROGRAM_HOLDER_EMAIL', 'TEST_PROGRAM_HOLDER_PASSWORD',
@@ -20,7 +22,7 @@ export function auditE2EServiceConfiguration(env = process.env) {
     'E2E_INSTRUCTOR_EMAIL', 'E2E_INSTRUCTOR_PASSWORD',
     'E2E_STAFF_EMAIL', 'E2E_STAFF_PASSWORD',
     'E2E_CASE_MANAGER_EMAIL', 'E2E_CASE_MANAGER_PASSWORD',
-  ];
+  );
   const missing = required.filter(key => !String(env[key] ?? '').trim());
   const failures = [];
   if (missing.length) failures.push('E2E_REQUIRED_TEST_CONFIGURATION_MISSING: ' + missing.join(', '));
@@ -56,12 +58,14 @@ export function auditE2EServiceConfiguration(env = process.env) {
 }
 
 if (process.argv[1] && import.meta.url === new URL('file://' + process.argv[1]).href) {
-  const result = auditE2EServiceConfiguration();
+  const result = auditE2EServiceConfiguration(process.env, {
+    infrastructureOnly: process.argv.includes('--infrastructure-only'),
+  });
   if (!result.ok) {
     for (const issue of result.failures) console.error('[e2e-preflight] ' + issue);
     console.error('[e2e-preflight] No browser execution or production data mutation was attempted.');
     process.exitCode = 1;
   } else {
-    console.info('[e2e-preflight] Isolated QA origin, credentials, and local three-service routing: configured.');
+    console.info('[e2e-preflight] Isolated QA configuration verified.');
   }
 }

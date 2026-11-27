@@ -3,6 +3,7 @@ import { writeFileSync, appendFileSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
 import { components, domains, evaluateRevision, evaluateApplication, result } from './verify-cutover-state.mjs';
 import { verifyDns, verifyTls, verifyGoogleRouting } from './verify-production-dns.mjs';
+import { readCommitIndex } from './verify-image-provenance.mjs';
 
 const project = 'elegant-racer-299721';
 const read = args => JSON.parse(execFileSync('gcloud', [...args, '--project=' + project, '--format=json'], {
@@ -66,7 +67,17 @@ export async function main() {
     try { commitImage = read(['artifacts', 'docker', 'images', 'describe', `us-central1-docker.pkg.dev/${project}/elevate/${component}:${commit}`]).image_summary?.fully_qualified_digest; }
     catch { /* Missing provenance fails DEPLOYED_COMMIT_VERIFIED below. */ }
   }
-  evaluateApplication(component, probes, revision?.spec?.containers?.[0]?.image, commitImage, expectedCommit).forEach(add);
+  const revisionImage = revision?.spec?.containers?.[0]?.image;
+  let commitIndex;
+  if (commitImage && revisionImage && commitImage !== revisionImage) {
+    try {
+      const accessToken = execFileSync('gcloud', ['auth', 'print-access-token', '--quiet'], {
+        encoding: 'utf8', timeout: 30000, maxBuffer: 16384, stdio: ['ignore', 'pipe', 'pipe'],
+      }).trim();
+      commitIndex = await readCommitIndex(component, commitImage, accessToken);
+    } catch { /* Unavailable immutable index evidence must fail closed, never log the token. */ }
+  }
+  evaluateApplication(component, probes, revisionImage, commitImage, expectedCommit, commitIndex).forEach(add);
 
   let routing;
   try { routing = verifyGoogleRouting(component, domains[component], read); add(result('DOMAIN_ROUTING_VERIFIED', routing.passed, routing)); }

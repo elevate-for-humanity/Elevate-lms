@@ -355,7 +355,11 @@ export const FEATURED_BEAUTY_HOST_PARTNERS: FeaturedHostPartner[] = [
 ];
 
 export function getFeaturedHostPartnerBySlug(slug: string) {
-  const normalized = slug.trim().toLowerCase().replace(/-[a-f0-9]{8}$/, '');
+  const requested = slug.trim().toLowerCase();
+  // Resolve a configured public slug before stripping historical ID suffixes.
+  const exact = FEATURED_BEAUTY_HOST_PARTNERS.find((shop) => shop.slug === requested);
+  if (exact) return exact;
+  const normalized = requested.replace(/-[a-f0-9]{8}$/, '');
   const aliases: Record<string, string> = {
     'j-noelle-co': 'j-noelle-co',
     'style-and-scissors-salon': 'style-and-scissor-salon',

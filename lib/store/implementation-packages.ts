@@ -56,7 +56,7 @@ export const IMPLEMENTATION_PACKAGES: Record<ImplementationPackageId, Implementa
       'Advanced drag-and-drop course builder',
       'Unlimited quizzes, assessments, courses and lessons',
       'Quiz → discovery → assessment → recommended-program workflow',
-      'Stripe payments, subscriptions and calendar booking',
+      'QuickBooks invoice billing, payment tracking and calendar booking',
       'Certificates, client files and transactional email notifications',
       'PARIS with text and microphone support',
       'PARIS knowledge base built from approved business materials',

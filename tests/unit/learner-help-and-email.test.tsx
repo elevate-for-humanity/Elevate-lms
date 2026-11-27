@@ -57,11 +57,14 @@ describe('learner help and interoffice email', () => {
       vi.stubGlobal('fetch', fetcher);
       render(
         <EmailWorkspace
+          guideHref="/communications/email/help?mailbox=host-shop"
           initialRecipient="center.of.destiny@elevateforhumanity.org"
           initialSubject="Bookkeeping orientation introduction"
         />,
       );
       await screen.findAllByText('student@example.test');
+      expect(screen.getByRole('link', { name: 'How to use Interoffice Email' }))
+        .toHaveAttribute('href', '/communications/email/help?mailbox=host-shop');
       if (readOnly) expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
       else {
         expect(await screen.findByRole('dialog', { name: 'Compose email' })).toBeInTheDocument();

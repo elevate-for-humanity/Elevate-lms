@@ -3,6 +3,7 @@ import { getPayPalSubscription, listPayPalSubscriptionTransactions } from './pro
 import 'server-only';
 
 import {
+  billingWeekEnd,
   billingWeekStart,
   findInvoiceForScheduleWeek,
   nextWeeklyInvoiceDateAfter,
@@ -122,8 +123,16 @@ export async function syncPayPalPaymentToQuickBooks(
   if (target.action === 'skip-duplicate') {
     // The week's invoice is already paid (e.g. the student paid the fallback
     // invoice by hand and PayPal also collected). Creating another invoice
-    // would charge a third time. The double payment itself needs a human
-    // refund review; no new invoice is created here.
+    // would charge a third time. The second payment is not in QuickBooks, so
+    // it must be accounted for as a human refund review — an idempotent
+    // provider-event record keyed by the PayPal payment ID — instead of being
+    // silently acknowledged by the webhook or only logged by reconcile.
+    await recordDuplicatePaymentForRefundReview(db, {
+      scheduleId: schedule.id,
+      payment,
+      weekStart,
+      invoice: target.invoice,
+    });
     return { scheduleId: schedule.id, alreadyProcessed: true, duplicateSkipped: true };
   }
   if (target.action === 'apply') {
@@ -191,6 +200,52 @@ export async function syncPayPalPaymentToQuickBooks(
   return { scheduleId: schedule.id, alreadyProcessed: false };
 }
 
+/**
+ * Persist a durable, idempotent refund-review record for a PayPal payment
+ * that has no unposted invoice target because the week's invoice is already
+ * paid. Without it the second collection leaves no trace in QuickBooks: the
+ * PayPal webhook acknowledges the event as handled and reconcile only logs
+ * the duplicate. Keyed by PayPal payment ID so webhook retries and
+ * reconcile reruns record it exactly once (unique (provider,
+ * provider_event_id) on billing_provider_events). Status 'processing' means
+ * open — a human refund review is still owed.
+ */
+export async function recordDuplicatePaymentForRefundReview(
+  db: Database,
+  input: {
+    scheduleId: string;
+    payment: PayPalSubscriptionPayment;
+    weekStart: string;
+    invoice: ScheduleWeekInvoice;
+  },
+): Promise<void> {
+  const inserted = await db
+    .from('billing_provider_events')
+    .insert({
+      provider: 'paypal',
+      provider_event_id: `paypal-refund-review:${input.payment.paymentId}`,
+      event_type: 'payment.duplicate',
+      resource_id: input.payment.paymentId,
+      status: 'processing',
+      payload: {
+        billingScheduleId: input.scheduleId,
+        paymentId: input.payment.paymentId,
+        amountCents: input.payment.amountCents,
+        paidAt: input.payment.paidAt,
+        weekStart: input.weekStart,
+        invoiceId: input.invoice.id,
+        invoiceNumber: input.invoice.invoice_number,
+      },
+    })
+    .select('id')
+    .single();
+  if (!inserted.error) return;
+  if (inserted.error.code === '23505') return; // Already recorded for this payment.
+  throw new Error(
+    `Could not record duplicate PayPal payment for refund review: ${inserted.error.message}`,
+  );
+}
+
 export type PayPalPaymentTarget =
   | { action: 'apply'; invoice: ScheduleWeekInvoice }
   | { action: 'skip-duplicate'; invoice: ScheduleWeekInvoice }
@@ -231,6 +286,23 @@ export async function resolvePayPalPaymentTarget(
 }
 
 /**
+ * Whether a schedule has already been advanced past the given billing week.
+ * The schedule's next invoice date keeps its enrollment anchor weekday
+ * (weekly cadence adds 7 days), so it is usually NOT a Monday: comparing it
+ * with the week's Monday wrongly reports "already advanced" for any
+ * Tuesday–Sunday anchor, and that week's installment is then never consumed
+ * — remaining_invoices never decrements and the schedule stalls. A schedule
+ * is past the week only when its next invoice date falls after the week's
+ * Sunday.
+ */
+export function scheduleAdvancedPastWeek(
+  nextInvoiceDate: string | null | undefined,
+  weekStart: string,
+): boolean {
+  return String(nextInvoiceDate || '') > billingWeekEnd(weekStart);
+}
+
+/**
  * Advance a schedule after its weekly payment was applied to an invoice the
  * fallback writer already created. The fallback already consumed this week's
  * schedule slot (remaining count and next invoice date) when it created the
@@ -243,7 +315,7 @@ async function advanceScheduleAfterPayment(
   schedule: any,
   weekStart: string,
 ): Promise<void> {
-  const alreadyAdvanced = String(schedule.next_invoice_date || '') > weekStart;
+  const alreadyAdvanced = scheduleAdvancedPastWeek(schedule.next_invoice_date, weekStart);
   if (alreadyAdvanced) {
     const touched = await db
       .from('billing_schedules')

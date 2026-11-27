@@ -11,6 +11,7 @@ export default function LessonWorkbook({
   response,
   accountId,
   readOnly,
+  pdfUrl,
   requiredForCompletion = true,
 }: {
   workbook: Workbook;
@@ -18,6 +19,7 @@ export default function LessonWorkbook({
   response?: WorkbookResponse;
   accountId: string;
   readOnly: boolean;
+  pdfUrl?: string | null;
   requiredForCompletion?: boolean;
 }) {
   const [reviewed, setReviewed] = useState(response?.reviewed === true);
@@ -50,6 +52,7 @@ export default function LessonWorkbook({
         readOnly={readOnly}
         accountId={accountId}
         workbookSlug={workbook.slug}
+        pdfUrl={pdfUrl}
         sectionPicker={null}
         showTimeclock={false}
         visual={visual}

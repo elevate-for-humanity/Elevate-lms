@@ -50,7 +50,7 @@ const steps = [
 
 const verifiedCapabilities = [
   'Role-based authentication and authorization for protected platform surfaces',
-  'Stripe-backed checkout and subscription status handling for configured Store products',
+  'QuickBooks invoice creation and verified-payment entitlement handling for configured Store products',
   'Organization, tenant, membership, and entitlement records used to control access',
   'Trial-expiration enforcement for configured self-service applications',
   'Website Builder subscription enforcement for editor APIs and user-owned public hosting',

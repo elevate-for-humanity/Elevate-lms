@@ -124,11 +124,56 @@ it('expands the complete lesson across the viewport and restores the same mounte
   const video = screen.getByLabelText('Full lesson video');
   fireEvent.change(textarea, { target: { value: 'Unsubmitted saved work stays mounted' } });
   fireEvent.click(screen.getByRole('button', { name: 'Full screen lesson' }));
-  expect(container.querySelector('[data-learning-workspace]')).toHaveAttribute('data-expanded', 'true');
-  expect(container.querySelector('[data-learning-workspace]')).toHaveAttribute('data-view', 'preview');
+  expect(container.querySelector('[data-learning-workspace]')).toHaveAttribute(
+    'data-expanded',
+    'true',
+  );
+  expect(container.querySelector('[data-learning-workspace]')).toHaveAttribute(
+    'data-view',
+    'preview',
+  );
   expect(screen.getByLabelText('Full lesson video')).toBe(video);
   fireEvent.keyDown(document, { key: 'Escape' });
-  expect(container.querySelector('[data-learning-workspace]')).toHaveAttribute('data-expanded', 'false');
+  expect(container.querySelector('[data-learning-workspace]')).toHaveAttribute(
+    'data-expanded',
+    'false',
+  );
   expect(screen.getByRole('textbox', { name: 'Workbook answer' })).toBe(textarea);
   expect(textarea).toHaveValue('Unsubmitted saved work stays mounted');
+});
+
+it('reveals a simulation fragment on direct reload and same-page navigation', () => {
+  window.history.replaceState({}, '', '/lesson#hvac-simulation');
+  const { container, unmount } = render(
+    <LearningWorkspace
+      initialView="preview"
+      activityFragment="hvac-simulation"
+      instructions={<div id="hvac-simulation">Practice</div>}
+      preview={<video />}
+    />,
+  );
+  expect(container.querySelector('[data-learning-workspace]')).toHaveAttribute(
+    'data-view',
+    'instructions',
+  );
+  fireEvent.click(screen.getByRole('button', { name: 'Lesson preview', exact: true }));
+  fireEvent(window, new HashChangeEvent('hashchange'));
+  expect(container.querySelector('[data-learning-workspace]')).toHaveAttribute(
+    'data-view',
+    'instructions',
+  );
+  unmount();
+  window.history.replaceState({}, '', '/lesson');
+  const ordinary = render(
+    <LearningWorkspace
+      initialView="preview"
+      activityFragment="hvac-simulation"
+      instructions={<div>Practice</div>}
+      preview={<video />}
+    />,
+  );
+  expect(ordinary.container.querySelector('[data-learning-workspace]')).toHaveAttribute(
+    'data-view',
+    'preview',
+  );
 });

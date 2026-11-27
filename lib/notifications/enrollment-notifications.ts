@@ -354,7 +354,7 @@ export async function sendEnrollmentNotification(
         </div>
         <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #eee; font-size: 12px; color: #666;">
           <p>${PLATFORM_DEFAULTS.orgName}</p>
-          <p>8888 Keystone Crossing Suite 1300, Indianapolis, IN 46240</p>
+          <p>120 East Market Street, Suite 930, Indianapolis, IN 46204</p>
           <p><a href="${siteUrl}">${PLATFORM_DEFAULTS.canonicalDomain}</a> | ${PLATFORM_DEFAULTS.supportPhone}</p>
         </div>
       </body></html>`,

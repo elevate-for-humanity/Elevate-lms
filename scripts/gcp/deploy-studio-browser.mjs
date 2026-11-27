@@ -1,3 +1,6 @@
+// Branch refreshed to pick up main (71e31a22): /apply/student E2E fix + Dockerfile.google-lms.
+// Branch refreshed to pick up main (dbe7a427): fresh CI after E2E shard 3/4 environment failure on the 433802fb base.
+// Branch refreshed to pick up main (a5daf49d): Course Builder merge; fresh CI after E2E shard 3/4 environment failure.
 import { spawnSync } from 'node:child_process';
 
 const PROJECT='elegant-racer-299721';
@@ -9,7 +12,11 @@ if(!/^[a-f0-9]{40}$/.test(IMAGE_SHA||'')) throw new Error('Full Studio image SHA
 
 function gcloud(args){
   const r=spawnSync('gcloud',args,{encoding:'utf8',maxBuffer:4*1024*1024});
-  if(r.status!==0) throw new Error('Google Studio operation failed: '+args.slice(0,3).join(' '));
+  if(r.status!==0){
+    const output=((r.stderr||r.stdout||'').trim().slice(-2000));
+    const detail=[r.error&&('spawn error: '+r.error.message),output].filter(Boolean).join(' :: ') || 'no gcloud output';
+    throw new Error('Google Studio operation failed: '+args.slice(0,3).join(' ')+' :: '+detail);
+  }
   return r.stdout.trim();
 }
 const image='us-central1-docker.pkg.dev/'+PROJECT+'/elevate/studio-browser:'+IMAGE_SHA;

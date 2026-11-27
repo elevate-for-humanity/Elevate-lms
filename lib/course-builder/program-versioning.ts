@@ -23,7 +23,7 @@ export type VersionSummary = {
   created_by: string | null;
 };
 
-export type PublishResult = { ok: boolean; version?: number; error?: string };
+export type PublishResult = { ok: boolean; version?: number; error?: string; blocked?: boolean };
 export type RollbackResult = { ok: boolean; rolledBackTo?: number; error?: string };
 
 // ── publishProgram ────────────────────────────────────────────────────────────
@@ -33,71 +33,21 @@ export async function publishProgram(
   programId: string,
   publishedBy: string,
 ): Promise<PublishResult> {
-  // Load full program state for snapshot
-  const { data: program, error: loadErr } = await db
-    .from('programs')
-    .select(
-      `
-      *,
-      program_outcomes(*),
-      program_credentials(*),
-      program_modules(*, program_lessons(*)),
-      program_ctas(*),
-      program_tracks(*)
-    `,
-    )
-    .eq('id', programId)
-    .maybeSingle();
-
-  if (loadErr) return { ok: false, error: loadErr.message };
-  if (!program) return { ok: false, error: 'Program not found' };
-
-  const nextVersion = (program.version ?? 0) + 1;
-  const now = new Date().toISOString();
-  const orgId = program.org_id;
-
-  if (!orgId)
-    return { ok: false, error: 'Program has no org_id — apply migration 20260422000003 first' };
-
-  // Write snapshot
-  const { error: snapErr } = await db.from('program_versions').insert({
-    org_id: orgId,
-    program_id: programId,
-    version: nextVersion,
-    snapshot: program,
-    created_by: publishedBy,
-    created_at: now,
+  const { data: version, error } = await db.rpc('publish_catalog_program', {
+    p_program_id: programId,
+    p_actor_id: publishedBy,
   });
-
-  if (snapErr) {
-    logger.error('[program-versioning] snapshot failed', undefined, { programId, error: snapErr.message });
-    return { ok: false, error: snapErr.message };
+  if (error) {
+    const blocked = error.code === '23514' && error.message.startsWith('PUBLISH_BLOCKED: ');
+    if (blocked) {
+      return { ok: false, blocked, error: error.message.slice('PUBLISH_BLOCKED: '.length) };
+    }
+    logger.error('[program-versioning] publish failed', error, { programId });
+    return { ok: false, error: error.message };
   }
 
-  // Update program: increment version, mark published
-  const { error: updateErr } = await db
-    .from('programs')
-    .update({
-      version: nextVersion,
-      published: true,
-      published_at: now,
-      published_by: publishedBy,
-      status: 'published',
-      review_status: 'published',
-      updated_at: now,
-    })
-    .eq('id', programId);
-
-  if (updateErr) {
-    logger.error('[program-versioning] publish update failed', undefined, {
-      programId,
-      error: updateErr.message,
-    });
-    return { ok: false, error: updateErr.message };
-  }
-
-  logger.info('[program-versioning] program published', { programId, version: nextVersion });
-  return { ok: true, version: nextVersion };
+  logger.info('[program-versioning] program published', { programId, publishedBy, version });
+  return { ok: true, version };
 }
 
 // ── publishCourse ─────────────────────────────────────────────────────────────

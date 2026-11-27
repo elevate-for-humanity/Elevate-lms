@@ -15,7 +15,29 @@ export async function GET(request: NextRequest) {
   if (rateLimited) return rateLimited;
   try {
     const program = new URL(request.url).searchParams.get('program') as ProgramKey | null;
-    const shops = await getApprovedShops(program ?? undefined);
+    // Explicit public projection: new operational fields must not become public by default.
+    const shops = (await getApprovedShops(program ?? undefined)).map((shop) => ({
+      id: shop.id,
+      name: shop.name,
+      address: shop.address,
+      city: shop.city,
+      state: shop.state,
+      zip: shop.zip,
+      phone: shop.phone,
+      programs: shop.programs,
+      primaryProgram: shop.primaryProgram,
+      badge: shop.badge,
+      publicSlug: shop.publicSlug,
+      publicSlugAliases: shop.publicSlugAliases,
+      canonicalPartner: shop.canonicalPartner,
+      description: shop.description,
+      website: shop.website,
+      googleMapsUrl: shop.googleMapsUrl,
+      logoUrl: shop.logoUrl,
+      flyerUrl: shop.flyerUrl,
+      videoUrl: shop.videoUrl,
+      mediaGallery: shop.mediaGallery,
+    }));
     return NextResponse.json({ shops });
   } catch (err) {
     return safeInternalError(err, 'Failed to load host shops');

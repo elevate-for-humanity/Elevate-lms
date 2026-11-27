@@ -111,7 +111,7 @@ export function registerPublicNavigationAudit() {
     await page.goto(origin + '/about', { waitUntil: 'domcontentloaded' });
     const desktop = (page.viewportSize()?.width ?? 0) >= 1180;
     if (!desktop) await page.getByRole('button', { name: 'Open menu', exact: true }).click();
-    const nav = page.getByRole('navigation', { name: desktop ? 'Main navigation' : 'Site navigation', exact: true });
+    const nav = page.getByRole('navigation', { name: desktop ? 'Main navigation' : 'Mobile navigation', exact: true });
     for (const item of NAV_ITEMS.filter(item => item.subItems?.length)) {
       const trigger = nav.getByRole('button', { name: desktop ? `${item.name} menu` : item.name, exact: true });
       await trigger.click();

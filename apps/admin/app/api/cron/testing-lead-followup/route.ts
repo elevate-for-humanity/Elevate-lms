@@ -163,7 +163,7 @@ function followUp1Html(lead: { first_name: string | null; exam_type: string }) {
     </p>
   </div>
   <div style="background:#f8fafc;border-top:1px solid #e2e8f0;padding:16px 32px;text-align:center;color:#94a3b8;font-size:11px">
-    8888 Keystone Crossing Suite 1300 · Indianapolis, IN 46240<br>
+    120 East Market Street, Suite 930, Indianapolis, IN 46204<br>
     <a href="${SITE_URL}/unsubscribe?email={{email}}" style="color:#94a3b8">Unsubscribe</a>
   </div>
 </div>
@@ -197,7 +197,7 @@ function followUp2Html(lead: { first_name: string | null; exam_type: string }) {
     </p>
   </div>
   <div style="background:#f8fafc;border-top:1px solid #e2e8f0;padding:16px 32px;text-align:center;color:#94a3b8;font-size:11px">
-    8888 Keystone Crossing Suite 1300 · Indianapolis, IN 46240<br>
+    120 East Market Street, Suite 930, Indianapolis, IN 46204<br>
     <a href="${SITE_URL}/unsubscribe?email={{email}}" style="color:#94a3b8">Unsubscribe</a>
   </div>
 </div>

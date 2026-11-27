@@ -2,11 +2,12 @@ import { NextRequest } from 'next/server';
 import { z } from 'zod';
 import { requireCleaningOwner,cleaningHandler,sameOrigin,reply,rpc,CLEANING_SITE,serviceSchema,CleaningError,newCapability,hashCapability } from '@/lib/cleaning/server';
 import { processCleaningOutbox } from '@/lib/cleaning/outbox';
+import { matchProviderReviewSnapshot, providerApplicationName, providerReviewRevision, providerReviewSelect } from '@/lib/cleaning/provider-snapshot';
 export const runtime='nodejs';export const dynamic='force-dynamic';
 export async function GET(request:NextRequest){return cleaningHandler(async()=>{
  const {db}=await requireCleaningOwner(request);
  const results=await Promise.all([
-  db.from('cleaning_providers').select('id,lead_id,name,email,hourly_cents,zips,services,opted_in,eligibility,review_note').eq('website_id',CLEANING_SITE).order('created_at',{ascending:false}).limit(200),
+  db.from('cleaning_providers').select(providerReviewSelect).eq('website_id',CLEANING_SITE).order('created_at',{ascending:false}).limit(200),
   db.from('cleaning_jobs').select('id,customer_name,customer_email,service,zip,starts_at,status,private_details,summary,customer_cents,discount_cents,provider_pay_cents,provider_id').eq('website_id',CLEANING_SITE).order('created_at',{ascending:false}).limit(100),
   db.from('cleaning_outbox').select('id,job_id,kind,status,error,created_at').eq('website_id',CLEANING_SITE).order('created_at',{ascending:false}).limit(100),
   db.from('tenant_site_leads').select('id,name,email,message').eq('website_id',CLEANING_SITE).like('source_path','%/join-network').not('name','ilike','%test%').order('created_at',{ascending:false}).limit(200),
@@ -14,7 +15,7 @@ export async function GET(request:NextRequest){return cleaningHandler(async()=>{
   db.from('cleaning_job_accounts').select('job_id,collected_cents,provider_payable_cents,discount_cents,platform_gross_cents,status,payment_reference,cleaning_jobs!inner(website_id)').eq('cleaning_jobs.website_id',CLEANING_SITE).order('created_at',{ascending:false}).limit(100),
  ]);
  for(const result of results)if(result.error)throw result.error;
- return reply({providers:results[0].data,jobs:results[1].data,deliveries:results[2].data,applications:results[3].data,membershipPayments:results[4].data,accounts:results[5].data});
+ return reply({providers:(results[0].data||[]).map((provider:any)=>({...provider,reviewRevision:providerReviewRevision(provider)})),jobs:results[1].data,deliveries:results[2].data,applications:results[3].data,membershipPayments:results[4].data,accounts:results[5].data});
 });}
 export async function POST(request:NextRequest){return cleaningHandler(async()=>{
  sameOrigin(request);const {db,user}=await requireCleaningOwner(request);const raw=await request.json();
@@ -22,14 +23,22 @@ export async function POST(request:NextRequest){return cleaningHandler(async()=>
   const input=z.object({leadId:z.uuid(),hourlyCents:z.number().int().min(1500).max(20000),zips:z.array(z.string().regex(/^\d{5}$/)).min(1).max(100),services:z.array(serviceSchema).min(1).max(7)}).parse(raw);
   const {data:lead,error}=await db.from('tenant_site_leads').select('id,name,email,message,source_path').eq('id',input.leadId).eq('website_id',CLEANING_SITE).maybeSingle();if(error)throw error;
   if(!lead||!/\/join-network$/.test(lead.source_path||'')||/test/i.test(lead.name))throw new CleaningError('Select a genuine network application.',404);
-  const company=lead.message.match(/Company name, if applicable:\s*([^\n]+)/)?.[1]||lead.name;
-  const saved=await db.from('cleaning_providers').insert({website_id:CLEANING_SITE,lead_id:lead.id,name:company.slice(0,200),email:lead.email.toLowerCase(),hourly_cents:input.hourlyCents,zips:input.zips,services:input.services});if(saved.error)throw new CleaningError('This application may already be in the directory. Refresh before retrying.',409);
+  const company=providerApplicationName(lead);if(!company)throw new CleaningError('The application needs a provider business or contact name.',409);
+  const saved=await db.from('cleaning_providers').insert({website_id:CLEANING_SITE,lead_id:lead.id,name:company,email:lead.email.toLowerCase(),hourly_cents:input.hourlyCents,zips:input.zips,services:input.services});if(saved.error)throw new CleaningError('This application may already be in the directory. Refresh before retrying.',409);
   return reply({imported:true,eligibility:'pending'});
  }
  if(raw.action==='review'){
-  const input=z.object({id:z.uuid(),eligibility:z.enum(['eligible','suspended']),optedIn:z.boolean(),note:z.string().trim().min(10).max(2000),verified:z.literal(true)}).parse(raw);
-  if(input.eligibility==='eligible'&&!input.optedIn)throw new CleaningError('Provider permission to receive job emails is required.');
-  const saved=await db.from('cleaning_providers').update({eligibility:input.eligibility,opted_in:input.optedIn,review_note:input.note,reviewed_by:user!.id,reviewed_at:new Date().toISOString()}).eq('id',input.id).eq('website_id',CLEANING_SITE).select('id').maybeSingle();if(saved.error)throw saved.error;if(!saved.data)throw new CleaningError('Provider not found.',404);return reply({reviewed:true});
+  const input=z.object({action:z.literal('review'),id:z.uuid(),eligibility:z.enum(['eligible','suspended']),reviewRevision:z.string().regex(/^[a-f0-9]{64}$/),note:z.string().trim().min(10).max(2000),verified:z.literal(true)}).strict().parse(raw);
+  const current=await db.from('cleaning_providers').select(providerReviewSelect).eq('id',input.id).eq('website_id',CLEANING_SITE).maybeSingle();
+  if(current.error)throw current.error;
+  if(!current.data)throw new CleaningError('Provider not found.',404);
+  if(providerReviewRevision(current.data)!==input.reviewRevision)throw new CleaningError('The provider profile changed after you opened it. Refresh and review the current details.',409);
+  if(input.eligibility==='eligible'&&!current.data.opted_in)throw new CleaningError('The provider must give their own permission to receive job emails before approval.',409);
+  const update=db.from('cleaning_providers').update({eligibility:input.eligibility,review_note:input.note,reviewed_by:user!.id,reviewed_at:new Date().toISOString()}).eq('website_id',CLEANING_SITE);
+  const saved=await matchProviderReviewSnapshot(update,current.data).select('id').maybeSingle();
+  if(saved.error)throw saved.error;
+  if(!saved.data)throw new CleaningError('The provider profile changed during review. Refresh and review the current details.',409);
+  return reply({reviewed:true});
  }
  if(raw.action==='quote'){
   const input=z.object({id:z.uuid(),hourlyCents:z.number().int().min(1500).max(20000),hours:z.number().min(2).max(200),durationHours:z.number().min(0.25).max(200),summary:z.string().trim().min(5).max(1000)}).parse(raw);

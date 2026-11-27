@@ -9,7 +9,7 @@ export const SANITATION: ProgramSchema = {
   sector: 'healthcare',
   category: 'Infection Control',
   programType: 'certification',
-  heroImage: '/images/pexels/medical-assistant.webp',
+  heroImage: '/images/refresh-20261014/sanitation.webp',
   heroImageAlt: 'Sanitation and infection control training in a clinical setting',
   videoSrc: '/videos/cna-hero.mp4',
   deliveryMode: 'hybrid',

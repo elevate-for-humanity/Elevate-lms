@@ -1,4 +1,7 @@
+// Branch refreshed to pick up main (71e31a22): /apply/student E2E fix + Dockerfile.google-lms.
 'use client';
+// Branch refreshed to pick up main (a11d77d8): CI Preflight test fixes for the worker-start dispatcher/resume changes.
+// Branch refreshed to pick up main (2c73e61c): fresh CI after E2E shard 3/4 environment failure on the 71e31a22 base.
 
 import { DashboardVideoCalls } from '@/components/communications/DashboardVideoCalls';
 import { AudioOutputControl } from '@/components/communications/AudioOutputControl';
@@ -27,9 +30,19 @@ import {
 } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { getPushNotificationClient } from '@/lib/notifications/push-client';
-import { installAudioUnlock, startRingtone, stopRingtone, unlockAudio } from '@/lib/notifications/audio-unlock';
+import {
+  installAudioUnlock,
+  onRingtoneStatusChange,
+  startRingtone,
+  stopRingtone,
+  unlockAudio,
+  type RingtoneStatus,
+} from '@/lib/notifications/audio-unlock';
+import { log } from '@/lib/logger';
 import { PhoneRecordingPlayer } from '@/components/communications/PhoneRecordingPlayer';
 import { ProgramHolderPhoneIntroduction } from '@/components/program-holder/ProgramHolderPhoneIntroduction';
+import { TextWorkspace } from '@/components/communications/TextWorkspace';
+import { PwaInstallButton } from '@/components/pwa/PwaInstallButton';
 import { phonePresenceDisplay } from '@/lib/phone/presence-display';
 import { claimPhoneContext, type PhoneContextLeadership } from '@/lib/phone/context-lock';
 
@@ -141,6 +154,7 @@ export function ProgramHolderPhone({
   const [held, setHeld] = useState(false);
   const [returnNumber, setReturnNumber] = useState('');
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+  const [tab, setTab] = useState<'texts' | 'voicemail' | 'inbox' | 'settings'>('texts');
   const clientRef = useRef<PhoneClient | null>(null);
   const outboundClientRef = useRef<PhoneClient | null>(null);
   const callRef = useRef<BrowserPhoneCall | null>(null);
@@ -161,6 +175,20 @@ export function ProgramHolderPhone({
   const wakeRef = useRef<{ callId: string; from: string } | null>(null);
   const wakeAttemptsRef = useRef(0);
   const [wakeMode, setWakeMode] = useState(false);
+  const [ringtoneStatus, setRingtoneStatus] = useState<RingtoneStatus>('idle');
+  const [testingRing, setTestingRing] = useState(false);
+  const fallbackRingingRef = useRef(false);
+  const testRingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Cancels a test ring's auto-stop timer. The beep itself is stopped by the
+  // caller (startRingtone stops any previous ring; answer/hangup stop it too).
+  const stopTestRing = useCallback(() => {
+    if (testRingTimerRef.current) {
+      clearTimeout(testRingTimerRef.current);
+      testRingTimerRef.current = null;
+    }
+    setTestingRing(false);
+  }, []);
 
   useEffect(() => {
     if (data) ringModeRef.current = data.extension.ringMode;
@@ -170,8 +198,20 @@ export function ProgramHolderPhone({
   // an inbound call can ring without the operator touching the phone first.
   useEffect(() => {
     const removeAudioUnlock = installAudioUnlock();
+    const removeRingtoneStatus = onRingtoneStatusChange((status) => {
+      setRingtoneStatus(status);
+      if (status === 'ringing' && fallbackRingingRef.current) {
+        // The primary beep is sounding; silence the SIP fallback.
+        fallbackRingingRef.current = false;
+        log.info('[phone] ringtone: primary beep sounding; stopping SIP fallback');
+        callRef.current?.stopRingtone();
+      }
+    });
     return () => {
+      removeRingtoneStatus();
       removeAudioUnlock();
+      if (testRingTimerRef.current) clearTimeout(testRingTimerRef.current);
+      testRingTimerRef.current = null;
       stopRingtone();
     };
   }, []);
@@ -185,6 +225,9 @@ export function ProgramHolderPhone({
   useEffect(() => {
     // Launcher shortcuts may arrive before the asynchronous phone data renders.
     if (!loading && window.location.hash === '#incoming-call-alert-mode') {
+      // The ring controls live in the Settings tab now; open it first so the
+      // anchor target is visible before scrolling to it.
+      setTab('settings');
       document.getElementById('incoming-call-alert-mode')?.scrollIntoView({ block: 'center' });
     }
   }, [loading, data?.extension.id]);
@@ -481,13 +524,34 @@ export function ProgramHolderPhone({
           );
           setCallState('ringing');
           if (ringModeRef.current === 'ring') {
-            // Use the gesture-primed context once, rather than also starting a
-            // second SDK AudioContext that mobile autoplay may keep suspended.
-            startRingtone();
+            // A test ring must never outlive a real call: cancel its timer so
+            // it cannot stop the real ringtone.
+            stopTestRing();
+            void Promise.resolve(startRingtone()).then((status) => {
+              if (callRef.current?.id !== call.id) return;
+              if (status === 'ringing') {
+                log.info('[phone] ringtone: primary beep sounding');
+                return;
+              }
+              // The primary beep did not start (audio still locked or this
+              // browser has no audio): fall back to the SIP ringtone, which
+              // retries on its own interval. The fallback is silenced as soon
+              // as the primary beep starts.
+              log.info('[phone] ringtone: primary beep did not start; starting SIP fallback', {
+                status,
+              });
+              try {
+                call.playRingtone();
+                fallbackRingingRef.current = true;
+              } catch {
+                log.info('[phone] ringtone: SIP fallback could not start');
+              }
+            });
           }
           if (ringModeRef.current === 'vibrate') navigator.vibrate?.([350, 150, 350, 150, 700]);
         } else if (state === 'active') {
           stopRingtone();
+          fallbackRingingRef.current = false;
           callRef.current = call;
           setCallState('active');
           setMuted(false);
@@ -495,6 +559,7 @@ export function ProgramHolderPhone({
           navigator.vibrate?.(0);
         } else if (state === 'hangup' || state === 'destroy' || state === 'purge') {
           stopRingtone();
+          fallbackRingingRef.current = false;
           if (callRef.current?.id === call.id) {
             callRef.current = null;
             setCallState('idle');
@@ -522,7 +587,7 @@ export function ProgramHolderPhone({
       clearDeadline();
       controller.signal.removeEventListener('abort', clearDeadline);
     }
-  }, [connected, connecting, data, disconnect, ensureContextClaim, heartbeat, scheduleReconnect]);
+  }, [connected, connecting, data, disconnect, ensureContextClaim, heartbeat, scheduleReconnect, stopTestRing]);
 
   useEffect(() => {
     connectRef.current = connect;
@@ -622,6 +687,7 @@ export function ProgramHolderPhone({
       );
       if (mode !== 'ring') {
         callRef.current?.stopRingtone();
+        fallbackRingingRef.current = false;
         stopRingtone();
       }
       if (mode !== 'vibrate') navigator.vibrate?.(0);
@@ -645,6 +711,39 @@ export function ProgramHolderPhone({
     }
   }
 
+  /**
+   * Play the actual inbound ringtone for five seconds so the operator can
+   * verify sound before a real call. Starting a real call, answering, or
+   * hanging up always stops a test ring first.
+   */
+  async function testRing() {
+    if (testingRing) {
+      stopTestRing();
+      stopRingtone();
+      setMessage('Test ring stopped.');
+      return;
+    }
+    setError('');
+    const status = await Promise.resolve(startRingtone());
+    if (status === 'unavailable') {
+      setError(
+        'The test ring could not play on this device. Check the volume and that this browser allows sound, then try again.',
+      );
+      return;
+    }
+    setTestingRing(true);
+    setMessage(
+      status === 'pending'
+        ? 'Waiting for audio — tap anywhere on the page if you do not hear the ring.'
+        : 'Test ring playing — you should hear a repeating beep.',
+    );
+    testRingTimerRef.current = setTimeout(() => {
+      testRingTimerRef.current = null;
+      stopRingtone();
+      setTestingRing(false);
+    }, 5000);
+  }
+
   async function enableNotifications() {
     if (data?.readOnly) return;
     setError('');
@@ -665,6 +764,7 @@ export function ProgramHolderPhone({
     if (!call) return;
     void unlockAudio();
     call.stopRingtone();
+    fallbackRingingRef.current = false;
     stopRingtone();
     navigator.vibrate?.(0);
     try {
@@ -678,6 +778,7 @@ export function ProgramHolderPhone({
     const call = callRef.current;
     if (!call) return;
     call.stopRingtone();
+    fallbackRingingRef.current = false;
     stopRingtone();
     navigator.vibrate?.(0);
     await call.hangup();
@@ -907,95 +1008,109 @@ export function ProgramHolderPhone({
     );
 
   const presence = phonePresenceDisplay(data.readOnly, connected, data.extension.presenceStatus);
+  const openInboxCount = data.inbox.filter((item) => item.status !== 'resolved').length;
 
   return (
-    <main className="mx-auto w-full min-w-0 max-w-4xl space-y-6 p-4 sm:p-6">
+    <main className="flex min-h-dvh w-full flex-col bg-slate-100">
       <audio ref={remoteAudioRef} autoPlay playsInline />
-      <AudioOutputControl audio={remoteAudioRef} />
-      <nav aria-label="Phone communication tools" className="flex gap-2 overflow-x-auto">
-        <a href="#incoming-call-alert-mode" className="shrink-0 rounded-lg border bg-white p-3 font-bold text-blue-900">Ringer &amp; alerts</a>
-        <a
-          href={textsHref}
-          className="shrink-0 rounded-lg border bg-white p-3 font-bold text-blue-900"
-        >
-          Text messages
-        </a>
-        <a
-          href={emailHref}
-          className="shrink-0 rounded-lg border bg-white p-3 font-bold text-blue-900"
-        >
-          Interoffice email
-        </a>
-        <a
-          href={calendarHref}
-          className="shrink-0 rounded-lg border bg-white p-3 font-bold text-blue-900"
-        >
-          Calendar
-        </a>
-      </nav>
-      {data.readOnly && (
-        <p className="rounded-2xl border border-blue-200 bg-blue-50 p-4 font-bold text-blue-950">
-          Administrator preview: this {roleLabel} extension, settings, and PARIS call inbox are
-          shown read-only. Sign in as the {roleLabel} to connect the PWA, change settings, return
-          calls, or update callback status.
-        </p>
-      )}
-      <header className="rounded-3xl bg-gradient-to-br from-blue-950 via-blue-800 to-cyan-700 p-6 text-white shadow-xl sm:p-8">
-        <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <p className="text-xs font-black uppercase tracking-[0.2em] text-cyan-200">
+      <header className="sticky top-0 z-30 border-b border-blue-900 bg-blue-950 text-white shadow-lg">
+        <div className="mx-auto flex w-full max-w-7xl flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3 sm:px-6">
+          <div className="min-w-0 flex-1">
+            <p className="text-[11px] font-black uppercase tracking-[0.2em] text-cyan-300">
               Elevate Phone
             </p>
-            <h1 className="mt-2 text-3xl font-black">{data.extension.displayName}</h1>
-            <p className="mt-2 text-blue-100">
-              Extension {data.extension.extension} · {data.extension.department || roleLabel}
-            </p>
-            <p className="mt-1 text-lg font-bold">
+            <h1 className="truncate text-xl font-black leading-tight">
+              {data.extension.displayName}
+            </h1>
+            <p className="truncate text-sm text-blue-100">
+              Extension {data.extension.extension} · {data.extension.department || roleLabel} ·
               Business caller ID {friendlyNumber(data.phoneNumber)}
             </p>
           </div>
-          <div
-            className={`rounded-2xl border px-5 py-4 ${presence.online ? 'border-emerald-300 bg-emerald-500/20' : 'border-white/30 bg-white/10'}`}
+          <p
+            className={`flex items-center gap-2 rounded-full border px-3 py-2 text-sm font-black ${presence.online ? 'border-emerald-300 bg-emerald-500/20' : 'border-white/30 bg-white/10'}`}
           >
-            <p className="flex items-center gap-2 font-black">
-              <span
-                className={`h-3 w-3 rounded-full ${presence.online ? 'bg-emerald-300' : 'bg-slate-300'}`}
-              />
-              {presence.label}
-            </p>
-            <button
-              onClick={connected ? disconnectByUser : connect}
-              disabled={
-                data.readOnly ||
-                connecting ||
-                ['offline', 'do_not_disturb'].includes(data.extension.ringMode)
-              }
-              className="mt-3 min-h-11 rounded-xl bg-white px-5 font-black text-blue-900 disabled:opacity-50"
-            >
-              {connecting ? 'Connecting…' : connected ? 'Disconnect' : 'Connect phone'}
-            </button>
-          </div>
+            <span
+              className={`h-2.5 w-2.5 rounded-full ${presence.online ? 'bg-emerald-300' : 'bg-slate-300'}`}
+            />
+            {presence.label}
+          </p>
+          <PwaInstallButton
+            label="Install Elevate Phone"
+            installedLabel="Phone installed"
+            className="min-h-11 rounded-xl bg-white px-4 font-black text-blue-900"
+          />
+          <button
+            onClick={connected ? disconnectByUser : connect}
+            disabled={
+              data.readOnly ||
+              connecting ||
+              ['offline', 'do_not_disturb'].includes(data.extension.ringMode)
+            }
+            className="min-h-11 rounded-xl bg-cyan-500 px-5 font-black text-blue-950 disabled:opacity-50"
+          >
+            {connecting ? 'Connecting…' : connected ? 'Disconnect' : 'Connect phone'}
+          </button>
         </div>
       </header>
 
-      {error && (
-        <p
-          role="alert"
-          className="rounded-xl border border-red-200 bg-red-50 p-4 font-bold text-red-900"
-        >
-          {error}
-        </p>
-      )}
-      {message && (
-        <p
-          role="status"
-          className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 font-bold text-emerald-900"
-        >
-          {message}
-        </p>
-      )}
+      <div className="mx-auto w-full max-w-7xl px-4 pt-4 sm:px-6">
+        {data.readOnly && (
+          <p className="rounded-2xl border border-blue-200 bg-blue-50 p-4 font-bold text-blue-950">
+            Administrator preview: this {roleLabel} extension, settings, and PARIS call inbox are
+            shown read-only. Sign in as the {roleLabel} to connect the PWA, change settings, return
+            calls, or update callback status.
+          </p>
+        )}
+        {error && (
+          <p
+            role="alert"
+            className="mt-3 rounded-xl border border-red-200 bg-red-50 p-4 font-bold text-red-900"
+          >
+            {error}
+          </p>
+        )}
+        {message && (
+          <p
+            role="status"
+            className="mt-3 rounded-xl border border-emerald-200 bg-emerald-50 p-4 font-bold text-emerald-900"
+          >
+            {message}
+          </p>
+        )}
+        <nav aria-label="Phone communication tools" className="mt-3 flex flex-wrap gap-2">
+          <a
+            href="#incoming-call-alert-mode"
+            onClick={() => setTab('settings')}
+            className="rounded-lg border bg-white px-3 py-2 text-sm font-bold text-blue-900"
+          >
+            Ringer &amp; alerts
+          </a>
+          <a
+            href={textsHref}
+            className="rounded-lg border bg-white px-3 py-2 text-sm font-bold text-blue-900"
+          >
+            Text messages
+          </a>
+          <a
+            href={emailHref}
+            className="rounded-lg border bg-white px-3 py-2 text-sm font-bold text-blue-900"
+          >
+            Interoffice email
+          </a>
+          <a
+            href={calendarHref}
+            className="rounded-lg border bg-white px-3 py-2 text-sm font-bold text-blue-900"
+          >
+            Calendar
+          </a>
+        </nav>
+      </div>
 
-      <section className="mx-auto w-full min-w-0 max-w-[26rem] rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
+      <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col gap-6 px-4 py-4 sm:px-6 lg:flex-row">
+        <div className="w-full shrink-0 space-y-6 lg:w-[26rem]">
+
+          <section className="w-full rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
         <h2 className="text-xl font-black text-slate-950">Dial pad</h2>
         <p className="mt-1 text-sm text-slate-600">
           {data.extension.provider === 'asterisk'
@@ -1008,7 +1123,7 @@ export function ProgramHolderPhone({
               key={digit}
               type="button"
               onClick={() => void pressDialDigit(digit)}
-              className="min-h-12 rounded-xl border border-slate-300 bg-slate-50 text-xl font-black text-slate-950 active:bg-slate-200"
+              className="min-h-14 rounded-xl border border-slate-300 bg-slate-50 text-2xl font-black text-slate-950 active:bg-slate-200"
             >
               {digit}
             </button>
@@ -1082,7 +1197,6 @@ export function ProgramHolderPhone({
           ))}
         </div>
       </section>
-
       {wakeMode && callState === 'idle' && (
         <section className="mx-auto w-full max-w-md rounded-3xl border-2 border-amber-300 bg-amber-50 p-5 text-center shadow" aria-live="polite">
           <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-amber-400/20">
@@ -1101,7 +1215,7 @@ export function ProgramHolderPhone({
       )}
 
       {callState !== 'idle' && (
-        <section id="incoming-call-card" className="mx-auto w-full max-w-md rounded-3xl border-2 border-cyan-300 bg-slate-950 p-5 text-center text-white shadow-2xl">
+        <section id="incoming-call-card" className="w-full rounded-3xl border-2 border-cyan-300 bg-slate-950 p-5 text-center text-white shadow-2xl">
           <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-cyan-500/20">
             <PhoneCall className="h-10 w-10 text-cyan-300" />
           </div>
@@ -1113,6 +1227,9 @@ export function ProgramHolderPhone({
                 : 'Call connected'}
           </p>
           <h2 className="mt-2 text-3xl font-black">{friendlyNumber(incomingNumber)}</h2>
+          {callState === 'ringing' && ringtoneStatus === 'pending' && (
+            <p className="mt-3 text-sm font-bold text-amber-300">Tap anywhere to hear the ring.</p>
+          )}
           <div className="mt-6 flex flex-wrap justify-center gap-3">
             {callState === 'ringing' && (
               <button
@@ -1155,7 +1272,51 @@ export function ProgramHolderPhone({
         </section>
       )}
 
-      <div className="grid gap-6">
+      <AudioOutputControl audio={remoteAudioRef} />
+    </div>
+    <div className="min-w-0 flex-1">
+      <div role="tablist" aria-label="Phone panels" className="flex gap-2 overflow-x-auto">
+        <button
+          type="button"
+          role="tab"
+          aria-selected={tab === 'texts'}
+          onClick={() => setTab('texts')}
+          className={`min-h-11 shrink-0 rounded-xl border px-4 font-black ${tab === 'texts' ? 'border-blue-700 bg-blue-700 text-white' : 'border-slate-300 bg-white text-slate-900'}`}
+        >
+          Text messages
+        </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={tab === 'voicemail'}
+          onClick={() => setTab('voicemail')}
+          className={`min-h-11 shrink-0 rounded-xl border px-4 font-black ${tab === 'voicemail' ? 'border-blue-700 bg-blue-700 text-white' : 'border-slate-300 bg-white text-slate-900'}`}
+        >
+          Voicemail
+        </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={tab === 'inbox'}
+          onClick={() => setTab('inbox')}
+          className={`min-h-11 shrink-0 rounded-xl border px-4 font-black ${tab === 'inbox' ? 'border-blue-700 bg-blue-700 text-white' : 'border-slate-300 bg-white text-slate-900'}`}
+        >
+          Calls to return{openInboxCount > 0 ? ` (${openInboxCount} open)` : ''}
+        </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={tab === 'settings'}
+          onClick={() => setTab('settings')}
+          className={`min-h-11 shrink-0 rounded-xl border px-4 font-black ${tab === 'settings' ? 'border-blue-700 bg-blue-700 text-white' : 'border-slate-300 bg-white text-slate-900'}`}
+        >
+          Settings
+        </button>
+      </div>
+      <section hidden={tab !== 'texts'} aria-label="Text messages" className="mt-4">
+        <TextWorkspace embedded />
+      </section>
+      <section hidden={tab !== 'settings'} aria-label="Availability and ringing" className="mt-4">
         <section id="phone-settings" className="scroll-mt-24 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
           <h2 className="flex items-center gap-2 text-xl font-black text-slate-950">
             <Headphones className="h-5 w-5 text-blue-700" />
@@ -1335,6 +1496,14 @@ export function ProgramHolderPhone({
               )}
               {notificationsEnabled ? 'Alerts enabled' : 'Enable missed-call alerts'}
             </button>
+            <button
+              onClick={() => void testRing()}
+              disabled={data.readOnly || callState !== 'idle'}
+              className="min-h-12 rounded-xl border border-slate-300 bg-white px-5 font-black text-slate-900 disabled:opacity-50"
+            >
+              <BellRing className="mr-2 inline h-5 w-5" />
+              {testingRing ? 'Stop test ring' : 'Test ring'}
+            </button>
           </div>
           <label className="mt-4 flex items-start gap-3 rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm font-bold text-slate-800">
             <input
@@ -1391,11 +1560,15 @@ export function ProgramHolderPhone({
           <p className="mt-4 text-xs leading-5 text-slate-500">
             For the most reliable live ringing, install the PWA and keep it open or recently active.
             If the phone is asleep, offline, outside your hours, or unanswered, PARIS takes the call
-            and sends a secure missed-call alert.
+            and sends a secure missed-call alert. Test ring plays the incoming-call sound on this
+            device so you can check the volume before a real call.
           </p>
         </section>
-      </div>
-
+        <div className="mt-6">
+          <ProgramHolderPhoneIntroduction roleLabel={roleLabel} />
+        </div>
+      </section>
+      <section hidden={tab !== 'voicemail'} aria-label="Voicemail" className="mt-4">
       <section id="phone-voicemail" className="scroll-mt-24 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
         <h2 className="text-xl font-black">Voicemail</h2>
         {data.voicemail?.items?.length ? (
@@ -1419,7 +1592,8 @@ export function ProgramHolderPhone({
           <p className="mt-3 text-sm text-slate-600">No voicemail messages.</p>
         )}
       </section>
-
+      </section>
+      <section hidden={tab !== 'inbox'} aria-label="Calls to return" className="mt-4">
       <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
         <div className="flex items-center justify-between gap-3">
           <div>
@@ -1513,7 +1687,9 @@ export function ProgramHolderPhone({
           ))}
         </div>
       </section>
-      <ProgramHolderPhoneIntroduction roleLabel={roleLabel} />
-    </main>
+      </section>
+    </div>
+  </div>
+</main>
   );
 }

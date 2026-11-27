@@ -20,6 +20,8 @@ const workers = [
   { path: 'apps/marketing/public/sw-marketing.js', cache: `elevate-marketing-${shortSha}` },
   { path: 'public/sw-admin.js', cache: `elevate-admin-${shortSha}` },
   { path: 'apps/admin/public/sw-admin.js', cache: `elevate-admin-${shortSha}` },
+  { path: 'public/sw-mail.js', cache: `elevate-mail-${shortSha}` },
+  { path: 'apps/admin/public/sw-mail.js', cache: `elevate-mail-${shortSha}` },
   { path: 'public/sw-lms.js', cache: `elevate-lms-${shortSha}` },
   { path: 'apps/lms/public/sw-lms.js', cache: `elevate-lms-${shortSha}` },
 ];

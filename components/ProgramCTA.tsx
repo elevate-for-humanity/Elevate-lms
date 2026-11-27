@@ -96,7 +96,7 @@ export default function ProgramCTA({ programName = 'this program' }: ProgramCTAP
           <div className="grid sm:grid-cols-3 gap-6 mb-8">
             <div className="bg-white rounded-lg p-6 text-slate-900"><div className="text-4xl mb-3">💬</div><h3 className="font-bold mb-2">Get Support</h3><a href="/support" className="text-brand-blue-700">Visit Support Center</a></div>
             <div className="bg-white rounded-lg p-6 text-slate-900"><div className="text-4xl mb-3">✉️</div><h3 className="font-bold mb-2">Email Us</h3><a href="/contact" className="text-brand-blue-700">our contact form</a></div>
-            <div className="bg-white rounded-lg p-6 text-slate-900"><MapPin className="w-8 h-8 mb-3 text-brand-red-500 mx-auto"/><h3 className="font-bold mb-2">Visit Us</h3><p className="text-sm">6331 N Keystone Ave<br/>Suite D<br/>Indianapolis, IN 46220</p></div>
+            <div className="bg-white rounded-lg p-6 text-slate-900"><MapPin className="w-8 h-8 mb-3 text-brand-red-500 mx-auto"/><h3 className="font-bold mb-2">Visit Us</h3><p className="text-sm">120 East Market Street<br/>Suite 930<br/>Indianapolis, IN 46204</p></div>
           </div>
           <Link href="/contact" className="inline-block px-8 py-4 bg-white text-brand-blue-700 font-bold rounded-full hover:bg-slate-50 transition-all shadow-xl text-lg">Contact Us Today</Link>
         </div>

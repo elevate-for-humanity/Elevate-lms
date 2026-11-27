@@ -8,9 +8,13 @@ const action = process.argv[2] || 'provision';
 const statePath = process.env.QA_E2E_STATE_PATH || '.qa-apprenticeship-e2e-state.json';
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
 const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const isolated = process.env.QA_ISOLATED_APPRENTICESHIP_FIXTURES === 'true';
 
 if (!supabaseUrl || !serviceRoleKey) {
   throw new Error('NEXT_PUBLIC_SUPABASE_URL/SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are required');
+}
+if (isolated && new URL(supabaseUrl).origin !== 'https://isdgjcdabhxxozarmxta.supabase.co') {
+  throw new Error('Isolated apprenticeship fixtures require the dedicated QA project');
 }
 
 const db = createClient(supabaseUrl, serviceRoleKey, {
@@ -74,7 +78,7 @@ async function must(resultPromise, label) {
   throw new Error(`${label}: exhausted retry policy`);
 }
 
-async function createQaUser(kind, role, fullName) {
+async function createQaUser(kind, role, fullName, profileTenantId) {
   const email = `${marker}-${kind}@qa.invalid`;
   const pass = password();
   const user = await createQaAuthUser({
@@ -93,7 +97,7 @@ async function createQaUser(kind, role, fullName) {
       email,
       full_name: fullName,
       role,
-      tenant_id: tenantId,
+      tenant_id: profileTenantId,
       updated_at: new Date().toISOString(),
     }, { onConflict: 'id' }),
     `upsert ${kind} profile`,
@@ -105,15 +109,6 @@ async function provision() {
   let state = { runId, marker, host: null, apprentice: null, approver: null, partnerId: null, shopId: null, hostShopId: null, enrollmentId: null, placementId: null };
 
   try {
-    const host = await createQaUser('host', 'host_shop', '[QA E2E] Host Shop Supervisor');
-    state.host = host;
-    // Persist every completed resource immediately so interrupted QA can clean it.
-    await writePrivateQaState(statePath, state);
-    const apprentice = await createQaUser('apprentice', 'apprentice', '[QA E2E] Barber Apprentice');
-    state.apprentice = apprentice;
-    // Persist every completed resource immediately so interrupted QA can clean it.
-    await writePrivateQaState(statePath, state);
-
     // Production disposables are approved by a dedicated QA approver
     // identity created by this fixture — never by a real administrator.
     // The learner gate admits a waived enrollment only with a recorded
@@ -127,7 +122,6 @@ async function provision() {
       // Persist every completed resource immediately so interrupted QA can clean it.
       await writePrivateQaState(statePath, state);
     }
-
     const program = await must(
       db.from('programs').select('id,slug,organization_id,tenant_id').eq('slug', 'barber-apprenticeship').maybeSingle(),
       'load barber apprenticeship program',
@@ -145,6 +139,35 @@ async function provision() {
       'load active Barber registered standard',
     );
     if (!standard?.standard_key) throw new Error('Active registered Barber standard is missing');
+
+    let isolatedAccess = {};
+    if (isolated) {
+      const adminEmail = process.env.E2E_ADMIN_EMAIL?.trim().toLowerCase();
+      if (!program.tenant_id || !adminEmail?.endsWith('@qa.invalid')) {
+        throw new Error('The isolated barber program and disposable QA approval identity are required');
+      }
+      const admin = await must(
+        db.from('profiles').select('id').eq('email', adminEmail).eq('tenant_id', program.tenant_id)
+          .in('role', ['admin', 'super_admin']).maybeSingle(),
+        'verify isolated enrollment approval identity',
+      );
+      if (!admin?.id) throw new Error('The disposable approval identity does not belong to the QA tenant');
+      isolatedAccess = {
+        payment_status: 'paid',
+        amount_paid_cents: 0,
+        approved_at: new Date().toISOString(),
+        approved_by: admin.id,
+        access_status: 'active',
+      };
+    }
+
+    const profileTenantId = isolated ? program.tenant_id : tenantId;
+    const host = await createQaUser('host', 'host_shop', '[QA E2E] Host Shop Supervisor', profileTenantId);
+    state.host = host;
+    await writePrivateQaState(statePath, state);
+    const apprentice = await createQaUser('apprentice', 'apprentice', '[QA E2E] Barber Apprentice', profileTenantId);
+    state.apprentice = apprentice;
+    await writePrivateQaState(statePath, state);
 
     const partner = await must(
       db.from('partners').insert({
@@ -295,6 +318,7 @@ async function provision() {
         funding_source: 'SELF_PAY',
         funding_pathway: 'qa_e2e',
         ...enrollmentPayment,
+        ...isolatedAccess,
         funding_verified: false,
         organization_id: program.organization_id,
         tenant_id: program.tenant_id || tenantId,

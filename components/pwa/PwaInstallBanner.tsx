@@ -56,7 +56,16 @@ export function PwaInstallBanner({
   }, [storageKey]);
 
   // Installation is optional; never cover an on-screen film or its controls.
-  if (!pageSettled || isInstalled || bannerDismissed || videoVisible) return null;
+  // The phone page shows its own Elevate Phone install prompt; never promote
+  // the dashboard app there, or the wrong PWA gets installed.
+  if (
+    !pageSettled ||
+    isInstalled ||
+    bannerDismissed ||
+    videoVisible ||
+    pathname?.startsWith('/communications/phone')
+  )
+    return null;
 
   const isIos = platform === 'ios';
   if (!canInstall && !isIos) return null;

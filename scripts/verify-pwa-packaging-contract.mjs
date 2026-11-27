@@ -30,7 +30,7 @@ const services = {
     appDir: 'apps/admin',
     worker: 'sw-admin.js',
     cachePrefix: 'elevate-admin-',
-    files: ['sw-admin.js', 'manifest-admin.json', 'offline.html', 'sw-phone.js', 'manifest-phone.json'],
+    files: ['sw-admin.js', 'manifest-admin.json', 'sw-mail.js', 'manifest-mail.json', 'offline.html', 'sw-phone.js', 'manifest-phone.json'],
   },
 };
 
@@ -115,8 +115,11 @@ for (const [service, config] of Object.entries(services)) {
 
     if (canonical === null || runtime === null) continue;
 
-    if (filename === config.worker) {
-      const normalizedRuntime = normalizeStampedWorker(runtime, config.cachePrefix);
+    // Sibling application workers (Elevate Mail's sw-mail.js inside the
+    // Admin build) stamp with their own cache prefix, not the service's.
+    const stampPrefix = filename === 'sw-mail.js' ? 'elevate-mail-' : config.cachePrefix;
+    if (filename === config.worker || filename === 'sw-mail.js') {
+      const normalizedRuntime = normalizeStampedWorker(runtime, stampPrefix);
       if (canonical !== normalizedRuntime) {
         fail(`${service} runtime worker differs from canonical public/${filename} beyond the expected cache-version stamp`);
       }

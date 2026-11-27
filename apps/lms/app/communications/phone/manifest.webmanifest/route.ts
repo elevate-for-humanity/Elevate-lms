@@ -4,7 +4,7 @@ export function GET(){return Response.json({
   "short_name": "Phone",
   "description": "Elevate phone dial pad and voicemail",
   "start_url": "/communications/phone",
-  "scope": "/",
+  "scope": "/communications/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#1E3A5F",

@@ -20,3 +20,13 @@ it('loads the chat only when opened, keeps the portal identity and closes with E
   fireEvent.keyDown(window, { key: 'Escape' });
   expect(screen.queryByRole('dialog')).toBeNull();
 });
+
+it('opens the public chat without waiting for an on-click import', async () => {
+  const { PublicParisLauncher } = await import('../../apps/marketing/app/PublicParisLauncher');
+  render(<PublicParisLauncher />);
+
+  fireEvent.click(screen.getByRole('button', { name: 'Open PARIS Career Assistant' }));
+
+  expect(screen.getByText('Chat ready for')).toBeTruthy();
+  expect(screen.queryByText('Opening PARIS…')).toBeNull();
+});

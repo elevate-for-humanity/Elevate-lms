@@ -4,7 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 const mock = vi.hoisted(() => ({ create: vi.fn(), unlock: vi.fn().mockResolvedValue(true), handlers: {} as Record<string, (value?: any) => void> }));
 vi.mock('@/lib/phone/browser-client', () => ({ createPhoneClient: mock.create, phoneDestination: (value: string) => value }));
 vi.mock('@/lib/notifications/push-client', () => ({ getPushNotificationClient: vi.fn() }));
-vi.mock('@/lib/notifications/audio-unlock', () => ({ installAudioUnlock: () => () => {}, startRingtone: vi.fn(), stopRingtone: vi.fn(), unlockAudio: mock.unlock }));
+vi.mock('@/lib/notifications/audio-unlock', () => ({ installAudioUnlock: () => () => {}, onRingtoneStatusChange: () => () => {}, startRingtone: vi.fn(), stopRingtone: vi.fn(), unlockAudio: mock.unlock }));
 vi.mock('@/components/program-holder/ProgramHolderPhoneIntroduction', () => ({ ProgramHolderPhoneIntroduction: () => null }));
 import { ProgramHolderPhone } from '@/components/program-holder/ProgramHolderPhone';
 const data = { readOnly: false, phoneNumber: '', system: { name: 'Isolated fixture', timezone: 'UTC', status: 'active' },

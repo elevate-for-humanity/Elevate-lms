@@ -21,7 +21,7 @@ export async function smokeProbe(url, options={}, timeoutMs=10000, responseType=
       // transport uncertainty: do not allow a later healthy request to mask it.
       const beforeHeaders = error?.headersReceived === false;
       const retryable = beforeHeaders && (
-        /^Smoke HTTP response timed out after \d+ ms$/.test(message) ||
+        /^Smoke HTTP response(?: for \/\S*)? timed out after \d+ ms$/.test(message) ||
         message === 'fetch failed' || error?.name === 'AbortError'
       );
       if (!retryable || attempt===attempts) {

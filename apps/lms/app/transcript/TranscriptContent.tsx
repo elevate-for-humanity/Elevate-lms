@@ -74,7 +74,7 @@ export default function TranscriptContent({
               {PLATFORM_DEFAULTS.orgName} Career &amp; Technical Institute
             </h1>
             <p className="text-sm text-slate-500 mt-1">
-              6331 N Keystone Ave, Suite D, Indianapolis, IN 46220
+              120 East Market Street, Suite 930, Indianapolis, IN 46204
             </p>
             <p className="text-xs text-slate-400 mt-1">
               ETPL Listed · DOL Registered Apprenticeship #2025-IN-132301

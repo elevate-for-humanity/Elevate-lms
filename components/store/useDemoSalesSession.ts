@@ -48,9 +48,10 @@ export function useDemoSalesSession(productKey: string, scenarioKey?: string) {
       try {
         const existing = window.sessionStorage.getItem(storageKey);
         if (existing) {
-          const response = await fetch(`/api/store/demo/session?token=${encodeURIComponent(existing)}`, {
+          const response = await fetch('/api/store/demo/session', {
             method: 'GET',
             cache: 'no-store',
+            headers: { 'x-demo-session-token': existing },
           });
           const payload = await response.json().catch(() => ({}));
           if (response.ok && typeof payload?.demo?.session_token === 'string') {

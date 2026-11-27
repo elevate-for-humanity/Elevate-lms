@@ -1,5 +1,6 @@
 import {expect,it} from 'vitest';
 import {budgetRepairMessages,repairCompletionTokens,repairRetryGoal,REPAIR_INFERENCE_TIMEOUT_MS,REPAIR_MODEL_PROBE_TIMEOUT_MS} from '@/lib/devstudio/repair-inference-budget.mjs';
+import {budgetRepairTurn,estimatePromptTokens} from '@/lib/devstudio/repair-inference-time-budget.mjs';
 import {elevateCompletionBudget} from '@/lib/ai/providers/elevate';
 it('retains task authority while fitting eight large source observations in the owned context',()=>{
  const task='Fix the known bug. Preserve all existing learner records.';
@@ -70,4 +71,24 @@ it('preserves a 11965-character source-free repair goal using configured 8K CPU 
  expect(JSON.parse(output[1].content).task).toBe(task);
  expect(output[1].content).toContain('Partial diagnostic excerpt');
  expect(()=>budgetRepairMessages(messages,4096,512,'cpu')).toThrow('PARIS_REPAIR_TASK_EXCEEDS_MODEL_CONTEXT');
+});
+
+it('never admits a CPU prompt the time budget cannot process (budget coordination)',()=>{
+ // e1dcee6e shape: small immutable task, observations piled up across
+ // turns. The context cap alone admitted ~2157 tokens, which the 210s
+ // guard then deferred (PARIS_REPAIR_TURN_EXCEEDS_TIME_BUDGET) and the
+ // repair died at preparation. The coordinated cap admits at most the
+ // guard's own ceiling (1482 tokens at the planning rates).
+ const system={role:'system',content:'Repair rules and authority. '.repeat(20)};
+ const task='Diagnose and correct the failed Course Builder job; preserve the checkpoint.';
+ const messages=[system,{role:'user',content:JSON.stringify({task,turn:3,observations:Array.from({length:8},(_,i)=>`READ lib/file-${i}.ts: `+'exact source line\n'.repeat(300))})}];
+ const out=budgetRepairMessages(messages,8192,384,'cpu');
+ expect(out[0]).toBe(system);
+ expect(JSON.parse(out[1].content).task).toBe(task);
+ expect(out[1].content).toContain('READ lib/file-');
+ expect(estimatePromptTokens(out as any)).toBeLessThanOrEqual(1482);
+ expect(budgetRepairTurn({messages:out as any,maxTokens:384,deadlineMs:REPAIR_INFERENCE_TIMEOUT_MS,tier:'cpu'}).fits).toBe(true);
+ // GPU turns are not time-budgeted; their window is unchanged.
+ const gpu=budgetRepairMessages(messages,8192,2400,'gpu');
+ expect(estimatePromptTokens(gpu as any)).toBeGreaterThan(1482);
 });

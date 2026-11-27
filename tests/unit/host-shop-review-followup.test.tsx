@@ -8,7 +8,10 @@ const fixtures = vi.hoisted(() => ({
   approved: { id: 'dbo', publicSlug: 'dbo-hair-studios-cddf6115', name: 'DBO Hair Studios', address: '2626 W Washington St, Indianapolis, IN 46222', city: 'Indianapolis', state: 'IN', zip: '46222', programs: ['cosmetology-apprenticeship'], videoUrl: '/uploaded-dbo.mp4' },
   profile: { public_slug: 'dbo-hair-studios-cddf6115', media_gallery: [{ url: '/profile-only.webp', alt: 'Saved profile photograph' }], video_url: '/old-profile-tour.mp4' } as { public_slug: string; media_gallery: {url: string; alt: string}[]; video_url: string } | null,
 }));
-vi.mock('@/lib/programs/host-shop-network', () => ({ getHostShopNetwork: async () => [{ ...fixtures.approved, slug: fixtures.approved.publicSlug, description: 'DBO approved portfolio', gallery: [{ url: '/images/host-shops/dbo-hair-studios/evelyn.webp', alt: 'Network portrait' }], videoUrl: '/network-dbo.mp4' }] }));
+vi.mock('@/lib/programs/host-shop-network', async (importOriginal) => ({
+  ...await importOriginal<typeof import('@/lib/programs/host-shop-network')>(),
+  getHostShopNetwork: async () => [{ ...fixtures.approved, slug: fixtures.approved.publicSlug, description: 'DBO approved portfolio', gallery: [{ url: '/images/host-shops/dbo-hair-studios/evelyn.webp', alt: 'Network portrait' }], videoUrl: '/network-dbo.mp4' }],
+}));
 vi.mock('@/lib/programs/host-shops', () => ({ getApprovedShopByPublicSlug: async () => fixtures.approved }));
 vi.mock('@/lib/partners/public-host-shops', () => ({ getPublicHostShopBySlug: async () => fixtures.profile }));
 vi.mock('@/components/partners/HostShopMediaCarousel', () => ({ default: ({items, videoUrl, videoScript}: {videoScript?: string; items: {url: string; alt?: string}[]; videoUrl?: string}) => <div data-video-script={videoScript}>{items.map(item => <img key={item.url} src={item.url} alt={item.alt} />)}{videoUrl && <video aria-label="Shop video" src={videoUrl} />}</div> }));

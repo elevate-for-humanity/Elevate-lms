@@ -72,7 +72,7 @@ export async function POST(
   }
 
   const result = await publishProgram(db, programId, auth.id);
-  if (!result.ok) return safeError(result.error ?? 'Publish failed', 500);
+  if (!result.ok) return safeError(result.error ?? 'Publish failed', result.blocked ? 422 : 500);
 
   return NextResponse.json({ ok: true, version: result.version });
 }

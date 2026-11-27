@@ -12,10 +12,18 @@ import { checkAndSendOnboardingCompleteEmail } from '@/lib/program-holder/onboar
 import {
   ACHIEVE_HOLDER_ID,
   achieveCnaAgreements,
+  achieveCnaRevisionId,
   achieveDocumentVersion,
   type AchieveDocument,
 } from '@/lib/program-holder/achieve-cna-agreements';
 import { paymentAddendum } from '@/lib/program-holder/payment-addendum';
+import {
+  INSTRUCTOR_CURRICULUM_IP_AGREEMENT_TYPE,
+  INSTRUCTOR_CURRICULUM_IP_VERSION_HASHES,
+  getCurrentInstructorCurriculumAgreement,
+  issueInstructorCurriculumLicense,
+  logInstructorLicenseEvent,
+} from '@/lib/legal/instructorCurriculumLicense';
 
 export async function signAgreement(data: {
   agreementType: string;
@@ -24,6 +32,7 @@ export async function signAgreement(data: {
   signature?: string;
   typedName?: string;
   studentId?: string;
+  renewalLicenseId?: string;
 }) {
   const supabase = await createClient();
   const {
@@ -40,12 +49,36 @@ export async function signAgreement(data: {
 
   const signingMou = data.agreementType === 'program_holder_mou';
   const signingAchieveNda = data.agreementType === 'nda' && data.agreementVersion?.startsWith('achieve-cna-');
+  // Proprietary-curriculum IP license: only instructors sign it, only the
+  // current published version counts, and signing must also issue the
+  // version-scoped license row (acceptance alone does not authorize access).
+  const signingCurriculumIp =
+    data.agreementType === INSTRUCTOR_CURRICULUM_IP_AGREEMENT_TYPE;
+  if (signingCurriculumIp && profile?.role !== 'instructor') {
+    return { success: false, error: 'Only instructors can sign the instructor license agreement.' };
+  }
+  let curriculumIpCurrent: { version: string; hash: string | null } | null = null;
+  if (signingCurriculumIp) {
+    const adminDb = await requireAdminClient();
+    curriculumIpCurrent = await getCurrentInstructorCurriculumAgreement(adminDb);
+    const expectedHash = INSTRUCTOR_CURRICULUM_IP_VERSION_HASHES[curriculumIpCurrent.version];
+    if (!expectedHash) {
+      return { success: false, error: 'The instructor license agreement is not published in this release.' };
+    }
+    if (data.agreementVersion !== curriculumIpCurrent.version) {
+      return { success: false, error: 'The agreement changed. Reload and review the current terms before signing.' };
+    }
+    if (curriculumIpCurrent.hash && curriculumIpCurrent.hash !== expectedHash) {
+      return { success: false, error: 'The agreement text changed under its version. Reload and review the current terms before signing.' };
+    }
+  }
   let signingPaymentAddendum = false;
   let holderId: string | undefined;
   let achieveSignature: {
     kind: AchieveDocument;
     features: Record<string, unknown>;
     packet: Record<string, unknown>;
+    revisionId: string;
     updatedAt: string | null;
   } | undefined;
   if (signingMou || signingAchieveNda) {
@@ -65,8 +98,10 @@ export async function signAgreement(data: {
         return { success: false, error: 'Your agreement will be available after approval.' };
       }
       const approved = achieveCnaAgreements(holder.features);
+      const revisionId = achieveCnaRevisionId(holder.features);
       const kind = signingAchieveNda ? 'nda' : 'mou';
-      if (!approved || data.agreementVersion !== achieveDocumentVersion(kind, approved.digest)) {
+      if (!approved?.signingArtifactComplete || !revisionId ||
+          data.agreementVersion !== achieveDocumentVersion(kind, approved.digest, revisionId)) {
         return { success: false, error: 'The finalized CNA agreement is unavailable or changed. Open the current agreement before signing.' };
       }
       if (!['checkbox', 'typed', 'drawn'].includes(data.method) ||
@@ -74,7 +109,13 @@ export async function signAgreement(data: {
           (data.method === 'drawn' && !data.signature?.startsWith('data:image/png;base64,'))) {
         return { success: false, error: 'Enter a valid signature for the current agreement.' };
       }
-      achieveSignature = { kind, features: holder.features, packet: approved.packet, updatedAt: holder.updated_at };
+      achieveSignature = {
+        kind,
+        features: holder.features,
+        packet: approved.packet,
+        revisionId,
+        updatedAt: holder.updated_at,
+      };
     } else if (signingAchieveNda || (!signingPaymentAddendum && data.agreementVersion !== `3.0-${holderId}`)) {
       return { success: false, error: 'The agreement changed. Reload and review the current terms before signing.' };
     }
@@ -102,13 +143,69 @@ export async function signAgreement(data: {
     signatureData: data.method === 'drawn' ? data.signature : undefined,
     ipAddress,
     userAgent,
-    context: achieveSignature ? `achieve-cna-${achieveSignature.kind}` : 'onboarding',
+    context: achieveSignature ? `achieve-cna-${achieveSignature.kind}:${achieveSignature.revisionId}` : 'onboarding',
+    documentUrl: achieveSignature
+      ? `db://public.achieve_cna_packet_revisions/${achieveSignature.revisionId}`
+      : undefined,
     organizationId: profile?.organization_id || undefined,
     tenantId: profile?.tenant_id || undefined,
   });
 
   if (!result.success)
     return { success: false, error: result.error || 'Agreement could not be recorded.' };
+
+  if (signingCurriculumIp && curriculumIpCurrent) {
+    const adminDb = await requireAdminClient();
+    const expectedHash = INSTRUCTOR_CURRICULUM_IP_VERSION_HASHES[curriculumIpCurrent.version];
+    const { data: assignments } = await adminDb
+      .from('instructor_assignments')
+      .select('course_id,program_id')
+      .eq('instructor_id', user.id)
+      .eq('active', true);
+    const scopeCourseIds = [...new Set((assignments ?? []).map((row: any) => row.course_id).filter(Boolean))].map(String);
+    const scopeProgramIds = [...new Set((assignments ?? []).map((row: any) => row.program_id).filter(Boolean))].map(String);
+    let license;
+    try {
+      license = await issueInstructorCurriculumLicense(adminDb, {
+        userId: user.id,
+        agreementVersion: curriculumIpCurrent.version,
+        agreementHash: expectedHash,
+        scopeCourseIds,
+        programIds: scopeProgramIds,
+        signatureReceipt: {
+          renewalLicenseId: data.renewalLicenseId,
+          acceptanceId: result.id!, signedAt: new Date().toISOString(),
+          signerName, signerEmail: user.email, method: data.method,
+          signature: data.method === 'drawn' ? data.signature || '' : signerName,
+          ipAddress, userAgent,
+        },
+      });
+    } catch (error) {
+      return {
+        success: false,
+        error:
+          'Your signature was recorded but the instructor license could not be issued. Sign again to finish activation.',
+      };
+    }
+    await logInstructorLicenseEvent(adminDb, {
+      userId: user.id,
+      action: 'instructor_curriculum_ip.signed',
+      details: {
+        agreement_version: curriculumIpCurrent.version,
+        agreement_hash: expectedHash,
+        license_reference: license.licenseReference,
+        already_active: license.alreadyActive,
+      },
+      ipAddress,
+    });
+    return {
+      success: true,
+      id: result.id,
+      alreadyExists: result.alreadyExists,
+      licenseReference: license.licenseReference,
+      timestamp: new Date().toISOString(),
+    };
+  }
 
   if (holderId && (achieveSignature || (signingMou && !signingPaymentAddendum))) {
     const db = await requireAdminClient();
@@ -129,6 +226,7 @@ export async function signAgreement(data: {
           ...achieveSignature.features,
           [`achieve_cna_signed_${achieveSignature.kind}`]: {
             packet: achieveSignature.packet,
+            revision_id: achieveSignature.revisionId,
             version: data.agreementVersion,
             acceptance_id: result.id,
             signed_at: signedAt,

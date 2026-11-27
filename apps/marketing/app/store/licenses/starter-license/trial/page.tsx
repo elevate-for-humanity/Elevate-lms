@@ -254,7 +254,7 @@ export default function StarterTrialPage() {
               </button>
 
               <p className="text-xs text-slate-500 text-center">
-                Platform trial does not require a card. License purchase uses secure Stripe checkout
+                Platform trial does not require a card. License purchase creates a QuickBooks invoice
                 (sign-in required).
               </p>
             </form>
@@ -267,7 +267,7 @@ export default function StarterTrialPage() {
                 </div>
                 <div className="flex items-center gap-1">
                   <Clock className="w-4 h-4" />
-                  Cancel anytime
+                  No payment for trial
                 </div>
               </div>
             </div>

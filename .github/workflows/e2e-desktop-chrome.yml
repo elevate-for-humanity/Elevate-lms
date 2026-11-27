@@ -180,7 +180,7 @@ jobs:
     name: E2E desktop-chrome
     runs-on: ubuntu-24.04
     needs: [desktop-chrome-shard]
-    if: ${{ always() }}
+    if: ${{ !cancelled() }}
     steps:
       - name: Require successful desktop results from the full matrix
         env:

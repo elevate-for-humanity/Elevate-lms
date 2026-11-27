@@ -566,7 +566,7 @@ export const footerNavigation = {
       { label: 'Ecosystem', href: '/ecosystem' },
       { label: 'Email', href: '/email' },
       { label: 'Government', href: '/government' },
-      { label: 'For Students', href: '/for-students' },
+      { label: 'For Students', href: '/programs' },
       { label: 'For Employers', href: '/for-employers' },
       { label: 'Portals', href: '/portals' },
       { label: 'Mobile App', href: '/mobile-app' },
@@ -739,7 +739,7 @@ export const contactInfo = {
   phone: '1-800-ELEVATE (353-8283)',
   email: 'info@www.elevateforhumanity.org',
   address: {
-    street: '120 E Market St Suite 120',
+    street: '120 E Market St, Suite 930',
     city: 'Indianapolis',
     state: 'IN',
     zip: '46204',

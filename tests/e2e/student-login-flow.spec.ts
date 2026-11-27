@@ -18,6 +18,7 @@ import { appOrigin } from './helpers/app-origins';
 import { test, expect } from '@playwright/test';
 
 const BASE = appOrigin('lms');
+const MARKETING = appOrigin('marketing');
 const STUDENT_EMAIL = process.env.TEST_STUDENT_EMAIL || '';
 const STUDENT_PASSWORD = process.env.TEST_STUDENT_PASSWORD || '';
 const HAS_CREDENTIALS = !!STUDENT_EMAIL && !!STUDENT_PASSWORD;
@@ -49,8 +50,12 @@ test.describe('Public routes', () => {
     expect(res?.status()).toBeLessThan(500);
   });
 
-  test('/onboarding/learner redirects unauthenticated users to /login', async ({ page }) => {
-    await page.goto(`${BASE}/onboarding/learner`, { waitUntil: 'domcontentloaded' });
+  test('/lms/onboarding redirects unauthenticated users to /login', async ({ page }) => {
+    // Learner onboarding lives on the LMS origin as /lms/onboarding
+    // (apps/lms/app/lms/(app)/onboarding). /onboarding/learner is a
+    // Marketing route (apps/marketing/app/onboarding/learner) and 404s on
+    // this origin, so it can never redirect to /login here.
+    await page.goto(`${BASE}/lms/onboarding`, { waitUntil: 'domcontentloaded' });
     await expect(page).toHaveURL(/\/login/);
   });
 });
@@ -103,15 +108,20 @@ test.describe('Authenticated student flow', () => {
     expect(hasStudentContent, 'Dashboard body has no student content').toBe(true);
   });
 
-  test('profile_missing redirect goes to /onboarding/learner not /unauthorized', async ({ page }) => {
+  test('profile_missing redirect goes to /lms/onboarding not /unauthorized', async ({ page }) => {
     // Simulate the profile_missing path by checking the redirect target in requireRole
     // We can't easily simulate a missing profile in E2E, but we can verify the
-    // /onboarding/learner?reason=profile_missing URL renders without error
-    await page.goto(`${BASE}/onboarding/learner?reason=profile_missing`, {
+    // /lms/onboarding?reason=profile_missing URL renders without error.
+    // /onboarding/learner is a Marketing route and 404s on the LMS origin.
+    await page.goto(`${BASE}/lms/onboarding?reason=profile_missing`, {
       waitUntil: 'domcontentloaded',
     });
-    // Should render the onboarding page, not redirect to /unauthorized
+    // The legacy LMS path must reach the existing Marketing-owned checklist,
+    // including its query, rather than passing this test with a 404 document.
+    await expect(page).toHaveURL(url => url.origin === new URL(MARKETING).origin && url.pathname === '/onboarding/learner' && url.searchParams.get('reason') === 'profile_missing');
+    await expect(page.getByRole('heading', { level: 1, name: /Welcome to/ })).toBeVisible();
     expect(page.url()).not.toContain('/unauthorized');
+    await page.waitForLoadState('load');
     const status = await page.evaluate(() => document.readyState);
     expect(status).toBe('complete');
   });

@@ -1,3 +1,6 @@
+import { Suspense } from 'react';
+// Branch refreshed to pick up main (a11d77d8): CI Preflight test fixes for the worker-start dispatcher/resume changes.
+// Branch refreshed to pick up main (e8b0e402): fresh CI after E2E shard 4/4 runner died mid-step on the fcad399b-era base (no test verdict produced).
 import { redirect } from 'next/navigation';
 import PodcastProgramGuideReview from '@/components/admin/PodcastProgramGuideReview';
 import { Metadata } from 'next';
@@ -45,7 +48,9 @@ export default async function AdminDashboardPage() {
   return (
     <>
       <div className="px-3 pt-4 sm:px-5 lg:px-6">
-        <EmailAccountNotice href="/phone/email" userId={user.id} personalOnly />
+        <Suspense fallback={null}>
+          <EmailAccountNotice href="/phone/email" userId={user.id} personalOnly />
+        </Suspense>
         <div className="mt-3 flex flex-wrap gap-3">
           <Link href="/calendar" className="rounded-lg bg-blue-700 px-4 py-3 font-bold text-white">Calendar and Google appointments</Link>
           <Link href="/settings/notifications" className="rounded-lg border bg-white px-4 py-3 font-bold">Cellphone email alerts</Link>

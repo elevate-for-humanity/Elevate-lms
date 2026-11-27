@@ -1,6 +1,6 @@
 'use client';
 
-import { lazy, Suspense, useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useRef, useState, type ComponentProps, type ComponentType, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { usePathname } from 'next/navigation';
 import { X, MessageCircle, Mic } from 'lucide-react';
@@ -9,7 +9,7 @@ import type { ParisLearnerContext } from './ParisFloatingWrapper';
 import { PARIS_PORTAL_ISSUE_EVENT, reportPortalWorkflowIssue, type PortalIssueReceipt, type PortalSupportIssue } from '@/lib/paris/portal-support';
 import { useHvacVideoDock } from '@/hooks/useHvacVideoDock';
 
-const ParisChat = lazy(() => import('./ParisChat'));
+const LazyParisChat = lazy(() => import('./ParisChat'));
 
 export function ParisFloatingButton({
   surface = 'public',
@@ -19,7 +19,8 @@ export function ParisFloatingButton({
   portalRole,
   personName,
   autoOpenOnDashboard = false,
-}: ParisLearnerContext) {
+  Chat = LazyParisChat,
+}: ParisLearnerContext & { Chat?: ComponentType<ComponentProps<typeof LazyParisChat>> }) {
   const [isOpen, setIsOpen] = useState(false);
   const [showWelcome, setShowWelcome] = useState(false);
   const [portalIssue, setPortalIssue] = useState<PortalSupportIssue | null>(null);
@@ -174,7 +175,7 @@ export function ParisFloatingButton({
                   </p>
                 }
               >
-                <ParisChat
+                <Chat
                   showHeader={false}
                   surface={surface}
                   courseTitle={courseTitle}

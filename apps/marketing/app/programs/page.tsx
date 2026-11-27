@@ -1,3 +1,4 @@
+import { isEmtInquiryOnly } from '@/lib/programs/emt-inquiry-only';
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import { ArrowRight, BriefcaseBusiness } from 'lucide-react';
@@ -8,6 +9,7 @@ import {
 } from '@/lib/programs/public-programs-page';
 import { WORKONE_INDY_INTAKE_URL } from '@/lib/programs/funding-registry';
 import { ProgramsExplorer } from './ProgramsExplorer';
+import PublicCatalogCard from '@/components/programs/PublicCatalogCard';
 import { HomeProgramShowcase } from '@/components/home/HomeProgramShowcase';
 
 // Cache the public catalog briefly so every visit does not block on a fresh database query.
@@ -20,12 +22,14 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function ProgramsPage() {
   const { programs } = await getPublicProgramsPageData();
+  const inquiryOnly = programs.filter((program) => isEmtInquiryOnly(program.slug));
+  const enrollmentPrograms = programs.filter((program) => !isEmtInquiryOnly(program.slug));
   const isApprenticeship = (program: (typeof programs)[number]) =>
     program.category.toLowerCase().includes('apprenticeship') ||
     program.slug.includes('apprenticeship') ||
     program.title.toLowerCase().includes('apprenticeship');
-  const apprenticeships = programs.filter(isApprenticeship);
-  const careerTraining = programs.filter((program) => !isApprenticeship(program));
+  const apprenticeships = enrollmentPrograms.filter(isApprenticeship);
+  const careerTraining = enrollmentPrograms.filter((program) => !isApprenticeship(program));
   const funded = careerTraining.filter((program) => program.funding_tier === 'workforce-funded');
   const selfPay = careerTraining.filter((program) => program.funding_tier === 'self-pay');
 
@@ -79,6 +83,18 @@ export default async function ProgramsPage() {
           <ProgramsExplorer programs={selfPay} />
         </div>
       </section>
+
+      {inquiryOnly.length > 0 && (
+        <section className="border-t border-slate-200 bg-slate-50 py-12 sm:py-16">
+          <div className="mx-auto max-w-6xl px-4 sm:px-6">
+            <h2 className="text-3xl font-black text-slate-950">Training inquiries</h2>
+            <p className="mt-3 text-slate-700">Ask about future training. These programs are not open for enrollment or payment.</p>
+            <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {inquiryOnly.map((program) => <PublicCatalogCard key={program.slug} program={program} />)}
+            </div>
+          </div>
+        </section>
+      )}
 
       <section className="bg-slate-950 py-14 text-white">
         <div className="mx-auto max-w-4xl px-6 text-center">

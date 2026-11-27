@@ -44,7 +44,8 @@ const config = {
     appDir: 'apps/admin',
     worker: 'sw-admin.js',
     cachePrefix: 'elevate-admin-',
-    files: ['sw-admin.js', 'manifest-admin.json', 'offline.html'],
+    files: ['sw-admin.js', 'manifest-admin.json', 'sw-mail.js', 'manifest-mail.json', 'offline.html'],
+    extraWorkers: [{ file: 'sw-mail.js', cachePrefix: 'elevate-mail-' }],
   },
 };
 
@@ -102,15 +103,24 @@ function resolveBuildSha() {
 
 const sha = resolveBuildSha();
 if (sha && /^[a-f0-9]{7,40}$/i.test(sha)) {
-  const workerPath = join(targetDir, config[service].worker);
-  const workerSource = readFileSync(workerPath, 'utf8');
-  const cacheVersion = `${config[service].cachePrefix}${sha.slice(0, 12)}`;
-  const stamped = workerSource.replaceAll('__CACHE_VERSION__', cacheVersion);
-  if (stamped.includes('__CACHE_VERSION__')) {
-    throw new Error(`[sync-pwa-public] Failed to stamp ${workerPath}`);
+  // A service can host a sibling application worker (Elevate Mail's
+  // sw-mail.js ships inside the Admin build); every copied worker gets
+  // stamped with its own cache prefix.
+  const stampTargets = [
+    { file: config[service].worker, cachePrefix: config[service].cachePrefix },
+    ...(config[service].extraWorkers ?? []),
+  ];
+  for (const target of stampTargets) {
+    const workerPath = join(targetDir, target.file);
+    const workerSource = readFileSync(workerPath, 'utf8');
+    const cacheVersion = `${target.cachePrefix}${sha.slice(0, 12)}`;
+    const stamped = workerSource.replaceAll('__CACHE_VERSION__', cacheVersion);
+    if (stamped.includes('__CACHE_VERSION__')) {
+      throw new Error(`[sync-pwa-public] Failed to stamp ${workerPath}`);
+    }
+    writeFileSync(workerPath, stamped, 'utf8');
+    console.log(`[sync-pwa-public] ${service}: stamped ${target.file} → ${cacheVersion}`);
   }
-  writeFileSync(workerPath, stamped, 'utf8');
-  console.log(`[sync-pwa-public] ${service}: stamped ${config[service].worker} → ${cacheVersion}`);
 }
 
 console.log(

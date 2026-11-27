@@ -1,4 +1,5 @@
 import { healthPassed } from './audit-runtime-parity.mjs';
+import { imageRelationship } from './verify-image-provenance.mjs';
 
 export const components = ['marketing', 'admin', 'lms', 'store'];
 export const domains = {
@@ -42,7 +43,7 @@ export function evaluateRevision(component, service, revision) {
   ];
 }
 
-export function evaluateApplication(component, probes, revisionImage, commitImage, expectedCommit = '') {
+export function evaluateApplication(component, probes, revisionImage, commitImage, expectedCommit = '', commitIndex) {
   const direct = probes.find(p => p.surface === 'google' && p.path === '/api/health');
   const health = probes.filter(p => p.path === '/api/health');
   const readiness = probes.filter(p => p.path === '/api/ready');
@@ -50,6 +51,7 @@ export function evaluateApplication(component, probes, revisionImage, commitImag
   const shaValid = /^[a-f0-9]{40}$/.test(commit ?? '');
   const expectedCount = domains[component].length + 1; // Google URL and each public host (apex checked through canonical redirect).
   const allPresent = health.length === expectedCount && readiness.length === expectedCount;
+  const provenance = imageRelationship(component, revisionImage, commitImage, commitIndex);
   return [
     result('APPLICATION_IDENTITY_VERIFIED', allPresent && [...health, ...readiness].every(p => p.body?.service === component),
       { expected: component, observed: [...health, ...readiness].map(p => ({ surface: p.surface, service: p.body?.service })) }),
@@ -58,8 +60,7 @@ export function evaluateApplication(component, probes, revisionImage, commitImag
     result('PUBLIC_HEALTHY', allPresent && probes.every(p => p.path === '/' || p.path === '/store'
       ? p.status === 200 : healthPassed(component, p.path, p.status, p.body)),
     { results: probes.map(p => ({ surface: p.surface, path: p.path, status: p.status })) }),
-    result('DEPLOYED_COMMIT_VERIFIED', allPresent && shaValid && digestPattern.test(revisionImage ?? '') &&
-      commitImage === revisionImage && health.every(p => p.body?.commit === commit) && readiness.every(p => p.body?.commit === commit) && (!expectedCommit || commit === expectedCommit),
-    { directCommit: commit, expectedCommit: expectedCommit || undefined, publicCommits: health.filter(p => p.surface !== 'google').map(p => ({ surface: p.surface, commit: p.body?.commit })), revisionImage, commitImage }),
+    result('DEPLOYED_COMMIT_VERIFIED', allPresent && shaValid && provenance !== 'unverified' && health.every(p => p.body?.commit === commit) && readiness.every(p => p.body?.commit === commit) && (!expectedCommit || commit === expectedCommit),
+    { directCommit: commit, expectedCommit: expectedCommit || undefined, publicCommits: health.filter(p => p.surface !== 'google').map(p => ({ surface: p.surface, commit: p.body?.commit })), revisionImage, commitImage, imageRelationship: provenance }),
   ];
 }

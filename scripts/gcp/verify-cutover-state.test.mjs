@@ -1,6 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import './verify-image-provenance.test.mjs';
 import { domains, evaluateRevision, evaluateApplication } from './verify-cutover-state.mjs';
 import { verifyDns, parseAnswer, backendForHost } from './verify-production-dns.mjs';
 
@@ -112,4 +114,20 @@ test('trusted workflow invokes testable verifier and never confuses dispatch wit
   assert.match(yml, /Deploy LMS automatically on Google/);
   assert.match(yml, /run: node scripts\/gcp\/verify-google-cutover.mjs/);
   assert.match(yml, /if: always\(\)/);
+});
+
+test('verified image index cannot bypass exact serving SHA or public readiness identity', () => {
+  const index = Buffer.from(JSON.stringify({ schemaVersion: 2, mediaType: 'application/vnd.oci.image.index.v1+json', manifests: [
+    { mediaType: 'application/vnd.oci.image.manifest.v1+json', digest: 'sha256:' + 'b'.repeat(64), size: 123, platform: { os: 'linux', architecture: 'amd64' } },
+  ] }));
+  const parent = image.replace('b'.repeat(64), createHash('sha256').update(index).digest('hex'));
+  const good = evaluateApplication('admin', probes(), image, parent, sha, index).find(c => c.name === 'DEPLOYED_COMMIT_VERIFIED');
+  assert.equal(good.status, 'PASS');
+  assert.equal(good.evidence.imageRelationship, 'linux-amd64-child');
+  assert.equal(good.evidence.commitImage, parent);
+  assert.equal(good.evidence.revisionImage, image);
+  assert.equal(statuses(evaluateApplication('admin', probes(), image, parent, 'd'.repeat(40), index)).DEPLOYED_COMMIT_VERIFIED, 'FAIL');
+  const stale = probes(); stale.find(p => p.surface !== 'google' && p.path === '/api/ready').body.commit = 'c'.repeat(40);
+  assert.equal(statuses(evaluateApplication('admin', stale, image, parent, sha, index)).DEPLOYED_COMMIT_VERIFIED, 'FAIL');
+  assert.equal(statuses(evaluateApplication('admin', probes(), image, parent, sha)).DEPLOYED_COMMIT_VERIFIED, 'FAIL');
 });

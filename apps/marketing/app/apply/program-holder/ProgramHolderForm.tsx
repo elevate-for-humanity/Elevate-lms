@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { PROGRAM_HOLDER_INTERESTS, programHolderInterestFromSelection } from '@/lib/program-holder/program-interest';
 
 const PROGRAM_TYPE_OPTIONS = [
   ['registered_apprenticeship', 'Registered Apprenticeship'],
@@ -85,6 +86,7 @@ export default function ProgramHolderForm({
     }
 
     setSubmitting(true);
+    const programInterest = programHolderInterestFromSelection(form.requestedProgram);
     const notes = [
       form.orgType ? `Organization type: ${form.orgType}` : '',
       form.legalStructure ? `Legal structure: ${form.legalStructure}` : '',
@@ -116,7 +118,8 @@ export default function ProgramHolderForm({
           phone: form.phone,
           website: form.website,
           programTypes: form.programTypes,
-          requestedProgramSlugs: [form.requestedProgram],
+          requestedProgramSlugs: programInterest ? [] : [form.requestedProgram],
+          ...(programInterest ? { requestedProgramInterest: programInterest.id } : {}),
           preferredTitle: form.preferredTitle,
           professionalBio: form.professionalBio,
           notes,
@@ -181,12 +184,15 @@ export default function ProgramHolderForm({
       <section className="border-t border-slate-200 pt-7">
         <h2 className="mb-2 text-xl font-black text-slate-950">Programs and operating capacity</h2>
         <div className="mb-5">
-          <label className={labelClass}>Primary program you will manage *</label>
-          <select name="requestedProgram" required value={form.requestedProgram} onChange={handleChange} className={fieldClass}>
+          <label htmlFor="requestedProgram" className={labelClass}>Primary program you will manage *</label>
+          <select id="requestedProgram" name="requestedProgram" required value={form.requestedProgram} onChange={handleChange} className={fieldClass}>
             <option value="">Select a program</option>
             {programOptions.map((program) => <option key={program.slug} value={program.slug}>{program.name}</option>)}
+            <optgroup label="Request a program scope review">
+              {PROGRAM_HOLDER_INTERESTS.map((interest) => <option key={interest.id} value={interest.selection}>{interest.label}</option>)}
+            </optgroup>
           </select>
-          <p className="mt-2 text-sm text-slate-600">The selected program is assigned to your dashboard only after application review and approval.</p>
+          <p className="mt-2 text-sm text-slate-600">The selected program is assigned to your dashboard only after application review and approval. Janitorial requests include a review of the training program, instructor qualifications, supervision, and written payment terms before any assignment.</p>
         </div>
         <p className="mb-4 text-sm text-slate-700">Select every training/service category you intend to operate or manage.</p>
         <div className="grid gap-3 sm:grid-cols-2">

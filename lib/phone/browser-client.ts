@@ -68,9 +68,21 @@ function ringtone() {
     stop,
     play() {
       stop();
-      context = new AudioContext();
+      try {
+        context = new AudioContext();
+      } catch {
+        // No WebAudio on this browser; the caller keeps the visual banner.
+        return;
+      }
       const ring = () => {
-        if (!context || context.state !== 'running') return;
+        if (!context) return;
+        if (context.state === 'suspended') {
+          // The first resume may not latch without a gesture; retry on each
+          // tick so the ring starts as soon as the page is interacted with.
+          void context.resume().catch(() => undefined);
+          return;
+        }
+        if (context.state !== 'running') return;
         const gain = context.createGain();
         gain.gain.value = 0.08;
         gain.connect(context.destination);

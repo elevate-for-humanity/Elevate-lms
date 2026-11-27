@@ -1,4 +1,5 @@
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { organization } from '@/lib/config/organization';
 
 /**
  * Centralized public site configuration.
@@ -25,14 +26,14 @@ export const siteConfig = {
   },
   technicalSupport: {
     display: PLATFORM_DEFAULTS.supportPhone,
-    href: 'tel:+13143173757',
-    e164: '+13143173757',
+    href: 'tel:+13173143757',
+    e164: '+13173143757',
   },
   email: {
-    general: 'elevate4humanityedu@gmail.com',
-    enrollment: 'elevate4humanityedu@gmail.com',
-    support: 'elevate4humanityedu@gmail.com',
-    careers: 'elevate4humanityedu@gmail.com',
+    general: organization.email,
+    enrollment: PLATFORM_DEFAULTS.supportEmail,
+    support: PLATFORM_DEFAULTS.supportEmail,
+    careers: PLATFORM_DEFAULTS.supportEmail,
   },
 
   // Public Indianapolis location. Keep this synchronized with lib/contact-info.ts
@@ -56,8 +57,8 @@ export const siteConfig = {
 
   // Business hours
   hours: {
-    weekdays: '9:00 AM - 5:00 PM EST',
-    saturday: 'By appointment',
+    weekdays: organization.hours.weekdays,
+    saturday: organization.hours.saturday,
     sunday: 'Closed',
   },
 

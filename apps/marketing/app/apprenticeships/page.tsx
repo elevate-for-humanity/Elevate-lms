@@ -102,6 +102,12 @@ export default async function ApprenticeshipsPage() {
         </div>
       </section>
 
+      <div className="mx-auto max-w-6xl px-4">
+        <Link href="/apprenticeships/indiana" className="inline-flex min-h-11 items-center font-bold text-blue-800 underline">
+          Find Indiana Host Shops by location and occupation
+        </Link>
+      </div>
+
       <section id="programs" className="px-4 py-14 sm:py-20">
         <div className="mx-auto max-w-6xl">
           <div className="max-w-3xl">

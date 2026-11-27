@@ -2,29 +2,22 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { teamProfileHref, teamPortrait, teamPortraitAlt } from '@/lib/navigation/team-profile';
 import { notFound } from 'next/navigation';
-import { getTeamMembers } from '@/lib/content';
+import { getTeamMembersResult } from '@/lib/content';
 import { buildMetadata } from '@/lib/cf-seo';
 import { siteConfig } from '@/content/cf-site';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import { TEAM } from '@/data/team';
+import { resolveTeamProfileMember } from '@/lib/team-roster';
 
 export const dynamic = 'force-dynamic';
 
-function teamMemberSlug(member: { name: string }): string {
-  return member.name
-    .normalize('NFKD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/(^-|-$)/g, '');
-}
-
 async function findTeamMember(slug: string) {
-  const databaseMembers = await getTeamMembers().catch(() => []);
-  return (
-    databaseMembers.find((member) =>
-      member.id === slug || teamMemberSlug(member) === slug || teamProfileHref(member).endsWith(`/${slug}`),
-    ) ?? TEAM.find((member) => member.id === slug || teamMemberSlug(member) === slug || teamProfileHref(member).endsWith(`/${slug}`))
+  const { members, error } = await getTeamMembersResult();
+  return resolveTeamProfileMember(
+    slug,
+    members,
+    TEAM,
+    error !== null,
   );
 }
 
@@ -44,6 +37,10 @@ export default async function TeamMemberPage({ params }: { params: Promise<{ slu
   const member = await findTeamMember(slug);
   if (!member) return notFound();
   const portrait = teamPortrait(member);
+  const credentials =
+    (Array.isArray(member.credentials) && member.credentials.length > 0
+      ? member.credentials
+      : TEAM.find((candidate) => candidate.name === member.name)?.credentials) ?? [];
 
   return (
     <section className="mx-auto max-w-3xl px-4 py-16">
@@ -51,6 +48,13 @@ export default async function TeamMemberPage({ params }: { params: Promise<{ slu
       {portrait ? <Image src={portrait} alt={teamPortraitAlt(member.name, portrait)} width={400} height={500} className="mb-6 w-full max-w-sm rounded-2xl object-cover object-top" /> : null}
       <h1 className="text-3xl font-bold">{member.name}</h1>
       <p className="mt-1 text-lg text-slate-600">{member.title}</p>
+      {credentials.length > 0 && (
+        <ul className="mt-4 list-disc pl-5 leading-7 text-slate-700">
+          {credentials.map((credential) => (
+            <li key={credential}>{credential}</li>
+          ))}
+        </ul>
+      )}
       <div className="mt-6 space-y-4 text-slate-700">{(member.bio ?? '').split(/\n\n/).map((paragraph, index) => <p key={index} className="leading-7">{paragraph}</p>)}</div>
       <div className="mt-10">
         <a

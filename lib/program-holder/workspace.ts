@@ -1,3 +1,4 @@
+import { programHolderReferralsReady } from './referral-readiness';
 import type { LearningMaterial } from '@/components/lms/AssignedLearningMaterials';
 import { loadHolderOnlineStudy } from './online-study';
 import { loadHolderExitReports } from './exit-reports';
@@ -11,10 +12,24 @@ import { verifiedTrainingForEnrollment } from './verified-hours';
 import { hasActiveProgramEnrollment, learnerProgramKey } from './enrollment-identity';
 import { holderCredentialStatus, holderTrainingRecord } from './student-training';
 import { studentContactProjection } from './contact-privacy';
-import { isLearnerRosterProfile } from './roster-eligibility';
-import { LEARNER_ROSTER_ROLES } from './roster-eligibility';
+import { isIsolatedQaProgramHolderRosterContext, isLearnerRosterProfile } from './roster-eligibility';
 import { requireProgramHolder } from '@/lib/auth/require-program-holder';
 import { calculateDistanceMiles, geocodeAddress, isGeocodingResult } from '@/lib/geo/geocode';
+
+type Settled<T> = { ok: true; value: T } | { ok: false; error: unknown };
+function settled<T>(promise: Promise<T>): Promise<Settled<T>> {
+  return promise.then(
+    (value): Settled<T> => ({ ok: true, value }),
+    (error): Settled<T> => ({ ok: false, error }),
+  );
+}
+function unwrapSettled<T>(outcome: Settled<T>): T {
+  // The repo typechecks with strict:false, where boolean-discriminant
+  // narrowing is inert — discriminate by property presence instead.
+  if ('error' in outcome) throw outcome.error;
+  return outcome.value;
+}
+
 
 export type ProgramHolderWorkspace = {
   mode: 'admin' | 'holder';
@@ -97,6 +112,19 @@ function getGaryRegionalCityCenter(city: unknown): RegionalLocation | null {
 /** Canonical, holder-scoped data contract shared by every Program Holder page. */
 export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspace> {
   const ctx = await requireProgramHolder();
+  return buildProgramHolderWorkspace(ctx, false);
+}
+
+/** Hours-page variant: also loads the hands-on training clocks (online study). */
+export async function getProgramHolderWorkspaceWithOnlineStudy(): Promise<ProgramHolderWorkspace> {
+  const ctx = await requireProgramHolder();
+  return buildProgramHolderWorkspace(ctx, true);
+}
+
+async function buildProgramHolderWorkspace(
+  ctx: Awaited<ReturnType<typeof requireProgramHolder>>,
+  includeOnlineStudy: boolean,
+): Promise<ProgramHolderWorkspace> {
   if (ctx.mode === 'holder') {
     const holderId = ctx.holderId;
     after(async () => {
@@ -157,6 +185,7 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
   const holderName = `${holderRes.data?.organization_name || ''} ${holderRes.data?.name || ''}`;
   const requiresEnchantedHeartsTerms = /enchanted hearts/i.test(holderName);
   const signedTypes = new Set(acknowledgements.map((item: any) => item.document_type));
+  const referralsReady = await programHolderReferralsReady(db, holderId, holderRes.data ?? null);
   const contactProjection = studentContactProjection(
     requiresEnchantedHeartsTerms,
     signedTypes.has('non_compete'),
@@ -166,7 +195,7 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
   const applicantContactColumns = contactProjection.applicant;
   const applicantNotesColumns = contactProjection.notes;
   const programWideStudentAccess = holderRes.data?.features?.program_wide_student_access === true;
-  const recruitingEnabled = hasRecruitingAssignment(holderRes.data?.features);
+  const recruitingEnabled = referralsReady && hasRecruitingAssignment(holderRes.data?.features);
   const allApplicantAccess = holderRes.data?.features?.all_applicant_access === true;
   const regionalAssignment =
     holderRes.data?.features?.regional_assignment &&
@@ -240,7 +269,7 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
           .in('status', ['active', 'enrolled', 'in_progress', 'funded'])
           .order('training_start_date', { ascending: true, nullsFirst: false })
       : Promise.resolve({ data: [] }),
-    programIds.length
+    programIds.length && referralsReady
       ? db
           .from('program_holder_students')
           .select(
@@ -349,15 +378,134 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
     if (error) throw new Error(`Program Holder ${name} could not load: ${error.message}`);
   }
 
-  const secondaryCourses = await db.from('courses')
-    .select('id,metadata')
-    .contains('metadata', { assignment_kind: 'secondary', program_holder_id: holderId });
+  // Dashboard load performance: the roster, credential, teaching and
+  // secondary-course queries below depend only on the parallel blocks
+  // above (holder, profile, program ids, roster ids), not on each other,
+  // so they run in one parallel block instead of a serial chain. The
+  // school-applicant and exit-report loads start here too. Every error
+  // check stays at its original position below, so failure precedence
+  // and messages are unchanged.
+  const rosterUserIds: string[] = Array.from(
+    new Set(
+      [
+        ...(enrollmentsRes.data ?? []),
+        ...(upcomingRes.data ?? []),
+        ...(convertedStudentsRes.data ?? []),
+      ]
+        .map((row: any) => row.user_id)
+        .filter((value: unknown): value is string => typeof value === 'string' && value.length > 0),
+    ),
+  );
+  const schoolApplicantsPromise = settled(
+    loadApprovedSchoolApplicants(
+      db,
+      holderRes.data?.features,
+      programsRes.data || [],
+      contactAccessGranted,
+      true,
+    ),
+  );
+  const exitReportsPromise = settled(loadHolderExitReports(db, holderId));
+  const [secondaryCourses, progressEntriesRes, rosterProfilesOutcome, credentialOutcome, assignedTeaching] =
+    await Promise.all([
+      db.from('courses')
+        .select('id,metadata')
+        .contains('metadata', { assignment_kind: 'secondary', program_holder_id: holderId }),
+      rosterUserIds.length && programIds.length
+        ? db
+            .from('progress_entries')
+            .select(
+              'id,apprentice_id,program_id,hour_entry_id,hours_worked,work_date,clock_in_at,clock_out_at,status',
+            )
+            .in('apprentice_id', rosterUserIds)
+            .in('program_id', programIds)
+            .eq('status', 'verified')
+            .order('work_date', { ascending: false })
+            .limit(5000)
+        : { data: [], error: null },
+      rosterUserIds.length
+        ? db.from('profiles').select('id,role,email,phone,full_name').in('id', rosterUserIds)
+        : { data: [], error: null },
+      rosterUserIds.length && programIds.length
+        ? db
+            .from('student_credential_uploads')
+            .select('user_id,program_id,verification_status,credential_earned_date,verified_at')
+            .in('user_id', rosterUserIds)
+            .in('program_id', programIds)
+        : { data: [], error: null },
+      db.from('instructor_assignments').select('course_id')
+        .eq('instructor_id', profile.id).eq('active', true),
+    ]);
+  const rosterProfiles = rosterProfilesOutcome.data;
+  const rosterProfilesError = rosterProfilesOutcome.error;
+  const credentialUploads = credentialOutcome.data;
+  const credentialError = credentialOutcome.error;
   if (secondaryCourses.error) throw new Error('Secondary syllabus courses could not load.');
   coursesRes.data = [...(coursesRes.data ?? []), ...(secondaryCourses.data ?? []).map((course: any) => ({
     id: course.id, course_id: course.id, program_id: course.metadata.holder_program_id,
     custom_syllabus_path: course.metadata.syllabus_path, status: 'under_review',
     term_name: 'Secondary assignment',
   }))] as any;
+  const emailByUserId = new Map<string, string>(
+    (rosterProfiles ?? [])
+      .filter((row) => typeof row.email === 'string' && row.email.trim())
+      .map((row) => [row.id, String(row.email).trim()]),
+  );
+  const phoneByUserId = new Map<string, string>(
+    (rosterProfiles ?? [])
+      .filter((row) => typeof row.phone === 'string' && row.phone.trim())
+      .map((row) => [row.id, String(row.phone).trim()]),
+  );
+  const trainingRecord = (row: any) =>
+    holderTrainingRecord({
+      ...row,
+      ...(contactAccessGranted
+        ? {
+            email: row.email || emailByUserId.get(row.user_id || row.student_id),
+            phone: row.phone || phoneByUserId.get(row.user_id || row.student_id),
+          }
+        : {}),
+      ...holderCredentialStatus(row, credentialUploads ?? []),
+    });
+  const includeIsolatedQaFixtures = isIsolatedQaProgramHolderRosterContext({
+    supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL,
+    testMode: process.env.TEST_MODE,
+  });
+  const eligibleRosterUserIds = new Set(
+    (rosterProfiles ?? [])
+      .filter((row: any) => isLearnerRosterProfile(row, { includeIsolatedQaFixtures }))
+      .map((row: any) => row.id),
+  );
+  const nameByUserId = new Map<string, string>(
+    (rosterProfiles ?? [])
+      .filter((row: any) => typeof row.full_name === 'string' && row.full_name.trim())
+      .map((row: any) => [row.id, row.full_name.trim()]),
+  );
+  const enrolledRoster = (enrollmentsRes.data ?? [])
+    .filter((row: any) => !row.user_id || eligibleRosterUserIds.has(row.user_id))
+    .map((row: any) => {
+      const verified = verifiedTrainingForEnrollment(
+        row,
+        hoursRes.data ?? [],
+        progressEntriesRes.data ?? [],
+      );
+      return {
+        ...row,
+        full_name: row.full_name?.trim() || nameByUserId.get(row.user_id) || 'Student',
+        total_hours_completed: Math.max(Number(row.total_hours_completed || 0), verified.total),
+        training_start_date: row.training_start_date || verified.firstDate || null,
+      };
+    });
+  const onlineStudyPromise = settled(
+    (async (): Promise<any[]> =>
+      includeOnlineStudy ? await loadHolderOnlineStudy(db, enrolledRoster) : [])(),
+  );
+  const upcomingRoster = (upcomingRes.data ?? []).filter(
+    (row: any) => !row.user_id || eligibleRosterUserIds.has(row.user_id),
+  );
+  const convertedRoster = (convertedStudentsRes.data ?? []).filter(
+    (row: any) => !row.user_id || eligibleRosterUserIds.has(row.user_id),
+  );
   // Holder-specific course rows override the canonical program/course catalog.
   const canonicalCourseIds = [
     ...new Set(
@@ -435,8 +583,6 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
   });
   const learningMaterials: NonNullable<ProgramHolderWorkspace['learningMaterials']> = { courses: [], workbooks: [] };
   try {
-    const assignedTeaching = await db.from('instructor_assignments').select('course_id')
-      .eq('instructor_id', profile.id).eq('active', true);
     if (assignedTeaching.error) throw new Error('Teaching material access could not be verified.');
     const teachingIds = new Set((assignedTeaching.data ?? []).map(row => row.course_id));
     const teachingCourses = currentAssignments.filter(row => row.published && teachingIds.has(row.course_id));
@@ -452,117 +598,14 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
     logger.error('PROGRAM_HOLDER_LEARNING_MATERIALS_UNAVAILABLE');
     learningMaterials.error = 'Learning material links could not be loaded. Open My Courses or Workbooks to retry.';
   }
-  const rosterUserIds: string[] = Array.from(
-    new Set(
-      [
-        ...(enrollmentsRes.data ?? []),
-        ...(upcomingRes.data ?? []),
-        ...(convertedStudentsRes.data ?? []),
-      ]
-        .map((row: any) => row.user_id)
-        .filter((value: unknown): value is string => typeof value === 'string' && value.length > 0),
-    ),
-  );
-  const progressEntriesRes =
-    rosterUserIds.length && programIds.length
-      ? await db
-          .from('progress_entries')
-          .select(
-            'id,apprentice_id,program_id,hour_entry_id,hours_worked,work_date,clock_in_at,clock_out_at,status',
-          )
-          .in('apprentice_id', rosterUserIds)
-          .in('program_id', programIds)
-          .eq('status', 'verified')
-          .order('work_date', { ascending: false })
-          .limit(5000)
-      : { data: [], error: null };
   if (progressEntriesRes.error)
     throw new Error('Program Holder verified training hours could not load.');
-  const { data: rosterProfiles, error: rosterProfilesError } = rosterUserIds.length
-    ? await db.from('profiles').select('id,role,email,phone,full_name').in('id', rosterUserIds)
-    : { data: [], error: null };
   if (rosterProfilesError)
     throw new Error(
       `Program Holder roster profiles could not load: ${rosterProfilesError.message}`,
     );
-  const { data: credentialUploads, error: credentialError } =
-    rosterUserIds.length && programIds.length
-      ? await db
-          .from('student_credential_uploads')
-          .select('user_id,program_id,verification_status,credential_earned_date,verified_at')
-          .in('user_id', rosterUserIds)
-          .in('program_id', programIds)
-      : { data: [], error: null };
   if (credentialError) throw new Error('Program Holder certification status could not load.');
-  const emailByUserId = new Map<string, string>(
-    (rosterProfiles ?? [])
-      .filter((row) => typeof row.email === 'string' && row.email.trim())
-      .map((row) => [row.id, String(row.email).trim()]),
-  );
-  const phoneByUserId = new Map<string, string>(
-    (rosterProfiles ?? [])
-      .filter((row) => typeof row.phone === 'string' && row.phone.trim())
-      .map((row) => [row.id, String(row.phone).trim()]),
-  );
-  const trainingRecord = (row: any) =>
-    holderTrainingRecord({
-      ...row,
-      ...(contactAccessGranted
-        ? {
-            email: row.email || emailByUserId.get(row.user_id || row.student_id),
-            phone: row.phone || phoneByUserId.get(row.user_id || row.student_id),
-          }
-        : {}),
-      ...holderCredentialStatus(row, credentialUploads ?? []),
-    });
-  const eligibleRosterUserIds = new Set(
-    (rosterProfiles ?? []).filter(isLearnerRosterProfile).map((row: any) => row.id),
-  );
-  // The production-roster safeguard above keeps test-marked profiles out of
-  // real holders' rosters. A QA fixture holder exists only to exercise this
-  // portal with its own fixture students, so when the viewing holder is
-  // itself a QA fixture, its own learner-role fixture profiles are eligible.
-  // Real holders (features.qa_e2e is not true) are unaffected.
-  if ((holderRes.data?.features as any)?.qa_e2e === true) {
-    for (const row of rosterProfiles ?? []) {
-      if (
-        typeof row?.id === 'string' &&
-        row.id &&
-        (LEARNER_ROSTER_ROLES as readonly string[]).includes(
-          String(row.role || '').toLowerCase(),
-        )
-      ) {
-        eligibleRosterUserIds.add(row.id);
-      }
-    }
-  }
-  const nameByUserId = new Map<string, string>(
-    (rosterProfiles ?? [])
-      .filter((row: any) => typeof row.full_name === 'string' && row.full_name.trim())
-      .map((row: any) => [row.id, row.full_name.trim()]),
-  );
-  const enrolledRoster = (enrollmentsRes.data ?? [])
-    .filter((row: any) => !row.user_id || eligibleRosterUserIds.has(row.user_id))
-    .map((row: any) => {
-      const verified = verifiedTrainingForEnrollment(
-        row,
-        hoursRes.data ?? [],
-        progressEntriesRes.data ?? [],
-      );
-      return {
-        ...row,
-        full_name: row.full_name?.trim() || nameByUserId.get(row.user_id) || 'Student',
-        total_hours_completed: Math.max(Number(row.total_hours_completed || 0), verified.total),
-        training_start_date: row.training_start_date || verified.firstDate || null,
-      };
-    });
-  const onlineStudySessions = await loadHolderOnlineStudy(db, enrolledRoster);
-  const upcomingRoster = (upcomingRes.data ?? []).filter(
-    (row: any) => !row.user_id || eligibleRosterUserIds.has(row.user_id),
-  );
-  const convertedRoster = (convertedStudentsRes.data ?? []).filter(
-    (row: any) => !row.user_id || eligibleRosterUserIds.has(row.user_id),
-  );
+  const onlineStudySessions = unwrapSettled(await onlineStudyPromise);
 
   let phoneLine = phoneLineRes.data ?? null;
   const extension = extensionRes.data?.extension ?? phoneLine?.extension ?? null;
@@ -727,13 +770,9 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
     );
   });
 
-  const schoolApplicants = await loadApprovedSchoolApplicants(
-    db,
-    holderRes.data?.features,
-    programsRes.data || [],
-    contactAccessGranted,
-    true,
-  );
+  const schoolApplicants = unwrapSettled(await schoolApplicantsPromise);
+
+  const exitReports = unwrapSettled(await exitReportsPromise);
 
   return {
     mode: 'holder',
@@ -771,7 +810,7 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
     onlineStudySessions,
     documents: documentsRes.data ?? [],
     reports: reportsRes.data ?? [],
-    testingReports: await loadHolderExitReports(db, holderId),
+    testingReports: exitReports,
     courseAssignments: currentAssignments,
     learningMaterials,
     payoutProfile: payoutRes.data ?? null,

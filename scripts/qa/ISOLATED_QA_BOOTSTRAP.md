@@ -94,3 +94,39 @@ the corrected migration subsequently passed.
 
 The early core-schema evidence JSON is a historical zero-row structural-stage
 snapshot. Later Auth/profile and MFA evidence files record subsequent stages.
+
+## Host Shop and apprenticeship browser fixtures
+
+On a fresh isolated project, install the project identity anchor, core schema
+and read policies, then create the disposable QA tenant. Apply the student
+lifecycle and portal schema contracts first, including the QA HVAC catalog
+entry required by the portal contract. The portal contract installs
+`course_lessons`, `documents` and the private `documents` bucket.
+
+Apply the following with stop-on-error against the isolated QA database,
+in order. For an existing project, check its migration history first and skip
+stages it already has. The workspace and apprenticeship stages intentionally
+reject overlapping relations.
+
+1. `bootstrap-host-shop-fixtures-20261119.sql` creates the canonical shop and
+   staff relations, scoped membership policies, empty audit sinks and the
+   isolated Barber program anchor.
+2. `bootstrap-portal-workspace-20261122.sql` restores the applied workspace
+   stage, including hour and competency records.
+3. `bootstrap-apprentice-runtime-20261122.sql` restores the applied
+   apprenticeship stage, including placements, the active Barber standard
+   and the document requirement catalog.
+4. `bootstrap-apprentice-acceptance-20261122.sql` adds the Host Shop attendance,
+   wage and certificate schema, seeds the approved Barber RTI categories,
+   and aligns the existing private document bucket with allowed uploads.
+   Apply this stage on existing QA projects that already have steps 1–3.
+
+The desktop workflow installs the locked Node dependencies, verifies its QA
+connection, and provisions the disposable Admin before the Host Shop fallback.
+With `E2E_HOST_SHOP_EMAIL` and `E2E_HOST_SHOP_PASSWORD` unset, the fallback
+creates run-scoped Host Shop and Apprentice identities and removes them during
+teardown. To verify a clean bootstrap, run all four desktop shards with the
+pair unset and check that fixture provisioning, the authenticated Host Shop
+browser checks, and fixture cleanup succeed. A static credential pair must
+belong to a disposable QA Host Shop supervisor with approved active
+membership. Store customer and production credentials must stay out of QA.

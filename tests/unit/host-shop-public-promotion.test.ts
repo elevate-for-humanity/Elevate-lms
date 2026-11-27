@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 vi.mock('@/lib/programs/host-shops', () => ({ getApprovedShops: async () => [
   { id: 'dbo', publicSlug: 'dbo-hair-studios-cddf6115', name: 'DBO Hair Studios', address: '2626 W Washington Street', city: 'Indianapolis', state: 'IN', zip: '46222', phone: '3178224783', programs: ['cosmetology-apprenticeship'], description: 'DBO Hair Studios — Indianapolis, IN. Approved Elevate Host Site record for Cosmetology Apprenticeship.' },
   { id: 'b52', publicSlug: 'b-52-s-barber-shop-llc-183dd1d7', name: 'B-52’s Barber Shop LLC', address: '314C Parkview Dr.', city: 'New Castle', state: 'IN', zip: '47362', phone: '7653749869', programs: ['barber-apprenticeship'] },
+  { id: 'mesmerized', publicSlug: 'mesmerized-by-beauty-cosmetology-academy-8420fefa', name: 'Mesmerized by Beauty Cosmetology Academy', address: '120 E Market Street, Suite 560', city: 'Indianapolis', state: 'IN', zip: '46204', programs: ['esthetician-apprenticeship', 'nail-technician-apprenticeship'], mediaGallery: [] },
 ] }));
 import { getHostShopNetwork } from '@/lib/programs/host-shop-network';
 
@@ -24,6 +25,15 @@ describe('complete public shop promotion', () => {
     expect(shop?.gallery).toHaveLength(1);
     expect(shop?.gallery?.[0].url).toBe('/images/partners/b52s-interior-enhanced-2026.webp');
     expect(shop?.gallery?.[0].alt).toMatch(/^AI-enhanced/);
+  });
+  it('retains the exact approved Mesmerized profile and both trade photos with a suffixed configured slug', async () => {
+    const shop = (await getHostShopNetwork()).find((candidate) => candidate.id === 'mesmerized');
+    expect(shop?.slug).toBe('mesmerized-by-beauty-cosmetology-academy-8420fefa');
+    expect(shop?.programs).toEqual(['esthetician-apprenticeship', 'nail-technician-apprenticeship']);
+    expect(shop?.gallery?.map((photo) => photo.url)).toEqual(expect.arrayContaining([
+      '/images/partners/mesmerized-by-beauty/downtown-nail-program.webp',
+      '/images/partners/mesmerized-by-beauty/downtown-esthetician-program.webp',
+    ]));
   });
   it('never promotes pending businesses even through the historical includeOnboarding option', async () => {
     const directory = await getHostShopNetwork(true);

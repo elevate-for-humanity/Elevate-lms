@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {inspectCourseAutopilot,inspectOrphanedPool} from '../../lib/ultimate-course-builder/worker/paris-monitor.mjs';
-import {monitorCourseQueue,latestRoleJobs} from './paris-course-monitor.mjs';
+import {monitorCourseQueue,latestRoleJobs,requestParisRepairReceipt} from './paris-course-monitor.mjs';
 const now=new Date('2026-10-14T18:00:00Z');
 test('source revision failures require reconciliation even when a PARIS repair receipt exists',()=>{
  const blocked=inspectCourseAutopilot({status:'failed',last_error:'ULTIMATE_AUTOPILOT_SOURCE_REVISION_REQUIRED',
@@ -604,4 +604,24 @@ test('monitor names an orphaned pool on the coordinator job instead of awaiting 
  assert.equal(coordObservation.state,'pool_orphaned');
  assert.equal(patches.get('coord').monitor.state,'pool_orphaned');
  assert.deepEqual(patches.get('coord').monitor.failedJobIds,['lesson-job']);
+});
+
+
+test('repair receipt recovery ignores fingerprint conflicts and reads existing receipt without changing it',async()=>{
+ const existing={id:'existing-repair',status:'blocked'};
+ const calls=[];
+ const request=async(url,options={})=>{
+  const u=new URL(url);calls.push({url:u,method:options.method});
+  if(u.pathname.endsWith('/paris_autopilot_policy'))return {ok:true,json:async()=>[{enabled:true,actor_id:'paris-actor'}]};
+  if(options.method==='POST'){
+   assert.equal(JSON.parse(options.body).fingerprint,'course:job:quality');
+   assert.equal(options.headers.Prefer,'resolution=ignore-duplicates');
+   // PostgREST defaults to the primary key unless on_conflict names the unique fingerprint.
+   return u.searchParams.get('on_conflict')==='fingerprint'?{ok:true,status:201}:{ok:false,status:409};
+  }
+  assert.equal(u.searchParams.get('fingerprint'),'eq.course:job:quality');
+  return {ok:true,json:async()=>[existing]};
+ };
+ assert.deepEqual(await requestParisRepairReceipt({request,headers:{},job:{id:'job',build_id:'build'}}),existing);
+ assert.deepEqual(calls.map(c=>c.method),[undefined,'POST',undefined]);
 });

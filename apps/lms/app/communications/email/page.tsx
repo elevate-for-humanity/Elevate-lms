@@ -57,6 +57,7 @@ export default async function InterofficeEmail({
           </details>
         )}
         <EmailWorkspace
+          guideHref="/communications/email/help"
           initialThreadId={typeof params.threadId === 'string' ? params.threadId : undefined}
           roleLabel="account holder"
           initialMailboxId={typeof params.mailboxId === 'string' && /^[0-9a-f-]{36}$/i.test(params.mailboxId) ? params.mailboxId : undefined}

@@ -3,6 +3,7 @@ import { randomBytes } from 'node:crypto';
 import { readFile, writeFile } from 'node:fs/promises';
 import { createQaAuthUser } from './supabase-auth-fixtures.mjs';
 import { writePrivateQaState } from './write-private-state.mjs';
+import { prepareQaHolderRosterProfile } from './holder-roster-fixture.mjs';
 
 const action = process.argv[2] || 'provision';
 const statePath = process.env.QA_PORTAL_E2E_STATE_PATH || '.qa-learner-program-holder-e2e-state.json';
@@ -56,7 +57,7 @@ async function createQaUser(kind, role, fullName, tenantId) {
 }
 
 async function provision() {
-  const anchor = await must(db.from('programs').select('organization_id,tenant_id').eq('slug', 'barber-apprenticeship').maybeSingle(), 'load tenant anchor');
+  const anchor = await must(db.from('programs').select('id,organization_id,tenant_id').eq('slug', 'barber-apprenticeship').maybeSingle(), 'load tenant anchor');
   if (!anchor?.tenant_id) throw new Error('Canonical tenant anchor is missing');
   const adminEmail = String(process.env.E2E_ADMIN_EMAIL || process.env.TEST_ADMIN_EMAIL || '').trim().toLowerCase();
   let approvalAdminQuery = db
@@ -99,6 +100,21 @@ async function provision() {
     state.hvacEnrollmentId = qaHvac.id;
     // Preserve the cleanup receipt even if later QA provisioning fails.
     await writePrivateQaState(statePath, state);
+    const apprentice = await createQaUser('apprentice', 'apprentice', '[QA E2E] Barber Apprentice', anchor.tenant_id);
+    state.apprentice = apprentice;
+    await writePrivateQaState(statePath, state);
+    const barberEnrollment = await must(db.from('program_enrollments').insert({
+      user_id: apprentice.id, student_id: apprentice.id, email: apprentice.email,
+      full_name: '[QA E2E] Barber Apprentice', program_id: anchor.id,
+      program_slug: 'barber-apprenticeship', status: 'active', enrollment_state: 'active',
+      payment_status: paymentStatus, approved_at: new Date().toISOString(), approved_by: approvalAdmin.id,
+      access_granted_at: new Date().toISOString(), access_status: 'active',
+      funding_source: 'qa-e2e', funding_status: 'unfunded_self_continuing',
+      funding_verified: false, amount_paid_cents: 0, source: 'qa-e2e', tenant_id: anchor.tenant_id,
+      training_start_date: new Date().toISOString().slice(0, 10),
+    }).select('id').single(), 'enroll isolated QA apprentice with approved access');
+    state.apprenticeEnrollmentId = barberEnrollment.id;
+    await writePrivateQaState(statePath, state);
     const programHolder = await createQaUser('program-holder', 'program_holder', '[QA E2E] Program Holder', anchor.tenant_id); state.programHolder = programHolder;
     const qaProgram = await must(db.from('programs').insert({ slug: `${marker}-program`, title: '[QA E2E] Isolated Program Holder Program', name: '[QA E2E] Isolated Program Holder Program', category: 'qa', description: 'Disposable isolated program used only for responsive production QA.', is_active: false, published: false, status: 'draft', review_status: 'draft', tenant_id: anchor.tenant_id, organization_id: anchor.organization_id, funding_eligible: false, is_free: true, enrollment_state: 'closed' }).select('id,slug').single(), 'create isolated QA program'); state.qaProgramId = qaProgram.id;
     const holder = await must(db.from('program_holders').insert({ user_id: programHolder.id, organization_name: '[QA E2E] Isolated Program Holder', name: '[QA E2E] Program Holder', contact_name: '[QA E2E] Program Holder', contact_email: programHolder.email, status: 'approved', approved_at: new Date().toISOString(), mou_signed: true, mou_signed_at: new Date().toISOString(), mou_status: 'signed', is_using_internal_lms: true, payout_status: 'not_started', primary_program_id: qaProgram.id, teaches_multiple: false, features: { qa_e2e: true, qa_run_id: runId, isolated: true } }).select('id').single(), 'create isolated QA program holder'); state.holderId = holder.id;
@@ -112,9 +128,13 @@ async function provision() {
     // (program_holder_id) because the report API verifies ownership against
     // the holder before inserting a report.
     const holderStudent = await createQaUser('holder-student', 'student', '[QA E2E] Holder Student', anchor.tenant_id); state.holderStudent = holderStudent;
+    await writePrivateQaState(statePath, state);
+    const holderRosterProfile = await prepareQaHolderRosterProfile({
+      db, supabaseUrl, runId, userId: holderStudent.id, allowProductionDisposables,
+    });
     const holderEnrollment = await must(db.from('program_enrollments').insert({
-      user_id: holderStudent.id, student_id: holderStudent.id, email: holderStudent.email,
-      full_name: '[QA E2E] Holder Student', program_id: qaProgram.id, program_slug: qaProgram.slug,
+      user_id: holderStudent.id, student_id: holderStudent.id, email: holderRosterProfile.email,
+      full_name: holderRosterProfile.full_name, program_id: qaProgram.id, program_slug: qaProgram.slug,
       program_holder_id: holder.id,
       status: 'active', enrollment_state: 'active',
       payment_status: paymentStatus, approved_at: new Date().toISOString(),
@@ -126,6 +146,26 @@ async function provision() {
     }).select('id').single(), 'enroll isolated QA student under program holder');
     state.holderEnrollmentId = holderEnrollment.id;
     await writePrivateQaState(statePath, state);
+    // A two-student roster under the same holder, so roster filtering can
+    // distinguish an active enrollment from a completed one.
+    const roster = [
+      { kind: 'holder-active-student', name: 'QA Holder Active Student', status: 'active' },
+      { kind: 'holder-completed-student', name: 'QA Holder Completed Student', status: 'completed' },
+    ];
+    state.holderRoster = [];
+    for (const { kind, name, status } of roster) {
+      const student = await createQaUser(kind, 'student', name, anchor.tenant_id);
+      const record = { id: student.id, enrollmentId: null };
+      state.holderRoster.push(record);
+      await writePrivateQaState(statePath, state);
+      const enrollment = await must(db.from('program_enrollments').insert({
+        user_id: student.id, student_id: student.id, email: student.email, full_name: name,
+        program_holder_id: holder.id, program_id: qaProgram.id, program_slug: qaProgram.slug,
+        tenant_id: anchor.tenant_id, status, enrollment_state: status, source: 'qa-e2e',
+      }).select('id').single(), `enroll ${kind} in the isolated holder roster`);
+      record.enrollmentId = enrollment.id;
+      await writePrivateQaState(statePath, state);
+    }
     if (process.env.GITHUB_ENV) {
       await writeFile(process.env.GITHUB_ENV, [
         `E2E_LEARNER_EMAIL=${learner.email}`,
@@ -136,15 +176,43 @@ async function provision() {
         `E2E_PROGRAM_HOLDER_PASSWORD=${programHolder.password}`,
         `TEST_PROGRAM_HOLDER_EMAIL=${programHolder.email}`,
         `TEST_PROGRAM_HOLDER_PASSWORD=${programHolder.password}`,
+        `E2E_APPRENTICE_EMAIL=${apprentice.email}`,
+        `E2E_APPRENTICE_PASSWORD=${apprentice.password}`,
       ].join('\n') + '\n', { flag: 'a' });
       console.log(`::add-mask::${learner.password}`); console.log(`::add-mask::${programHolder.password}`);
+      console.log(`::add-mask::${apprentice.password}`);
     }
     console.log(JSON.stringify({ ok: true, learnerUserId: learner.id, programHolderUserId: programHolder.id, holderId: holder.id, qaProgramId: qaProgram.id }));
   } catch (error) { await writePrivateQaState(statePath, state).catch(() => {}); await cleanup().catch((cleanupError) => console.error('cleanup after provision failure:', cleanupError)); throw error; }
 }
 
 async function cleanup() {
-  let state; try { state = JSON.parse(await readFile(statePath, 'utf8')); } catch { console.log('No Learner/Program Holder QA state file found; nothing to clean up.'); return; }
+  let state;
+  try { state = JSON.parse(await readFile(statePath, 'utf8')); }
+  catch (error) {
+    if (error.code !== 'ENOENT') throw error;
+    console.log('No Learner/Program Holder QA state file found; nothing to clean up.');
+    return;
+  }
+  if (!state.runId || state.marker !== `qa-portal-e2e-${state.runId}`)
+    throw new Error('QA cleanup rejected an invalid run marker');
+  const checked = async (promise, label) => {
+    const { data, error } = await promise;
+    if (error) throw new Error(`QA cleanup ${label}: ${error.message}`);
+    return data;
+  };
+  const read = (table, id, columns) => id
+    ? checked(db.from(table).select(columns).eq('id', id).maybeSingle(), `read ${table}`)
+    : null;
+  const requireBinding = (valid, label) => {
+    if (!valid) throw new Error(`QA cleanup rejected mismatched ${label}`);
+  };
+  const deleteOne = async (query, label) => {
+    const rows = await checked(query.select('id'), `delete ${label}`);
+    if (rows?.length !== 1) throw new Error(`QA cleanup ${label} changed before deletion`);
+  };
+  const authMissing = error => error?.status === 404 || error?.code === 'user_not_found';
+
   // Derived tables may not exist in the isolated QA project (minimal
   // schema). A missing table means no derived rows could have been
   // created there, so "table does not exist" is ignored; every other
@@ -178,6 +246,20 @@ async function cleanup() {
     await deleteDerived(db.from('platform_events').delete()
       .eq('event_type', 'enrollment.confirmed').eq('subject_type', 'program_enrollment')
       .eq('subject_id', enrollmentId), 'delete enrollment platform event');
+    // Fixture alerts must never outlive teardown (Blocker A, 2026-11-26):
+    // the RAPIDS queue + staff alert and the program-holder 'New Student
+    // Assigned' notification are trigger-derived from the enrollment row.
+    // The triggers also skip qa-e2e fixtures at the source (migration
+    // 20261126173000); these deletes are the backstop for rows created
+    // before that migration or by any other derived path.
+    await deleteDerived(db.from('rapids_action_queue').delete()
+      .eq('entity_type', 'apprentice').eq('entity_id', enrollmentId)
+      .eq('action_type', 'register_apprentice'), 'delete RAPIDS queue entry');
+    await deleteDerived(db.from('staff_notifications').delete()
+      .eq('type', 'apprentice_ready_for_rapids')
+      .eq('metadata->>enrollment_id', enrollmentId), 'delete RAPIDS staff notification');
+    await deleteDerived(db.from('notifications').delete()
+      .eq('metadata->>enrollment_id', enrollmentId), 'delete holder enrollment notification');
   };
   const assertEnrollmentDerivedGone = async (enrollmentId, label) => {
     await assertDerivedGone(db.from('program_holder_students')
@@ -188,59 +270,146 @@ async function cleanup() {
     await assertDerivedGone(db.from('platform_events')
       .select('id').eq('event_type', 'enrollment.confirmed')
       .eq('subject_type', 'program_enrollment').eq('subject_id', enrollmentId).limit(1), label + ' enrollment platform event');
+    await assertDerivedGone(db.from('staff_notifications')
+      .select('id').eq('type', 'apprentice_ready_for_rapids')
+      .eq('metadata->>enrollment_id', enrollmentId).limit(1), label + ' RAPIDS staff notification');
+    await assertDerivedGone(db.from('notifications')
+      .select('id').eq('metadata->>enrollment_id', enrollmentId).limit(1), label + ' holder enrollment notification');
   };
-  if (state.learner?.id) {
-    // Playback stores QA events, never formal credits. Remove only this run's
-    // disposable learner rows before its profile and login are removed.
+  // Validate every checkpointed object before any mutation. A corrupt or stale
+  // checkpoint must not turn one verified QA login into authority over another
+  // holder, program, enrollment, or student's report.
+  const program = await read('programs', state.qaProgramId, 'id,slug,category');
+  if (program) requireBinding(program.slug === `${state.marker}-program` && program.category === 'qa', 'program');
+  const holder = await read('program_holders', state.holderId, 'id,user_id,primary_program_id,features');
+  if (holder) requireBinding(state.programHolder?.id && state.qaProgramId && holder.user_id === state.programHolder.id && holder.primary_program_id === state.qaProgramId &&
+    holder.features?.qa_e2e === true && String(holder.features?.qa_run_id) === String(state.runId), 'holder');
+  const link = await read('program_holder_programs', state.holderProgramId, 'id,program_holder_id,program_id');
+  if (link) requireBinding(state.holderId && state.qaProgramId && link.program_holder_id === state.holderId && link.program_id === state.qaProgramId, 'holder program');
+  const hvac = await read('program_enrollments', state.hvacEnrollmentId, 'id,user_id,student_id,course_id,source');
+  if (hvac) requireBinding(state.learner?.id && hvac.user_id === state.learner.id && hvac.student_id === state.learner.id &&
+    hvac.course_id === QA_HVAC_COURSE_ID && hvac.source === 'qa-e2e', 'HVAC enrollment');
+  const enrollment = await read('program_enrollments', state.holderEnrollmentId, 'id,user_id,student_id,program_id,program_holder_id,source');
+  if (enrollment) requireBinding(state.holderStudent?.id && state.qaProgramId && state.holderId && enrollment.user_id === state.holderStudent.id && enrollment.student_id === state.holderStudent.id &&
+    enrollment.program_id === state.qaProgramId && enrollment.program_holder_id === state.holderId &&
+    enrollment.source === 'qa-e2e', 'holder enrollment');
+
+  const identities = [];
+  for (const [key, kind, role] of [['learner', 'learner', 'student'], ['programHolder', 'program-holder', 'program_holder'], ['holderStudent', 'holder-student', 'student']]) {
+    const fixture = state[key];
+    if (!fixture) continue;
+    const expectedEmail = `${state.marker}-${kind}@qa.invalid`;
+    requireBinding(fixture.id && fixture.email === expectedEmail, `${kind} checkpoint`);
+    const profile = await read('profiles', fixture.id, 'id,email,role,program_holder_id');
+    const rosterEmail = `${state.marker}-holder-student@roster.qa.invalid`;
+    if (profile) requireBinding(profile.role === role &&
+      (profile.email === expectedEmail || (key === 'holderStudent' && profile.email === rosterEmail)) &&
+      (key !== 'programHolder' || !profile.program_holder_id || profile.program_holder_id === state.holderId), `${kind} profile`);
+    const { data, error } = await db.auth.admin.getUserById(fixture.id);
+    if (error && !authMissing(error)) throw new Error(`QA cleanup read ${kind} Auth: ${error.message}`);
+    const user = data?.user;
+    if (user) requireBinding(user.id === fixture.id, `${kind} Auth ID`);
+    if (user && !user.deleted_at) requireBinding(user.email === expectedEmail && user.app_metadata?.qa_e2e === true &&
+      String(user.app_metadata?.qa_run_id) === String(state.runId) && user.app_metadata?.role === role, `${kind} Auth identity`);
+    // Soft deletion may redact Auth metadata. Existing profile/enrollment/holder
+    // bindings above remain verifiable; a fully removed identity needs no DML.
+    const ownedRecord = profile || (key === 'learner' ? hvac : key === 'programHolder' ? holder : enrollment);
+    identities.push({ key, fixture, profile, active: Boolean(user && !user.deleted_at), ownedRecord });
+  }
+
+  const learner = identities.find(identity => identity.key === 'learner');
+  if (learner && (learner.active || learner.ownedRecord)) {
+    // Remove only this run's disposable HVAC simulation evidence; real learner
+    // history and other interaction categories remain outside this cleanup.
+    await deleteDerived(db.from('interaction_progress').delete()
+      .eq('learner_id', state.learner.id).eq('course_id', QA_HVAC_COURSE_ID)
+      .eq('interaction_type', 'simulation').like('interaction_id', 'hvac-sim:%'),
+    'delete disposable HVAC simulation progress');
+    await assertDerivedGone(db.from('interaction_progress').select('id')
+      .eq('learner_id', state.learner.id).eq('course_id', QA_HVAC_COURSE_ID)
+      .eq('interaction_type', 'simulation').like('interaction_id', 'hvac-sim:%').limit(1),
+    'disposable HVAC simulation progress');
     for (const table of [
-      'video_playback_events',
-      'learner_video_checkpoint_responses',
-      'interactive_video_quiz_answers',
-      'learner_video_notes',
-      'learner_video_progress',
-      'checkpoint_scores',
-      'lesson_progress',
-    ]) {
-      const { error } = await db.from(table).delete().eq('user_id', state.learner.id);
-      if (error) throw new Error('QA playback cleanup failed for ' + table + ': ' + error.message);
+      'video_playback_events', 'learner_video_checkpoint_responses', 'interactive_video_quiz_answers',
+      'learner_video_notes', 'learner_video_progress', 'checkpoint_scores', 'lesson_progress',
+    ]) await checked(db.from(table).delete().eq('user_id', learner.fixture.id), `delete ${table}`);
+    // Isolated QA's resumes table has no profile cascade on soft auth deletion.
+    await must(db.from('resumes').delete().eq('user_id', state.learner.id),
+      'remove isolated QA learner resumes');
+    const remainingResumes = await must(
+      db.from('resumes').select('id').eq('user_id', state.learner.id).limit(1),
+      'verify isolated QA learner resume cleanup',
+    );
+    if (remainingResumes?.length) {
+      throw new Error('QA learner resume cleanup left disposable learner rows');
     }
+    await checked(db.from('course_enrollments').delete().eq('student_id', learner.fixture.id), 'delete course enrollments');
   }
-  if (state.hvacEnrollmentId) {
-    // The auto-assign trigger may have linked this enrollment to a
-    // program holder; remove the link before the enrollment itself.
-    await deleteDerived(db.from('program_holder_students').delete()
-      .eq('enrollment_id', state.hvacEnrollmentId), 'delete HVAC holder-student link');
-    const { data, error } = await db.from('program_enrollments').delete()
-      .eq('id', state.hvacEnrollmentId).eq('user_id', state.learner.id).select('id');
-    if (error || data?.length !== 1)
-      throw new Error('QA HVAC enrollment cleanup was not independently confirmed: ' + (error?.message || 'row count mismatch'));
-    const { error: courseError } = await db.from('course_enrollments').delete()
-      .eq('student_id', state.learner.id);
-    if (courseError) throw new Error('QA course enrollment cleanup failed: ' + courseError.message);
-    await deleteEnrollmentDerived(state.hvacEnrollmentId);
+  if (hvac) await deleteDerived(db.from('program_holder_students').delete()
+    .eq('enrollment_id', state.hvacEnrollmentId), 'delete HVAC holder-student link');
+  if (hvac) await deleteOne(db.from('program_enrollments').delete().eq('id', hvac.id)
+    .eq('user_id', state.learner.id).eq('student_id', state.learner.id)
+    .eq('course_id', QA_HVAC_COURSE_ID).eq('source', 'qa-e2e'), 'HVAC enrollment');
+  if (hvac) await deleteEnrollmentDerived(state.hvacEnrollmentId);
+  const reportQuery = remove => (remove ? db.from('program_holder_reports').delete() : db.from('program_holder_reports').select('id'))
+    .eq('program_holder_id', state.holderId).eq('user_id', state.programHolder.id)
+    .eq('report_type', 'student_progress').contains('metadata', { enrollment_id: state.holderEnrollmentId });
+  const reportScope = state.holderEnrollmentId && state.programHolder?.id && state.holderId;
+  if (reportScope && (enrollment || holder)) {
+    await checked(reportQuery(true), 'delete holder reports');
   }
-  if (state.holderEnrollmentId && state.holderStudent?.id) {
-    await deleteDerived(db.from('program_holder_students').delete()
-      .eq('enrollment_id', state.holderEnrollmentId), 'delete holder holder-student link');
-    const { data, error } = await db.from('program_enrollments').delete()
-      .eq('id', state.holderEnrollmentId).eq('user_id', state.holderStudent.id).select('id');
-    if (error || data?.length !== 1)
-      throw new Error('QA holder-student enrollment cleanup was not independently confirmed: ' + (error?.message || 'row count mismatch'));
-    // The sync trigger mirrors program enrollments into course_enrollments
-    // for the holder student too; the old cleanup only removed the
-    // learner's mirrored rows.
+  if (enrollment) await deleteDerived(db.from('program_holder_students').delete()
+    .eq('enrollment_id', state.holderEnrollmentId), 'delete holder holder-student link');
+  if (enrollment) await deleteOne(db.from('program_enrollments').delete().eq('id', enrollment.id)
+    .eq('user_id', state.holderStudent.id).eq('student_id', state.holderStudent.id)
+    .eq('program_holder_id', state.holderId).eq('program_id', state.qaProgramId).eq('source', 'qa-e2e'), 'holder enrollment');
+  if (enrollment) {
     const { error: holderCourseError } = await db.from('course_enrollments').delete()
       .eq('student_id', state.holderStudent.id);
     if (holderCourseError) throw new Error('QA holder course enrollment cleanup failed: ' + holderCourseError.message);
     await deleteEnrollmentDerived(state.holderEnrollmentId);
   }
-  if (state.holderProgramId) await db.from('program_holder_programs').delete().eq('id', state.holderProgramId);
-  if (state.holderId) await db.from('program_holders').delete().eq('id', state.holderId);
-  if (state.qaProgramId) await db.from('programs').delete().eq('id', state.qaProgramId);
-  for (const userId of [state.learner?.id, state.programHolder?.id, state.holderStudent?.id].filter(Boolean)) {
-    await db.from('profiles').delete().eq('id', userId);
-    const { error } = await db.auth.admin.deleteUser(userId, true);
-    if (error && !/not found/i.test(error.message)) console.error(`soft-delete auth user ${userId}: ${error.message}`);
+
+  if (state.apprenticeEnrollmentId && state.apprentice?.id) {
+    await must(db.from('program_enrollments').delete().eq('id', state.apprenticeEnrollmentId).eq('user_id', state.apprentice.id), 'remove isolated apprentice enrollment');
+    await must(db.from('course_enrollments').delete().eq('student_id', state.apprentice.id), 'remove isolated apprentice course enrollments');
+    await deleteEnrollmentDerived(state.apprenticeEnrollmentId);
+  }
+  for (const student of state.holderRoster ?? []) {
+    if (student.enrollmentId) {
+      await must(db.from('program_enrollments').delete().eq('id', student.enrollmentId).eq('user_id', student.id), 'remove isolated holder roster enrollment');
+    }
+  }
+  if (link) await deleteOne(db.from('program_holder_programs').delete().eq('id', link.id)
+    .eq('program_holder_id', state.holderId).eq('program_id', state.qaProgramId), 'holder program');
+  const holderProfile = identities.find(identity => identity.key === 'programHolder')?.profile;
+  if (holderProfile?.program_holder_id) await checked(db.from('profiles').update({ program_holder_id: null })
+    .eq('id', state.programHolder.id).eq('program_holder_id', state.holderId), 'unlink holder profile');
+  if (holder) await deleteOne(db.from('program_holders').delete().eq('id', holder.id)
+    .eq('user_id', state.programHolder.id).eq('primary_program_id', state.qaProgramId)
+    .contains('features', { qa_e2e: true, qa_run_id: state.runId }), 'holder');
+  if (program) await deleteOne(db.from('programs').delete().eq('id', program.id)
+    .eq('slug', `${state.marker}-program`).eq('category', 'qa'), 'program');
+  for (const identity of identities) {
+    if (identity.profile) await deleteOne(db.from('profiles').delete().eq('id', identity.fixture.id)
+      .eq('role', identity.profile.role).eq('email', identity.profile.email), `${identity.key} profile`);
+    if (identity.active) {
+      const { error } = await db.auth.admin.deleteUser(identity.fixture.id, true);
+      if (error && !authMissing(error)) throw new Error(`QA cleanup soft-delete ${identity.key} Auth: ${error.message}`);
+    }
+  }
+
+  for (const [table, id] of [
+    ['program_enrollments', state.hvacEnrollmentId], ['program_enrollments', state.holderEnrollmentId],
+    ['program_holder_programs', state.holderProgramId], ['program_holders', state.holderId], ['programs', state.qaProgramId],
+    ...identities.map(identity => ['profiles', identity.fixture.id]),
+  ]) if (await read(table, id, 'id')) throw new Error(`QA cleanup incomplete: ${table}`);
+  if (reportScope && (await checked(reportQuery(false), 'verify holder reports')).length)
+    throw new Error('QA cleanup incomplete: holder reports');
+  for (const identity of identities) {
+    const { data, error } = await db.auth.admin.getUserById(identity.fixture.id);
+    if (error && !authMissing(error)) throw new Error(`QA cleanup verify Auth: ${error.message}`);
+    if (data?.user && !data.user.deleted_at) throw new Error('QA cleanup incomplete: Auth identity remains active');
   }
   // Verify the trigger-derived rows are gone (skipped where the table
   // does not exist in the QA project).
@@ -250,6 +419,13 @@ async function cleanup() {
     .select('id').eq('student_id', state.holderStudent.id).limit(1), 'holder-student course enrollments');
   if (state.hvacEnrollmentId) await assertEnrollmentDerivedGone(state.hvacEnrollmentId, 'HVAC');
   if (state.holderEnrollmentId) await assertEnrollmentDerivedGone(state.holderEnrollmentId, 'holder-student');
+  if (state.learner?.id) await assertDerivedGone(db.from('course_enrollments')
+    .select('id').eq('student_id', state.learner.id).limit(1), 'learner course enrollments');
+  if (state.holderStudent?.id) await assertDerivedGone(db.from('course_enrollments')
+    .select('id').eq('student_id', state.holderStudent.id).limit(1), 'holder-student course enrollments');
+  if (state.hvacEnrollmentId) await assertEnrollmentDerivedGone(state.hvacEnrollmentId, 'HVAC');
+  if (state.holderEnrollmentId) await assertEnrollmentDerivedGone(state.holderEnrollmentId, 'holder-student');
+  if (state.apprenticeEnrollmentId) await assertEnrollmentDerivedGone(state.apprenticeEnrollmentId, 'apprentice');
   console.log(JSON.stringify({ ok: true, cleanedRunId: state.runId }));
 }
 

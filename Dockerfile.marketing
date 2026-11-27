@@ -158,12 +158,13 @@ COPY --from=builder --chown=nextjs:nodejs \
     /workspace/apps/marketing/.next/static \
     ./apps/marketing/.next/static/
 
-COPY --from=builder --chown=nextjs:nodejs /workspace/public ./public/
 COPY --from=builder --chown=nextjs:nodejs /workspace/public ./apps/marketing/public/
-COPY --from=builder --chown=nextjs:nodejs /workspace/apps/marketing/public/data/hero-banners.json ./public/data/hero-banners.json
 COPY --from=builder --chown=nextjs:nodejs /workspace/apps/marketing/public/data/hero-banners.json ./apps/marketing/public/data/hero-banners.json
 
-RUN test -s /app/public/images/social/elevate-career-training-20261009.jpg && \
+# Filesystem readers use /app/public while Next serves the app-local tree.
+RUN ln -s apps/marketing/public /app/public && \
+    test -L /app/public && \
+    test -s /app/public/images/social/elevate-career-training-20261009.jpg && \
     test -s /app/apps/marketing/public/images/social/elevate-career-training-20261009.jpg && \
     test -f /app/public/version.json && \
     test -f /app/apps/marketing/public/version.json && \

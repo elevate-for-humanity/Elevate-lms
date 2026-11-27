@@ -206,8 +206,11 @@ export type ScheduleWeekInvoice = {
  *    whose amount matches — catches reconcile-created (`paypal:`) invoices
  *    once they are linked to the schedule.
  *
- * Failed invoice rows are ignored: a failed creation is retried, not treated
- * as a billed week. Returns the earliest matching invoice, or null.
+ * Failed and voided invoice rows are ignored: a failed creation is retried,
+ * not treated as a billed week, and a voided invoice is terminal — it can
+ * neither take a payment nor stand in for the week, so a replacement invoice
+ * may be created for that week instead of the payment failing outright.
+ * Returns the earliest matching invoice, or null.
  */
 export async function findInvoiceForScheduleWeek(
   db: Database,
@@ -222,6 +225,7 @@ export async function findInvoiceForScheduleWeek(
     .eq('idempotency_key', `apprentice-fallback:${input.scheduleId}:${input.weekStart}`)
     .eq('total_cents', input.amountCents)
     .neq('status', 'failed')
+    .neq('status', 'void')
     .maybeSingle();
   if (byKey.error) throw new Error(`Could not check for a duplicate invoice: ${byKey.error.message}`);
   if (byKey.data) return byKey.data as ScheduleWeekInvoice;
@@ -234,6 +238,7 @@ export async function findInvoiceForScheduleWeek(
     .gte('due_at', input.weekStart)
     .lte('due_at', weekEnd)
     .neq('status', 'failed')
+    .neq('status', 'void')
     .order('created_at', { ascending: true })
     .limit(1)
     .maybeSingle();

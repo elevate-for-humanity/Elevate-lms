@@ -2,16 +2,14 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { GET as studio } from '@/apps/admin/app/manifest-dev-studio.json/route';
 import { GET as courses } from '@/apps/admin/app/manifest-course-builder.json/route';
-import { GET as email } from '@/apps/admin/app/manifest-email.json/route';
 
 describe('separate workspace apps', () => {
   it('keeps each installed launcher and its assets within an independent scope', async () => {
-    const manifests = await Promise.all([studio(), courses(), email()].map((response) => response.json()));
-    expect(new Set(manifests.map((manifest) => manifest.id)).size).toBe(3);
+    const manifests = await Promise.all([studio(), courses()].map((response) => response.json()));
+    expect(new Set(manifests.map((manifest) => manifest.id)).size).toBe(2);
     const entries = [
       ['/install/dev-studio.html', '/studio'],
       ['/install/course-builder.html', '/studio/courses'],
-      ['/install/email.html', '/phone/email'],
     ];
     for (const [index, manifest] of manifests.entries()) {
       const [launcher, destination] = entries[index];

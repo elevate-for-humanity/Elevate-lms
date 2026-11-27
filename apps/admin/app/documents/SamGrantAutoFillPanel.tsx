@@ -108,10 +108,10 @@ export default function SamGrantAutoFillPanel() {
             legalName: `${PLATFORM_DEFAULTS.orgName} Career & Technical Institute`,
             contactEmail: `info@${PLATFORM_DEFAULTS.canonicalDomain}`,
             contactPhone: PLATFORM_DEFAULTS.supportPhone,
-            address: '8888 Keystone Crossing, Suite 1300',
+            address: '120 East Market Street, Suite 930, Indianapolis, IN 46204',
             city: 'Indianapolis',
             state: 'IN',
-            zip: '46240',
+            zip: '46204',
           },
           project: {
             title: `Grant Application - ${selected.title}`,

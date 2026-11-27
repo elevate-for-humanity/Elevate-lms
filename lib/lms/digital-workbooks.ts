@@ -2,6 +2,8 @@ import 'server-only';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { resolvePortalPreviewSubject } from '@/lib/admin/portal-preview';
+import { getInstructorCurriculumLicenseStatus } from '@/lib/legal/instructorCurriculumLicense';
+import { HVAC_COURSE_ID } from '@/lib/lms/hvac-workbook-contract';
 
 export type Workbook = {
   id: string;
@@ -9,6 +11,10 @@ export type Workbook = {
   title: string;
   program_id: string;
   cover_image: string;
+  // The stored illustrated book itself. Sections carry prompts + a pdf_page
+  // mapping into this document; the viewer must render its pages, never a
+  // prompts-only skeleton (REAL, NOT SKELETON rule, 2026-11-26).
+  pdf_storage_path?: string | null;
 };
 export type WorkbookSection = {
   id: string;
@@ -58,10 +64,25 @@ export async function loadMyDigitalWorkbooks() {
     if (teaching.error) throw new Error('Workbook teaching access could not be verified.');
     const teachingIds = (teaching.data ?? []).map(row => row.course_id).filter(Boolean);
     if (teachingIds.length) {
-      const courses = await admin.from('courses').select('program_id')
+      const courses = await admin.from('courses').select('id,program_id')
         .in('id', teachingIds).eq('is_active', true).eq('status', 'published');
       if (courses.error) throw new Error('Workbook teaching programs could not be verified.');
-      programIds = [...new Set([...programIds, ...(courses.data ?? []).map(row => row.program_id).filter(Boolean)])];
+      let teachingPrograms = (courses.data ?? [])
+        .map((row) => ({ courseId: String(row.id), programId: row.program_id }))
+        .filter((row) => row.programId);
+      // Proprietary-curriculum gate: teaching the HVAC course also requires
+      // the current instructor IP license. Without it, the HVAC program is
+      // excluded from the teaching workbook set; other teaching programs pass
+      // through unchanged. (Assignment itself is already proven above.)
+      const hvacTeaching = teachingPrograms.filter((row) => row.courseId === HVAC_COURSE_ID);
+      if (hvacTeaching.length) {
+        const licenseStatus = await getInstructorCurriculumLicenseStatus(admin, subject.userId);
+        if (!licenseStatus.authorized) {
+          const hvacProgramIds = new Set(hvacTeaching.map((row) => row.programId));
+          teachingPrograms = teachingPrograms.filter((row) => !hvacProgramIds.has(row.programId));
+        }
+      }
+      programIds = [...new Set([...programIds, ...teachingPrograms.map((row) => row.programId)])];
     }
     if (!programIds.length)
       return { user: { id: subject.userId }, workbooks: [] as Workbook[], previewing: true };
@@ -69,7 +90,7 @@ export async function loadMyDigitalWorkbooks() {
   }
   let query = reader
     .from('digital_workbooks')
-    .select('id,slug,title,program_id,cover_image')
+    .select('id,slug,title,program_id,cover_image,pdf_storage_path')
     .eq('is_active', true);
   if (subject.previewing) query = query.in('program_id', programIds);
   const { data, error } = await query.order('title');
@@ -131,11 +152,23 @@ export async function loadMyDigitalWorkbook(slug: string) {
     ? { data: false, error: null }
     : await db.rpc('can_edit_digital_workbook', { p_workbook_id: workbook.id });
   if (access.error) throw new Error('Workbook access could not be verified.');
+  // Hand the viewer a short-lived signed URL for the real book so its pages
+  // render in place beside the section prompts. Fail safe: no URL simply
+  // leaves the curated-visual presentation in place.
+  let pdfUrl: string | null = null;
+  if (workbook.pdf_storage_path) {
+    const admin = await requireAdminClient();
+    const signed = await admin.storage
+      .from('documents')
+      .createSignedUrl(workbook.pdf_storage_path, 60 * 60);
+    if (!signed.error) pdfUrl = signed.data?.signedUrl ?? null;
+  }
   return {
     workbook,
     sections: typedSections,
     responses,
     readOnly: access.data !== true,
     accountId: user.id,
+    pdfUrl,
   };
 }

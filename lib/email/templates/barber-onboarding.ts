@@ -100,7 +100,7 @@ export function barberOnboardingEmail(data: BarberOnboardingData) {
 
   <!-- Footer -->
   <div style="background: #f1f5f9; padding: 16px; text-align: center; font-size: 12px; color: #64748b; border-radius: 0 0 12px 12px;">
-    <p style="margin: 0;">Elevate for Humanity | 8888 Keystone Crossing, Indianapolis, IN</p>
+    <p style="margin: 0;">Elevate for Humanity | 120 East Market Street, Suite 930, Indianapolis, IN 46204</p>
     <p style="margin: 4px 0 0;">" + PLATFORM_DEFAULTS.supportPhone + " | info@elevateforhumanity.org</p>
     <p style="margin: 8px 0 0;"><a href={PLATFORM_DEFAULTS.siteUrl} style="color: #ea580c;">${PLATFORM_DEFAULTS.canonicalDomain}</a></p>
   </div>

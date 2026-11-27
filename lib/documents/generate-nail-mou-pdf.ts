@@ -26,7 +26,7 @@ const SPONSOR_TITLE = 'Founder & Chief Executive Officer';
 const RAPIDS = '2025-IN-132302';
 const CAGE = '0QH19';
 const UEI = 'VX2GK5S8SZH8';
-const ADDRESS = '8888 Keystone Crossing, Suite 1300, Indianapolis, IN 46240';
+const ADDRESS = '120 East Market Street, Suite 930, Indianapolis, IN 46204';
 const PHONE = PLATFORM_DEFAULTS.supportPhone;
 
 function wrapText(text: string, maxWidth: number, font: PDFFont, fontSize: number): string[] {

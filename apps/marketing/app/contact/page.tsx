@@ -1,3 +1,4 @@
+import { EMT_PROGRAM_SLUG, isEmtInquiryOnly } from '@/lib/programs/emt-inquiry-only';
 import HeroPicture from '@/components/marketing/HeroPicture';
 import { siteConfig } from '@/lib/config/site';
 import { Metadata } from 'next';
@@ -5,6 +6,8 @@ import { Phone, Mail, MapPin, Clock, MessageSquare, Users, Building2 } from 'luc
 import Link from 'next/link';
 import { ContactRequestForm } from '@/components/forms/ContactRequestForm';
 import { COURSE_BUILDER_REQUESTS } from '@/lib/course-builder/offer';
+import { HOST_SHOP_REGIONS } from '@/lib/marketing/host-shop-regions';
+import { PROGRAM_LABELS } from '@/lib/programs/host-shop-programs';
 
 export const metadata: Metadata = {
   title: 'Contact | Workforce Development & Apprenticeship Programs',
@@ -29,8 +32,18 @@ export default async function ContactPage({ searchParams }: ContactPageProps) {
   const courseBuilderMessage = Object.hasOwn(COURSE_BUILDER_REQUESTS, product)
     ? COURSE_BUILDER_REQUESTS[product as keyof typeof COURSE_BUILDER_REQUESTS]
     : null;
-  const defaultSubject = courseBuilderMessage ? 'course-builder' : course ? 'enrollment' : requestedItem ? 'other' : '';
-  const defaultMessage = courseBuilderMessage ?? (requestedItem
+  const apprenticeship = typeof params.apprenticeship === 'string' ? params.apprenticeship : '';
+  const isApprenticeshipInquiry = apprenticeship === 'general' || Object.hasOwn(PROGRAM_LABELS, apprenticeship);
+  const region = HOST_SHOP_REGIONS.find((entry) => entry.slug === params.region);
+  const community = typeof params.community === 'string' ? params.community.trim().slice(0, 80) : '';
+  const location = [community, region?.city].filter(Boolean).join(', ');
+  const defaultSubject = courseBuilderMessage ? 'course-builder' : isApprenticeshipInquiry ? 'apprenticeship' : course ? 'enrollment' : requestedItem ? 'other' : '';
+  const emtInquiry = isEmtInquiryOnly(params.program);
+  const defaultMessage = emtInquiry
+    ? 'I would like an update on future EMT training, the training provider and certification requirements.'
+    : courseBuilderMessage ?? (isApprenticeshipInquiry
+    ? `I would like information about ${PROGRAM_LABELS[apprenticeship] ?? 'apprenticeship opportunities'}${location ? ` near ${location}` : ' in Indiana'}.`
+    : requestedItem
     ? `I would like current availability, delivery details, access terms, and final pricing for ${titleFromSlug(requestedItem)}.`
     : '');
 
@@ -71,7 +84,8 @@ export default async function ContactPage({ searchParams }: ContactPageProps) {
                 )}
                 
                 <ContactRequestForm>
-                  {courseBuilderMessage && <input type="hidden" name="interest" value={product} />}
+                  {emtInquiry && <input type="hidden" name="program" value={EMT_PROGRAM_SLUG} />}
+                  {!emtInquiry && courseBuilderMessage && <input type="hidden" name="interest" value={product} />}
                   {/* Name */}
                   <div>
                     <label htmlFor="name" className="block text-sm font-semibold text-slate-700 mb-2">

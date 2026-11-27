@@ -5,6 +5,8 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import { sendEmail } from '@/lib/email/sendgrid';
 import { logger } from '@/lib/logger';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { isActiveProgramHolderScopeProgram, programHolderApplicationScope, programHolderProgramSlugs, programHolderScopeReview, unresolvedProgramHolderInterest, PROGRAM_HOLDER_SCOPE_INTAKE_FIELDS } from '@/lib/program-holder/program-interest';
+import { buildProgramHolderApprovalMessage, isGaryRegionalCoordinator } from '@/lib/program-holder/approval-message';
 
 // Program Holder pages are served by the LMS app, not the public marketing site.
 // Keeping auth callback and destination on the same app domain is especially
@@ -183,20 +185,27 @@ export async function POST(_request: NextRequest, { params }: { params: Promise<
     if (!email)
       return NextResponse.json({ error: 'Application has no email address.' }, { status: 400 });
 
-    const existingData =
+    const applicationData =
       application.data && typeof application.data === 'object' && !Array.isArray(application.data)
         ? (application.data as Record<string, unknown>)
         : {};
+    // Always consult protected intake: application.data can be applicant-writable,
+    // including removal of the original interest or injection of a fake review.
+    const { data: intake, error: intakeError } = await db.from('application_intake')
+      .select(PROGRAM_HOLDER_SCOPE_INTAKE_FIELDS)
+      .eq('application_type', 'program_holder').eq('destination_table', 'program_holder_applications')
+      .eq('destination_id', id).maybeSingle();
+    if (intakeError) throw intakeError;
+    const existingData = programHolderApplicationScope(id, applicationData, intake);
     const accountRole = accountRoleForApprovedRole(existingData.approved_role);
-    const requestedProgramSlugs = Array.isArray(existingData.requested_program_slugs)
-      ? [
-          ...new Set(
-            existingData.requested_program_slugs
-              .map((value) => String(value || '').trim())
-              .filter(Boolean),
-          ),
-        ]
-      : [];
+    if (unresolvedProgramHolderInterest(existingData)) {
+      return NextResponse.json(
+        { error: 'Complete the requested program scope review and link an active program before approving this Program Holder application.' },
+        { status: 409 },
+      );
+    }
+    const scopeReview = programHolderScopeReview(existingData);
+    const requestedProgramSlugs = programHolderProgramSlugs(existingData);
 
     let activePrograms: Array<{ id: string; slug: string }> = [];
     if (requestedProgramSlugs.length > 0) {
@@ -208,8 +217,10 @@ export async function POST(_request: NextRequest, { params }: { params: Promise<
 
       activePrograms = (requestedPrograms ?? []).filter(
         (program) =>
-          program.is_active !== false &&
-          !['archived', 'inactive'].includes(String(program.status || '').toLowerCase()),
+          scopeReview
+            ? program.id === scopeReview.program_id && isActiveProgramHolderScopeProgram(program)
+            : program.is_active !== false &&
+              !['archived', 'inactive'].includes(String(program.status || '').toLowerCase()),
       );
       const resolvedSlugs = new Set(activePrograms.map((program) => String(program.slug)));
       const missingSlugs = requestedProgramSlugs.filter((slug) => !resolvedSlugs.has(slug));
@@ -373,12 +384,29 @@ export async function POST(_request: NextRequest, { params }: { params: Promise<
     const portalUrl = `${PORTAL_BASE}/login?portal=program-holder&redirect=${encodeURIComponent('/program-holder/dashboard')}`;
     const fallbackPath = alreadySigned ? '/program-holder/dashboard' : '/program-holder/sign-mou';
     const nextUrl = `${PORTAL_BASE}/login?portal=program-holder&redirect=${encodeURIComponent(fallbackPath)}`;
-    const subject =
-      'Approved: Gary Regional Site Coordinator — Dashboard Access & Required Onboarding | Elevate for Humanity';
+    const requiresRecovery = identity.isNewUser && !accessLink;
+    const onboardingAccessUrl = accessLink || (requiresRecovery ? `${PORTAL_BASE}/reset-password?portal=program-holder` : nextUrl);
+    const standardNotice = buildProgramHolderApprovalMessage({
+      organizationName: String(application.organization_name || ''),
+      contactName,
+      email,
+      accountRole,
+      programSlugs: requestedProgramSlugs,
+      accessUrl: onboardingAccessUrl,
+      portalUrl,
+      isNewUser: identity.isNewUser,
+      requiresRecovery,
+      alreadySigned,
+      supportPhone: PLATFORM_DEFAULTS.supportPhone,
+    });
+    const useGaryNotice = isGaryRegionalCoordinator(existingData);
+    const subject = useGaryNotice
+      ? 'Approved: Gary Regional Site Coordinator — Dashboard Access & Required Onboarding | Elevate for Humanity'
+      : standardNotice.subject;
     const result = await sendEmail({
       to: email,
       subject,
-      html: `<div style="font-family:Arial,sans-serif;max-width:720px;margin:auto;color:#0f172a;line-height:1.55"><h2>Your Gary Regional Site Coordinator application is approved</h2><p>Hello ${escapeHtml(contactName)},</p><p><strong>${escapeHtml(application.organization_name)}</strong> has been approved for the <strong>Gary Regional Site Coordinator</strong> role covering Gary, Indiana and surrounding communities within 30 miles.</p><p>You and the other Gary coordinator will have separate linked dashboards. You are responsible for regional intake, WorkOne coordination, program-holder recruitment and supervision, student monitoring, documentation, communications, reporting, and closeout. For any offered program without an assigned qualified Program Holder, the Site Coordinators remain responsible for coordinating that program until a qualified holder is approved and assigned.</p><p><strong>Username:</strong> ${escapeHtml(email)}</p><p>For security, Elevate does not email a plaintext password.</p><p><a href="${accessLink || nextUrl}" style="display:inline-block;background:#1d4ed8;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none;font-weight:bold">${identity.isNewUser ? 'Set Password & Continue Onboarding' : 'Secure Sign In & Continue Onboarding'}</a></p><h3>Required onboarding — complete every dashboard item</h3><ol>${alreadySigned ? '' : '<li>Review and sign your custom Site Coordinator MOU.</li>'}<li>Complete the W-9 and upload all required organization documents.</li><li>Enter banking information only through the secure payout workflow and complete QuickBooks payment-record setup.</li><li>Go to WorkOne, complete setup, establish the local working relationship, and document applicant eligibility and funding steps. Funding is never guaranteed.</li><li>Review PARIS and the interactive office. Use dashboard calls, messages, notes, tasks, documents, reports, and applicant/student status tools to contact and manage people through the system.</li><li>Recruit qualified Program Holders for every program offered in your region; vet, onboard, assign, support, and monitor them.</li><li>Track each applicant from intake through WorkOne, approved enrollment, attendance, course progress, completion, credential, and closeout.</li></ol><h3>Compensation</h3><p>The approved compensation is <strong>$1,000 per eligible, verified enrollment</strong>: <strong>$500</strong> after verified enrollment, required documentation, and funding authorization; and <strong>$500</strong> after verified course completion and required closeout documentation. A lead, incomplete application, unverified enrollment, or unverified completion does not by itself trigger payment.</p><p><strong>Contact requirement:</strong> No compensation is earned or payable for an applicant unless you make a documented call/contact through the system and record the outcome on that applicant. If Elevate staff performs the intake and you do not contact the applicant, you are not entitled to payout credit. Applicants without a documented contact outcome for five days are escalated to the Elevate admin dashboard.</p><h3>PARIS and your interactive office</h3><p>PARIS helps explain the dashboard, open the right workspace, identify missing requirements, and prepare actions. Use the interactive office to call or message applicants, record notes and outcomes, assign tasks, review documents, monitor students, submit reports, and view payout readiness. You remain responsible for reviewing records and completing official submissions.</p><p>Portal: <a href="${portalUrl}">${portalUrl}</a></p><p>Questions? Call ${PLATFORM_DEFAULTS.supportPhone}.</p></div>`,
+      html: useGaryNotice ? `<div style="font-family:Arial,sans-serif;max-width:720px;margin:auto;color:#0f172a;line-height:1.55"><h2>Your Gary Regional Site Coordinator application is approved</h2><p>Hello ${escapeHtml(contactName)},</p><p><strong>${escapeHtml(application.organization_name)}</strong> has been approved for the <strong>Gary Regional Site Coordinator</strong> role covering Gary, Indiana and surrounding communities within 30 miles.</p><p>You and the other Gary coordinator will have separate linked dashboards. You are responsible for regional intake, WorkOne coordination, program-holder recruitment and supervision, student monitoring, documentation, communications, reporting, and closeout. For any offered program without an assigned qualified Program Holder, the Site Coordinators remain responsible for coordinating that program until a qualified holder is approved and assigned.</p><p><strong>Username:</strong> ${escapeHtml(email)}</p><p>For security, Elevate does not email a plaintext password.</p><p><a href="${onboardingAccessUrl}" style="display:inline-block;background:#1d4ed8;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none;font-weight:bold">${requiresRecovery ? 'Request Password Setup Link' : identity.isNewUser ? 'Set Password & Continue Onboarding' : 'Secure Sign In & Continue Onboarding'}</a></p><h3>Required onboarding — complete every dashboard item</h3><ol>${alreadySigned ? '' : '<li>Review and sign your custom Site Coordinator MOU.</li>'}<li>Complete the W-9 and upload all required organization documents.</li><li>Enter banking information only through the secure payout workflow and complete QuickBooks payment-record setup.</li><li>Go to WorkOne, complete setup, establish the local working relationship, and document applicant eligibility and funding steps. Funding is never guaranteed.</li><li>Review PARIS and the interactive office. Use dashboard calls, messages, notes, tasks, documents, reports, and applicant/student status tools to contact and manage people through the system.</li><li>Recruit qualified Program Holders for every program offered in your region; vet, onboard, assign, support, and monitor them.</li><li>Track each applicant from intake through WorkOne, approved enrollment, attendance, course progress, completion, credential, and closeout.</li></ol><h3>Compensation</h3><p>The approved compensation is <strong>$1,000 per eligible, verified enrollment</strong>: <strong>$500</strong> after verified enrollment, required documentation, and funding authorization; and <strong>$500</strong> after verified course completion and required closeout documentation. A lead, incomplete application, unverified enrollment, or unverified completion does not by itself trigger payment.</p><p><strong>Contact requirement:</strong> No compensation is earned or payable for an applicant unless you make a documented call/contact through the system and record the outcome on that applicant. If Elevate staff performs the intake and you do not contact the applicant, you are not entitled to payout credit. Applicants without a documented contact outcome for five days are escalated to the Elevate admin dashboard.</p><h3>PARIS and your interactive office</h3><p>PARIS helps explain the dashboard, open the right workspace, identify missing requirements, and prepare actions. Use the interactive office to call or message applicants, record notes and outcomes, assign tasks, review documents, monitor students, submit reports, and view payout readiness. You remain responsible for reviewing records and completing official submissions.</p><p>Portal: <a href="${portalUrl}">${portalUrl}</a></p><p>Questions? Call ${PLATFORM_DEFAULTS.supportPhone}.</p></div>` : standardNotice.html,
     });
     await auditEmail(db, {
       recipient: email,

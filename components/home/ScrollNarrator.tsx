@@ -17,7 +17,7 @@ import {
 const NARRATION_PREFERENCE_KEY = 'elevate:scroll-narration';
 const LEGACY_NARRATION_PREFERENCE_KEY = 'elevate:scroll-narration:v2';
 const SECTION_PAUSE_MS = 1000;
-const SCROLL_SETTLE_MS = 850;
+const SCROLL_SETTLE_MS = 220;
 const NARRATION_GESTURE_NOTICE = 'Tap the speaker to start page narration.';
 
 function narrationFor(section: HTMLElement) {
@@ -103,6 +103,14 @@ export function ScrollNarrator() {
     if (Array.from(document.querySelectorAll<HTMLMediaElement>('audio, video')).some(
       (media) => !media.paused && (!media.muted && media.volume > 0 || media.hasAttribute('data-narrated-tour')),
     )) return false;
+    // Browsers cannot play audible narration before a visitor gesture.
+    // Do not generate billable provider speech while the document is still
+    // untouched (including automated page-readiness checks). The existing
+    // pointer/keyboard listener will begin narration on first interaction.
+    if (typeof navigator !== 'undefined' && navigator.userActivation && !navigator.userActivation.hasBeenActive) {
+      setNotice(NARRATION_GESTURE_NOTICE);
+      return false;
+    }
     const section = mostVisiblePageSection();
     if (!section) {
       // Mobile layouts frequently have spacing between narrated sections.
@@ -140,6 +148,7 @@ export function ScrollNarrator() {
       onEnded: () => {
         if (generation !== playbackGenerationRef.current) return;
         speakingRef.current = false;
+        narratedRef.current.add(key);
         quietUntilRef.current = Math.max(quietUntilRef.current, Date.now() + SECTION_PAUSE_MS);
         window.clearTimeout(transitionTimerRef.current);
         transitionTimerRef.current = window.setTimeout(
@@ -164,7 +173,6 @@ export function ScrollNarrator() {
         ? NARRATION_GESTURE_NOTICE
         : 'Narration could not start. Turn narration off and on to retry.');
     } else {
-      narratedRef.current.add(key);
       setNotice(null);
     }
     return started;
@@ -182,6 +190,7 @@ export function ScrollNarrator() {
       playbackGenerationRef.current += 1;
       speakingRef.current = false;
       pendingRef.current = null;
+      lastNarrationRef.current = null;
       window.clearTimeout(transitionTimerRef.current);
       stopAllNaturalVoicePlayback();
       pauseOtherAudibleMedia(media);
@@ -192,17 +201,29 @@ export function ScrollNarrator() {
       playbackGenerationRef.current += 1;
       speakingRef.current = false;
       pendingRef.current = null;
+      lastNarrationRef.current = null;
       window.clearTimeout(transitionTimerRef.current);
     };
+    const continueAfterMedia = (event: Event) => {
+      const media = event.target;
+      if (!enabled || !(media instanceof HTMLMediaElement) || speakingRef.current ||
+          (media.muted && !media.hasAttribute('data-narrated-tour'))) return;
+      window.clearTimeout(transitionTimerRef.current);
+      transitionTimerRef.current = window.setTimeout(() => continueRef.current(), SECTION_PAUSE_MS);
+    };
     window.addEventListener(NATURAL_VOICE_STOP_EVENT, releaseInterruptedNarration);
+    document.addEventListener('ended', continueAfterMedia, true);
+    document.addEventListener('pause', continueAfterMedia, true);
     document.addEventListener('play', governAudibleMedia, true);
     document.addEventListener('volumechange', governAudibleMedia, true);
     return () => {
       window.removeEventListener(NATURAL_VOICE_STOP_EVENT, releaseInterruptedNarration);
+      document.removeEventListener('ended', continueAfterMedia, true);
+      document.removeEventListener('pause', continueAfterMedia, true);
       document.removeEventListener('play', governAudibleMedia, true);
       document.removeEventListener('volumechange', governAudibleMedia, true);
     };
-  }, []);
+  }, [enabled]);
 
   useEffect(() => {
     // Privacy modes may reject even reading Storage. Narration preferences
@@ -246,12 +267,10 @@ export function ScrollNarrator() {
     lastNarrationRef.current = null;
     stop();
     if (!enabled || !hasNarration) return;
-    // Give the page and opening visual time to settle before narration begins.
-    // This prevents the hero, route transition, and first scroll section from
-    // competing to speak during initial render.
-    const timer = window.setTimeout(() => void narrateVisibleSection(), 1400);
+    // Wait one frame for streamed sections to be measured.
+    const frame = window.requestAnimationFrame(() => void narrateVisibleSection());
     return () => {
-      window.clearTimeout(timer);
+      window.cancelAnimationFrame(frame);
       window.clearTimeout(transitionTimerRef.current);
       playbackGenerationRef.current += 1;
       speakingRef.current = false;
@@ -269,9 +288,12 @@ export function ScrollNarrator() {
 
     const preload = (section: HTMLElement) => {
       const text = narrationFor(section);
-      if (text)
+      const src = narrationSourceFor(section);
+      // Only preload existing same-origin recordings. Generated speech must
+      // not invoke an unconfigured provider merely because a page is viewed.
+      if (text && src && (!navigator.userActivation || navigator.userActivation.hasBeenActive))
         void prepare(text, {
-          src: narrationSourceFor(section),
+          src,
           voice: 'coral',
           style: narrationStyleFor(section),
           rate: narrationRateFor(section),
@@ -314,8 +336,7 @@ export function ScrollNarrator() {
       timer = window.setTimeout(() => {
         const current = lastNarrationRef.current?.section;
         const visible = mostVisiblePageSection();
-        if (visible === current) return;
-        if (!visible) return;
+        if (!visible || visible === current) return;
         void narrateVisibleSection();
       }, Math.max(SCROLL_SETTLE_MS, quietUntilRef.current - Date.now()));
     };

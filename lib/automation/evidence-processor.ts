@@ -65,6 +65,8 @@ export interface ValidationRule {
   id: string;
   name: string;
   description: string;
+  /** Extracted-data fields the rule reads; the rule is skipped (not failed) when any is absent. */
+  requires?: string[];
   validate: (data: Record<string, unknown>, context: ValidationContext) => ValidationResult;
 }
 
@@ -129,6 +131,7 @@ const STATES_WITH_TRANSCRIPT_RULES = new Set([
 const TRANSCRIPT_RULES: ValidationRule[] = [
   {
     id: 'transcript_hours_positive',
+    requires: ['hours_completed'],
     name: 'Hours must be positive',
     description: 'Completed hours must be greater than 0',
     validate: (data) => ({
@@ -139,6 +142,7 @@ const TRANSCRIPT_RULES: ValidationRule[] = [
   },
   {
     id: 'transcript_hours_reasonable',
+    requires: ['hours_completed'],
     name: 'Hours must be reasonable',
     description: 'Hours should not exceed 3000 (typical max for apprenticeship)',
     validate: (data) => ({
@@ -149,6 +153,7 @@ const TRANSCRIPT_RULES: ValidationRule[] = [
   },
   {
     id: 'transcript_date_not_future',
+    requires: ['completion_date'],
     name: 'Completion date not in future',
     description: 'Completion date cannot be in the future',
     validate: (data) => {
@@ -164,6 +169,7 @@ const TRANSCRIPT_RULES: ValidationRule[] = [
   },
   {
     id: 'transcript_in_state',
+    requires: ['state'],
     name: 'In-state transcript',
     description: 'Transcript must be from a state with explicit ruleset for auto-approval',
     validate: (data, context) => {
@@ -180,6 +186,7 @@ const TRANSCRIPT_RULES: ValidationRule[] = [
 const LICENSE_RULES: ValidationRule[] = [
   {
     id: 'license_not_expired',
+    requires: ['expiration_date'],
     name: 'License not expired',
     description: 'License expiration date must be in the future',
     validate: (data) => {
@@ -195,6 +202,7 @@ const LICENSE_RULES: ValidationRule[] = [
   },
   {
     id: 'license_number_format',
+    requires: ['license_number'],
     name: 'Valid license number',
     description: 'License number must be present and non-empty',
     validate: (data) => ({
@@ -208,6 +216,7 @@ const LICENSE_RULES: ValidationRule[] = [
 const MOU_RULES: ValidationRule[] = [
   {
     id: 'mou_signed',
+    requires: ['signature_date'],
     name: 'MOU is signed',
     description: 'MOU must have a signature date',
     validate: (data) => ({
@@ -218,6 +227,7 @@ const MOU_RULES: ValidationRule[] = [
   },
   {
     id: 'mou_effective',
+    requires: ['effective_date'],
     name: 'MOU is effective',
     description: 'MOU effective date must be today or earlier',
     validate: (data) => {
@@ -306,28 +316,34 @@ export async function processDocument(
       );
     }
 
-    // Step 3: Check required fields
+    // Step 3: Record required fields the extraction did not produce.
+    // OCR retains text only (see Step 1), so structured fields are
+    // informational for staff — under the standing auto-approve behavior
+    // (Elizabeth, 2026-11-26: present + uploaded = approved) a missing
+    // extracted field never blocks approval of a legible document.
     const requiredFields = REQUIRED_FIELDS[detectedType];
     const missingFields = requiredFields.filter((field) => !extractedData[field]);
+    const warnings: string[] = [];
     if (missingFields.length > 0) {
-      return await routeToReview(
-        supabase,
-        documentId,
-        detectedType,
-        extractedData,
-        confidence,
-        [`Missing required fields: ${missingFields.join(', ')}`],
-        context,
-        startTime,
-      );
+      warnings.push(`Extracted fields not present: ${missingFields.join(', ')}`);
     }
 
-    // Step 4: Run validation rules
+    // Step 4: Run validation rules. A rule is evaluated only when every
+    // field it requires is present in the extracted data (or context);
+    // a rule whose inputs were not extracted is skipped, not failed —
+    // absence of an extracted field is not evidence against the document.
     const rules = RULESETS[detectedType];
     const failedRules: string[] = [];
-    const warnings: string[] = [];
 
     for (const rule of rules) {
+      const requires = rule.requires || [];
+      const evaluable = requires.every(
+        (field) => extractedData[field] !== undefined || (context as any)?.[field] !== undefined,
+      );
+      if (!evaluable) {
+        warnings.push(`${rule.name}: not evaluated (inputs not extracted)`);
+        continue;
+      }
       const result = rule.validate(extractedData, context || { documentType: detectedType });
       if (!result.passed) {
         if (result.severity === 'error') {
@@ -352,15 +368,18 @@ export async function processDocument(
       );
     }
 
-    // Step 6: Route to human review — auto-approval is disabled.
-    // All documents require manual admin approval regardless of OCR confidence.
-    return await routeToReview(
+    // Step 6: Standing behavior (Elizabeth, 2026-11-26) — a document that
+    // arrived legible (OCR cleared the confidence floor in Step 2) with no
+    // failed evaluable rule is approved on arrival. Illegible documents and
+    // failed rules have already been routed to the staff review queue
+    // above as exceptions; nothing waits in a silent pending state.
+    return await autoApprove(
       supabase,
       documentId,
       detectedType,
       extractedData,
       confidence,
-      warnings.length > 0 ? warnings : ['ocr_passed_pending_admin_review'],
+      warnings,
       context,
       startTime,
     );
@@ -384,9 +403,10 @@ export async function processDocument(
 }
 
 /**
- * Auto-approval is disabled — all documents require manual admin review.
- * This function is retained for reference but is no longer called.
- * @deprecated Use routeToReview instead.
+ * Approve a document on arrival (standing behavior, Elizabeth 2026-11-26):
+ * present + uploaded + legible = approved, with the decision logged.
+ * Illegible documents and failed evaluable rules go through routeToReview
+ * as staff exceptions instead.
  */
 async function autoApprove(
   supabase: ReturnType<typeof createAdminClient>,
@@ -400,13 +420,16 @@ async function autoApprove(
 ): Promise<ProcessingResult> {
   const processingTimeMs = Date.now() - startTime;
 
-  // Update document status
+  // Update document status. verified_by is a uuid column, so the system
+  // attribution lives in verification_notes; setting a text value there
+  // would fail the update and leave the document unapproved.
   await supabase
     .from('documents')
     .update({
       status: 'approved',
+      verified: true,
       verified_at: new Date().toISOString(),
-      verified_by: 'system',
+      verification_notes: 'Auto-approved on arrival by the evidence processor (present + uploaded + legible = approved).',
       extracted_data: extractedData,
       ocr_confidence: confidence,
       updated_at: new Date().toISOString(),
@@ -718,3 +741,4 @@ export async function processTranscript(
 // ============================================
 
 export { RULESET_VERSION, MIN_CONFIDENCE, REQUIRED_FIELDS, STATES_WITH_TRANSCRIPT_RULES };
+

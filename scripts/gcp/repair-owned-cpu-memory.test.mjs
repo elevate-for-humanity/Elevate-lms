@@ -7,8 +7,8 @@ function fixture({tamper=false}={}) {
  const base='https://elevate-owned-cpu-llm-aabnh2y32a-ue.a.run.app';
  const old='elevate-owned-cpu-llm-old',next='elevate-owned-cpu-llm-new';
  const calls=[];let staged=false,serving=old;
- const task={serviceAccountName:'elevate-llm-runtime@elegant-racer-299721.iam.gserviceaccount.com',containerConcurrency:1,
-  containers:[{image:'us-central1-docker.pkg.dev/elegant-racer-299721/elevate/owned-cpu-llm@sha256:'+'a'.repeat(64),resources:{limits:{cpu:'4',memory:'8Gi'}},env:[{name:'LLM_WORKER_SECRET',valueFrom:{secretKeyRef:{name:'existing-secret',key:'latest'}}}]}]};
+ const task={serviceAccountName:'elevate-llm-runtime@elegant-racer-299721.iam.gserviceaccount.com',containerConcurrency:2,
+  containers:[{image:'us-central1-docker.pkg.dev/elegant-racer-299721/elevate/owned-cpu-llm@sha256:'+'a'.repeat(64),resources:{limits:{cpu:'8',memory:'16Gi'}},env:[{name:'LLM_WORKER_SECRET',valueFrom:{secretKeyRef:{name:'existing-secret',key:'latest'}}}]}]};
  const run=args=>{
   calls.push(args);
   if(args[0]==='projects')return JSON.stringify({bindings:[{role:'roles/owner',members:['user:owner@example.test']}]});

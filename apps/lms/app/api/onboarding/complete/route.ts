@@ -87,7 +87,7 @@ async function sendEnrollmentConfirmationEmail({
           </div>
           <div style="border-top:1px solid #e0e0e0;margin-top:32px;padding-top:20px;text-align:center;font-family:Arial,sans-serif;font-size:12px;color:#999">
             <p style="margin:0 0 4px">${PLATFORM_DEFAULTS.orgName} Career &amp; Technical Institute</p>
-            <p style="margin:0 0 4px">8888 Keystone Crossing Suite 1300, Indianapolis, IN 46240</p>
+            <p style="margin:0 0 4px">120 East Market Street, Suite 930, Indianapolis, IN 46204</p>
             <p style="margin:0"><a href="${SITE_URL}" style="color:#999;text-decoration:underline">${PLATFORM_DEFAULTS.canonicalDomain}</a> &nbsp;|&nbsp; ${PLATFORM_DEFAULTS.supportPhone}</p>
           </div>
         </div>

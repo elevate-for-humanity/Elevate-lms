@@ -18,8 +18,9 @@ describe('homepage scroll narration lifecycle', () => {
       source.indexOf('const synchronizeNarrationToScroll'),
       source.indexOf("window.addEventListener('scroll'"),
     );
-    expect(scrollHandler).toContain('if (visible === current) return');
-    expect(scrollHandler).toContain('if (!visible) return');
+    // A combined guard is equivalent to two early returns and prevents
+    // restarts on a section boundary or on small movements within a section.
+    expect(scrollHandler).toMatch(/if \(!visible\s*\|\|\s*visible === current\) return|if \(visible === current\) return;?[\s\S]*?if \(!visible\) return/);
     expect(scrollHandler).not.toContain('lastNarrationRef.current = null');
     expect(scrollHandler).not.toContain('stop()');
     expect(scrollHandler).toContain('void narrateVisibleSection()');
@@ -45,6 +46,16 @@ describe('homepage scroll narration lifecycle', () => {
     expect(source).toContain('Narration could not start. Turn narration off and on to retry.');
     expect(source).toContain("window.addEventListener('pointerdown', beginFromNaturalInteraction");
     expect(source).toContain("window.addEventListener('keydown', beginFromNaturalInteraction");
+  });
+
+  it('restarts narration interrupted by media and only deduplicates completed sections', () => {
+    const end = source.slice(source.indexOf('onEnded: () =>'), source.indexOf('onError: () =>'));
+    const start = source.slice(source.indexOf('const started = await playback'), source.indexOf('return started;'));
+    const interrupt = source.slice(source.indexOf('const governAudibleMedia'), source.indexOf('const continueAfterMedia'));
+    expect(end).toContain('narratedRef.current.add(key)');
+    expect(start).not.toContain('narratedRef.current.add(key)');
+    expect(interrupt).toContain('lastNarrationRef.current = null');
+    expect(source).toContain('window.setTimeout(() => continueRef.current(), SECTION_PAUSE_MS)');
   });
 
   it('does not rebuild scroll listeners for transient playback state', () => {

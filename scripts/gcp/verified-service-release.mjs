@@ -2,7 +2,8 @@
 // Validation-only jobs can succeed while all deployment stages were skipped.
 const requiredReleaseJobs = Object.freeze({
   'deploy-admin.yml': ['Deploy and verify Admin on Google', 'acceptance'],
-  'deploy-google-lms-trigger.yml': ['deploy', 'acceptance'],
+  // GitHub prefixes the called workflow's matrix job with the caller job ID.
+  'deploy-google-lms-trigger.yml': ['deploy / deploy (lms)', 'acceptance'],
   'deploy-google-marketing-trigger.yml': ['Deploy and verify Marketing on Google', 'acceptance'],
   'deploy-google-store-runtime.yml': ['Deploy and verify Store on Google', 'acceptance'],
 });

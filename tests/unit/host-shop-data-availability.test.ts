@@ -38,6 +38,38 @@ vi.mock('@/lib/supabase/admin', () => ({
         program_enrollments: [
           { id: 'enrollment', user_id: 'student', program_slug: 'cosmetology-apprenticeship' },
         ],
+        host_shop_practical_service_entries: [
+          {
+            id: 'entry-1',
+            enrollment_id: 'enrollment',
+            student_id: 'student',
+            service_name: 'Haircut',
+            performed_on: '2026-11-20',
+            subject_type: 'patron',
+            verified_at: '2026-11-20T10:00:00Z',
+            voided_at: null,
+          },
+          {
+            id: 'entry-2',
+            enrollment_id: 'enrollment',
+            student_id: 'student',
+            service_name: 'Haircut',
+            performed_on: '2026-11-21',
+            subject_type: 'patron',
+            verified_at: '2026-11-21T10:00:00Z',
+            voided_at: null,
+          },
+          {
+            id: 'entry-3',
+            enrollment_id: 'enrollment',
+            student_id: 'student',
+            service_name: 'Shave',
+            performed_on: '2026-11-19',
+            subject_type: 'mannequin',
+            verified_at: null,
+            voided_at: null,
+          },
+        ],
       };
       const result = () => ({
         data: state.errors.has(table) ? null : (rows[table] ?? []),
@@ -59,6 +91,7 @@ it.each([
   ['hour_entries', 'work hours'],
   ['program_enrollments', 'program enrollments'],
   ['apprentice_competency_records', 'competency records'],
+  ['host_shop_practical_service_entries', 'practical services'],
   ['partner_program_access', 'assigned programs'],
   ['partner_document_requirements', 'document requirements'],
   ['partner_documents', 'uploaded documents'],
@@ -73,4 +106,13 @@ it.each([
 });
 it('does not report an outage when queries return genuine empty results', async () => {
   expect((await getHostShopBoard('owner')).unavailableData).toEqual([]);
+});
+it('counts only verified, non-voided practical services per apprentice', async () => {
+  const board = await getHostShopBoard('owner');
+  expect(board.practicalServicesTotal).toBe(2);
+  expect(board.apprentices[0].practical).toEqual({ verified: 2 });
+  expect(board.practicalRecentEntries.map((entry) => entry.id)).toEqual([
+    'entry-2',
+    'entry-1',
+  ]);
 });

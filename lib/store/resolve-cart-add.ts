@@ -1,5 +1,11 @@
 import { HVAC_STORE_BUNDLE } from './hvac-course-product';
 import { INDIVIDUAL_APP_CATALOG, type IndividualAppSlug, type IndividualPlanId } from '@/lib/apps/individual-app-plans';
+import {
+  CLONE_LICENSES,
+  COMMUNITY_ADDONS,
+  STORE_PRODUCTS,
+  type StoreProduct as CatalogStoreProduct,
+} from '@/lib/data/store-products';
 import { getProductBySlug, type StoreProduct } from '@/lib/store/products';
 import { workbookProducts } from '@/lib/store/workbook-products';
 
@@ -30,7 +36,42 @@ function individualAppProduct(appSlug: IndividualAppSlug, planId: IndividualPlan
 }
 
 /**
+ * Map a license/product from the canonical catalog in
+ * lib/data/store-products into the cart's StoreProduct shape. Prices here
+ * must match the advertised prices; the server revalidates the slug and
+ * price against the `products` table at checkout, so the DB rows must
+ * carry the same prices (see the 20261123 price-correction migrations).
+ * Only catalogs with matching DB rows are consulted: the grant/contract
+ * add-ons have no `products` rows and no purchase path, so they are
+ * deliberately left out — resolving them would build a cart the server
+ * would reject at checkout.
+ */
+function catalogLicenseProduct(license: CatalogStoreProduct): StoreProduct {
+  return {
+    id: license.id,
+    name: license.name,
+    slug: license.slug,
+    category: 'license',
+    price: license.price,
+    description: license.description,
+    longDescription: license.longDescription,
+    image: '/images/pages/store-hero.webp',
+    stripeProductId: license.stripeProductId,
+    stripePriceId: license.stripePriceId,
+    inStock: true,
+    featured: false,
+    digital: true,
+    tags: ['license', 'clone', license.slug],
+  };
+}
+
+/**
  * Resolve ?add= query values from store links (e.g. website-builder-pro).
+ * Platform licenses (efh-core-platform, school-license,
+ * enterprise-license, monthly-subscription), community add-ons, and clone
+ * licenses (starter-license, pro-license, enterprise-clone-license) come
+ * from the canonical catalog in lib/data/store-products; the legacy
+ * workbook catalog in lib/store/products does not carry them.
  */
 export function resolveCartAddParam(param: string): StoreProduct | null {
   const normalized = param.trim().toLowerCase();
@@ -38,6 +79,9 @@ export function resolveCartAddParam(param: string): StoreProduct | null {
 
   const direct = (normalized === HVAC_STORE_BUNDLE.slug ? HVAC_STORE_BUNDLE : null) ?? workbookProducts.find(book => book.slug === normalized) ?? getProductBySlug(normalized);
   if (direct) return direct;
+
+  const catalogProduct = [...STORE_PRODUCTS, ...COMMUNITY_ADDONS, ...CLONE_LICENSES].find((product) => product.slug === normalized);
+  if (catalogProduct) return catalogLicenseProduct(catalogProduct);
 
   const appPlanMatch = normalized.match(/^(website-builder|sam-gov|grants)-(.+)$/);
   if (appPlanMatch) {

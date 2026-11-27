@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Branch refreshed to pick up main (a5daf49d): Course Builder merge; fresh CI after E2E shard 3/4 environment failure.
 """Read only the approved operator route and worker health; never emit caller data."""
 import json,re,subprocess,hashlib,base64,urllib.request
 from pathlib import Path
@@ -42,7 +43,7 @@ def preflight():
   'operatorEntryVerified':'Gosub(elevate-operator,s,1)' in operator,
   'operatorDeviceRouteVerified':'Gosub(elevate-pwa-extensions,0,1)' in fallback,
   'operatorVoicemailFallbackVerified':'VoiceMail(0@elevate,u)' in fallback,
-  'adminCellularFallbackConfigured':'Dial(PJSIP/+13179562748@twilio,25,U(elevate-owner-accept))' in fallback,
+  'adminCellularFallbackConfigured':'Dial(PJSIP/+13179562748@twilio,20,U(elevate-owner-accept))' in fallback,
   'adminBrandCallerIdConfigured':'CALLERID(name)=Elevate for Humanity' in fallback,
   'operatorRegisteredContacts':contacts,'operatorLeasedEndpointCount':len(targets),
   'operatorVoicemailPromptsReady':all(subprocess.run(['docker','exec','--user','asterisk','pbx_asterisk_1','test','-r','/var/lib/asterisk/sounds/en/'+name],capture_output=True,timeout=10).returncode==0 for name in ['beep.ulaw','vm-intro.ulaw','vm-theperson.ulaw','vm-isunavail.ulaw','digits/0.ulaw']),

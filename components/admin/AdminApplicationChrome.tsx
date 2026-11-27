@@ -1,5 +1,6 @@
 'use client';
 
+import { siteUrls } from '@/lib/utils/site-urls';
 import { DashboardVideoCalls } from '@/components/communications/DashboardVideoCalls';
 
 import { usePathname, useSearchParams } from 'next/navigation';
@@ -24,6 +25,15 @@ export function AdminApplicationChrome({
   if (pathname === '/staff-portal' || pathname.startsWith('/staff-portal/') || (staffInbox && pathname === '/phone/email')) {
     return (
       <div data-elevate-staff-shell className="min-h-dvh min-w-0 bg-white">
+        {children}
+      </div>
+    );
+  }
+  // Elevate Mail is its own installed app (own manifest, worker, and scope).
+  // It never wears the Admin shell: no administrator menu, notices, or dock.
+  if (pathname === '/mail' || pathname.startsWith('/mail/')) {
+    return (
+      <div data-elevate-mail-shell className="min-h-dvh min-w-0 bg-white">
         {children}
       </div>
     );
@@ -71,6 +81,14 @@ export function AdminApplicationChrome({
             : 'min-w-0 overflow-x-clip pb-[calc(5rem+env(safe-area-inset-bottom))] lg:pb-0'
         }
       >
+        {(pathname === '/dashboard' || pathname === '/instructor/dashboard') && (
+          <a
+            href={`${siteUrls.lms}/portal-guide?portal=${pathname === '/dashboard' ? 'administrator' : 'instructor'}`}
+            className="mx-4 mt-4 inline-flex min-h-11 items-center rounded-lg border bg-white px-4 text-sm font-bold text-blue-800"
+          >
+            Orientation and FAQs
+          </a>
+        )}
         {children}
       </main>
       {!pathname.endsWith('/phone') ? <DashboardVideoCalls /> : null}

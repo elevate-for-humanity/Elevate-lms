@@ -56,25 +56,9 @@ interface AIChatProps {
   ellieMode?: boolean;
 }
 
-type ProviderId = 'auto' | 'xai' | 'groq' | 'openai' | 'anthropic' | 'gemini';
-
-const MODEL_OPTIONS: Record<ProviderId, string[]> = {
-  auto: ['auto'],
-  xai: ['grok-4.6'],
-  groq: ['llama-3.3-70b-versatile', 'llama-3.1-8b-instant'],
-  openai: ['gpt-4.1-mini', 'gpt-4.1', 'gpt-4o-mini'],
-  anthropic: ['claude-sonnet-4-5', 'claude-3-5-haiku-latest'],
-  gemini: ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash'],
-};
-
-const PROVIDER_LABELS: Record<ProviderId, string> = {
-  auto: 'Auto',
-  xai: 'Grok / xAI',
-  groq: 'Groq',
-  openai: 'ChatGPT / OpenAI',
-  anthropic: 'Claude / Anthropic',
-  gemini: 'Gemini',
-};
+type ProviderId = 'auto';
+const MODEL_OPTIONS: Record<ProviderId, string[]> = { auto: ['elevate-local'] };
+const PROVIDER_LABELS: Record<ProviderId, string> = { auto: 'Elevate-owned AI' };
 
 export const TOOL_META: Record<
   string,
@@ -493,16 +477,8 @@ export default function AIChat({ fileContext, onApplyCode, ellieMode = false }: 
   const [documentsContext, setDocumentsContext] = useState('');
   const [aiStatus, setAiStatus] = useState<'checking' | 'ready' | 'unconfigured'>('checking');
   const [aiProvider, setAiProvider] = useState<string>('');
-  const [availableProviders, setAvailableProviders] = useState<Record<ProviderId, boolean>>({
-    auto: true,
-    xai: false,
-    groq: false,
-    openai: false,
-    anthropic: false,
-    gemini: false,
-  });
   const [selectedProvider, setSelectedProvider] = useState<ProviderId>('auto');
-  const [selectedModel, setSelectedModel] = useState('auto');
+  const [selectedModel, setSelectedModel] = useState('elevate-local');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -515,35 +491,10 @@ export default function AIChat({ fileContext, onApplyCode, ellieMode = false }: 
           return;
         }
         const data = await res.json();
-        const providers = {
-          auto: true,
-          xai: Boolean(data?.hasXAI ?? data?.availableProviders?.xai),
-          groq: Boolean(data?.hasGroq ?? data?.availableProviders?.groq),
-          openai: Boolean(data?.hasOpenAI ?? data?.availableProviders?.openai),
-          anthropic: Boolean(data?.hasAnthropic ?? data?.availableProviders?.anthropic),
-          gemini: Boolean(data?.hasGemini ?? data?.availableProviders?.gemini),
-        };
-        setAvailableProviders((prev) => ({ ...prev, ...providers }));
-        const configured =
-          data?.aiConfigured === true ||
-          providers.xai ||
-          providers.groq ||
-          providers.openai ||
-          providers.anthropic ||
-          providers.gemini;
-        if (configured) {
-          setAiStatus('ready');
-          const names = [
-            providers.xai && 'Grok',
-            providers.groq && 'Groq',
-            providers.openai && 'OpenAI',
-            providers.anthropic && 'Anthropic',
-            providers.gemini && 'Gemini',
-          ].filter(Boolean);
-          setAiProvider(names.join(' / ') || 'AI');
-        } else {
-          setAiStatus('unconfigured');
-        }
+        // Vendor credentials never establish readiness for the owned engine.
+        const configured = data?.hasElevate === true && data?.ownedModel?.verified === true;
+        setAiStatus(configured ? 'ready' : 'unconfigured');
+        setAiProvider(configured ? 'Elevate-owned AI' : '');
       } catch {
         setAiStatus('unconfigured');
       }
@@ -903,10 +854,8 @@ export default function AIChat({ fileContext, onApplyCode, ellieMode = false }: 
             <option
               key={provider}
               value={provider}
-              disabled={provider !== 'auto' && !availableProviders[provider]}
             >
               {PROVIDER_LABELS[provider]}
-              {provider !== 'auto' && !availableProviders[provider] ? ' (not configured)' : ''}
             </option>
           ))}
         </select>
@@ -937,7 +886,7 @@ export default function AIChat({ fileContext, onApplyCode, ellieMode = false }: 
           )}
           {aiStatus === 'unconfigured' && (
             <span className="flex items-center gap-1 text-xs text-amber-600">
-              <AlertTriangle className="w-3.5 h-3.5" /> no AI key
+              <AlertTriangle className="w-3.5 h-3.5" /> owned engine unavailable
             </span>
           )}
         </div>

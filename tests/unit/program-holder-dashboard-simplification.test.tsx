@@ -31,9 +31,11 @@ const fixture = vi.hoisted(() => ({
   schoolApplicants: [],
 }));
 vi.mock('@/lib/program-holder/workspace', () => ({
-  getProgramHolderWorkspace: async () => fixture,
+  getProgramHolderWorkspace: vi.fn(async () => fixture),
+  getProgramHolderWorkspaceWithOnlineStudy: vi.fn(async () => fixture),
   programTitle: () => 'Assigned program',
 }));
+import { getProgramHolderWorkspace } from '@/lib/program-holder/workspace';
 vi.mock('next/image', () => ({
   default: ({ fill, sizes, priority, ...props }: any) => <img {...props} />,
 }));
@@ -44,6 +46,12 @@ vi.mock('@/components/program-holder/ProgramHolderPaymentAddendum', () => ({
   ProgramHolderPaymentAddendum: () => null,
 }));
 afterEach(cleanup);
+it('uses the server-provided verified workspace without repeating the loader', async () => {
+  vi.mocked(getProgramHolderWorkspace).mockClear();
+  render(await ProgramHolderWorkspaceView({ section: 'dashboard', workspace: fixture as any }));
+  expect(getProgramHolderWorkspace).not.toHaveBeenCalled();
+  expect(screen.getByRole('heading', { name: 'To-dos', level: 1 })).toBeVisible();
+});
 it('shows only To-dos and Alerts at home; the roster and guide belong to their task tabs', async () => {
   render(await ProgramHolderWorkspaceView({ section: 'dashboard' }));
   expect(screen.getAllByRole('heading').map((heading) => heading.textContent)).toEqual([
@@ -180,4 +188,21 @@ it('keeps recruiting tools out of the ordinary holder workspace', async () => {
   render(await ProgramHolderWorkspaceView({ section: 'recruiting', workspace: fixture as any }));
   expect(screen.getByText('Recruiting assignment required.')).toBeInTheDocument();
   expect(screen.queryByText('Call Notes')).not.toBeInTheDocument();
+});
+it('identifies pending applications without granting ordinary holders recruiting tools', async () => {
+  render(await ProgramHolderWorkspaceView({ section: 'pending', workspace: fixture as any }));
+  expect(screen.getByRole('heading', { name: 'Pending Students', level: 1 })).toBeVisible();
+  expect(screen.getByText(/Applicant recruiting tools are available only to assigned recruiters/)).toBeVisible();
+  expect(screen.queryByText('Call Notes')).not.toBeInTheDocument();
+});
+it('keeps assigned pending applications under that page title and excludes accepted ones', async () => {
+  const workspace = { ...fixture, schoolApplicants: [
+    { id: 'pending', full_name: 'Assigned applicant', status: 'submitted', program_interest: 'hvac-technician' },
+    { id: 'accepted', full_name: 'Accepted applicant', status: 'accepted', program_interest: 'hvac-technician' },
+  ] };
+  render(await ProgramHolderWorkspaceView({ section: 'pending', workspace: workspace as any }));
+  expect(screen.getByRole('heading', { name: 'Pending Students', level: 1 })).toBeVisible();
+  expect(screen.getByRole('heading', { name: 'New school applications', level: 2 })).toBeVisible();
+  expect(screen.getByText('Assigned applicant')).toBeVisible();
+  expect(screen.queryByText('Accepted applicant')).not.toBeInTheDocument();
 });

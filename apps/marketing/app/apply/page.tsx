@@ -1,3 +1,4 @@
+import { EMT_INQUIRY_HREF, isEmtInquiryOnly } from '@/lib/programs/emt-inquiry-only';
 import Image from 'next/image';
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
@@ -17,6 +18,7 @@ export default async function ApplyPage({ searchParams }: {
   searchParams?: Promise<{ program?: string; payment?: string; funding?: string }>;
 }) {
   const params = await searchParams;
+  if (isEmtInquiryOnly(params?.program)) redirect(EMT_INQUIRY_HREF);
   const query = new URLSearchParams();
   if (params?.program) query.set('program', params.program);
   if (params?.payment) query.set('payment', params.payment);

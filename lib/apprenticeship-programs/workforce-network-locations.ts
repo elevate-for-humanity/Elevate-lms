@@ -18,16 +18,16 @@ export type NetworkMapPin = {
 /** Marion County / Indy metro — used on barber program map */
 export const BARBER_WORKFORCE_NETWORK_PINS: NetworkMapPin[] = [
   {
-    id: 'elevate-keystone',
+    id: 'elevate-downtown',
     kind: 'elevate',
-    name: `${PLATFORM_DEFAULTS.orgName} — Keystone`,
-    address: '8888 Keystone Crossing, Suite 1300',
+    name: `${PLATFORM_DEFAULTS.orgName} — Downtown`,
+    address: '120 East Market Street, Suite 930, Indianapolis, IN 46204',
     city: 'Indianapolis',
     state: 'IN',
-    zip: '46240',
+    zip: '46204',
     phone: PLATFORM_DEFAULTS.mainPhone,
-    lat: 39.9142,
-    lng: -86.065,
+    lat: 39.7688,
+    lng: -86.1555,
     programs: ['barber-apprenticeship', 'cosmetology-apprenticeship'],
     href: '/contact',
   },

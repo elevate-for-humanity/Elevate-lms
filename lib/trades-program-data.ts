@@ -29,9 +29,9 @@ export const HVAC_DATA: TradesProgramData = {
   name: 'HVAC Technician',
   tagline:
     'Heating, ventilation, and air conditioning — installation, maintenance, and repair. Year-round demand, strong pay.',
-  heroImage: '/images/hvac-training-vibrant-2026.webp',
+  heroImage: '/images/hvac-hero.webp',
   secondaryImage: '/images/pages/training-classroom.webp',
-  careerImage: '/images/hvac-training-vibrant-2026.webp',
+  careerImage: '/images/hvac-hero.webp',
   duration: '20 weeks',
   totalHours: '400+ hours',
   rtiHours: '240 hours (online / LMS)',
@@ -67,7 +67,7 @@ export const HVAC_DATA: TradesProgramData = {
         'Safety protocols and OSHA standards',
         'Basic electrical theory',
       ],
-      image: '/images/hvac-training-vibrant-2026.webp',
+      image: '/images/hvac-hero.webp',
       project: 'Identify and diagram a complete HVAC system',
     },
     {
@@ -170,9 +170,9 @@ export const ELECTRICAL_DATA: TradesProgramData = {
   name: 'Electrical Technology',
   tagline:
     'Residential and commercial wiring, NEC code, troubleshooting. Path to licensed journeyman electrician.',
-  heroImage: '/images/hvac-training-vibrant-2026.webp',
+  heroImage: '/images/refresh-20261014/electrical.webp',
   secondaryImage: '/images/pages/training-classroom.webp',
-  careerImage: '/images/hvac-training-vibrant-2026.webp',
+  careerImage: '/images/refresh-20261014/electrical.webp',
   duration: '16–24 weeks',
   totalHours: '400+ hours',
   rtiHours: '240 hours (online / LMS)',
@@ -197,7 +197,7 @@ export const ELECTRICAL_DATA: TradesProgramData = {
         'AC vs DC electricity',
         'Electrical safety and OSHA',
       ],
-      image: '/images/hvac-training-vibrant-2026.webp',
+      image: '/images/refresh-20261014/electrical.webp',
       project: 'Build and test basic circuits',
     },
     {
@@ -209,7 +209,7 @@ export const ELECTRICAL_DATA: TradesProgramData = {
         'Box fill calculations',
         'Conductor sizing and ampacity',
       ],
-      image: '/images/hvac-training-vibrant-2026.webp',
+      image: '/images/refresh-20261014/electrical.webp',
       project: 'NEC code lookup exercises',
     },
     {
@@ -299,8 +299,8 @@ export const PLUMBING_DATA: TradesProgramData = {
   name: 'Plumbing Technology',
   tagline:
     'Water supply, drainage, fixtures, gas piping. Essential trade with steady demand and strong earnings.',
-  heroImage: '/images/hvac-training-vibrant-2026.webp',
-  secondaryImage: '/images/hvac-training-vibrant-2026.webp',
+  heroImage: '/images/refresh-20261014/plumbing.webp',
+  secondaryImage: '/images/refresh-20261014/plumbing.webp',
   careerImage: '/images/pages/training-classroom.webp',
   duration: '16 weeks',
   totalHours: '400+ hours',
@@ -325,7 +325,7 @@ export const PLUMBING_DATA: TradesProgramData = {
         'Pipe materials (copper, PVC, PEX, cast iron)',
         'Safety and tool identification',
       ],
-      image: '/images/hvac-training-vibrant-2026.webp',
+      image: '/images/refresh-20261014/plumbing.webp',
       project: 'Identify and assemble various pipe types',
     },
     {
@@ -337,7 +337,7 @@ export const PLUMBING_DATA: TradesProgramData = {
         'PEX installation methods',
         'Pressure testing and leak detection',
       ],
-      image: '/images/hvac-training-vibrant-2026.webp',
+      image: '/images/refresh-20261014/plumbing.webp',
       project: 'Install a complete water supply rough-in',
     },
     {
@@ -426,9 +426,9 @@ export const FORKLIFT_DATA: TradesProgramData = {
   name: 'Forklift Operator Certification',
   tagline:
     'OSHA-compliant powered industrial truck certification. Classroom instruction, hands-on evaluation, and written test in one day.',
-  heroImage: '/images/hvac-training-vibrant-2026.webp',
+  heroImage: '/images/refresh-20261014/forklift.webp',
   secondaryImage: '/images/pages/training-classroom.webp',
-  careerImage: '/images/hvac-training-vibrant-2026.webp',
+  careerImage: '/images/refresh-20261014/forklift.webp',
   duration: '1 day (8 hours)',
   totalHours: '8 hours',
   rtiHours: '4 hours (classroom)',
@@ -461,7 +461,7 @@ export const FORKLIFT_DATA: TradesProgramData = {
         'Center of gravity and turning radius',
         'Speed control and braking',
       ],
-      image: '/images/hvac-training-vibrant-2026.webp',
+      image: '/images/refresh-20261014/forklift.webp',
     },
     {
       week: 'Afternoon',

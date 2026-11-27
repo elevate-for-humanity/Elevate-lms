@@ -27,7 +27,7 @@ export default async function HostShopEmailPage() {
             Use your approved shop address for apprenticeship communication.
           </p>
         </div>
-        <EmailWorkspace roleLabel="Host Shop" />
+        <EmailWorkspace roleLabel="Host Shop" guideHref="/communications/email/help?mailbox=host-shop" />
       </main>
     </PlatformShell>
   );

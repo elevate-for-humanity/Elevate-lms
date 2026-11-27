@@ -1,5 +1,6 @@
 'use client';
 
+import { siteUrls } from '@/lib/utils/site-urls';
 import { DashboardVideoCalls } from '@/components/communications/DashboardVideoCalls';
 
 import { PortalToolSearch } from './PortalToolSearch';
@@ -28,6 +29,7 @@ import type {
 } from '@/lib/navigation/navigation-config';
 import {
   getNavigationForRole,
+  getNavigationRole,
   getDashboardHref,
   ROLE_DISPLAY_NAMES,
 } from '@/lib/navigation/navigation-config';
@@ -486,6 +488,14 @@ export function PlatformShell({
           )}
           {['host_shop','host_shop_admin','partner','partner_admin'].includes(role) ? <NarratedTabWalkthrough sections={sections} /> : null}
           <div className="min-w-0 w-full max-w-none overflow-x-auto break-words p-3 sm:p-4 lg:p-6">
+            {pathname === new URL(dashboardHref, 'https://local.invalid').pathname && (
+              <Link
+                href={`${siteUrls.lms}/portal-guide?portal=${encodeURIComponent(getNavigationRole(role))}`}
+                className="mb-4 inline-flex min-h-11 items-center rounded-lg border bg-white px-4 text-sm font-bold text-blue-800"
+              >
+                Orientation and FAQs
+              </Link>
+            )}
             {children}
           </div>
         </main>

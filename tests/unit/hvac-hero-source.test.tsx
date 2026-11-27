@@ -32,7 +32,7 @@ describe('server-rendered HVAC hero source', () => {
     const root = document.createElement('div');
     root.innerHTML = renderToStaticMarkup(<HvacLabHero />);
     expect(root.querySelector('video')).toBeNull();
-    expect(root.querySelector('img')?.getAttribute('src')).toContain('hvac-training-vibrant-2026.webp');
+    expect(root.querySelector('img')?.getAttribute('src')).toContain('hvac-hero.webp');
     expect(root.querySelector('img')?.className).toContain('object-cover');
     expect(root.querySelector('a')?.getAttribute('href')).toBe('#hvac-program-film');
   });

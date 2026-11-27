@@ -20,16 +20,36 @@ export default function LearningWorkspace({
   instructionLabel = 'Instructions & activities',
   previewLabel = 'Lesson preview',
   initialView = 'split',
+  activityFragment,
 }: {
   instructions: ReactNode;
   preview: ReactNode;
   instructionLabel?: string;
   previewLabel?: string;
   initialView?: 'split' | 'instructions' | 'preview';
+  activityFragment?: string;
 }) {
   const id = useId();
   const [view, setView] = useState(initialView);
   const [expanded, setExpanded] = useState(false);
+  useEffect(() => {
+    if (!activityFragment) return;
+    const reveal = () => {
+      if (window.location.hash === `#${activityFragment}`) setView('instructions');
+    };
+    reveal();
+    window.addEventListener('hashchange', reveal);
+    return () => window.removeEventListener('hashchange', reveal);
+  }, [activityFragment]);
+  useEffect(() => {
+    if (
+      activityFragment &&
+      view === 'instructions' &&
+      window.location.hash === `#${activityFragment}`
+    ) {
+      document.getElementById(activityFragment)?.scrollIntoView?.({ block: 'start' });
+    }
+  }, [activityFragment, view]);
   useEffect(() => {
     if (!expanded) return;
     const close = (event: KeyboardEvent) => {
@@ -44,7 +64,12 @@ export default function LearningWorkspace({
 
   return (
     <PreviewTarget.Provider value={previewTarget}>
-      <div className={`${styles.workspace} min-w-0`} data-learning-workspace data-view={view} data-expanded={expanded ? 'true' : 'false'}>
+      <div
+        className={`${styles.workspace} min-w-0`}
+        data-learning-workspace
+        data-view={view}
+        data-expanded={expanded ? 'true' : 'false'}
+      >
         <div
           className={`${styles.views} mb-4 gap-2`}
           role="group"

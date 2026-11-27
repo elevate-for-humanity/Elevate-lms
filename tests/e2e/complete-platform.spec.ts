@@ -240,7 +240,7 @@ test.describe('Complete Platform Verification', () => {
       const menuButton = page.getByRole('button', { name: 'Open menu', exact: true });
       await expect(menuButton).toBeEnabled();
       await menuButton.click();
-      const navigation = page.getByRole('navigation', { name: 'Site navigation' });
+      const navigation = page.getByRole('navigation', { name: 'Mobile navigation' });
       await expect(navigation).toBeVisible();
       const programs = navigation.getByRole('button', { name: 'Programs', exact: true });
       await programs.click();

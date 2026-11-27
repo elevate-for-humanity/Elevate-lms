@@ -1,3 +1,4 @@
+// Branch refreshed to pick up main (71e31a22): /apply/student E2E fix + Dockerfile.google-lms.
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -75,7 +76,7 @@ async function requestNaturalVoiceBlob(text: string, options: PlayOptions): Prom
   if (cached) return cached;
 
   const source = options.src?.trim();
-  if (source && !source.startsWith('/')) {
+  if (source && (!source.startsWith('/') || source.startsWith('//') || source.includes('\\'))) {
     throw new Error('Natural voice media must use a same-origin path.');
   }
 
@@ -114,6 +115,16 @@ async function requestNaturalVoiceBlob(text: string, options: PlayOptions): Prom
 }
 
 async function requestNaturalVoice(text: string, options: PlayOptions): Promise<HTMLAudioElement> {
+  const source = options.src?.trim();
+  if (source) {
+    if (!source.startsWith('/') || source.startsWith('//') || source.includes('\\')) {
+      throw new Error('Natural voice media must use a same-origin path.');
+    }
+    const audio = new Audio(source);
+    audio.preload = 'auto';
+    audio.playbackRate = narrationPlaybackRate(options);
+    return audio;
+  }
   const blob = await requestNaturalVoiceBlob(text, options);
   const url = URL.createObjectURL(blob);
   const audio = new Audio(url);

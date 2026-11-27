@@ -32,19 +32,28 @@ test('student can access Career Services, save, reopen, preview and download res
   await page.getByPlaceholder('Email').fill('qa-career@example.invalid');
   await page.getByPlaceholder('Write a brief summary of your professional background and career goals...').fill('Verified student resume persistence test.');
   await page.getByRole('button', { name: 'Add training', exact: true }).click();
-  await page.getByLabel('Program or qualification').fill('QA Workforce Training');
-  await page.getByLabel('School or training provider').fill('QA Training Provider');
+  // Scope to the newly added (last) entry: on a retry the builder already
+  // shows the training saved by the previous attempt, so an unscoped
+  // getByLabel resolves to 2 elements and Playwright strict mode fails.
+  // Run 45623494305 failed the retry on exactly this.
+  await page.getByLabel('Program or qualification').last().fill('QA Workforce Training');
+  await page.getByLabel('School or training provider').last().fill('QA Training Provider');
   await page.getByLabel('Skill to add').fill('Customer service');
   await page.getByRole('button', { name: 'Add skill', exact: true }).click();
   await page.getByRole('button', { name: 'Add credential', exact: true }).click();
-  await page.getByLabel('Credential name', { exact: true }).fill('QA Earned Credential');
-  await page.getByLabel('Issued by', { exact: true }).fill('QA Credential Provider');
+  await page.getByLabel('Credential name', { exact: true }).last().fill('QA Earned Credential');
+  await page.getByLabel('Issued by', { exact: true }).last().fill('QA Credential Provider');
   await page.getByRole('button', { name: 'Save Resume' }).click();
   await expect(page.getByRole('status').filter({ hasText: 'Resume saved.' })).toBeVisible();
   await page.reload({waitUntil:'domcontentloaded'});
-  await expect(page.getByPlaceholder('Full Name')).toHaveValue('QA Career Resume');
-  await expect(page.getByLabel('Program or qualification')).toHaveValue('QA Workforce Training');
-  await expect(page.getByLabel('Credential name', { exact: true })).toHaveValue('QA Earned Credential');
+  // Wait for the builder to render (and its client fetch to settle) before
+  // asserting saved values: a reload that lands while the dev server is
+  // restarting can render before the saved resume is loaded, and the
+  // default 5s assertion timeout is too short for that fetch.
+  await expect(page.getByRole('heading', { name: 'Build your professional resume' })).toBeVisible({ timeout: 30000 });
+  await expect(page.getByPlaceholder('Full Name')).toHaveValue('QA Career Resume', { timeout: 30000 });
+  await expect(page.getByLabel('Program or qualification').first()).toHaveValue('QA Workforce Training', { timeout: 30000 });
+  await expect(page.getByLabel('Credential name', { exact: true }).first()).toHaveValue('QA Earned Credential', { timeout: 30000 });
   await page.getByRole('button', { name: 'Preview' }).click();
   await expect(page.getByRole('region', { name: 'Resume preview' })).toContainText('QA Workforce Training');
   await expect(page.getByRole('region', { name: 'Resume preview' })).toContainText('QA Earned Credential');

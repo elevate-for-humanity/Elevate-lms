@@ -25,6 +25,24 @@ export const APPRENTICESHIP_AGREEMENT: RequiredAgreement = {
   documentUrl: '/lms/legal/apprenticeship-agreement',
 };
 
+/**
+ * Proprietary curriculum IP agreement (Elevate HVAC/R Virtual Training
+ * Academy). An instructor must sign THIS agreement — the general instructor
+ * services agreement ('instructor_services') does not satisfy it.
+ * Live server-side enforcement is lib/legal/instructorCurriculumLicense.ts;
+ * this declaration is the compliance source of truth. The canonical text is
+ * docs/legal/instructor-curriculum-ip-agreement-v1.md (v1.0, DRAFT pending
+ * legal review).
+ */
+export const INSTRUCTOR_CURRICULUM_IP_AGREEMENT: RequiredAgreement = {
+  type: 'instructor_curriculum_ip',
+  version: '1.0',
+  title: 'Proprietary Curriculum and Authorized Instructor License',
+  description:
+    'Limited, nontransferable teaching authorization for Elevate proprietary curriculum, simulations and instructor materials',
+  documentUrl: '/legal/instructor-curriculum-ip-agreement',
+};
+
 export function isApprenticeshipProgram(programSlug?: string | null): boolean {
   return /apprentice|barber|cosmetology|esthetic|manicur|nail-technician/i.test(programSlug || '');
 }
@@ -168,6 +186,8 @@ export const REQUIRED_AGREEMENTS: Record<UserRole, RequiredAgreement[]> = {
       description: 'Terms for instructional services',
       documentUrl: '/legal/instructor-agreement',
     },
+    // The general instructor services agreement does NOT satisfy this one.
+    INSTRUCTOR_CURRICULUM_IP_AGREEMENT,
   ],
 
   mentor: [

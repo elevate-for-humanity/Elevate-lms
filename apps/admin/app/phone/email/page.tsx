@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { EmailWorkspace } from '@/components/communications/EmailWorkspace';
 import { requireRole } from '@/lib/auth/require-role';
 import { COMMUNICATION_MEMBER_ROLES } from '@/lib/phone/access';
+import { siteUrls } from '@/lib/utils/site-urls';
 
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = { title: 'Elevate Email' };
@@ -51,6 +52,7 @@ export default async function AdminEmailPage({
         </div>
       </div>
       <EmailWorkspace
+        guideHref={`${siteUrls.lms}/communications/email/help?mailbox=admin`}
         initialMailboxId={params.mailboxId}
         initialThreadId={params.threadId}
         communicationLinks={staffInbox ? null : undefined}

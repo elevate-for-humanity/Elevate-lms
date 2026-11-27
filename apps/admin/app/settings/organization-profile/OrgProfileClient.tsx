@@ -40,10 +40,10 @@ const SECTIONS = [
     { key: 'funding_approvals', label: 'Funding Approvals', placeholder: 'WRG, WIOA, and JRI approved' },
   ]},
   { id: 'contact', label: 'Contact & Address', icon: MapPin, fields: [
-    { key: 'address_line_1', label: 'Address', placeholder: '8888 Keystone Crossing, Suite 1300' },
+    { key: 'address_line_1', label: 'Address', placeholder: '120 East Market Street, Suite 930, Indianapolis, IN 46204' },
     { key: 'city', label: 'City', placeholder: 'Indianapolis' },
     { key: 'state', label: 'State', placeholder: 'IN' },
-    { key: 'zip', label: 'ZIP', placeholder: '46240' },
+    { key: 'zip', label: 'ZIP', placeholder: '46204' },
     { key: 'phone', label: 'Phone', placeholder: PLATFORM_DEFAULTS.supportPhone },
     { key: 'general_email', label: 'Email', placeholder: 'elevate4humanityedu@gmail.com' },
     { key: 'website', label: 'Website', placeholder: PLATFORM_DEFAULTS.siteUrl },

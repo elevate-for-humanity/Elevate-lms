@@ -1,6 +1,6 @@
 // PUBLIC ROUTE: program pricing is public-facing (calculator on program pages)
 import { NextRequest, NextResponse } from 'next/server';
-import { installmentSchedule } from '@/lib/programs/installment-terms';
+import { installmentSchedule, programInstallmentTerms } from '@/lib/programs/installment-terms';
 import { createPublicClient } from '@/lib/supabase/public';
 import { safeError } from '@/lib/api/safe-error';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -16,12 +16,30 @@ function parseMoneyToCents(value?: string | null): number {
   return Number.isFinite(dollars) && dollars > 0 ? Math.round(dollars * 100) : 0;
 }
 
+function hvacPricing(programName: string, tuitionCents: number, source: 'programs' | 'static-program') {
+  const terms = programInstallmentTerms('hvac-technician', tuitionCents);
+  return {
+    program_slug: 'hvac-technician',
+    program_name: programName,
+    tuition_cents: tuitionCents,
+    deposit_min_cents: terms.downPaymentCents,
+    deposit_default_cents: terms.downPaymentCents,
+    payment_frequency: terms.cadence,
+    payment_weeks: terms.installmentCount,
+    stripe_deposit_url: null,
+    stripe_full_url: null,
+    notes: 'Review the remaining balance and invoice schedule before payment.',
+    source,
+  };
+}
+
 function buildStaticPricing(slug: string) {
   const program = getStaticProgram(slug);
   if (!program) return null;
 
   const tuitionCents = parseMoneyToCents(program.selfPayCost);
   if (!tuitionCents) return null;
+  if (slug === 'hvac-technician') return hvacPricing(program.title, tuitionCents, 'static-program');
 
   const configuredDeposit = parseMoneyToCents(program.depositAmount);
   const depositMinCents = getMinimumDepositCents({
@@ -60,9 +78,9 @@ export async function GET(request: NextRequest) {
 
   try {
     const supabase = createPublicClient();
-    // Apprenticeship pricing must agree with the canonical invoice checkout,
+    // HVAC and apprenticeship pricing must agree with the canonical invoice checkout,
     // which reads programs.price/tuition, not a stale legacy pricing row.
-    if (slug.includes('apprenticeship')) {
+    if (slug === 'hvac-technician' || slug.includes('apprenticeship')) {
       // Bound the live lookup and retain the published static price when the
       // database is slow or temporarily unavailable. Never expose raw HTML/JSON errors.
       const lookup = supabase.from('programs')
@@ -76,6 +94,9 @@ export async function GET(request: NextRequest) {
       ]);
       if (!programError && program) {
         const tuitionCents = Math.round(Number(program.price ?? program.tuition ?? program.total_cost ?? 0) * 100);
+        if (slug === 'hvac-technician' && Number.isFinite(tuitionCents) && tuitionCents > 0) {
+          return NextResponse.json(hvacPricing(program.title, tuitionCents, 'programs'));
+        }
         if (Number.isFinite(tuitionCents) && tuitionCents > 0)
           return NextResponse.json({program_slug:slug,program_name:program.title,tuition_cents:tuitionCents,deposit_min_cents:getInitialProgramInvoiceCents(slug, tuitionCents),deposit_default_cents:getInitialProgramInvoiceCents(slug, tuitionCents),payment_frequency:installmentSchedule(slug,tuitionCents-getInitialProgramInvoiceCents(slug,tuitionCents)).cadence,payment_weeks:slug==='barber-apprenticeship'?installmentSchedule(slug,tuitionCents-getInitialProgramInvoiceCents(slug,tuitionCents)).installmentCount:16,source:'programs',notes:slug==='barber-apprenticeship'?'Start with $600 down and weekly manual invoices. A larger down payment reduces weekly payments. Final invoice is capped to the balance.':'Pay in full or a $600 deposit and three monthly invoices. Provider-approved BNPL is separate.'});
       }

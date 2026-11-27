@@ -40,6 +40,7 @@ export default function BookkeepingVideoPage() {
         </section>
         <aside className="rounded-xl bg-slate-50 p-5 text-slate-700">
           <p>New enrollment for this offering is currently closed. Current students can continue through their student dashboard.</p>
+          <p className="mt-2">Published self-pay tuition: $1,500.</p>
           <Link href="https://app.elevateforhumanity.org/learner/dashboard" className="mt-3 inline-flex min-h-11 items-center font-bold text-blue-800 underline">Open student dashboard</Link>
         </aside>
       </section>

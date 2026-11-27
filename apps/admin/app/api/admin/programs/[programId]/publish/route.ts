@@ -13,7 +13,6 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
 import { publishProgram } from '@/lib/course-builder/program-versioning';
-import { autoGenerateCourseForProgram } from '@/lib/course-builder/program-auto-course';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -31,18 +30,6 @@ export async function POST(
   const { programId } = await params;
   const db = await requireAdminClient();
   if (!db) return safeError('Service unavailable', 503);
-
-  const body = await request.json().catch(() => ({}));
-  const autoGenerateCourse = body?.auto_generate_course !== false;
-  const autoMode =
-    body?.auto_mode === 'replace'
-      ? 'replace'
-      : body?.auto_mode === 'missing-only'
-        ? 'missing-only'
-        : 'refresh';
-  const autoVideoMode = body?.auto_video_mode === 'off' ? 'off' : 'queue';
-  const autoVideoQueueLimit =
-    typeof body?.auto_video_queue_limit === 'number' ? Number(body.auto_video_queue_limit) : null;
 
   const { data: program } = await db
     .from('programs')
@@ -86,7 +73,10 @@ export async function POST(
   }
 
   const result = await publishProgram(db, programId, auth.id);
-  if (!result.ok) return safeInternalError(new Error(result.error), 'Publish failed');
+  if (!result.ok) {
+    if (result.blocked) return safeError(result.error ?? 'Program is incomplete', 422);
+    return safeInternalError(new Error(result.error), 'Publish failed');
+  }
 
   try {
     await db.from('audit_logs').insert({
@@ -99,24 +89,9 @@ export async function POST(
     // Audit persistence is non-blocking for the publish result.
   }
 
-  let autoCourseResult: Awaited<ReturnType<typeof autoGenerateCourseForProgram>> | null = null;
-  if (autoGenerateCourse) {
-    try {
-      autoCourseResult = await autoGenerateCourseForProgram({
-        programId,
-        mode: autoMode,
-        videoMode: autoVideoMode,
-        videoQueueLimit: autoVideoQueueLimit,
-      });
-    } catch {
-      // Non-blocking: publish should still succeed even if auto-generation fails.
-    }
-  }
-
   return NextResponse.json({
     ok: true,
     published: true,
     version: result.version,
-    auto_course: autoCourseResult,
   });
 }

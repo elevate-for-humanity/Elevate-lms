@@ -130,6 +130,7 @@
     "openai": "6.42.0",
     "passport-google-oauth20": "2.0.0",
     "pdf-parse": "^2.4.5",
+    "pdfjs-dist": "5.4.296",
     "pdfkit": "^0.18.0",
     "postgres": "^3.4.9",
     "qrcode": "1.5.4",
@@ -160,7 +161,7 @@
     "tesseract.js": "7.0.0",
     "three": "^0.184.0",
     "uuid": "^11.0.0",
-    "video.js": "8.23.7",
+    "video.js": "8.24.1",
     "web-push": "3.6.7",
     "winston": "3.19.0",
     "winston-daily-rotate-file": "5.0.0",
@@ -215,7 +216,7 @@
     "prettier": "3.8.4",
     "react-router-dom": "^7.18.2",
     "robots-parser": "^3.0.1",
-    "schema-dts": "1.1.5",
+    "schema-dts": "2.1.0",
     "serve": "14.2.6",
     "stylelint": "17.13.0",
     "tailwindcss": "3.4.18",
@@ -419,3 +420,6 @@
     "inflight": "npm:lru-cache@^10.0.0"
   }
 }
+
+
+

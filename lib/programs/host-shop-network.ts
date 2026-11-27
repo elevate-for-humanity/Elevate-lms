@@ -1,5 +1,5 @@
 import onboardingProfiles from '@/lib/partners/host-shop-onboarding-profiles.json';
-import { uniqueHostShops } from '@/lib/partners/dedupe-host-shops.mjs';
+import { hostShopWorksiteKey, uniqueHostShops } from '@/lib/partners/dedupe-host-shops.mjs';
 import { curateShopGallery } from '@/lib/partners/curated-shop-media';
 import 'server-only';
 import { formatHostShopAddress } from '@/lib/partners/host-shop-address';
@@ -43,17 +43,31 @@ function approvedAddress(shop: HostShop) {
 }
 
 function sameBusiness(approved: HostShop, featured: FeaturedHostPartner) {
+  // This gallery depicts the planned downtown training rooms, not the
+  // current Michigan Road location. A business slug cannot prove that an
+  // approved operational record covers the same training site.
+  if (
+    featured.slug === 'mesmerized-by-beauty-cosmetology-academy-8420fefa' &&
+    !/^120eastmarketstsuite560indianapolisin(?:46204(?:[0-9]{4})?)?$/.test(
+      hostShopWorksiteKey(approvedAddress(approved).replace(/\bE\.?\s+Market\b/i, 'East Market')),
+    )
+  ) return false;
+
   const knownProfile = getFeaturedHostPartnerBySlug(approved.publicSlug ?? '');
   if (knownProfile?.slug === featured.slug) return true;
+  if (approved.canonicalPartner) return false;
   const sameName =
     identityKey(approved.name) === identityKey(featured.name) ||
     (featured.dba ? identityKey(approved.name) === identityKey(featured.dba) : false);
   const approvedPhone = phoneKey(approved.phone);
   const featuredPhone = phoneKey(featured.phone);
   const samePhone = Boolean(approvedPhone && featuredPhone && approvedPhone === featuredPhone);
+  const approvedWorksite = hostShopWorksiteKey(approvedAddress(approved));
+  const featuredWorksite = hostShopWorksiteKey(featuredAddress(featured));
+  const sameWorksite = Boolean(approvedWorksite && featuredWorksite && approvedWorksite === featuredWorksite);
   // Independent businesses can share a campus, address, or suite. Location
   // alone must never replace a shop's identity, portfolio, or occupations.
-  return sameName || samePhone;
+  return sameName && (samePhone || sameWorksite);
 }
 
 /**
@@ -72,13 +86,25 @@ export async function getHostShopNetwork(includeOnboarding = false): Promise<Hos
     return !/prestige[\s-]+elevation[\s-]+barber[\s-]+and[\s-]+beauty[\s-]+institute/.test(identity);
   });
 
-  const operational = approved.map((shop): HostShopNetworkEntry => {
+  const operational = approved.map((shop): HostShopNetworkEntry & { matchByName: boolean } => {
     const featured = FEATURED_BEAUTY_HOST_PARTNERS.find((candidate) =>
       sameBusiness(shop, candidate),
     );
 
-    const publicProfile = onboardingProfiles.find(
-      (profile) => identityKey(profile.name) === identityKey(shop.name),
+    const shopWorksite = hostShopWorksiteKey(approvedAddress(shop));
+    // B-52’s approved record writes Suite C as part of the street number.
+    // Normalize only this verified listing for portfolio lookup, not for public
+    // display or deduplication. A different suite keeps its own identity.
+    const profileWorksite =
+      shop.publicSlug === 'b-52-s-barber-shop-llc-183dd1d7' &&
+      shopWorksite === hostShopWorksiteKey('314C Parkview Dr., New Castle, IN 47362')
+        ? hostShopWorksiteKey('314 Parkview Drive, Suite C, New Castle, IN 47362')
+        : shopWorksite;
+    const publicProfile = onboardingProfiles.find((profile) =>
+      profile.slug === shop.publicSlug || (
+        identityKey(profile.name) === identityKey(shop.name) &&
+        profileWorksite && hostShopWorksiteKey(profile.address) === profileWorksite
+      ),
     );
     const gallery = curateShopGallery(featured?.slug ?? shop.publicSlug ?? '', [
       ...(shop.mediaGallery ?? []),
@@ -102,6 +128,7 @@ export async function getHostShopNetwork(includeOnboarding = false): Promise<Hos
       gallery.sort((a, b) => Number(b.url === preferredPhoto) - Number(a.url === preferredPhoto));
     return {
       id: shop.id,
+      matchByName: !shop.canonicalPartner,
       slug: featured?.slug ?? shop.publicSlug!,
       name: featured?.dba ?? shop.name,
       city: shop.city || featured?.city || '',
@@ -138,7 +165,7 @@ export async function getHostShopNetwork(includeOnboarding = false): Promise<Hos
 
   // Multiple historical approval records can refer to the same public shop.
   // Keep one destination and preserve its independently approved pathways.
-  return uniqueHostShops(operational).sort(
+  return uniqueHostShops(operational).map(({ matchByName: _matchByName, ...entry }) => entry).sort(
     (left: HostShopNetworkEntry, right: HostShopNetworkEntry) =>
       left.city.localeCompare(right.city) || left.name.localeCompare(right.name),
   );

@@ -1,3 +1,4 @@
+// Branch refreshed to pick up main (71e31a22): /apply/student E2E fix + Dockerfile.google-lms.
 import React from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, render, screen } from '@testing-library/react';
@@ -44,6 +45,19 @@ describe('separate staff and learner workspaces', () => {
     ).toString();
     expect(resolveRoleCompatiblePostLoginUrl(course, 'staff', ['staff'])).toBe(
       getRoleDestinationUrl('staff'),
+    );
+  });
+  it('returns instructors to the exact LMS orientation page and preserves its selection', () => {
+    const guide = '/portal-guide?portal=instructor';
+    const lms = new URL(getRoleDestinationUrl('student'));
+    expect(resolveRoleCompatiblePostLoginUrl(guide, 'instructor')).toBe(
+      new URL(guide, lms).toString(),
+    );
+    expect(resolveRoleCompatiblePostLoginUrl('/portal-guide/private', 'instructor')).toBe(
+      getRoleDestinationUrl('instructor'),
+    );
+    expect(resolveRoleCompatiblePostLoginUrl('https://example.org' + guide, 'instructor')).toBe(
+      getRoleDestinationUrl('instructor'),
     );
   });
   it('preserves the exact enrolled HVAC workspace without rerouting Admin program pages', () => {

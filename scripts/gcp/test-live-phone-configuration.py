@@ -63,7 +63,7 @@ class ConfigurationTests(unittest.TestCase):
             self.assertEqual(m.voice_probe('token','google-token',send,menu=[{'digit':0},{'digit':5}])['spokenMenuDigitsVerified'],expected)
 
     def test_database_active_does_not_conceal_unapplied_runtime_settings(self):
-        system = {'status': 'active', 'admin_extension': '0', 'ai_enabled': True, 'greeting': 'Approved greeting', 'ai_instructions': 'Approved instructions', 'voicemail_enabled': True, 'voicemail_transcription_enabled': True}
+        system = {'status': 'active', 'ai_enabled': True, 'greeting': 'Approved greeting', 'ai_instructions': 'Approved instructions', 'voicemail_enabled': True, 'voicemail_transcription_enabled': True, 'admin_extension': '0'}
         extensions = [{'extension': '0', 'webrtc_provider': 'asterisk'}, {'extension': '101', 'webrtc_provider': 'asterisk'}]
         result = m.compare_configuration(system, extensions, {}, {})
         self.assertTrue(result['phoneSystemActive'])

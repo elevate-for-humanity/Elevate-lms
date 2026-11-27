@@ -1,7 +1,10 @@
 export const PWA_APPLICATIONS = {
-  admin: { workerPath: '/sw-admin.js', cachePrefix: 'elevate-admin-', manifestPath: '/manifest-admin.json' },
-  lms: { workerPath: '/sw-lms.js', cachePrefix: 'elevate-lms-', manifestPath: '/manifest-lms.json' },
-  marketing: { workerPath: '/sw-marketing.js', cachePrefix: 'elevate-marketing-', manifestPath: '/manifest-marketing.json' },
+  admin: { workerPath: '/sw-admin.js', cachePrefix: 'elevate-admin-', manifestPath: '/manifest-admin.json', scope: '/' },
+  lms: { workerPath: '/sw-lms.js', cachePrefix: 'elevate-lms-', manifestPath: '/manifest-lms.json', scope: '/' },
+  marketing: { workerPath: '/sw-marketing.js', cachePrefix: 'elevate-marketing-', manifestPath: '/manifest-marketing.json', scope: '/' },
+  // Elevate Mail shares the Admin origin but owns the /mail/ scope: its own
+  // worker, caches, manifest, and install identity, insulated from Admin's.
+  mail: { workerPath: '/sw-mail.js', cachePrefix: 'elevate-mail-', manifestPath: '/manifest-mail.json', scope: '/mail/' },
 } as const;
 
 export type PwaApplication = keyof typeof PWA_APPLICATIONS;
@@ -18,5 +21,5 @@ export const LMS_ROLE_MANIFESTS = [
 export const ADMIN_WORKSPACE_PWAS = {
   'dev-studio': { name: 'Dev Studio', openPath: '/studio', installPath: '/install/dev-studio.html' },
   'course-builder': { name: 'Course Builder', openPath: '/studio/courses', installPath: '/install/course-builder.html' },
-  email: { name: 'Email', openPath: '/phone/email', installPath: '/install/email.html' },
+  email: { name: 'Email', openPath: '/mail', installPath: '/install/email.html' },
 } as const;

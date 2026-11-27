@@ -266,7 +266,7 @@ export default function StudentHandbookPage() {
           <p>
             {PLATFORM_DEFAULTS.orgName} — Program Director
             <br />
-            6331 N Keystone Ave, Suite D, Indianapolis, IN 46220
+            120 East Market Street, Suite 930, Indianapolis, IN 46204
             <br />
             Email: elevate4humanityedu@gmail.com · Phone: {PLATFORM_DEFAULTS.mainPhone}
           </p>

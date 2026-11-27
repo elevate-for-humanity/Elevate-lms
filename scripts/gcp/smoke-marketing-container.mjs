@@ -1,3 +1,5 @@
+// Branch refreshed to pick up main (71e31a22): /apply/student E2E fix + Dockerfile.google-lms.
+// Branch refreshed to pick up main (dbe7a427): fresh CI after E2E shard 3/4 environment failure on the 433802fb base.
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
 import { assertStorePageChrome } from './store-page-contract.mjs';
@@ -12,8 +14,10 @@ const component = process.env.COMPONENT || 'marketing';
 assert.ok(['marketing','store'].includes(component));
 const image = `elevate-${component}:${sha}`;
 const name = `${component}-smoke-${process.env.GITHUB_RUN_ID || process.pid}`;
-const docker = args => execFileSync('docker', args, { encoding: 'utf8', timeout: 30000, stdio: ['ignore', 'pipe', 'pipe'] }).trim();
+const docker = (args, timeout=30000) => execFileSync('docker', args, { encoding: 'utf8', timeout, stdio: ['ignore', 'pipe', 'pipe'] }).trim();
 let started = false;
+// A timed-out Docker launch may still have created the named container.
+let containerCreateAttempted = false;
 let phase = 'image-content-check';
 let lastStartupObservation = 'not_checked';
 const phaseStart = Date.now();
@@ -22,9 +26,19 @@ const reportPhase = label => {
   console.log(`Marketing smoke phase=${label} elapsed_ms=${Date.now()-phaseStart}`);
 };
 try {
+  reportPhase('start-local-container');
+  containerCreateAttempted = true;
+  // Reuse the same final-image container for content inspection and HTTP acceptance.
+  // This avoids a redundant cold image launch on the resource-constrained runner.
+  docker(['run', '-d', '--name', name, '-p', '127.0.0.1::3000',
+    '--env', 'PORT=3000', '--env', 'HOSTNAME=0.0.0.0',
+    '--env', `K_SERVICE=elevate-${component}-migration`,
+    '--env', `STORE_ONLY_RUNTIME=${component === 'store'}`,
+    '--env', 'NEXT_PUBLIC_SUPABASE_URL', '--env', 'NEXT_PUBLIC_SUPABASE_ANON_KEY', image], 90000);
+  started = true;
   // Resolve dependencies and assets inside the final image, as its runtime user.
   reportPhase('image-content-check');
-  docker(['run', '--rm', '--entrypoint=node', image, '-e', `
+  docker(['exec', name, 'node', '-e', `
     const fs=require('fs');
     for(const file of ['/app/apps/marketing/server.js','/app/apps/marketing/.next/BUILD_ID','/app/apps/marketing/public/version.json','/app/apps/marketing/public/data/hero-banners.json']) {
       if(!fs.statSync(file).size) throw new Error('Missing runtime file: '+file);
@@ -32,14 +46,7 @@ try {
     for(const pkg of ['next','react','react-dom','styled-jsx/style']) require.resolve(pkg,{paths:['/app/apps/marketing']});
     const version=JSON.parse(fs.readFileSync('/app/apps/marketing/public/version.json','utf8'));
     if(version.commit!==process.env.GIT_SHA) throw new Error('Packaged version mismatch');
-  `]);
-  reportPhase('start-local-container');
-  docker(['run', '-d', '--name', name, '-p', '127.0.0.1::3000',
-    '--env', 'PORT=3000', '--env', 'HOSTNAME=0.0.0.0',
-    '--env', `K_SERVICE=elevate-${component}-migration`,
-    '--env', `STORE_ONLY_RUNTIME=${component === 'store'}`,
-    '--env', 'NEXT_PUBLIC_SUPABASE_URL', '--env', 'NEXT_PUBLIC_SUPABASE_ANON_KEY', image]);
-  started = true;
+  `], 90000);
   const port = docker(['port', name, '3000/tcp']).split(':').at(-1);
   assert.match(port, /^\d+$/);
   const root = `http://127.0.0.1:${port}`;
@@ -117,12 +124,23 @@ try {
   console.error(`Marketing smoke failure phase=${phase} elapsed_ms=${Date.now()-phaseStart} startup_last=${lastStartupObservation}`);
   console.error('Marketing container smoke test failed:', error.message);
   if (started) {
-    console.error('Container state:', docker(['inspect', '--format={{.State.Status}} exit={{.State.ExitCode}} oom={{.State.OOMKilled}}', name]));
+    try { console.error('Container state:', docker(['inspect', '--format={{.State.Status}} exit={{.State.ExitCode}} oom={{.State.OOMKilled}}', name], 15000)); }
+    catch { console.error('Container state unavailable'); }
     try {
       console.error('Container resource snapshot:', docker(['stats', '--no-stream', '--format', 'cpu={{.CPUPerc}} memory={{.MemUsage}}', name]));
     } catch { console.error('Container resource snapshot unavailable'); }
   }
   process.exitCode = 1;
 } finally {
-  if (started) { try { docker(['rm', '-f', name]); } catch { console.error('Smoke container cleanup failed'); process.exitCode = 1; } }
+  if (containerCreateAttempted) {
+    // Run cleanup even if docker run timed out after creating the named container.
+    try { docker(['rm', '-f', name], 60000); }
+    catch (error) {
+      if (!/No such container/i.test(String(error?.stderr ?? error?.message ?? ''))) {
+        console.error('Smoke container cleanup failed');
+        process.exitCode = 1;
+      }
+    }
+  }
 }
+

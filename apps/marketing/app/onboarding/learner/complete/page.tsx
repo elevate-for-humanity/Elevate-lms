@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { ExternalLink, ArrowRight, BookOpen } from 'lucide-react';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { siteUrls } from '@/lib/utils/site-urls';
 
 export const dynamic = 'force-dynamic';
 
@@ -146,7 +147,7 @@ export default async function OrientationCompletePage() {
         {/* CTA */}
         <div className="flex flex-col sm:flex-row gap-3">
           <Link
-            href="https://app.elevateforhumanity.org/lms/dashboard"
+            href={siteUrls.dashboard}
             className="flex-1 flex items-center justify-center gap-2 px-5 py-3 bg-brand-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-brand-blue-700 transition-colors"
           >
             <BookOpen className="w-4 h-4" />

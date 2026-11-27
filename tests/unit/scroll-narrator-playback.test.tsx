@@ -127,6 +127,25 @@ describe('automatic page narration', () => {
     visible = 'b'; fireEvent.scroll(window); await advance(850);
     expect(voice.play).not.toHaveBeenCalled();
   });
+  it('does not call the speech provider until browser user activation', async () => {
+    const activation = { hasBeenActive: false };
+    Object.defineProperty(navigator, 'userActivation', {
+      configurable: true,
+      value: activation,
+    });
+    try {
+      setup();
+      await advance(1400);
+      expect(voice.play).not.toHaveBeenCalled();
+      expect(voice.prepare).not.toHaveBeenCalled();
+      expect(screen.getByRole('status')).toHaveTextContent('Tap the speaker');
+      activation.hasBeenActive = true;
+      await act(async () => { fireEvent.pointerDown(document.body); });
+      expect(voice.play).toHaveBeenCalledTimes(1);
+    } finally {
+      Reflect.deleteProperty(navigator, 'userActivation');
+    }
+  });
   it('does not restart an autoplayed script on the first touch', async () => {
     setup(); await advance(1400);
     await act(async () => { fireEvent.pointerDown(document.body); });

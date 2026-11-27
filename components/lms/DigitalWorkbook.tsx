@@ -3,6 +3,7 @@ import { useEffect, useRef, useState, type ReactNode } from 'react';
 import WorkbookNarration from './WorkbookNarration';
 import LearningWorkspace from './LearningWorkspace';
 import WorkbookLessonPicture from './WorkbookLessonPicture';
+import WorkbookPdfPage from './WorkbookPdfPage';
 import { workbookVisualAssignments, type WorkbookVisual } from '@/lib/lms/workbook-visuals';
 import { workbookSlides } from '@/lib/lms/workbook-slides';
 import { workbookCover } from '@/lib/store/workbook-products';
@@ -41,6 +42,7 @@ export function SectionEditor({
   accountId,
   visual,
   workbookSlug,
+  pdfUrl,
   onReviewSaved,
   sectionPicker,
   showTimeclock = true,
@@ -52,6 +54,7 @@ export function SectionEditor({
   accountId: string;
   visual?: WorkbookVisual;
   workbookSlug: string;
+  pdfUrl?: string | null;
   onReviewSaved?: (sectionId: string, reviewed: boolean) => void;
   sectionPicker: ReactNode;
   showTimeclock?: boolean;
@@ -361,6 +364,9 @@ export function SectionEditor({
             <p className="text-sm font-semibold text-teal-900">
               {section.section_number}. {section.title} · {slide.title}
             </p>
+            {pdfUrl && section.pdf_page > 0 ? (
+              <WorkbookPdfPage url={pdfUrl} page={section.pdf_page} title={section.title} />
+            ) : null}
             {visual ? (
               <WorkbookLessonPicture key={visual.src} visual={visual} />
             ) : (
@@ -388,12 +394,14 @@ export default function DigitalWorkbook({
   responses,
   readOnly,
   accountId,
+  pdfUrl,
 }: {
   workbook: Workbook;
   sections: WorkbookSection[];
   responses: WorkbookResponse[];
   readOnly: boolean;
   accountId: string;
+  pdfUrl?: string | null;
 }) {
   // Always start with the first workbook lesson when entering from a dashboard.
   // Existing writing is preserved, but a saved browser slide position must never
@@ -537,6 +545,7 @@ export default function DigitalWorkbook({
                 key={section.id}
                 section={section}
                 workbookSlug={workbook.slug}
+                pdfUrl={pdfUrl}
                 visual={visuals[section.id]}
                 initial={responses.find((row) => row.section_id === section.id)}
                 hidden={section.id !== active}

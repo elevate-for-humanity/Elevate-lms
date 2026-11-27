@@ -2,6 +2,7 @@ import { requireRole } from '@/lib/auth/require-role';
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
+import { syntheticQaProfileIds } from '@/lib/enrollment/qa-report-classification';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { FileText, Users, Award, DollarSign, ArrowLeft, Download, BarChart3, GraduationCap } from 'lucide-react';
 
@@ -17,7 +18,7 @@ export default async function SampleReportsPage() {
   const supabase = await createClient();
 
   const [students, enrollments, certificates, completions, programs, courses] = await Promise.all([
-    supabase.from('profiles').select('id, full_name, email, role, enrollment_status, created_at').eq('role', 'student').order('created_at', { ascending: false }).limit(20),
+    supabase.from('profiles').select('id, full_name, email, role, enrollment_status, created_at').in('role', ['student', 'apprentice']).order('created_at', { ascending: false }).limit(100),
     supabase.from('program_enrollments').select('id, status, created_at, program_id').order('created_at', { ascending: false }).limit(20),
     supabase.from('certificates').select('id, status, created_at').order('created_at', { ascending: false }).limit(20),
     supabase.from('completions').select('id, created_at').order('created_at', { ascending: false }).limit(20),
@@ -25,13 +26,30 @@ export default async function SampleReportsPage() {
     supabase.from('courses').select('id, title, is_active', { count: 'exact' }),
   ]);
 
+  // Keep synthetic QA learner identities out of operational roster figures.
+  // Reporting-only filter: does not modify enrollment, access, or funding state.
+  // A missing enrollment must never be assumed to be synthetic.
+  const profileIds = (students.data ?? []).map((row) => row.id);
+  const qaEnrollmentRows = profileIds.length
+    ? await supabase.from('program_enrollments')
+        .select('user_id,student_id,payment_status,funding_source')
+        .or(`user_id.in.(${profileIds.join(',')}),student_id.in.(${profileIds.join(',')})`)
+    : { data: [], error: null };
+  // Fail closed for reporting: do not silently include questionable records
+  // as certified human learners if the classification query failed.
+  if (qaEnrollmentRows.error) {
+    throw new Error('Enrollment QA classification unavailable');
+  }
+  const syntheticIds = syntheticQaProfileIds(qaEnrollmentRows.data ?? []);
+  const realStudents = (students.data ?? []).filter((row) => !syntheticIds.has(row.id)).slice(0, 20);
+
   const reportSections = [
     {
       title: 'Student Roster',
       icon: Users,
-      count: students.data?.length ?? 0,
+      count: realStudents.length,
       color: 'brand-blue',
-      rows: (students.data ?? []).map((s: any) => ({
+      rows: realStudents.map((s: any) => ({
         cols: [s.full_name || s.email || 'Unknown', s.role, s.enrollment_status || 'pending', s.created_at ? new Date(s.created_at).toLocaleDateString() : '—'],
       })),
       headers: ['Name', 'Role', 'Status', 'Registered'],

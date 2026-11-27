@@ -51,7 +51,7 @@ const paths = [
     title: 'Business Community',
     eyebrow: 'Post & Share',
     text: 'Join the community feed to post updates, upload and share photos or videos, comment, connect, and join discussions.',
-    href: '/lms/community',
+    href: 'https://app.elevateforhumanity.org/community',
     image: '/images/pages/community-page-1.webp',
     imageAlt: 'Community members connecting and sharing updates',
   },
@@ -105,7 +105,7 @@ export default function BusinessNetworkPage() {
                 Choose Your Path <ArrowRight className="h-4 w-4" />
               </Link>
               <Link
-                href="/lms/community"
+                href="https://app.elevateforhumanity.org/community"
                 className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-white/30 bg-white/5 px-6 py-3 font-black text-white backdrop-blur transition hover:bg-white/10"
               >
                 Open Community <Camera className="h-4 w-4" />
@@ -205,7 +205,7 @@ export default function BusinessNetworkPage() {
               participate in groups, and start discussions.
             </p>
             <Link
-              href="/lms/community"
+              href="https://app.elevateforhumanity.org/community"
               className="mt-7 inline-flex min-h-12 items-center gap-2 rounded-xl bg-slate-950 px-6 py-3 font-black text-white hover:bg-slate-800"
             >
               Go to the Community <ArrowRight className="h-4 w-4" />

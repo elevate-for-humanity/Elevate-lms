@@ -3,6 +3,7 @@ import { randomBytes } from 'node:crypto';
 import { readFile, writeFile } from 'node:fs/promises';
 import { createQaAuthUser } from './supabase-auth-fixtures.mjs';
 import { writePrivateQaState } from './write-private-state.mjs';
+import { assertQaApprenticeshipEnrollment, scopeQaHolderAssignmentAlert } from './qa-host-shop-alert-cleanup.mjs';
 
 const action = process.argv[2] || 'provision';
 const statePath = process.env.QA_E2E_STATE_PATH || '.qa-apprenticeship-e2e-state.json';
@@ -414,6 +415,13 @@ async function cleanup() {
   const hostId = state.host?.id;
   const apprenticeId = state.apprentice?.id;
   const approverId = state.approver?.id;
+  // Attest the enrollment itself before any destructive action, even when
+  // the checkpoint contains a valid disposable profile.
+  if (enrollmentId) {
+    const enrollment = await checked(db.from('program_enrollments')
+      .select('id,user_id,student_id,email,source,draft_data').eq('id', enrollmentId).maybeSingle(), 'load fixture enrollment');
+    assertQaApprenticeshipEnrollment(state, enrollment);
+  }
   // Fail BEFORE any destructive action if this fixture gained regulated records.
   if (placementId) {
     const placement = await checked(db.from('apprentice_placements')
@@ -489,6 +497,11 @@ async function cleanup() {
     await deleteDerived(db.from('staff_notifications').delete()
       .eq('type', 'apprentice_ready_for_rapids')
       .eq('metadata->>enrollment_id', enrollmentId), 'delete RAPIDS staff notification');
+    // Backstop the deployed QA-alert trigger guard. Scope by both fixture
+    // identities, never by the actual holder receiving the notification.
+    const holderAlertDelete = scopeQaHolderAssignmentAlert(db.from('notifications').delete(), enrollmentId, apprenticeId);
+    if (isProductionDisposable) await checked(holderAlertDelete, 'delete fixture holder assignment alert');
+    else await deleteDerived(holderAlertDelete, 'delete fixture holder assignment alert');
     await deleteDerived(db.from('notification_outbox').delete()
       .eq('template_key', 'enrollment_welcome').eq('entity_type', 'program_enrollment')
       .eq('entity_id', enrollmentId), 'delete welcome outbox entry');
@@ -547,6 +560,11 @@ async function cleanup() {
     await assertDerivedGone(db.from('staff_notifications')
       .select('id').eq('type', 'apprentice_ready_for_rapids')
       .eq('metadata->>enrollment_id', enrollmentId).limit(1), 'RAPIDS staff notification');
+    const holderAlertReadback = scopeQaHolderAssignmentAlert(db.from('notifications').select('id'), enrollmentId, apprenticeId).limit(1);
+    if (isProductionDisposable) {
+      const remaining = await checked(holderAlertReadback, 'verify fixture holder assignment alert');
+      if (remaining.length) throw new Error('QA cleanup incomplete: fixture holder assignment alert');
+    } else await assertDerivedGone(holderAlertReadback, 'fixture holder assignment alert');
     await assertDerivedGone(db.from('notification_outbox')
       .select('id').eq('template_key', 'enrollment_welcome')
       .eq('entity_type', 'program_enrollment').eq('entity_id', enrollmentId).limit(1), 'welcome outbox entry');

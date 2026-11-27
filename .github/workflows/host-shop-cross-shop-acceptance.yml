@@ -44,7 +44,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - run: node --test scripts/gcp/production-acceptance.test.mjs
+      - run: node --test scripts/gcp/production-acceptance.test.mjs scripts/qa/qa-host-shop-alert-cleanup.test.mjs
   authenticated-cross-shop:
     if: ${{ (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main') || (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main' && github.event.workflow_run.event == 'workflow_dispatch') }}
     name: Authenticated cross-shop isolation (production)

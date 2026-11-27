@@ -1,0 +1,370 @@
+{
+  "version": 1,
+  "workbookSlug": "prestige-elevation-nail-technology",
+  "chapters": [
+    {
+      "number": 1,
+      "heading": "Three exposures, three zones: sanitation and chemical safety",
+      "text": "Nail services combine three kinds of exposure at once: biological material from clients, chemicals from products, and dust from filing. The station controls all three only if it is set up in zones — clean tools and used tools kept in separate protected locations, and waste contained rather than left loose. Cleaning and disinfection are different steps in a fixed order: cleaning removes visible residue first, and disinfection follows only for reusable items that are compatible with it. A single-use porous file or buffer is never made reusable by spraying it; once used, it is discarded. Product labels are the authority for every chemical decision — the intended surface, the dilution, the contact time, and the protection required — and safety data sheets must be accessible before setup begins. Ventilation captures dust and vapor at the work area; a faint odor is not evidence that exposure is low, and a strong odor is not the measure either. Never mix chemicals, never use an unlabeled liquid, and keep solvent containers closed and away from ignition sources. Foot-spa equipment is cleaned by its own specific written procedure, because a surface wipe does not reach internal parts. Exposure, blood, or equipment failure stops the service, and the written response procedure takes over.",
+      "example": "A client finishes, and turnover begins. You discard the porous file and buffer she was served with — they look clean, but appearance and a disinfectant spray do not establish reuse safety for single-use items. Reusable implements go to the used zone, visible soil is removed, and only then are they processed by the method and contact time on the disinfectant label. The work surface is cleaned, disinfected items are stored protected in the clean zone, and the turnover is recorded. When the foot spa is next, you follow its written internal cleaning procedure instead of wiping the basin and calling it done.",
+      "review": "Why can a disinfectant spray never turn a used single-use file back into a clean tool?",
+      "diagram": [
+        "Check ventilation + labels",
+        "Hand hygiene + clean tools",
+        "Discard single-use items",
+        "Clean, then disinfect tools",
+        "Store protected, record it"
+      ]
+    },
+    {
+      "number": 2,
+      "heading": "Plate versus living tissue: conservative cuticle care",
+      "text": "The nail plate is hardened keratin, but the folds surrounding it are living protective tissue, and the two demand opposite handling. The cuticle that lies on the plate and the living eponychium are not interchangeable terms or interchangeable targets: material on the plate may be addressed by the taught technique, while living tissue is a barrier that keeps infection out. Removing living tissue injures that barrier and opens a route for infection, so a client's request for deeper cutting never justifies it. Older schedule wording describes implements historically used for cuticle work; that wording is not permission to cut aggressively. The trainer demonstrates the current permitted conservative method, and that method is what you practice. The service runs in order: consult and inspect the folds, explain the service, and confirm the skin is intact. Prepare clean, processed implements and apply a compatible softening product according to its label. Support the finger and use light, controlled pressure with the approved pusher method, removing only the nonliving material that current rules and the taught technique allow. Never dig under the folds. Reassess, remove residue, and record any modification to the service. Painful, swollen, bleeding, or infected-looking tissue is not worked over; if skin is cut or bleeding occurs, stop immediately and follow the exposure procedure.",
+      "example": "A client asks for very deep cuticle cutting because she thinks it looks neater. You explain, in plain language, that the tissue she wants removed is alive and protective — cutting it breaks the seal that keeps infection out and can leave her sore and exposed. Instead you offer the conservative service: softening product applied by its label, a supported finger, light pusher pressure, and only nonliving material on the plate removed. She agrees, the service finishes without injury, and you record that the requested cutting was declined and the conservative method delivered.",
+      "review": "A client insists deeper cutting looks better. What do you protect, what do you offer instead, and why?",
+      "diagram": [
+        "Consult + inspect folds",
+        "Confirm intact skin",
+        "Soften per label",
+        "Light pusher pressure only",
+        "Reassess + record changes"
+      ]
+    },
+    {
+      "number": 3,
+      "heading": "Preparation first: when soaking helps and when it harms",
+      "text": "Preparation is a decision, not a ritual. It begins with consultation, inspection, and a plan suited to both the nail in front of you and the product system you intend to use. Before any service is selected, look for nail plate damage, lifting, unusual color, and inflammation around the nail — any of these can change or stop the plan. Water has a real effect: it softens surface material, which some natural-nail services use. But prolonged soaking changes the condition of the nail itself, and that changed condition may be unsuitable before some enhancements. A soap-and-water step appearing in one work process is therefore not a reason to ignore a product's own directions; the system being applied governs. The demonstration runs: confirm the planned natural-nail service and inspect the hands; remove old product as directed where appropriate; use clean materials and comfortable water only when the service protocol calls for soaking; avoid prolonged immersion; dry thoroughly; and prepare gently by the taught method. Single-use items such as wooden sticks stay separate for disposal, and sharp sticks are never used to dig beneath the nail. Broken or inflamed skin, or an unexplained nail change, stops the service rather than being soaked and covered.",
+      "example": "The plan on the booking is an enhancement, and the system's instruction sheet calls for dry preparation. A long soak is part of a different manicure sequence you learned earlier, and it would be easy to add it out of habit. You do not: you follow the verified protocol for the system actually being applied, prepare the nail dry and gently, and note in the record that no soak was used because the system required dry preparation. The enhancement goes onto a nail in the condition its manufacturer intended, not one softened and changed by an unnecessary immersion.",
+      "review": "An enhancement system requires dry preparation. Why is adding a familiar long soak still the wrong decision?",
+      "diagram": [
+        "Consult + inspect hands",
+        "Check damage, lifting, color",
+        "Soak only if protocol calls",
+        "Dry thoroughly",
+        "Gentle prep, reassess, record"
+      ]
+    },
+    {
+      "number": 4,
+      "heading": "Rotary-tool control: speed is a decision, heat is a stop",
+      "text": "A rotary tool removes material quickly, which is exactly why it demands more judgment than a hand file, not less. Bit choice, pressure, angle, speed, and movement must all match the product and the trained technique — and there is no universal safe speed for every bit or task, so a number copied from a video is not a setting. Competence with a hand file does not automatically establish rotary-tool competence; the tool is learned on a training hand and enhancement practice tips first. Before work begins, check the device, the bit's condition, and the manufacturer's instructions with the trainer; confirm the bit suits the material and task, secure it correctly, and verify dust extraction and the required protection. Support the finger, keep the tool controlled and moving as demonstrated, use light pressure, and inspect frequently. Heat, vibration, or pain is a stop signal, never normal evidence of progress: stop, assess, and resume only after the cause is corrected. An unsuitable bit never runs against natural nail or skin, damaged equipment is removed from use, and lifted or suspicious nails are avoided. After use, the equipment is cleaned and reusable bits are processed by their approved method.",
+      "example": "On a practice tip, the bit lingers in one spot while you concentrate on a stubborn area, and the tip begins to develop heat. That heat is your instruction: stop. With the trainer, you reassess — the pressure was steady but the movement had stalled, so material and friction built up in one place. You correct the cause, keeping the tool moving with lighter pressure and pausing to inspect, and only then resume. The finished tip shows even reduction without gouges, and the stop itself is part of the competent performance, not an interruption of it.",
+      "review": "A practice tip heats up under a stationary bit. What do you do first, and what must change before you resume?",
+      "diagram": [
+        "Check device, bit, directions",
+        "Match bit to material",
+        "Secure bit, check dust capture",
+        "Light pressure, keep moving",
+        "Stop for heat, inspect often"
+      ]
+    },
+    {
+      "number": 5,
+      "heading": "Wraps reinforce suitable nails — they never conceal unsuitable ones",
+      "text": "A wrap reinforces a suitable nail using a specific fabric and bonding system. That word suitable carries the whole lesson: a wrap is a cosmetic reinforcement, not a treatment for infection and never a way to conceal an injured nail. Whether a repair is appropriate is decided by the condition of the natural nail and the location of the break, before any material is opened. Product compatibility and preparation decide whether the reinforcement holds; combining unrelated resins and activators can create unpredictable results, so the chosen system is used as a system. The service runs: inspect and confirm a suitable, intact nail with the trainer; explain the reinforcement and its maintenance limits to the client; prepare the nail according to the chosen system without excessive thinning; fit the wrap material to the required area, keeping it away from living tissue; and apply the compatible bonding layers exactly as instructed. Finish the surface conservatively, check the edges and balance, and explain maintenance and safe removal. The refusals are as important as the steps: do not seal over suspected infection, an open wound, or an unexplained change; keep adhesives off skin and eyes and work with ventilation; and never pull a lifted wrap away from the natural nail, which tears the surface it was meant to protect.",
+      "example": "A client presents a split that extends into painful tissue and asks you to wrap it so it stops catching. The same wrap that reinforces a healthy nail is wrong here: sealing over painful, injured tissue hides the problem instead of helping it. You decline the repair, explain that the location of the break and the pain make the nail unsuitable, and recommend appropriate evaluation. The contrast is the lesson — an intact nail with a suitable break gets reinforcement; a painful split into living tissue gets a referral, and the decision is made on inspection, not on the client's preference.",
+      "review": "A split reaches painful tissue. Why is a wrap the wrong answer, and what do you do instead?",
+      "diagram": [
+        "Inspect + confirm intact nail",
+        "Explain limits to client",
+        "Prep without thinning",
+        "Fit wrap clear of tissue",
+        "Bond per system, check edges"
+      ]
+    },
+    {
+      "number": 6,
+      "heading": "Forms and balance: architecture, not just length",
+      "text": "A sculpted extension is built on two foundations: a matched product system and a correctly fitted form. The form supports the shape while the material sets, so a form that points the wrong way or leaves a gap under the free edge undermines everything applied over it — filing afterward cannot reliably compensate for an unstable foundation. What makes the finished extension sound is balance and architecture, the structure that distributes ordinary stress; length alone is not a measure of quality, and a practical length and shape are agreed with the client first. Mixing ratios, working time, and setting depend on the manufacturer system and conditions, which is why substitution is forbidden: do not swap solvents and do not combine unrelated liquid and powder products. Repeated skin contact raises exposure and sensitization risk, so product stays clear of skin throughout. The service runs: inspect suitability; set up ventilation, closed containers, and the exact system instructions; prepare the nail conservatively; fit the form without a gap or pressure; apply material by the demonstrated manufacturer method; allow the specified setting process; then refine the shape without excessive filing. Keep liquids away from ignition sources, never cover a lifted, discolored, or painful nail, and if the product fails to set as expected, stop and investigate rather than applying more layers.",
+      "example": "As you fit a form on a practice finger, it points downward and leaves a visible gap under the free edge. The temptation is to proceed and fix the shape in filing. You stop and correct the fit first, seating the form so it supports the intended shape with no gap, because the extension will set in whatever shape the form gives it. Only then does product go on, kept clear of skin, and the short finished extension is checked for fit, skin clearance, structure, and balance — a sound foundation, not a rescued one.",
+      "review": "A form gaps under the free edge. Why must the fit be corrected before any product is applied?",
+      "diagram": [
+        "Inspect + agree length + shape",
+        "Ventilation + system ready",
+        "Conservative nail prep",
+        "Fit form: no gap, no pressure",
+        "Apply, set, refine, check"
+      ]
+    },
+    {
+      "number": 7,
+      "heading": "Removal matched to the coating: gentle beats forceful",
+      "text": "Removal is chosen by identifying what is actually on the nail. Ordinary lacquer and cured enhancement systems do not necessarily use the same method, so the existing coating and the next service together decide the removal plan. The goal throughout is narrow: remove the coating without scraping away natural nail layers. Solvents demand respect on three counts — they can irritate skin and eyes, they may be flammable, and their exposure is controlled by how you handle them. Controlled dispensing of a small amount, ventilation, and closed waste handling reduce unnecessary exposure; containers are closed again when the work is done. The service runs: identify the existing product and confirm the correct removal instructions; inspect skin and nail condition; prepare ventilation, appropriate protection, and a small controlled amount of compatible remover; apply it by the taught method, keeping contact limited to the intended area; remove softened coating gently with clean materials; and reassess. Solvent-contaminated materials are disposed of according to the safety data sheet and salon procedure. Three actions are always wrong: heating a flammable solvent, using an unknown liquid, and forcing off a resistant product. Significant irritation or unexpected nail damage stops the removal and sends you to the trainer.",
+      "example": "A coating on a practice tip does not soften with ordinary polish remover. Scraping harder would remove the coating — along with surface layers of the nail beneath it — and mixing solvents would add an uncontrolled chemical risk. Instead you stop and identify the coating first, because a product that resists lacquer remover is telling you it is a different system with its own removal instructions. Once identified, the correct method softens it as intended, it lifts gently with clean materials, and the surface underneath is reassessed intact rather than gouged.",
+      "review": "A coating will not soften in ordinary remover. Name the two responses you must not use, and the one you must.",
+      "diagram": [
+        "Identify the existing coating",
+        "Confirm removal instructions",
+        "Ventilate, protect, dispense",
+        "Apply to intended area only",
+        "Remove gently, close + dispose"
+      ]
+    },
+    {
+      "number": 8,
+      "heading": "Shaping natural nails: structure sets the limits",
+      "text": "A natural-nail shape is a negotiation between what the client wants, what their daily activity demands, and what the nail's structure can support. The free edge — the portion extending beyond the fingertip — is where shaping happens; the attached plate and the surrounding skin must remain protected throughout. File abrasiveness and technique are matched to the material: what suits an enhancement is not automatically what suits a natural nail. The structural warning is the sidewalls: aggressive sidewall reduction can weaken the nail's support, so a dramatic narrow shape on a short or weak nail is a request to decline or moderate, not to satisfy. Symmetry is judged honestly by inspecting length and shape from several views rather than relying on one angle. The service runs: consult about preferred length and daily activities; inspect for contraindications; choose suitable clean tools; reduce length conservatively by the taught method while supporting the finger; refine the free edge with controlled strokes and appropriate abrasive pressure; compare both sides and check for snags without filing into the surrounding folds; remove dust safely; and record the agreed changes. Pain, cracking, or a suspicious change stops the work, single-use abrasives are discarded, and reusable implements are processed appropriately.",
+      "example": "A client with a weak, short nail asks for a very narrow shape. Filing the sidewalls down to that outline would leave the nail without the support it needs and invite breakage in her daily activity. You explain the structural limitation in plain terms and offer a less aggressive shape that keeps the sidewall support while still giving her a refined outline. She agrees, you shape conservatively with supported, controlled strokes, check the result from several views, and clear a snag at the free edge without touching the folds. The agreed shape is recorded, so the next visit starts from the same structural judgment rather than a new guess.",
+      "review": "A client wants a narrow shape her weak nail cannot support. What do you refuse to remove, and what do you offer?",
+      "diagram": [
+        "Consult: length + activity",
+        "Inspect + choose clean tools",
+        "Reduce length conservatively",
+        "Refine edge, supported finger",
+        "Compare views, check snags"
+      ]
+    },
+    {
+      "number": 9,
+      "heading": "Base, color, top: thin coats and honest timing",
+      "text": "A lacquer finish is a layered system, and each layer has its own job: the base coat supports the chosen system, the color provides coverage, and the top coat provides the intended finish. The layers work when they are compatible products applied in thin, controlled coats — an overloaded brush does not speed coverage; it produces thick layers that wrinkle instead of drying evenly. Drying and curing are different processes and must never be confused: an air-dried lacquer follows its own timing, while a lamp-cured product requires the matching instructions and equipment, never an assumed timer or substituted lamp settings. Two boundaries protect the client: product stays off the skin — and any skin contamination is removed as instructed before a curing step — and a concerning nail change is never concealed under an opaque finish. The service runs: confirm suitability, color, and finish with the client; prepare the nail according to the lacquer system using clean dispensing practices; apply the specified base coat, then thin color layers with controlled brush loading, avoiding surrounding skin; follow the product timing; apply the compatible top coat; check the edges and finish; explain realistic drying and aftercare; and record the system and color. A reaction or unexpected heat stops the service.",
+      "example": "Your color layers go on thick, loaded from an overloaded brush, and the finish wrinkles instead of drying evenly. Adding more top coat would only seal the problem in. Following the system instructions, you correct the application and reapply in thin, controlled layers, letting each follow the product timing. On practice tips the contrast is visible side by side: the overloaded coat stays wrinkled and uneven while the thin coats level, dry as intended, and take the top coat cleanly. The record notes the system and color actually used. The comparison settles the technique: brush loading, not extra product, is what controls the finish.",
+      "review": "Thick color layers have wrinkled. Why is more top coat the wrong fix, and what corrects it?",
+      "diagram": [
+        "Confirm suitability + color",
+        "Prep per lacquer system",
+        "Base coat, thin layers",
+        "Controlled brush, off skin",
+        "Follow timing, apply top coat"
+      ]
+    },
+    {
+      "number": 10,
+      "heading": "Conservative surface preparation: the endpoint is 'enough'",
+      "text": "Surface preparation creates the condition a specific enhancement system requires — nothing more. It does not mean grinding a natural nail until it is thin, and the difference between those two ideas is the whole lesson. Some systems need only minimal preparation with a specified abrasive, so the system's own instruction sheet, not habit or guesswork, sets the amount of work. A rotary tool makes excess easy: it can rapidly remove too much plate, particularly near areas that are thin or previously damaged, which is why the trainer verifies the method and the nail condition before any live tool use. The demonstration runs: identify the exact system and read its preparation instructions; inspect nail thickness and prior damage; select the appropriate approved tool; on a training tip, demonstrate light, controlled preparation limited to the instructed area; remove dust by the safe method; inspect for uniformity; and stop before unnecessary material loss. Remaining system preparation is completed without touching surrounding skin. Redness, heat, or tenderness is never an acceptable preparation endpoint — those are signs of harm, not adhesion. And poor adhesion is never compensated for by repeatedly thinning the natural nail; a damaged nail is deferred and assessed by the trainer instead.",
+      "example": "A client returns with a tender, thinned nail after repeated preparation elsewhere, and an enhancement is booked. Roughening the nail again might promise better adhesion, but the plate has nothing left to give — more removal deepens the damage that is already causing tenderness. You stop the enhancement plan, do not touch the nail with an abrasive, and assess the situation with the trainer. The deferral is recorded, and the client leaves with her remaining nail intact rather than a better-bonded enhancement on a worse nail. The trainer's assessment, not adhesion, decides what happens at the next appointment for that nail.",
+      "review": "A returning nail is already tender and thinned. Why must the enhancement stop instead of being prepped harder?",
+      "diagram": [
+        "Identify system, read its prep",
+        "Inspect thickness + damage",
+        "Approved tool only",
+        "Light prep, set area only",
+        "Inspect uniformity, stop early"
+      ]
+    },
+    {
+      "number": 11,
+      "heading": "Buffing for shine: stop at the result, not beyond it",
+      "text": "Buffing smooths or polishes a surface through a suitable abrasive sequence, and its endpoint is the intended result — not the maximum shine physically obtainable. Shine is an appearance outcome, never proof that more material should be removed. Natural nails have limited thickness, and repeated aggressive buffing spends that thickness: each unnecessary pass weakens the nail a little more, and friction heat and dust exposure rise along the way. A buffing powder or finishing product is used only when it is appropriate for the intended surface and strictly according to its instructions. The service runs: inspect suitability; choose the correct clean or single-use buffer; support the finger; use the taught light pressure and a limited number of passes; work only on the intended area, inspecting frequently; apply any compatible finishing product as instructed; and stop when the intended result is achieved rather than continuing for more shine. Residue is removed safely and home-care limits are explained. The refusals mirror the risks: do not buff damaged, painful, or suspicious nails; do not reuse a disposable buffer between clients; and do not continue when heat develops. The number of passes that suited one practice tip is a record of that surface, not a universal prescription for every natural nail.",
+      "example": "A client's nail is already smooth, but she asks for more shine. Repeating abrasive passes would remove material from a nail that has no roughness left to correct, trading thickness for a marginal gloss. Instead you consider an appropriate finishing option suited to the surface, used as its instructions direct, and explain why that achieves her goal without further abrasion. On the practice tip you have recorded the controlled passes of the approved sequence — a useful record for that tip, and a reminder that the count does not transfer as a prescription to her natural nail.",
+      "review": "A nail is already smooth but the client wants more shine. What do you reach for instead of more abrasive passes?",
+      "diagram": [
+        "Inspect suitability",
+        "Choose clean/single-use buffer",
+        "Support finger, light pressure",
+        "Limited passes, inspect often",
+        "Stop at result, explain limits"
+      ]
+    },
+    {
+      "number": 12,
+      "heading": "Service records: what was delivered, traceable later",
+      "text": "A useful client record answers a future question you cannot yet foresee, so it distinguishes carefully between the service requested and the service actually delivered. Into it go the observations made before work began, the product system used, the shade or enhancement details, the client's response, and the aftercare given. Product identity is the traceability thread: if a reaction or lifting occurs later, a precise record of the system — and batch where required — supports a real investigation, while a generic label supports nothing. Records are confidential and accurate, access is restricted, and an error is corrected by a dated, auditable entry rather than by deleting the original history. Two confusions are kept out: card security data never goes into service notes, and a service note is not a training-hour record or a mentor signoff — each document proves its own thing. The routine runs: confirm the correct client; update relevant history and consent; record the date, observations, agreed plan, and any deferral; enter the actual products and service steps, the response, maintenance advice, and follow-up; save in the approved system and verify you are in the correct record. Photographs and marketing use need their own separate permission, and only necessary personal information is collected.",
+      "example": "Weeks after a service, a client reports a reaction, and the record for her visit says only a generic product category. That single word cannot identify what touched her nails, so the investigation stalls. The lesson is written into your practice record for a fictional enhancement service: full product identities, the condition observed, the service actually delivered, the response, and the advice given. When you spot an error in your entry, you add a dated correction beneath it — the original stays visible, because a record that can be silently rewritten cannot be trusted.",
+      "review": "A reaction is reported and the record names only a generic category. What should the record have held, and why?",
+      "diagram": [
+        "Confirm correct client record",
+        "Update history + consent",
+        "Record observations + plan",
+        "Enter products + response",
+        "Save, verify, restrict access"
+      ]
+    },
+    {
+      "number": 13,
+      "heading": "Inventory: usable, quarantined, ordered — counted separately",
+      "text": "Inventory management keeps safe supplies available without ever letting expired, damaged, or unidentified stock drift back into service. The counting discipline is separation: usable stock is counted on its own, and quarantined items are counted separately, never blended into the number you rely on. First-expiring stock is used first when it remains suitable, so serviceable product is not wasted while older stock ages out behind it. Reorder decisions weigh three things — expected use, supplier lead time, and a reasonable buffer — so replenishment is requested before a gap, not after one. Storage follows the label and safety data sheet; a convenient shelf is not appropriate for every chemical, incompatible materials are kept apart as instructed, and ignition controls are maintained for flammables. The routine runs: list each item with its unit size, usable quantity, and expiry or open-period information; inspect labels and packaging and quarantine anything unsuitable; count consumption in consistent units; compare remaining usable stock with anticipated demand and delivery time; request replenishment through the approved process; and store received items correctly, updating the record without mixing batches or decanting into unidentified containers. Expired material is never counted as available, and no product is diluted to stretch inventory.",
+      "example": "A shelf count shows ten bottles of a service staple, which looks comfortable. Inspection tells the real story: four are expired and two have damaged labels that make them unidentified. The usable count is four, not ten — the expired bottles are quarantined and the damaged-label bottles leave service entirely. Your mock inventory sheet records usable, quarantined, and ordered quantities in separate columns, and the reorder calculation, built from a stated weekly consumption and delivery interval with its assumptions labeled, is based on the four bottles you can actually use.",
+      "review": "Ten bottles sit on the shelf, four expired and two unreadable. What is your usable count, and what happens to the rest?",
+      "diagram": [
+        "List item, size, expiry",
+        "Inspect labels + packaging",
+        "Quarantine unsuitable stock",
+        "Count usable separately",
+        "Reorder: use, lead time, pad"
+      ]
+    },
+    {
+      "number": 14,
+      "heading": "Appointments and charges: agreement before, receipt after",
+      "text": "An appointment is a promise of enough time — for consultation, for the service itself, and for complete turnover afterward. That turnover time is protected: disinfectant contact time is never the slack that absorbs a late-running day. Scheduling must also reflect reality about staff competence and available equipment, not just empty slots. Money follows the same consent discipline as the service. A deposit or cancellation policy is explained before the client agrees to it, and payment records show the actual service delivered, itemized charges, the approved tax treatment, and the payment status. Card details belong to the payment system; the service chart never becomes a duplicate store of card data. The routine runs: confirm the client request and any accessibility needs; check staff availability and the service duration including cleaning time; explain the price and applicable policy and obtain agreement; save the appointment and confirm it through the authorized channel. At checkout, verify the actual services and total, process payment through the approved system, issue a receipt, and reconcile the appointment status. Errors follow the approved correction or refund process, a declined transaction is not repeatedly charged, and payment information stays protected throughout.",
+      "example": "A service runs late and the next appointment now overlaps the turnover window. Shortening the cleaning process would keep the schedule tidy and break the safety standard the schedule was built around. Instead you inform the waiting client honestly and adjust the schedule, protecting the full turnover. In your practice build, the mock day shows consultation, service, and turnover as separate blocks, the fictional receipt itemizes the actual service delivered, and a duplicate booking is resolved by moving an appointment — never by deleting safety time. The receipt for the fictional service matches the adjusted schedule, item by item.",
+      "review": "The next client arrives before turnover is finished. What gives way — the cleaning time or the schedule — and why?",
+      "diagram": [
+        "Confirm request + access needs",
+        "Check staff, time + turnover",
+        "Explain price + policy, agree",
+        "Save + confirm appointment",
+        "Verify, pay, receipt, close"
+      ]
+    },
+    {
+      "number": 15,
+      "heading": "Cosmetic hand massage: comfort within scope, never treatment",
+      "text": "Hand massage in nail care is a cosmetic comfort service, performed within verified scope. It is not treatment for an injury or a circulatory disease, and it never promises to fix either. Exfoliation sits under the same boundary: an appropriate cosmetic method on intact, suitable skin — it does not authorize cutting living tissue or using an aggressive blade. Consent and comfort govern everything: the condition of the hands is assessed first, the client is asked about discomfort, and their responses guide pressure and movement throughout, including a withdrawal of consent, which stops the service at once. The routine runs: inspect the hands and confirm suitability with the trainer; explain the proposed gentle technique and obtain consent; position the arm comfortably; use a compatible medium and perform the demonstrated cosmetic sequence with light, controlled pressure; if an exfoliating product is included, follow its label and remove it completely; check comfort throughout; and document the service and the response. Broken, inflamed, infected-looking, or painful areas are avoided entirely. Deep or medical massage is outside the service, and pain, numbness, or distress reported at any point stops it immediately — the correct response to discomfort is never more pressure.",
+      "example": "A client asks you to massage a swollen, painful joint thoroughly to fix it. Working the area harder would move you from cosmetic comfort into attempted treatment of a condition you are not there to treat. You defer that area, keep any service to suitable intact skin with light pressure — or pause the massage altogether — and recommend appropriate medical advice for the joint. In practice you role-play the other boundary too: a client withdraws consent mid-service, you stop immediately, and the record shows the stop and the advice given.",
+      "review": "A client wants a painful swollen joint massaged 'fixed'. What do you decline, and what do you recommend?",
+      "diagram": [
+        "Inspect hands, ask discomfort",
+        "Explain technique, get consent",
+        "Position arm comfortably",
+        "Light controlled pressure",
+        "Check comfort, document it"
+      ]
+    },
+    {
+      "number": 16,
+      "heading": "Observe before you cover: proceed, modify, or defer",
+      "text": "Observation comes before product, because anything you cover today is something nobody can assess tomorrow. Before a service, examine the nail plate, the free edge, the folds, and the surrounding skin, noting intactness, unusual color, lifting, thickening, and any reported pain. The discipline is in the language: you record what you see and what the client reports, separately, without diagnosing infection or disease. The findings are compared with the client history, and the client is asked about recent changes — a new change carries different weight from a stable, known one. The cosmetic practitioner's authority is real but specific: you may modify or defer a service and recommend medical assessment. Covering a suspicious change with product can delay attention and obscure later observations, which is why an enhancement never goes over an unexplained painful, lifted, or discolored nail, an uncertain lesion is never removed, and urgent symptoms trigger the emergency response rather than a continued appointment. The routine runs: ask about concerns and recent changes; inspect under suitable lighting; record the client report separately from visible findings; identify areas to avoid; decide with the trainer whether the planned service is suitable; explain any modification or referral respectfully; and document the decision, confidentially, before any product is applied.",
+      "example": "A client asks for dark polish specifically to hide a newly painful, greenish nail change. The polish would do exactly what she asks — conceal it — and that is the problem: the change is new, painful, and unexplained, and covering it delays the attention it needs. You defer that nail, explain respectfully that you cannot diagnose what it is but that it needs evaluation before cosmetic work, and recommend medical assessment. Using the fictional diagrams in practice, your notes for each case stay neutral — observation, client report, decision — with no disease name assigned.",
+      "review": "A client wants dark polish over a new painful color change. What is your decision, and how do you explain it?",
+      "diagram": [
+        "Ask concerns + recent changes",
+        "Inspect under good light",
+        "Record report vs findings",
+        "Identify areas to avoid",
+        "Decide: proceed, modify, defer"
+      ]
+    },
+    {
+      "number": 17,
+      "heading": "Home care and color advice: support without medical claims",
+      "text": "Home-care advice extends the service into the client's own habits, and its boundary is the same as the salon's: support the result without making medical claims. The advice covers maintenance, gentle use of the nails, the product instructions for anything the client uses at home, and — just as important — the signs that need professional attention rather than home remedies. A cosmetic hardener is never presented as treating a disease, and expensive products are never suggested as necessary for every client. Color selection is a preference conversation, not a sales pitch: desired finish, daily activities, and upkeep all shape a recommendation the client can actually live with. The routine runs: ask about work, hobbies, and the current routine; explain the specific aftercare for the service delivered and safe product use from the relevant labels; discuss maintenance and removal and recommend suitable options without pressure; ask for teach-back so misunderstandings surface while you can correct them; provide concise written instructions; and record the advice and any unresolved concern. Two instructions are never given: picking or pulling off enhancements, and using household glue to repair a damaged nail. Pain, inflammation, or an unexplained change calls for assessment, not concealment or a home fix.",
+      "example": "A client mentions she plans to pull off a lifted enhancement at home once it catches on something. Pulling risks tearing the natural nail surface away with the product — the damage would be worse than the lifting. You explain that risk plainly, advise her not to pick or pull, and arrange appropriate professional assessment and removal instead. Her aftercare card for the short enhancement service states the maintenance steps and carries a clear stop-and-contact instruction for pain or lifting, and in teach-back she repeats the plan correctly before she leaves.",
+      "review": "A client plans to pull off a lifted enhancement at home. What risk do you explain, and what do you arrange instead?",
+      "diagram": [
+        "Ask work, hobbies, routine",
+        "Explain aftercare + labels",
+        "Discuss maintenance + removal",
+        "Teach-back, correct gaps",
+        "Written notes, record advice"
+      ]
+    },
+    {
+      "number": 18,
+      "heading": "Ethical promotion: a suitable product, an honest claim",
+      "text": "Ethical promotion starts from a real need: it connects a suitable product with an actual client goal and explains the product's limits as plainly as its benefits. The central distinction is between a cosmetic benefit and a disease-treatment claim — the first may be described truthfully; the second may not be made for a cosmetic product. Permission structures the conversation: you obtain permission to discuss retail, you respect a refusal without pressure, and hygienic samples and clear information do the persuading instead of exaggerated before-and-after promises. Marketing photographs require the appropriate client consent, kept separate from service consent, and another client's private image is never used without it. Sponsorship is never concealed, and regulatory approval that has not been established is never claimed. The routine runs: identify the client goal; check the product's suitability and instructions; ask permission to demonstrate, using clean or single-use materials; explain the benefit, use, limitations, and price in plain language; invite questions and confirm understanding; respect the decision either way; and record the advice appropriately. In practice, the sharpest exercise is editing: take one unsupported medical claim in a draft product description and rewrite it as a truthful cosmetic statement — the discipline of promotion is mostly the discipline of the sentence.",
+      "example": "A client asks whether a cosmetic nail oil will cure what she believes is an infection. Selling the oil on that promise would be a sale built on a false claim, and it would delay the evaluation she actually needs. You explain the oil's cosmetic purpose honestly, decline to present it as a cure, and recommend medical evaluation for the suspected infection. If she still wants the oil for its cosmetic use afterward, that is her informed choice — the product was promoted for what it does, not for what it cannot do.",
+      "review": "A client asks if a cosmetic oil cures infection. What do you explain, what do you recommend, and what must you not claim?",
+      "diagram": [
+        "Identify the client goal",
+        "Check suitability + directions",
+        "Ask permission to demonstrate",
+        "Explain benefit, limits, price",
+        "Respect + record the decision"
+      ]
+    },
+    {
+      "number": 19,
+      "heading": "Retail checkout: consent, accuracy, and a clean follow-up",
+      "text": "A retail sale is complete only when three things are true: the client has agreed to the product and the total, the payment is recorded correctly, and a receipt is available. A demonstration is not consent to charge, and unrequested items are never added. Before processing, product identity, size, and price are checked, and relevant use and return information is explained. The transaction's records stay in their own lane: retail sales are kept distinct from apprentice progress, commissions, and training-hour records, so one activity never falsely implies another. Follow-up is offered only through approved, consented channels. The routine runs: confirm the item and quantity the client selected; check the price and applicable policy; enter the exact item in the approved checkout system; show the total before processing; accept payment through the authorized method; issue an itemized receipt; and update inventory and the appropriate records. Errors are corrected through the approved procedure. Payment safety has its own rule for uncertainty: card security codes are never stored, and when a transaction's status is ambiguous — a timeout after a charge attempt, for example — the status is verified through the authorized system before any second attempt, because retrying blind can charge the client twice for one product.",
+      "example": "A checkout screen times out after a client's charge attempt. The screen tells you nothing: the payment may have completed or may never have gone through, and assuming either answer risks harm — retrying could duplicate the charge, while handing over the product unpaid loses the sale record. You check the payment status through the authorized system first. Only with the true status known do you act: complete the sale and issue the receipt if it succeeded, or process the payment once, cleanly, if it did not. Your mock sale and inventory adjustment follow the same order.",
+      "review": "A checkout times out mid-charge. Why do you verify status before retrying, and what are you preventing?",
+      "diagram": [
+        "Confirm item + quantity",
+        "Check price + policy",
+        "Enter exact item, show total",
+        "Process via authorized method",
+        "Receipt, update inventory"
+      ]
+    },
+    {
+      "number": 20,
+      "heading": "Applied practice: proving the sanitation turnover",
+      "text": "This applied section turns the sanitation lesson into a timed, trainer-reviewed performance. You prepare a training station with three explicit zones — clean, used, and waste — so the separation the lesson requires is physical, not remembered. Working from a sample disinfectant label and its safety data sheet, you read the intended surface, the protection required, and the contact time, and you calculate only the dilution the label itself specifies; no other ratio is improvised. The turnover you demonstrate follows the lesson's order: hand hygiene and clean tools ready before the client, then after service the single-use items discarded, waste contained, visible soil removed from reusable tools and surfaces, compatible tools processed by the label method for the full contact time, and disinfected items stored protected with the turnover recorded. Foot-spa equipment is handled by its specific written procedure rather than a surface wipe. The chemical boundaries are performed, not recited: nothing is mixed, no unlabeled liquid is used, solvent containers stay closed and away from ignition, and an exposure, blood, or equipment failure stops the exercise for the written response procedure. The trainer's review judges the sequence and the decisions — especially the disposals — because in sanitation the discarded item is as much evidence as the cleaned one.",
+      "example": "In the practice scenario, a file used on the training client looks perfectly clean, and a spray bottle of disinfectant is within reach. Spraying it and returning it to the clean zone would look efficient and would be wrong: the file is labeled single-use, and neither appearance nor spray establishes reuse safety for a porous item. You dispose of it in the waste zone and take a fresh file for the next service. Then you vary one condition — the item is instead a compatible reusable implement — and the decision changes for the right reason: that item is cleaned, then disinfected by its label, and stored protected.",
+      "review": "In your timed turnover, a used single-use file looks clean. What decides its fate — its appearance, a spray, or its label?",
+      "diagram": [
+        "Set clean, used, waste zones",
+        "Read label + SDS first",
+        "Calculate label dilution only",
+        "Timed turnover, full contact",
+        "Dispose single-use, record"
+      ]
+    },
+    {
+      "number": 21,
+      "heading": "Applied practice: pusher positioning on the training hand",
+      "text": "This applied section makes cuticle care physical. First you label a diagram — nail plate, folds, and cuticle — until the anatomy the lesson depends on is unmistakable, because the hands cannot protect tissue the eyes cannot identify. The plate is hardened keratin; the folds are living protective tissue; the cuticle on the plate and the living eponychium are different things, and only nonliving material on the plate is ever addressed. On the training hand you then demonstrate safe pusher positioning: the finger supported, the approved method used with light, controlled pressure, a compatible softening product applied by its label, and the tool kept out of the places it must not go — never digging under the folds, never cutting into living tissue. The trainer's demonstration of the current permitted conservative method governs the practice, not older schedule wording about implements. Your stop-and-refer boundaries are written before practical work: painful, swollen, bleeding, or infected-looking tissue is not worked over, and if skin is cut or bleeding occurs, you stop immediately and follow the exposure procedure. A client request is practiced as a boundary too — the demand for deep cutting is answered with explanation and a conservative offer, exactly as it must be at a real station.",
+      "example": "In the practice scenario, your training client asks for very deep cuticle cutting because it looks neat. On the training hand you rehearse the real answer: explain that the tissue in question is alive and protective, forming the seal that keeps infection out, and that removing it injures her rather than grooming her. You offer conservative care instead — softening by label, supported finger, light pusher pressure on the plate only. Vary one condition in rehearsal: the fold is also swollen and painful. The decision hardens — now even the conservative service on that area stops, and referral replaces the offer.",
+      "review": "On the diagram and the training hand, where must the pusher never go — and what changes if the fold is swollen?",
+      "diagram": [
+        "Label plate, folds, cuticle",
+        "Soften per label",
+        "Support finger, light pressure",
+        "Plate only — never under folds",
+        "Stop + refer problem tissue"
+      ]
+    },
+    {
+      "number": 22,
+      "heading": "Applied practice: two preparations, side by side",
+      "text": "This applied section trains the judgment that preparation follows the system, not habit. You place a natural-nail manicure preparation beside a mock enhancement instruction sheet and explain, step by step, which steps differ and why. The natural-nail sequence may call for clean materials and comfortable water, used as its protocol directs; the enhancement sheet may require dry preparation, because prolonged soaking changes the nail's condition in ways that system cannot accept. Performing the natural-nail setup on a training hand, you work the full order: confirm the planned service, inspect the hands for damage, lifting, unusual color, or surrounding inflammation, remove old product as directed where appropriate, soak only where the protocol calls for it, avoid prolonged immersion, dry thoroughly, and prepare gently by the taught method. Single-use items stay separate for disposal, and nothing sharp digs beneath the nail. Your stop-and-refer checklist is written before practical work: broken or inflamed skin, or an unexplained nail change, ends the preparation and the service decision goes to the trainer. The comparison is the competence being certified — a practitioner who can say which sequence they are in, and why the other sequence's steps do not transfer, will not soak an enhancement nail out of habit.",
+      "example": "In the practice scenario, the mock enhancement sheet in front of you requires dry preparation, but the manicure sequence you performed yesterday included a long soak, and adding one feels thorough. It is not thorough; it is the wrong protocol. Soaking would change the nail's condition against the system's requirement, so you perform the verified dry preparation and can state the reason: the system being applied governs, not the sequence most recently practiced. Change the condition — the booking is now the natural-nail service whose protocol calls for soaking — and the soak returns, brief, comfortable, and followed by thorough drying.",
+      "review": "Two instruction sheets disagree about soaking. Which one governs the service in front of you, and why?",
+      "diagram": [
+        "Compare both sheets",
+        "Inspect hands first",
+        "Follow the system's protocol",
+        "Soak only where called for",
+        "Dry thoroughly, gentle prep"
+      ]
+    },
+    {
+      "number": 23,
+      "heading": "Applied practice: rotary control on artificial tips",
+      "text": "This applied section proves rotary-tool control where mistakes are free: on artificial tips. You demonstrate bit installation first — the bit appropriate to the material and task, checked for condition, secured correctly, with the manufacturer's instructions and the trainer confirming the setup, dust extraction verified, and required protection in place. Then comes controlled movement: the practice finger supported, the tool kept moving as demonstrated, light pressure, frequent inspection, and material reduced evenly without gouges. Speed is set for the bit and task in front of you, never guessed from a video, because no universal safe speed exists. The stop response is part of the assessment: heat, vibration, or discomfort ends the pass immediately, the cause is assessed with the trainer, and work resumes only after the cause is corrected. The trainer checks dust capture and the stop response before any client practice is contemplated, because competence with a hand file does not transfer automatically to a powered tool. After the exercise, equipment is cleaned and reusable bits processed by their approved method. Damaged equipment leaves service, an unsuitable bit never touches natural nail or skin, and lifted or suspicious nails are outside practice entirely.",
+      "example": "Midway across a practice tip, heat develops while the bit stays in one place as you focus on a thick area. The assessed response is immediate: stop, lift the tool away, and reassess pressure and movement with the trainer. The cause is visible in the work — a stationary bit concentrates friction instead of distributing it. You correct it by restoring controlled movement and lighter pressure, checking the surface frequently, and only then resume. Change one condition — the client reports the same heat as pain on a real nail — and the decision hardens: the pass ends, the nail is inspected, and no resumption happens without the trainer's judgment.",
+      "review": "Heat builds under a stationary bit on a tip. Demonstrate the stop: what do you check, and what must change to resume?",
+      "diagram": [
+        "Install + secure correct bit",
+        "Verify dust capture + PPE",
+        "Support tip, keep tool moving",
+        "Light pressure, inspect often",
+        "Stop for heat, correct cause"
+      ]
+    },
+    {
+      "number": 24,
+      "heading": "Applied practice: wrap a tip, refuse a painful split",
+      "text": "This applied section pairs the wrap's technique with its refusal, because the decision is the skill. On a practice tip you apply a wrap from the chosen fabric and bonding system: the surface prepared according to that system without excessive thinning, the material fitted to the required area with clean margins, kept away from where living tissue would be, and the compatible bonding layers applied exactly as instructed — no unrelated resins or activators combined, since compatibility decides both adhesion and predictability. You finish conservatively, check edges and balance, and document the system used, so the record identifies what was applied. Then the same hands evaluate a fictional painful split, and the correct performance is to not wrap it: a split extending into painful tissue makes the nail unsuitable, because a wrap is cosmetic reinforcement, not treatment, and sealing it over hides an injury instead of helping it. Your stop-and-refer checklist, written before practical work, covers the full boundary set: suspected infection, an open wound, an unexplained change, and pain all defer the repair with a recommendation for appropriate evaluation. Adhesives stay off skin and eyes, ventilation runs during application, and a lifted wrap is never pulled away from the natural nail.",
+      "example": "In the assessed scenario, a client asks you to wrap a split that extends into painful tissue so it stops catching. Performing the wrap would be technically easy and professionally wrong: the location of the break and the pain declare the nail unsuitable, and the wrap would conceal the injury under a sealed surface. You defer the repair, explain the reasoning in plain language, and recommend appropriate evaluation. Contrast it with your practice tip — intact, suitable, wrapped with clean margins and the system documented — and the pair of performances together prove you know both halves of the service.",
+      "review": "Your tip wrap succeeded and a painful split is refused. State the inspection findings that separate the two decisions.",
+      "diagram": [
+        "Prepare tip per system",
+        "Fit wrap, clean margins",
+        "Bond compatible layers only",
+        "Finish, check edges + balance",
+        "Document system, defer injury"
+      ]
+    },
+    {
+      "number": 25,
+      "heading": "Applied practice: form fit and a balanced short extension",
+      "text": "This applied section builds the sculpted extension from its foundation outward. You fit forms to several practice fingers first, because fit is the assessed skill before product ever appears: each form seated to support the intended shape, without a gap under the free edge and without pressure, with skin clearance checked. Only then do you build a short, balanced extension on a training tip using the matched liquid-and-powder system — exact instructions open, ventilation running, containers closed, ratios and working time taken from the manufacturer system, and product kept clear of skin to limit exposure and sensitization risk. The natural nail beneath is prepared conservatively, the material is allowed its specified setting process, and shaping afterward is refinement, not rescue: excessive filing cannot manufacture the balance that architecture should have built in. The trainer evaluates four things — fit, skin clearance, structure, and safe cleanup. Your stop-and-refer checklist, written before practical work, protects the boundaries: liquids stay away from ignition, a lifted, discolored, or painful nail is never covered, and product that fails to set as expected stops the build for investigation rather than receiving more layers on top of an unknown fault.",
+      "example": "In the assessed scenario, a fitted form points downward and leaves a gap under the free edge of the practice finger. Proceeding would set the extension on an unstable foundation, and no amount of filing afterward reliably compensates for structure that was never built. You correct the fit before product application — reseating the form until it supports the intended shape cleanly — and only then build. The trainer's evaluation confirms the sequence: fit corrected first, then a short extension whose balance came from its foundation, with skin clearance intact and cleanup safe.",
+      "review": "A form points downward with a gap beneath the free edge. Why does the correction belong before, not after, application?",
+      "diagram": [
+        "Fit forms to practice fingers",
+        "Check gap + skin clearance",
+        "Conservative prep, set system",
+        "Apply clear of skin, let set",
+        "Refine lightly, check balance"
+      ]
+    },
+    {
+      "number": 26,
+      "heading": "Applied practice: controlled removal on painted tips",
+      "text": "This applied section performs polish removal as an exposure-control exercise. Using painted practice tips, you demonstrate controlled dispensing — a small, measured amount of the compatible remover, not an open container poured freely — with ventilation prepared, appropriate protection in place, and the container labeled and closed again when dispensing is done. Before any remover touches a tip, the existing coating is identified and the correct removal instructions for it confirmed, because ordinary lacquer and cured enhancement systems do not necessarily share a method. Skin and nail condition are inspected, the remover's contact is kept limited to the intended area, and softened coating is removed gently with clean materials, reassessing as you go — the goal is the coating gone with the surface beneath it intact, never scraped thin. Solvent-contaminated materials go to waste according to the safety data sheet and salon procedure, handled closed rather than left evaporating on the station. Your stop-and-refer checklist, written before practical work, fixes the prohibitions: never heat a flammable solvent, never use an unknown liquid, never mix solvents, and never force off a resistant product. Significant irritation or unexpected damage stops the exercise and brings in the trainer.",
+      "example": "In the assessed scenario, a coating on a practice tip does not soften with ordinary polish remover. Scraping harder would take the coating and the surface under it together, and mixing solvents would gamble on an uncontrolled reaction. The correct performance is to stop and identify the coating, because its resistance is information: it belongs to a different system with its own removal method. Once identified and matched, it softens as its instructions intend and lifts gently. You then show the closing controls — container shut, contaminated materials disposed of per the safety data sheet, station ventilated.",
+      "review": "A coating resists ordinary remover during practice. Show the safe path: what do you identify, and what do you never do?",
+      "diagram": [
+        "Identify coating first",
+        "Confirm its removal method",
+        "Ventilate, dispense a little",
+        "Apply to intended area only",
+        "Remove gently, close + dispose"
+      ]
+    }
+  ]
+}

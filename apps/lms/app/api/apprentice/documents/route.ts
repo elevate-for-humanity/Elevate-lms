@@ -220,7 +220,7 @@ async function _POST(request: NextRequest) {
         verification_status: 'approved',
         verified: true,
         verified_at: new Date().toISOString(),
-        verified_by: 'system',
+        verification_notes: 'Auto-approved on arrival (present + uploaded = approved).',
         storage_path: storagePath,
         metadata: {
           program_slug: programSlug,

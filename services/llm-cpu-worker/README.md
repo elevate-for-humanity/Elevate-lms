@@ -7,12 +7,14 @@ all four original shard hashes before conversion. The CPU artifact records
 those hashes, the pinned llama.cpp source revision, the quantized artifact
 hash, and both licenses. Startup verifies the quantized checksum again.
 
-The container requires exactly 8 GiB, uses four CPU threads and one 8192-token
-slot, and has no GPU backend or runtime model downloads. It runs as a nonroot
+The container requires exactly 16 GiB, uses eight CPU threads and two
+8192-token slots (a 16384-token context shared across the pair, so each
+request keeps the full 8192-token budget), and has no GPU backend or runtime
+model downloads. It runs as a nonroot
 user, disables the Web UI and server subprocess support, and requires the
 model application secret. Its build workflow runs real authentication,
 inference, structured tool-call, and streaming tests with Docker restricted
-to 4 vCPU / 8 GiB. That is candidate evidence, not production acceptance.
+to 8 vCPU / 16 GiB. That is candidate evidence, not production acceptance.
 
 ## Release boundary
 

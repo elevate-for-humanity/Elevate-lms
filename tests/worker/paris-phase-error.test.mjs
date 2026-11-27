@@ -61,3 +61,23 @@ test('the nested cause is redacted, not just the primary message',()=>{
   assert.ok(jwtCause.cause.length<=401);
 });
 
+
+test('an actual GitHub branch-write refusal is distinct from an upstream GitHub 5xx',()=>{
+  const branch='GITHUB_APP_403_BRANCH: GitHub App cannot create branches in elevate-for-humanity/Elevate-lms.; provider message: Resource not accessible by integration';
+  for(const message of [branch,'PARIS_PATCH_FAILED: '+branch])
+    assert.deepEqual(classifyParisPhaseError(new Error(message)),{errorCode:'GITHUB_APP_403_BRANCH',status:403});
+  assert.deepEqual(classifyParisPhaseError(new Error('GITHUB_BRANCH_AUTHORITY_UNKNOWN: GitHub did not report repository permissions')),
+    {errorCode:'GITHUB_BRANCH_AUTHORITY_UNKNOWN',status:403});
+  for(const [message,code] of [
+    ['GitHub API 502 for /git/refs: GitHub API error (502); provider message: Bad Gateway','PARIS_GITHUB_HTTP_502'],
+    ['PARIS_PATCH_FAILED: GitHub API 503 for /git/ref/heads/main: unavailable','PARIS_GITHUB_HTTP_503'],
+    ['GITHUB_BRANCH_AUTHORITY_CHECK_HTTP_502','PARIS_GITHUB_HTTP_502'],
+    ['GITHUB_BRANCH_AUTHORITY_CHECK_HTTP_403','PARIS_GITHUB_HTTP_403'],
+  ]){
+    const classified=classifyParisPhaseError(new Error(message));
+    assert.deepEqual(classified,{errorCode:code,status:502});
+    assert.notEqual(classified.errorCode,'GITHUB_APP_403_BRANCH');
+  }
+  assert.deepEqual(classifyParisPhaseError(new Error('GitHub API 404 for /git/refs: not found')),
+    {errorCode:'PARIS_REPAIR_PHASE_FAILED',status:502});
+});

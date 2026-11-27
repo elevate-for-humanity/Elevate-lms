@@ -1,8 +1,4 @@
 name: Registered Apprenticeship E2E
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-
 on:
   pull_request:
     paths:

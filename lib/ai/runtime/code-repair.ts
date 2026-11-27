@@ -37,11 +37,14 @@ export async function diagnoseParisGitHubCredential(explicitHeaders?: HeadersIni
    const response=await fetch(endpoint+path,{headers:tokenHeaders,cache:'no-store',signal:AbortSignal.timeout(15000)});
    if(!response.ok)return {status:response.status,ok:false};
    const data=await response.json();
+   // Installation tokens receive all-false repository flags (even pull on a
+   // repository they just read); those flags are not reported, not denied.
+   const reported=data.permissions&&!(data.permissions.pull===false&&data.permissions.push===false)?data.permissions:null;
    if(kind==='contents')return {status:response.status,ok:/^[a-f0-9]{40}$/.test(data.object?.sha??'')};
    if(kind==='workflow')return {status:response.status,ok:data.state==='active',enabled:data.state==='active'};
    return {status:response.status,ok:true,permissions:{
-    contentsRead:data.permissions?data.permissions.pull===true||data.permissions.push===true||data.permissions.admin===true:null,
-    contentsWrite:data.permissions?data.permissions.push===true||data.permissions.admin===true:null,
+    contentsRead:reported?reported.pull===true||reported.push===true||reported.admin===true:null,
+    contentsWrite:reported?reported.push===true||reported.admin===true:null,
    }};
   }catch(error){return {ok:false,error:error instanceof Error&&['TimeoutError','AbortError'].includes(error.name)?'timeout':'request_failed'};}
  };
@@ -540,9 +543,12 @@ async function runParisCodeRepairTick({workflowOwnedDispatch=false}:{workflowOwn
     // A branch-creation refusal is cured only by proven write authority:
     // the read preflight above would requeue that class into the same 403.
     // The diagnostic reports the freshly minted App token's own contents
-    // permission, so require it explicitly for that failure class.
+    // permission, so require it explicitly for that failure class. An App
+    // installation token reports none (null); getGitHubAppToken already
+    // refused issuance unless the installation grants contents:write.
     githubAppWriteHealth=githubAppRecoveryHealth &&
-     diagnostic?.repository?.permissions?.contentsWrite===true;
+     (diagnostic?.repository?.permissions?.contentsWrite===true ||
+      diagnostic?.repository?.permissions?.contentsWrite===null);
    }
    const branchFailure=isGithubAppBranchFailure(repair);
    if(branchFailure?githubAppWriteHealth:githubAppRecoveryHealth){

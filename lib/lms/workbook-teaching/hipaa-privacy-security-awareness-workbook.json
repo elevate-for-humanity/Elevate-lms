@@ -1,0 +1,183 @@
+{
+  "version": 1,
+  "workbookSlug": "hipaa-privacy-security-awareness-workbook",
+  "chapters": [
+    {
+      "number": 1,
+      "heading": "Who HIPAA covers and what constitutes PHI",
+      "text": "HIPAA is a federal law administered by the U.S. Department of Health and Human Services under 45 CFR Parts 160 and 164. Its Privacy, Security, and Breach Notification Rules apply directly to covered entities: health plans, health care clearinghouses, and health care providers who transmit health information electronically in connection with standard transactions. They also apply to business associates — people or companies that create, receive, maintain, or transmit protected health information while performing a service for a covered entity, such as billing, cloud storage, shredding, or claims processing. PHI is individually identifiable health information held by a covered entity or business associate that relates to a person's past, present, or future physical or mental health, the provision of health care, or payment for health care. Identifiers include a name combined with a diagnosis, dates of service or birth, a medical record number, an address, a phone number, or an insurance member number. Properly de-identified information is not PHI, and a name alone on a general mailing list, with no link to health, care, or payment, is not PHI either — the health connection matters. Before handling information, ask what your role is in the task, and whether the information links an identifiable person to health, care, or payment. Role and duties decide coverage, not assumptions about routine work.",
+      "example": "A transport manifest lists a client's full name, pickup address, and the dialysis clinic she attends three times a week. That manifest is PHI: it identifies a person and links her to health care. The driver needs the name, address, and pickup time to do the job, but does not need her diagnosis history or insurance details, so those stay out of the manifest. A separate list of office supply deliveries, with no client health information, is not PHI. The classification turns on the same two questions every time: who is identifiable, and what health, care, or payment information is linked to them?",
+      "review": "A list gives a person's name and the clinic she visits for treatment — is it PHI, and which two elements make it so?",
+      "diagram": [
+        "Covered entity or associate?",
+        "Is a person identifiable?",
+        "Linked to health or care?",
+        "Linked to payment for care?",
+        "Treat as PHI if linked"
+      ]
+    },
+    {
+      "number": 2,
+      "heading": "Permitted uses, disclosures and minimum necessary",
+      "text": "Covered entities may use and disclose PHI without a person's written authorization for treatment, payment, and health care operations. Treatment includes one provider referring a patient to another. Payment includes billing an insurer for services, and health care operations includes quality review and training conducted under proper safeguards. Most other uses — for example, using identifiable information for marketing or giving it to an employer — require a valid written authorization from the individual, or another specific permission in the Privacy Rule. If you cannot name the permitted purpose, the recipient, and their role, pause and refer the request to the privacy contact. Where the minimum necessary standard applies, as in payment and health care operations, use, request, and disclose only the amount of PHI reasonably needed for the purpose. Role-based limits help: a billing clerk working a claim usually needs dates of service, procedure codes, and payer details, not the clinician's full therapy notes. The standard does not apply to disclosures for treatment, to the individual accessing their own information, or to disclosures made under a valid authorization, and certain provider-to-provider treatment disclosures are an exception to it.",
+      "example": "A staff member preparing a payment appeal is tempted to send the patient's entire chart to the insurer, just in case it helps. Applying minimum necessary, the correct resolution is to send only the records that support that claim — the relevant dates, codes, and clinical note for the disputed service — and to check the recipient's address before sending. Sending everything increases harm if the packet goes astray and shares more than the purpose requires. The purpose was payment for one disputed service, so the disclosure is trimmed to what that purpose reasonably needs.",
+      "review": "For a payment appeal, what should you send, and why is sending the entire chart the wrong choice?",
+      "diagram": [
+        "Name the purpose",
+        "Name recipient and role",
+        "Authorization needed?",
+        "Trim to minimum necessary",
+        "Verify before sending"
+      ]
+    },
+    {
+      "number": 3,
+      "heading": "Individual privacy rights and respectful communication",
+      "text": "HIPAA gives individuals important rights over their PHI. They generally have a right to access and obtain a copy of their PHI held in a designated record set, to request an amendment if they believe information is inaccurate or incomplete, and to receive an accounting of certain disclosures. They may request restrictions on some uses and disclosures, and they may request confidential communications — for example, asking that appointment reminders go to a different address or phone number. Individuals also receive a Notice of Privacy Practices explaining how their information may be used and how to exercise these rights or complain. When someone asks to exercise a right, do not improvise or promise an outcome: route the request promptly to the privacy contact through your organization's process, because requests carry response duties and deadlines. Respectful communication also protects privacy. It means neither confirming nor denying a care relationship to people with no right to know, and not discussing a person's care in public areas, with neighbors, or with family members unless the individual has agreed or a Privacy Rule permission applies. Curiosity, friendship, and employment alone do not permit opening a person's record.",
+      "example": "A neighbor stops you at the store and asks whether a mutual acquaintance was really at your clinic last week and what she was treated for. Even if you know the answer from work, you confirm nothing. A calm response is: 'I can't discuss anyone's care or whether someone receives services here, but I can give you our general contact information.' Saying 'She isn't a patient here' or 'He was here Tuesday' would both reveal protected information. If the person presses or the encounter suggests snooping, report it to the privacy contact.",
+      "review": "Why must you neither confirm nor deny that someone receives care when a neighbor asks about them?",
+      "diagram": [
+        "Right to access a copy",
+        "Request an amendment",
+        "Accounting of disclosures",
+        "Request restrictions",
+        "Confidential communications",
+        "Route requests promptly"
+      ]
+    },
+    {
+      "number": 4,
+      "heading": "Role-based access and confidential conversations",
+      "text": "Role-based access means each workforce member can see only the PHI their job duties require. A scheduler needs names, contact details, and appointment times; a clinician needs clinical notes; a billing specialist needs claim information. Being employed by the organization, being senior, or knowing the patient personally does not expand your access. Before you open, print, or send a record, run a three-part check. First, purpose: what task requires this? Second, authorization: does my role permit it, and is any patient authorization needed? Third, recipient: who exactly will receive it, and have I verified their identity and address? If any part fails, stop and ask the privacy contact. Privacy also depends on where and how you speak. Move sensitive conversations to a private area, lower your voice at check-in, avoid using full names where waiting rooms can overhear, and never discuss identifiable cases in elevators, cafeterias, or on social media. On the phone, verify who you are speaking with before sharing information, and share only what that person is entitled to hear.",
+      "example": "At a busy front desk, a caller asks for a client's test results and says he is her brother. A confident voice and a family claim are not authorization. The correct resolution is not to read results over the phone on his say-so. Verify identity and authority using your organization's procedure, share only what is permitted, or take a message and refer the request. The three-part check applies here: the purpose is unclear, his authority is unverified, and the recipient has not been confirmed, so the disclosure stops until those points are resolved.",
+      "review": "Before opening a record, what three things must you check — and what do you do if any one of them fails?",
+      "diagram": [
+        "Check purpose of task",
+        "Check role authorization",
+        "Verify recipient identity",
+        "Move to a private area",
+        "Share only what is permitted"
+      ]
+    },
+    {
+      "number": 5,
+      "heading": "Secure records handling and disposal",
+      "text": "Physical safeguards protect records wherever they sit. Keep paper PHI face-down or in locked drawers and cabinets, collect printouts immediately, and never leave intake forms, rosters, or lab slips visible in waiting areas, vehicles, or classrooms. Position screens so passersby cannot read them, and use privacy filters where provided. Carry only the records a task requires, in a closed folder or locked bag, and return them the same day. In training settings, classroom rosters and assessment results are restricted to the authorized training team — they are not posted, photographed, or shared with other learners. Lock the workstation every time you step away, even briefly, use only approved tools, systems, and your own credentials, and verify the recipient before handing over, mailing, or faxing any record. Disposal is part of protection. Never place PHI in regular trash or open recycling, where anyone can retrieve it. Use the approved secure disposal channel — typically a locked shred bin or contracted secure destruction service — for paper, and the approved process for electronic media so information cannot be recovered. If you find records in the wrong bin or left in a public place, secure them and report it.",
+      "example": "At the end of a workshop, an instructor finds sign-in sheets listing learners' names and program details in a hallway recycling bin, and a workstation nearby still logged in and unattended. The correct resolution is to retrieve and secure the sheets for approved disposal, lock the workstation, and report both issues so the team can be re-taught — not to leave them because the day is over. Open recycling does not destroy information, and an unattended logged-in screen leaves records open to anyone passing by.  That sequence protects the learners named on the sheets and restores the workstation to a safe state for the next user.",
+      "review": "You find PHI in open recycling beside an unattended, logged-in workstation. What three actions do you take?",
+      "diagram": [
+        "Keep paper locked away",
+        "Collect printouts at once",
+        "Lock workstation every time",
+        "Carry only what is needed",
+        "Use locked shred disposal",
+        "Secure and report finds"
+      ]
+    },
+    {
+      "number": 6,
+      "heading": "Privacy scenarios in healthcare and community services",
+      "text": "The same checks travel across settings. In home care, confirm the client's identity, discuss care out of hearing of visitors, and do not leave care notes in an unlocked car. At a community services front desk, verify a caller's identity before discussing appointments and avoid announcing full names and services aloud. In transport and courier work, use only the manifest fields the delivery role needs, keep the manifest out of sight, and hand it only to the verified receiving party. In every setting the sequence is identical: pause, confirm the purpose, confirm the recipient, choose the approved channel, and share the minimum needed. Training must never put real people at risk. Classroom practice uses entirely fictional records, and real patient paperwork is never brought into a lesson, photographed, or used as an example. Work in pairs — one person prepares a mock transfer while the partner checks purpose, recipient, and approved channel, then swap roles and re-teach any missed step immediately. That practice builds the habit of welcoming a check rather than treating it as mistrust, and it lets mistakes happen on fictional records instead of real ones.",
+      "example": "A coworker asks you to text a photo of a client's care summary to her personal phone to save time before a home visit. Her purpose is legitimate, but a proper purpose does not make an unapproved channel safe. The correct resolution is to decline the personal-phone photo and use the approved system or secure hand-off instead, because the image would sit outside organizational safeguards and audit controls. The check is not about doubting the coworker; it is about keeping the information inside the channels designed to protect it.  Welcoming that kind of check in practice is exactly what makes the real transfer safer.",
+      "review": "A legitimate purpose is offered for using a personal phone for PHI. Why does that still not make the channel acceptable?",
+      "diagram": [
+        "Pause before sharing",
+        "Confirm the purpose",
+        "Confirm the recipient",
+        "Choose approved channel",
+        "Share the minimum needed",
+        "Use fictional records only"
+      ]
+    },
+    {
+      "number": 7,
+      "heading": "Protecting electronic PHI and secure devices",
+      "text": "The HIPAA Security Rule protects electronic PHI, or ePHI, through three categories of safeguards. Administrative safeguards include risk analysis, workforce training, and procedures for granting and ending access. Physical safeguards control access to facilities, workstations, and devices. Technical safeguards include access controls with unique user IDs, audit controls that record activity in systems, integrity protections, and transmission security. Encryption is an addressable implementation specification: organizations assess it, implement it where reasonable and appropriate, and document their reasoning — in modern practice, encrypting laptops, phones, and backups that hold ePHI is the expected norm because unencrypted lost devices are a leading cause of breaches. For every workforce member, secure device habits follow from those safeguards. Use only approved, organization-managed devices for ePHI where your role requires it; keep them updated, password- or biometric-locked, and never leave them unattended in vehicles or public places. Do not copy ePHI to personal USB drives, personal cloud accounts, or home computers. Lock your screen every time you step away, and check the recipient and attachments before every send — autocomplete is a frequent cause of wrong-recipient disclosures.",
+      "example": "A staff member wants to finish documentation at home by emailing a spreadsheet of client names and services to a personal email account and saving it on a family laptop. The correct resolution is to refuse that route and use only the approved remote-access system on an approved device, where access controls, encryption, and audit logging apply. Convenience does not move ePHI outside the safeguards. On the family laptop, none of the technical safeguards the Security Rule relies on would be in place or recorded.  The spreadsheet would then be reachable by anyone with access to that personal account or laptop, with no organizational control over it.",
+      "review": "Name the Security Rule's three safeguard categories, and give one workforce habit that supports each.",
+      "diagram": [
+        "Administrative safeguards",
+        "Physical safeguards",
+        "Technical safeguards",
+        "Approved devices only",
+        "Lock screen, check sends",
+        "No personal storage"
+      ]
+    },
+    {
+      "number": 8,
+      "heading": "Phishing, password hygiene and access control",
+      "text": "Phishing messages try to trick you into revealing credentials or opening malicious attachments. Warning signs include unexpected requests, urgent threats such as 'your account closes today,' a sender address that almost — but not quite — matches your organization, generic greetings, links whose real destination differs from the displayed text, and any request for a password: legitimate administrators do not ask for your password by email. The safe response is consistent: do not click, do not reply, and do not enter credentials on a page the message led you to. Report the message through a known organizational contact or the approved reporting tool, using contact details you already trust — not details supplied inside the suspicious message. Access controls only work if credentials stay personal. Use a unique user ID and a strong, unique password or passphrase for work systems, use multi-factor authentication where it is offered, and never share your login with a coworker. Audit controls attribute every action to the ID used, so sharing credentials falsely attaches someone else's actions to you and defeats investigations. Lock sessions when away, and tell the designated contact promptly if you suspect your credentials were entered on a fake page, so access can be reset.",
+      "example": "An email styled like your employer's IT desk asks you to verify your password within two hours or lose access, linking to an unfamiliar sign-in page. The urgency, the password request, and the unfamiliar destination are the warning signs. The correct resolution is to stop, not click, and report it through a known organizational contact — using contact details you already trust, not any supplied inside the message. The same promptness applies to mistakes: if a message containing PHI goes to the wrong recipient, report it right away rather than quietly asking the recipient to delete it.",
+      "review": "An unexpected email demands your password urgently. What do you not do, and how do you report it?",
+      "diagram": [
+        "Spot unexpected requests",
+        "Do not click or reply",
+        "Report via known contact",
+        "Keep credentials personal",
+        "Use multi-factor auth",
+        "Lock sessions when away"
+      ]
+    },
+    {
+      "number": 9,
+      "heading": "Business associates, remote work and vendor safeguards",
+      "text": "When a vendor will create, receive, maintain, or transmit PHI for a covered entity — an electronic health record company, a billing service, a cloud host, a courier carrying records — it is a business associate. Before PHI flows, the parties put a business associate agreement in place requiring the vendor to safeguard the information, use it only for the contracted purpose, support individuals' rights, report incidents and breaches, and impose the same duties on its subcontractors. Frontline staff have a simple gatekeeping role: do not send PHI to a new vendor, app, or service until the privacy or security contact confirms the vendor's role and that any required agreement is in place. A vendor's promise that it is 'secure' is not a substitute for that check. Remote work changes the setting, not the standard. Work in a private space where family members and visitors cannot see or overhear PHI, use only approved devices and the organization's approved secure connection, lock screens when stepping away, and never let family members use a work device that holds ePHI. Print PHI at home only if your organization expressly permits it, and then store and securely destroy it by the approved method.",
+      "example": "A team member proposes uploading client files to a free personal file-sharing account so a contractor can help catch up, with no agreement in place. The correct resolution is to stop the upload and refer the arrangement to the privacy or security contact. The contractor's role must be evaluated, safeguards confirmed, and a business associate agreement signed if required before any PHI is shared. Helpfulness and speed do not replace that gatekeeping check, and the vendor's own assurance of security would not replace it either.  Until that evaluation is complete, no client files move to the contractor at all, however urgent the backlog feels.",
+      "review": "Before PHI goes to a new vendor or contractor, what must be confirmed, and who confirms it?",
+      "diagram": [
+        "Will vendor handle PHI?",
+        "Confirm vendor role",
+        "Agreement in place?",
+        "Use only for contract purpose",
+        "Remote: private space",
+        "Approved device + connection"
+      ]
+    },
+    {
+      "number": 10,
+      "heading": "Recognizing and reporting privacy incidents",
+      "text": "An incident is any event that may have exposed PHI to someone not authorized to see it, or that compromises the systems holding it. Examples include a lost or stolen work device, an email or fax sent to the wrong recipient, a record left in a public place, a coworker viewing a record without a job-related reason, a suspicious login, or a ransomware or phishing event. Not every incident turns out to be a breach — that determination comes later, after assessment — but every suspected incident deserves the same first move. Report promptly to the designated privacy or security contact, the same day you learn of it whenever possible, because early reporting preserves evidence and starts any notification clocks that may apply. A good report states what happened, when you discovered it, what information and which individuals were involved, who may have received or accessed it, and what you have done so far. Preserve evidence: do not delete messages, wipe devices, or alter records to fix the problem. Do not conceal an incident out of embarrassment, and do not independently decide whether notice is legally required or contact affected individuals yourself; that decision belongs to the authorized team.",
+      "example": "You realize you attached the wrong client's summary to an email sent to another provider an hour ago. The correct resolution is to report it now to the designated contact, stating what happened, when you discovered it, what information and which individual were involved, who received it, and what you have done so far. Do not quietly ask the recipient to delete it and say nothing, and do not wait until your next shift. Prompt, honest reporting lets the authorized team assess the event while the evidence is still intact.",
+      "review": "You discover a wrong-recipient disclosure an hour after sending it. What do you report, to whom, and how soon?",
+      "diagram": [
+        "Recognize possible exposure",
+        "Report the same day",
+        "State what and who",
+        "Preserve the evidence",
+        "Do not conceal it",
+        "Let authorized team decide"
+      ]
+    },
+    {
+      "number": 11,
+      "heading": "Breach notification roles and escalation",
+      "text": "Under the Breach Notification Rule, a breach is an impermissible use or disclosure of PHI that compromises its security or privacy, unless an assessment shows a low probability that the PHI was compromised. The authorized privacy or security team, with legal and compliance support, performs that risk assessment by weighing factors that include the nature and extent of the PHI involved and the identifiers it contained, who the unauthorized recipient was, whether the PHI was actually acquired or viewed, and how far the risk has been mitigated — for example, credible assurance that a wrong recipient deleted the information unopened. Individual workforce members supply facts quickly; they do not make this determination themselves. When an incident is determined to be a breach, notification duties follow. Affected individuals must be notified without unreasonable delay and no later than 60 days after discovery of the breach. The U.S. Department of Health and Human Services must also be notified, and if a breach affects 500 or more residents of a state, prominent media outlets in that state must be notified as well. Business associates must notify the covered entity of their breaches so these duties can be met. Your role is escalation speed.",
+      "example": "A manager asks a frontline employee who misdirected a fax to decide whether anyone has to be told. The correct resolution is for the employee to decline that decision, provide the facts, and escalate. Formal breach determinations and notifications belong to the authorized privacy or security team, following organizational procedures and appropriate legal and compliance support. The employee still has an essential part: report immediately, cooperate with the assessment, document what they know, and direct any questions from affected individuals or media to the authorized team rather than answering them.",
+      "review": "Who decides whether an incident is a breach requiring notification, and what is your role in that process?",
+      "diagram": [
+        "Supply facts quickly",
+        "Team assesses compromise risk",
+        "Weigh recipient and viewing",
+        "Breach determination made",
+        "Notify individuals + HHS",
+        "Escalate, do not decide"
+      ]
+    },
+    {
+      "number": 12,
+      "heading": "Final scenario assessment and policy acknowledgment",
+      "text": "This final section integrates every earlier standard into one working habit. Before accessing or sharing information: confirm the person is identifiable and the information is PHI; confirm your role permits it; confirm the purpose is treatment, payment, health care operations, an authorization, or another Privacy Rule permission; share only the minimum necessary where that standard applies; use an approved channel and device; and verify the recipient. While working: lock screens, guard conversations, store and dispose of records securely, treat unexpected password requests as phishing, and never move PHI to personal accounts or unapproved vendors. When something goes wrong: report promptly, preserve evidence, and let the authorized team assess and notify. HIPAA also expects organizations to train their workforce and apply sanctions for violations, so these habits are job requirements, not suggestions. A policy acknowledgment means you understand the standards in this course, will follow them in your role, and will ask the privacy or security contact when you are unsure — uncertainty is a reason to pause, never a reason to guess with someone's PHI.",
+      "example": "You are preparing a referral packet. A colleague says to send the whole chart to a new therapy office, and to email it to a personal account so it can be printed at home. Work the checks: the receiving office may receive what it needs for treatment, but the whole chart exceeds what the referral requires; a personal email account is an unapproved channel outside the safeguards; and a new recipient's identity and secure address must be verified first. The correct resolution is to verify the recipient, send only the referral-relevant information through the approved channel, decline the personal-email route, and pause and ask the privacy or security contact about anything you are unsure of.",
+      "review": "Walk the full check in order — PHI, role, purpose, minimum necessary, channel, recipient — for a referral you are about to send.",
+      "diagram": [
+        "Confirm it is PHI",
+        "Confirm your role permits it",
+        "Confirm permitted purpose",
+        "Minimum necessary applies?",
+        "Approved channel + device",
+        "Verify the recipient"
+      ]
+    }
+  ]
+}

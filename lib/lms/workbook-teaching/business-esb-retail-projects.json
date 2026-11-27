@@ -1,0 +1,304 @@
+{
+ "version": 1,
+ "workbookSlug": "business-esb-retail-projects",
+ "chapters": [
+  {
+   "number": 1,
+   "heading": "Test the venture before you invest: concept, prototype, evidence",
+   "text": "A venture concept is a decision document, not a slogan. It names a particular customer in a particular situation, the problem written in that customer's own terms, the offer, the benefit the customer values, and the current alternative they use instead. 'Excellent service for everyone' cannot be tested; a scheduled bicycle-cleaning service near a workplace, solving the inconvenience of cleaning a bike after a wet commute, can. Design thinking supplies the working method: observe real customers, define the problem precisely, generate possible solutions, build a small prototype, and test it for evidence. The smallest useful test is an MVP \u2014 a version that tests one important assumption against measurable quality criteria. Enthusiasm is not paid demand: friends liking an idea is weaker evidence than unrelated customers committing to a trial. Ventures also move through stages \u2014 development, launch, growth, maturity, decline, and renewal \u2014 and each stage is identified by operating evidence, not by hope. List every assumption behind the concept, such as access to a location, willingness to pay, and reliable service time, and keep observed facts visibly separate from ideas that still need a test. Completing a concept worksheet registers nothing and proves nothing; it produces a proposal specific enough for another person to understand, question, and help you test cheaply before real money is committed.",
+   "example": "Jordan proposes ten half-hour cleaning appointments at a hypothetical $30 each. Work the model before believing it: ten appointments at thirty minutes require five hours of appointment time. Full revenue would be 10 \u00d7 $30 = $300. Materials at $6 per service cost 10 \u00d7 $6 = $60 for the ten services. Those figures exclude other operating costs, owner compensation, and tax \u2014 they are a starting model, not a profit claim. Now apply the capacity check: if Jordan actually has only three hours at the location, the offer supports six appointments, not ten, and realistic revenue falls to 6 \u00d7 $30 = $180. The concept, the forecast, and the delivery capacity must agree before the plan is presented as deliverable.",
+   "review": "Twenty friends praise your idea and five strangers request a paid trial. Which is the stronger demand evidence, and why?",
+   "diagram": [
+    "Name customer + problem",
+    "State offer + benefit",
+    "List assumptions",
+    "Prototype an MVP",
+    "Test for paid evidence",
+    "Decide: invest or revise"
+   ]
+  },
+  {
+   "number": 2,
+   "heading": "Ownership, roles, and compensation are three separate decisions",
+   "text": "Keep two columns apart from the start. The offering column describes what the business delivers: a product business sells an item, a service business performs work, and a hybrid does both \u2014 a repair shop charges for labor and sells parts. The ownership column answers who owns the organization, who decides, and how it is legally formed. Selling products does not make a business a corporation, and working alone does not make it an LLC. A sole proprietorship has one owner and no separate legal entity, so business obligations can reach the owner personally. A partnership shares ownership, with responsibility and liability shaped by its form and agreement. An LLC separates the entity from its members and generally offers limited liability, with formation and operating requirements. A corporation is a separate entity with shareholders and formal governance. No structure removes every risk, and a trade name is not a liability shield. Roles are a third decision: owner, manager, salesperson, operations worker, and bookkeeper name responsibilities that one person may combine but never erase \u2014 scheduling, customer consent, service inspection, payment collection, and reconciliation should each have a named owner, with authorization, record-keeping, and review separated where practical. Compensation follows its own rules: hourly pay, salary, commission, bonus, and ownership distributions are different concepts, and a payment label never decides worker classification.",
+   "example": "Run the compensation arithmetic exactly as an agreement would. Hourly: 12 eligible hours at $18 per hour equals 12 \u00d7 $18 = $216 before deductions or other required adjustments. Commission: at a hypothetical 5 percent of $2,400 in eligible sales, commission is 0.05 \u00d7 $2,400 = $120. The agreement must define the sales base \u2014 booked sales, collected revenue, or another measure \u2014 and state how refunds are handled, because 5 percent of the wrong base pays the wrong amount. A salary is a stated amount for a defined period and does not by itself settle overtime eligibility, and an ownership distribution is not employee pay at all.",
+   "review": "A founder says, 'We registered a trade name, so my personal assets are protected.' What is wrong with that sentence?",
+   "diagram": [
+    "Offering: product/service",
+    "Ownership: compare forms",
+    "Roles: name each duty",
+    "Pay: define the basis",
+    "Review: separate checks"
+   ]
+  },
+  {
+   "number": 3,
+   "heading": "Plan, pitch, and canvas: three artifacts, one consistent story",
+   "text": "Choose the planning artifact for the conversation it must support. A business plan is the detailed working document: customer problem, proposed offer, target customer, alternatives, evidence of demand, how customers will learn about and buy the offer, the people, suppliers, equipment, and processes needed to deliver, the important risks, and the financial logic connecting sales activity to startup costs, operating costs, and cash needs. A pitch deck is a concise visual presentation shaped for a defined audience and, where a decision is needed, a clear request stating what the requested resource would accomplish. A lean canvas is a one-page map of the venture's key assumptions, valuable precisely because it exposes the weakest one. None of these replaces the others automatically: a canvas can surface a weak assumption in an afternoon, while a lender or partner may require the full plan. The discipline that binds them is internal consistency. Every major number must agree across marketing, operations, and finance; estimates are marked as estimates with their reasoning retained; and any asset the venture plans to use \u2014 a logo, a photograph, a training video, a customer list, a mechanism \u2014 belongs in a rights register recording its owner, the allowed use, restrictions, and the evidence for that use, because having internet access to an asset is not a license to reuse it.",
+   "example": "Jordan's plan forecasts twenty bicycle-cleaning appointments every Saturday, and the pitch slide looks polished. The operating section allows five working hours, and the measured pilot time is thirty minutes per appointment with one worker: 5 hours \u00f7 0.5 hours = 10 appointments of capacity, before breaks, setup, or travel. The plan disagrees with itself by a factor of two, and no slide design fixes that. Jordan has three honest corrections: revise the forecast down to ten, change the delivery process so an appointment takes less time, or investigate whether added capacity is feasible. Each correction changes costs, quality, or customer expectations, and the corrected plan must show those consequences in every section it touches.",
+   "review": "Your canvas is complete in every box. What still makes it weak, and which box do you test first?",
+   "diagram": [
+    "Canvas: map assumptions",
+    "Plan: connect the detail",
+    "Pitch: evidence for audience",
+    "Rights register: log assets",
+    "Check numbers agree"
+   ]
+  },
+  {
+   "number": 4,
+   "heading": "Research the decision: customers, competitors, and SWOT",
+   "text": "Market research begins with a decision and a question, never with collecting facts. Write down the decision to be made \u2014 for example, whether a defined customer group will order at a stated price \u2014 then the information needed, where it could come from, and the limits of the method. Primary research is gathered for the current investigation: interviews, observations, a small purchasing test. Secondary research already exists: published statistics and industry reports. Primary evidence fits your offer closely but covers a small group; secondary data covers a broader context but may use a different geography, customer definition, or time period, so check its source, date, population, and method before using it \u2014 an old national figure does not describe today's demand in one neighborhood. Question design decides what you learn: a leading question that supplies its own praise produces agreement, while asking about the last time someone handled the task and what was difficult produces usable experience. Competitor analysis compares direct competitors and substitutes against the same customer need and the same evidence standard. SWOT then sorts what you found honestly: strengths and weaknesses are internal to the venture, opportunities and threats are external conditions. Keep observed results, quotations, and estimates labeled and separate from your interpretation of them.",
+   "example": "Jordan invites thirty people from one specific commuter group to review a clear pilot offer, and twelve submit a completed order. The observed order rate is 12 \u00f7 30 = 0.40, or 40 percent \u2014 reported with both the count and the rate. That figure describes this invited group, under this wording, at this time. It does not establish that 40 percent of all commuters will order, because the invitation list, timing, and conditions shaped who responded. Jordan strengthens the result by also recording the questions people asked, any cancellations, and whether the service could actually be delivered to all twelve \u2014 a purchasing result means more when the business understands how participants were selected and what commitment they really made.",
+   "review": "A report says 40 percent of the national market wants your service. Name three checks before you use that figure for your neighborhood.",
+   "diagram": [
+    "Start with the decision",
+    "Ask neutral questions",
+    "Run a small purchase test",
+    "Check secondary sources",
+    "Sort SWOT honestly",
+    "Record limits + decide"
+   ]
+  },
+  {
+   "number": 5,
+   "heading": "Acquisition you can measure: cost, order value, repeat behavior",
+   "text": "A campaign is measurable only when its measures are defined before it runs. The marketing plan states the audience, the offer, the channel, the budget, the schedule, and the measure that will judge it. Sales data then needs the same discipline: inquiries, bookings, completed orders, paid orders, and refunds are different events, and a canceled booking is not collected revenue. Record the period and the customer group inside every measure, and compare like with like. Two ratios carry most acquisition decisions. Customer acquisition cost is the total cost assigned to acquiring customers divided by the number of new customers acquired in the same period. Average order value is the relevant sales revenue divided by the number of orders included in that revenue. Conversion rate is purchases divided by the relevant visits or invitations that could have produced them. Retention needs its own definition and denominator: a repeat-purchase rate counts how many of a defined starting group bought again within a defined follow-up period, and it needs its own campaign cost when a retention campaign is what you are judging. Judge channels by contribution after marketing cost, not by clicks or attention alone \u2014 and remember that neither acquisition cost nor order value, alone or together, establishes net profit.",
+   "example": "A pilot spends $120 in total on acquisition and gains eight new paying customers: acquisition cost is $120 \u00f7 8 = $15 per new customer. The same pilot records $480 of relevant sales revenue from sixteen completed paid orders: average order value is $480 \u00f7 $16 = $30 per order. Keep the denominators straight \u2014 the sixteen orders include repeat purchases, so dividing $120 by sixteen and calling the result cost per new customer would understate it at $7.50 and mislead the next budget. Separately, of ten first-time customers in a starting period, seven buy again in the follow-up period: the observed repeat rate is 7 \u00f7 10 = 70 percent. The other three are not automatically lost forever; their buying cycle may simply be longer.",
+   "review": "A campaign reports cheap customers because costs were divided by all orders. Which denominator is wrong, and what should it be?",
+   "diagram": [
+    "Define each sales measure",
+    "Set budget + schedule",
+    "Count new customers",
+    "CAC = cost \u00f7 new customers",
+    "AOV = revenue \u00f7 orders",
+    "Judge contribution, not clicks"
+   ]
+  },
+  {
+   "number": 6,
+   "heading": "Sell, support, and resolve exceptions inside your authority",
+   "text": "Map the customer's whole buying path, not just the moment money changes hands. A sales channel \u2014 a physical location, a website, a booking system, a partner referral \u2014 is how the customer reaches the offer; the sales process runs from inquiry through questions and listening, product evidence, an appropriate recommendation matched to the customer's situation, a clear close, delivery, payment, and follow-up support. At each stage the customer should know what is included, what information is needed, when delivery happens, and how a problem gets resolved. Support starts by establishing facts: what was agreed, what actually happened, and what the record shows. Acknowledge the specific concern, verify the facts privately rather than arguing them out in front of other customers, and explain the options the business's actual policy allows. An out-of-policy request \u2014 such as a return outside the stated window \u2014 is decided by the person with authority to decide it. Never promise an unauthorized refund to end an uncomfortable conversation, never tell a customer something was confirmed when it was not, and never confront a customer. Record the outcome, because a repeated exception is usually a process fault \u2014 a confirmation step that fails silently will keep generating the same complaint until the process, not the customer, is fixed.",
+   "example": "A customer says the booking form was submitted, but no appointment appears on the schedule. Work the process in order. First, establish whether the business actually received the inquiry and whether an appointment was ever confirmed \u2014 a submitted form is not a confirmed booking, and saying otherwise would overstate the sale and mislead the customer. Second, check real service capacity for an appropriate resolution under the offer's terms. Third, respond in writing: acknowledge the specific issue, state what has been checked, and explain the next action and when it will happen. Finally, log the outcome against the inquiry-to-confirmation step. If the log later shows several customers lost at that same step, the fix is a confirmation message and a schedule check in the process \u2014 not more apologies.",
+   "review": "A return is outside the policy window and beyond your authority. What do you verify, what do you explain, and what must you never promise?",
+   "diagram": [
+    "Inquire \u2192 listen first",
+    "Match evidence to need",
+    "Recommend + close clearly",
+    "Confirm + deliver + pay",
+    "Support: verify facts",
+    "Escalate beyond authority"
+   ]
+  },
+  {
+   "number": 7,
+   "heading": "When the retail system goes down: inputs, verified facts, reconciliation",
+   "text": "A retail offer runs on production inputs, and some of the most critical inputs are invisible: alongside materials, labor, equipment, and space, a store depends on information \u2014 the catalog, current prices, stock records, payment authorization, and appointment or order data. Treat those systems as inputs with a quantity, quality, timing, and source, exactly as you would a physical supply, because a plan that assumes an input is available without checking it fails even when customers want the offer. An outage plan therefore names, in advance, the verified source of stock and prices to work from when the live system is unavailable, the offline work that is permitted, who to escalate to, and how every offline action will be reconciled against the system afterward. Two rules never bend during an outage. Never write down a customer's card number in notes or on paper to charge later \u2014 card details are never collected outside the authorized payment process. And never invent transaction success: if authorization is unavailable, the sale has not been authorized, and the customer is told honestly what can and cannot be completed. Service keeps moving through what is verifiable \u2014 confirmed stock, confirmed prices, permitted manual steps \u2014 while unverifiable promises wait for the system or a manager's decision.",
+   "example": "Use the capacity discipline from production planning to decide what an improvised workaround can honestly promise. A measured trial shows one worker completes ten acceptable units per hour, and three hours are available: the supported capacity estimate is 10 \u00d7 3 = 30 units, before setup, interruptions, and other constraints. That evidence does not support promising fifty units in the same window \u2014 the gap is twenty units, and it must be closed with more time, a smaller commitment, or a verified outside provider, not with optimism. The same logic governs an outage shift: count what the verified stock record and the shelf actually support, promise only that, and record every exception so reconciliation after the system returns starts from facts rather than memory.",
+   "review": "The payment terminal is offline and a shopper offers to leave card details on paper. What do you refuse, what can you still do, and what gets reconciled later?",
+   "diagram": [
+    "List critical inputs",
+    "Name verified sources",
+    "Permit offline work only",
+    "Escalate early",
+    "Never paper-capture cards",
+    "Reconcile after restore"
+   ]
+  },
+  {
+   "number": 8,
+   "heading": "Design the display, then evaluate it like a salesperson",
+   "text": "A store display is a marketing plan made physical. The merchandising plan connects product placement, accurate signage, customer flow, accessibility, and replenishment into one decision: which products get which space, in what quantities, at which position in the customer's path. That assignment is recorded in a planogram \u2014 the plan of assigned space and quantities against which the real display is later checked. Design starts from the customer and the offer, as any marketing plan does: the message must state the benefit, the scope of the offer, the price or next step, and any important conditions, truthfully and in a form a passing customer can act on. Then evaluate the display with the same measures used for any channel. Conversion \u2014 how many of the customers who could buy actually buy \u2014 and contribution after costs matter more than compliments about how the display looks. Check availability while you evaluate: an attractive display of a product that is out of stock produces attention and disappointment in equal measure. Two failures require correction however good the display looks: signage that misstates a price, and a layout that blocks access for any customer. A display that cannot be shopped by everyone, or that promises a price the checkout will not honor, is not a design success with a flaw \u2014 it is a broken promise at the exact point of decision.",
+   "example": "Measure a display campaign the way the marketing lesson measures any acquisition effort. Suppose all costs assigned to a one-week display test total $90 and the display produces six new paying customers: acquisition cost is $90 \u00f7 6 = $15 per new paying customer. That is not a profit figure \u2014 revenue, delivery costs, and refunds still decide whether the test earned its space. Compare it honestly with the alternative result: a second display draws many views and compliments but no qualified inquiries and no paid orders. Its view count does not show that it met the goal. Define the measures \u2014 qualified inquiries, completed paid orders, acquisition cost, and display compliance against the planogram \u2014 before the test starts, so the business cannot simply select whichever number looks favorable afterward.",
+   "review": "A display wins praise, blocks the aisle, and its sign shows last week's price. Name the two corrections required before its sales figures mean anything.",
+   "diagram": [
+    "Set goal + customer",
+    "Planogram: space + qty",
+    "Signage: accurate price",
+    "Flow + access clear",
+    "Replenish to plan",
+    "Evaluate conversion"
+   ]
+  },
+  {
+   "number": 9,
+   "heading": "Discount or full price? Compare total gross profit, not volume",
+   "text": "Price, cost, and margin are three different numbers, and confusing them produces bad promotions. Selling price is what the customer pays before any treatment of taxes or fees the transaction requires. Unit cost is the cost assigned to one unit. Gross profit is sales less cost of goods sold; contribution goes further and deducts all the variable costs included in your calculation \u2014 so state your cost definition before comparing any two margins. Markup and margin are not interchangeable: markup percentage divides price minus cost by cost, while gross margin percentage divides price minus cost by price. To hit a target gross margin, price equals cost divided by one minus the target margin. A discount cuts the price while the unit cost usually stays exactly where it was, so the discount comes entirely out of gross profit per unit unless costs also change. That is why a promotion must be judged on total gross profit over an equal time period, not on units sold: higher volume can still produce lower total gross profit. Before crediting or blaming the promotion, account for returns, stock availability, and any campaign cost, and compare the same period length on both sides.",
+   "example": "A product costs $30 and sells for $50. Gross profit per unit is $50 \u2212 $30 = $20. Markup is $20 \u00f7 $30 = 66.7 percent; gross margin is $20 \u00f7 $50 = 40 percent \u2014 same $20, two different denominators. Now apply a 10 percent discount: the price falls to $45, gross profit falls to $45 \u2212 $30 = $15, a 25 percent reduction in profit per unit from a 10 percent price cut. Test the volume claim. At full price, selling 10 units earns 10 \u00d7 $20 = $200 of gross profit. On discount, even selling 12 units \u2014 a 20 percent volume increase \u2014 earns 12 \u00d7 $15 = $180. Volume rose and total gross profit fell by $20. The promotion needs more than twelve units just to stand still.",
+   "review": "A 10 percent discount raises unit sales by 20 percent. Using the figures above, did total gross profit rise or fall, and by how much?",
+   "diagram": [
+    "State cost definition",
+    "Margin: \u00f7 price",
+    "Markup: \u00f7 cost",
+    "Discount cuts profit first",
+    "Compare total gross profit",
+    "Equal periods, net of returns"
+   ]
+  },
+  {
+   "number": 10,
+   "heading": "Receive, count, and replenish: stock you can prove",
+   "text": "Receiving is a verification act, not a delivery acceptance signature. Before stock joins the saleable inventory, reconcile four records against each other: the purchase order, the delivery record, the actual physical count, and the condition of what arrived. A discrepancy is documented with evidence \u2014 counts, condition notes, the delivery paperwork \u2014 rather than quietly adjusted, because an unexplained adjustment destroys the record the next decision depends on. Saleable stock excludes damaged or quarantined units: a unit that cannot be sold is not inventory available to promise, however tidy it makes the count look. Replenishment then runs on a rule instead of a hunch. The reorder point equals expected demand during the supplier's lead time plus safety stock, the buffer held against demand or delivery surprises. The inventory position behind that decision also considers confirmed incoming stock and units already committed to customer orders, so the business does not order what is already coming or promise what is already spoken for. This is production planning applied to a stockroom: inputs must be identified by quantity, quality, timing, and source, dependencies named, and a contingency considered for the critical supplier whose failure would stop the offer. Count honestly, order on the rule, and keep the evidence that lets anyone re-perform your count.",
+   "example": "Set a reorder point from the formula with simple figures. Suppose a product sells steadily and expected demand during the supplier's lead time is 40 units. The business holds safety stock of 10 units against a late delivery or a busy week. The reorder point is 40 + 10 = 50 units: when the inventory position falls to 50, it is time to order. Now check the position properly before acting. If the count shows 58 units on hand but 12 are already committed to customer orders, the uncommitted position is 58 \u2212 12 = 46 units \u2014 already below the reorder point, even though the shelf count looked comfortable. Ordering from the raw count would have waited too long; promising from it would have oversold the stock.",
+   "review": "The shelf count is 58 and the reorder point is 50, yet you order today. What fact about those 58 units explains the decision?",
+   "diagram": [
+    "Reconcile PO + delivery",
+    "Count + check condition",
+    "Quarantine damaged stock",
+    "Reorder point = LT demand",
+    "Plus safety stock",
+    "Net off committed units"
+   ]
+  },
+  {
+   "number": 11,
+   "heading": "Pickup and transfer: fulfill the promise, not just the order",
+   "text": "Distribution is how the output reaches the customer; fulfillment is the controlled sequence that gets it there: receive the order, verify it, check availability, prepare the item, run a quality check, dispatch or hand over, confirm completion, and handle exceptions. In omnichannel retail those steps coordinate available-to-promise stock, a reservation for the customer, picking, checks, notification, and handoff \u2014 across the shelf, the stockroom, another store, and authorized off-site stock, all of which should be checked before availability is promised to anyone. Inventory records earn their keep here: they identify the item, its unit, its location, and the quantity available for the intended purpose. Keep three quantities distinct in your head and in the record: units physically present, units already committed to earlier orders, and units set aside as unavailable \u2014 damaged, or held while their condition is reviewed. Promising from the physical count alone sells stock the business cannot deliver. Channel choices carry tradeoffs that belong in the plan: customer pickup, direct delivery, shipping, and a third-party fulfillment partner differ in cost, control, timing, and who answers when something goes wrong. A delivery estimate must include preparation time and its stated conditions, not only travel time, and a service venture fulfills the same way \u2014 through scheduling, delivery of the service, and confirmation that it was completed.",
+   "example": "Reconcile stock against open orders before promising anything. A seller holds eighty notebooks in a storage location. Twenty are committed to earlier orders and five are set aside because their condition is being reviewed. Available for new orders: 80 \u2212 20 \u2212 5 = 55 notebooks. A request for seventy immediately available notebooks does not fit that position, and the honest responses are a smaller commitment or a clearly disclosed later delivery \u2014 never an unsupported promise that the stock is ready. The exception rule is just as strict at the pick face: an order for ten blue notebooks meets a shelf holding eight blue and two green. The total is ten, but the order is not. Do not substitute silently; verify the order, check for more blue stock, and follow the approved process for a substitution or a revised promise, recording the decision.",
+   "review": "Physical stock is 80 and a customer wants 70 today. What two deductions do you make before answering, and what are the honest options if they fail?",
+   "diagram": [
+    "Verify the order",
+    "Check all stock locations",
+    "Reserve available units",
+    "Pick + quality check",
+    "Notify + hand off",
+    "Confirm + log exceptions"
+   ]
+  },
+  {
+   "number": 12,
+   "heading": "Hazards first, loss second: safety and inventory control",
+   "text": "Keep three ideas connected but distinct. Quality is whether an output meets its defined requirements. Safety is the prevention and control of harm. Compliance is the set of rules and obligations that actually apply to this activity, in this location, with these workers and customers. A good quality result does not prove the business is safe or compliant, and an internal checklist is not a universal compliance certificate. When a hazard appears during a shift, the response order is fixed: people first, then scene control within your training and the site's emergency procedures, then notification, then a factual record. A spill beside electrical equipment, a carton blocking an exit, or damaged stock in a customer area is handled by the authorized site procedure \u2014 not by improvisation, and never by continuing the task to protect a production or sales target when the required conditions or authorization are missing. Inventory loss has its own discipline. Loss arises from theft, receiving errors, damage, vendor discrepancies, and transaction mistakes, and each cause leaves different evidence. Investigate the evidence without accusing people and without confronting anyone suspected of theft: segregate and protect what can be checked, compare records, and refer the matter through the proper channel. Controls work before the final inspection \u2014 define the required result, the steps that can affect it, the checks, and the records \u2014 and a recurring failure triggers a cause investigation, not just correction of the individual units.",
+   "example": "A packing review finds that five of one hundred packages carry a mismatch. The observed rate is 5 \u00f7 100 = 5 percent \u2014 an observation about this sample, not a universal acceptable-error threshold. Calculating the rate is only the first step. The known mismatches are segregated and corrected under the business's procedures; then the cause is traced \u2014 in the shipping-label case, the handoff between order selection, packing, and label printing \u2014 and a check comparing the order identifier with the package before dispatch is tested in real use. The process is not declared fixed because a new checklist was written; it is fixed when evidence from its actual use shows the mismatches have stopped. Record which packages were affected and what was done, and refer any consequence beyond the packing check \u2014 disclosed information, a regulated product \u2014 for qualified review.",
+   "review": "You find a spill beside an electrical display during a busy shift. State the response order, and name what you must not do to keep sales moving.",
+   "diagram": [
+    "People first, always",
+    "Control scene in training",
+    "Notify + record facts",
+    "Segregate suspect stock",
+    "Investigate cause, not people",
+    "Test the fix in use"
+   ]
+  },
+  {
+   "number": 13,
+   "heading": "The pricing and checkout desk: margin, markup, tax, receipt",
+   "text": "The checkout desk is where pricing theory becomes a customer's receipt, so its arithmetic must be exact and its terms used precisely. Selling price is what the customer pays before any treatment of taxes or fees the transaction requires. Gross profit is price minus the unit cost assigned to the item. Markup percentage divides that gross profit by cost; gross margin percentage divides it by selling price \u2014 the same dollars, two denominators, two different percentages, and quoting one when you mean the other misstates the business. A target gross margin sets the price directly: price equals cost divided by one minus the target margin. Discounts are applied to the price before any tax in this workbook's simulation, and the fictional tax rate used in exercises is a training assumption, never tax advice. The receipt keeps the money honest by separating its parts: the net sale, the tax, and the total. Tax collected from a customer is not sales revenue \u2014 it is money held for the transaction's tax treatment, and folding it into revenue overstates what the business earned. Round prices thoughtfully, state which costs your margin includes, and test whether customers value the offer at the level the arithmetic requires.",
+   "example": "Work one unit across the whole desk. An item costs $12 and sells for $20: gross profit is $20 \u2212 $12 = $8. Markup is $8 \u00f7 $12 = 66.67 percent. Margin is $8 \u00f7 $20 = 40 percent. Now run it through the register with the simulation's fictional 7 percent sales tax and no discount: tax is 0.07 \u00d7 $20 = $1.40, and the customer's total is $20 + $1.40 = $21.40. The receipt shows net sale $20.00, tax $1.40, total $21.40 \u2014 and the business records $20 of sale, not $21.40, because the $1.40 is tax collected, not revenue. Add a 10 percent discount and the order of operations matters: price falls to $18 first, then tax is 0.07 \u00d7 $18 = $1.26, total $19.26.",
+   "review": "A receipt total is $21.40 on a $20 sale. Why does the business record $20 of revenue, and which two percentages describe the $8 gross profit?",
+   "diagram": [
+    "Price \u2212 cost = profit",
+    "Markup: \u00f7 cost",
+    "Margin: \u00f7 price",
+    "Discount before tax",
+    "Receipt: sale, tax, total",
+    "Tax collected \u2260 revenue"
+   ]
+  },
+  {
+   "number": 14,
+   "heading": "Retail financial statements: what the business earned, owns, and owes",
+   "text": "Each financial statement answers a different question, and using one to answer another's question is the classic beginner's error. The income statement summarizes revenues and expenses over a defined period: for a retailer, net sales \u2014 sales after returns are subtracted \u2014 less cost of goods sold gives gross profit, and subtracting operating expenses gives the operating result for that period. The balance sheet describes a single moment: assets, liabilities, and equity at a particular date, bound by the equation assets equal liabilities plus equity. The cash-flow statement tracks cash movements over a period. Before comparing any two reports, check the period, the accounting basis, and what each includes. Two confusions to eliminate permanently. Equity is not cash available to withdraw: it is the residual interest after liabilities are deducted from assets, and those assets may be inventory, receivables, or equipment rather than money in the bank. And profit is not the cash balance: buying equipment, selling on credit, or paying down debt each move cash differently from how they move the period's result, so a profitable period can still end with an empty register. Classify transactions by their economic event: money received from a loan increases cash and creates an obligation \u2014 it is not sales revenue because cash arrived.",
+   "example": "Read a simplified position and a simplified result side by side without merging them. At the reporting date, assets total $12,000 and liabilities total $4,500, so equity is $12,000 \u2212 $4,500 = $7,500. Separately, the period report shows revenue of $8,000 and included expenses of $6,200, leaving $8,000 \u2212 $6,200 = $1,800 before any omitted items. The $7,500 describes the position at a date; the $1,800 describes performance over a period. Neither proves the next bill can be paid: if customers have not yet paid what they owe, or a liability falls due before receipts arrive, cash can run short in a business whose statements look healthy. That timing question belongs to the cash schedule, which is the next tool in the sequence.",
+   "review": "A loan payment lands in the bank account this morning. Why is it not revenue, and which statement shows what the business now owes?",
+   "diagram": [
+    "Net sales \u2212 returns",
+    "Gross profit \u2212 COGS out",
+    "Operating result: period",
+    "Assets = liabilities + equity",
+    "Balance sheet: one date",
+    "Profit \u2260 cash balance"
+   ]
+  },
+  {
+   "number": 15,
+   "heading": "Capacity, staffing, and break-even: how many units must sell",
+   "text": "Break-even analysis connects the sales target to the operation that must deliver it. Start by classifying costs by their behavior inside your stated model and period: a fixed cost stays unchanged across the activity range being analyzed, like a rented workspace for the period; a variable cost moves with each unit, like the material in each item sold. Some costs mix both behaviors or step up when capacity grows, so classify from actual behavior in the scenario, not from a permanent label. Contribution per unit is selling price minus variable cost per unit, and total contribution is what pays the fixed costs. Break-even units equal fixed costs divided by contribution per unit, rounded up to a whole unit whenever the result is fractional \u2014 rounding down quietly plans a loss. Then test the answer against reality on two sides. Capacity: staffing levels, working hours, breaks, skill, and safe workload cap how many units can actually be served or sold in the window, whatever the arithmetic wants. Demand: the model assumes customers will buy the required quantity, which the market evidence must support separately. Break-even exposes a gap between the plan and its assumptions; it guarantees neither sales, nor complete profitability, nor cash on every due date.",
+   "example": "A hypothetical service sells for $30, carries $10 of variable cost per completed unit, and faces $600 of fixed costs for the period. Contribution is $30 \u2212 $10 = $20 per unit. Break-even is $600 \u00f7 $20 = 30 units. Verify it: at 30 units, revenue is 30 \u00d7 $30 = $900, variable costs are 30 \u00d7 $10 = $300, plus $600 fixed costs totals $900 \u2014 the included result is exactly zero. At 40 units, contribution is 40 \u00d7 $20 = $800, leaving $800 \u2212 $600 = $200 before excluded items. Now the rounding rule: if fixed costs were $650 instead, the division gives 32.5 units. Thirty-two units contribute $640 \u2014 short. Thirty-three units contribute $660 and cover the $650, so the break-even target is 33 whole units, and the plan must still show that 33 units fit staffing and demand.",
+   "review": "Break-even computes to 32.5 units and your staffed capacity is 30. Name the two facts you now hold, and three assumptions you could revisit.",
+   "diagram": [
+    "Classify fixed vs variable",
+    "Contribution = price \u2212 VC",
+    "BE = fixed \u00f7 contribution",
+    "Round up to whole units",
+    "Check staffing capacity",
+    "Check demand evidence"
+   ]
+  },
+  {
+   "number": 16,
+   "heading": "Forecast cash and working capital: timing is the whole subject",
+   "text": "Cash flow is money moving, on dates. Earning revenue and collecting cash are different events: a sale on credit earns revenue now and produces cash only when the customer pays, while some cash payments are not the current period's expense at all. A cash forecast therefore runs on actual and expected receipt and payment dates \u2014 opening cash, plus receipts, minus payments, equals closing cash \u2014 and a promised future receipt sits in the schedule at its expected collection date with its uncertainty visible, never in today's balance. Delaying a bill is a negotiation requiring the supplier's agreement, not a silent edit to a due date, and stock levels and supplier terms both pull on cash: inventory bought early is cash converted into goods until it sells. Working capital adds the wider view: current assets minus current liabilities, under the applicable accounting framework. Read it by composition, not just by total. Current assets include cash, receivables, and inventory, and those three have very different spending power on a given Friday \u2014 receivables need collection and inventory needs a sale before either pays a bill. So a healthy working-capital figure and a dangerous cash week can be true at the same time, and the timing schedule, not the ratio, is what reveals the shortfall in time to act on it.",
+   "example": "Build the closing balance exactly as the schedule will. A venture opens a period with $1,000 cash, receives $600, and pays $900: closing cash is $1,000 + $600 \u2212 $900 = $700. A separate unpaid invoice for $400 changes nothing in that balance \u2014 it belongs in a future week at its expected collection date, flagged as uncertain. Now the working-capital check: current assets of $4,500 less current liabilities of $2,500 give working capital of $2,000. That $2,000 is not $2,000 in the bank; if much of the $4,500 is inventory and amounts customers owe, the spendable cash this week is the $700, and the forecast must compare that $700 against the payments actually falling due.",
+   "review": "Working capital is a comfortable $2,000, yet Friday's payroll looks impossible. Explain how both can be true in two sentences.",
+   "diagram": [
+    "Opening cash balance",
+    "Add actual receipts",
+    "Subtract actual payments",
+    "Closing = timing result",
+    "WC = CA \u2212 CL",
+    "Schedule dates, flag risk"
+   ]
+  },
+  {
+   "number": 17,
+   "heading": "Choose equipment and suppliers: ROI with honest definitions",
+   "text": "Return on investment compares a defined net gain with a defined investment cost over a defined period: ROI equals net gain divided by investment cost, expressed as a percentage. Every word of 'defined' matters. Before calculating, state what counts as the investment, which costs are netted into the gain, and the time horizon \u2014 in this workbook's practice cases, one year. Proceeds are not gain: money returned by a project must first repay the investment and any other included costs before anything is called a gain, and an omitted cost inflates the percentage exactly as surely as an invented receipt. A higher ROI does not settle an equipment decision on its own. Compare proposals on consistent assumptions and measurable service criteria: capacity, reliability, delivery and lead time, terms, and what happens to cash while the business waits. The same discipline governs make-versus-buy and supplier evaluation \u2014 a lower price with uncertain delivery is a different offer from a higher price with dependable service, and the comparison must price the risk, the timing of receipts, and the capacity the option actually provides. A forecast ROI is a model of an untested future, not an observed result, and it never removes cash risk: a project can show a fine percentage and still demand money the business does not have on the date the bill arrives.",
+   "example": "Calculate the simple case, then break it on purpose. A project costs $1,000 and returns $1,250 in proceeds, with no other costs assumed: net gain is $1,250 \u2212 $1,000 = $250, and ROI is $250 \u00f7 $1,000 = 25 percent. Dividing the $1,250 of proceeds by $1,000 and reporting 125 percent would confuse gross proceeds with net gain \u2014 the most common ROI error. Now restore one omitted necessary cost of $100: net gain falls to $250 \u2212 $100 = $150, and ROI falls to $150 \u00f7 $1,000 = 15 percent. One missing line moved the headline by ten points. Finally, refuse the lazy ranking: 25 percent earned over one year and 15 percent earned over a shorter, different period with different risk are not comparable until periods, costs, timing, and definitions are made the same.",
+   "review": "A supplier quotes the lowest price and an uncertain delivery window. Name four criteria besides price and ROI that belong in the evaluation.",
+   "diagram": [
+    "Define investment + period",
+    "Gain = proceeds \u2212 all costs",
+    "ROI = gain \u00f7 investment",
+    "Restore omitted costs",
+    "Compare service criteria",
+    "Check cash timing + risk"
+   ]
+  },
+  {
+   "number": 18,
+   "heading": "Build the funding package: budget, gap, and committed money only",
+   "text": "A startup funding package is a budget a reviewer can re-perform. Separate its three layers: one-time setup needs, recurring operating costs, and a cash reserve that carries the business while it waits for receipts. List each item specifically, with the source, date, and scope of its estimate \u2014 a single unexplained total invites exactly the skepticism a founder cannot afford \u2014 and check for double counting, where one item hides inside two categories. The funding gap is required cash minus committed available cash, and 'committed' is the load-bearing word: a grant application, an unapproved loan, or a customer's expression of interest is not money available to spend. Compare availability dates against the dates costs must be paid, because a gap can be a timing gap even when the totals eventually match. Funding sources are not interchangeable: bootstrapping, debt, equity, crowdfunding, and grants differ in repayment, ownership, eligibility, timing, and ongoing obligations, and borrowed funds, owner contributions, and operating revenue must be classified correctly in the package. An educational budget establishes no eligibility for any program; actual terms come from the provider and qualified support. Funding readiness means explaining the plan, its assumptions, the amount requested, and its proposed use \u2014 not claiming approval that has not happened.",
+   "example": "Reconcile a hypothetical package line by line. Setup costs $1,200, equipment $800, opening inventory $600, and initial operating cash $1,000: total planned need is $1,200 + $800 + $600 + $1,000 = $3,600. Owner funds actually available total $1,400, so the initial funding gap is $3,600 \u2212 $1,400 = $2,200. Now stress it the way a reviewer will: a verified equipment quote rises by $200, so planned need becomes $3,800 and the gap becomes $3,800 \u2212 $1,400 = $2,400, with available funds unchanged. The honest responses are a revised launch scope, revised timing, or a real funding decision \u2014 never closing the gap on paper by recording the unawarded grant as approved or by deleting a cost the operation genuinely needs.",
+   "review": "Your gap is $2,200 and a grant decision is pending. Why does the package still show $2,200, and what two honest moves can shrink it?",
+   "diagram": [
+    "List one-time setup",
+    "Add recurring + reserve",
+    "Total the planned need",
+    "Count committed cash only",
+    "Gap = need \u2212 available",
+    "Match dates, not just totals"
+   ]
+  },
+  {
+   "number": 19,
+   "heading": "Coach the team, then plan the career: feedback with evidence",
+   "text": "Coaching is supervision done deliberately. A supervisor sets clear expectations, checks that the associate actually understands them, supports safe work, and gives feedback built on specific observed evidence rather than general impressions \u2014 'three promotion labels carried the wrong price on Tuesday' can be corrected; 'be more careful' cannot. Delegate only within the authority of the role, pair every delegated task with an escalation path for the moment it exceeds that authority, and treat a fast worker who skips discrepancy reporting as a coaching case, not a success story: speed that hides errors exports the cost to customers and to the next shift. The same evidence discipline powers a retail career plan. Compare the requirements of the role you want with the skills you have demonstrably shown, name the gap precisely, and close it with practice, feedback, and learning steps in sequence \u2014 a receiving associate who wants a lead role builds discrepancy documentation, then supervised receiving, then a reviewed shift. A workbook result, however strong, never promises a promotion; it produces evidence a decision-maker can weigh. End every coaching conversation the way a good pitch ends: with the next action, its owner, and the date it will be reviewed.",
+   "example": "Coach the two associates from this section's scenario as one worked pattern. The new associate repeatedly mislabels a promotion: the feedback names the observed fact \u2014 the labels, the product, the dates \u2014 restates the expectation, checks understanding by having the associate talk through the labeling steps, and sets a short review point. The senior colleague completes receiving quickly but omits discrepancy notes: the feedback acknowledges the speed, then shows the consequence \u2014 an unrecorded shortage becomes an unexplained stock loss that someone else must investigate \u2014 and agrees that completed receiving includes the discrepancy record, with the supervisor spot-checking the next two deliveries. Neither conversation accuses, generalizes about character, or promises an outcome; both end with a specific behavior, support, and a check date.",
+   "review": "Your fastest receiver never files discrepancy notes. Write the first sentence of your feedback so it names evidence, not character.",
+   "diagram": [
+    "Set clear expectations",
+    "Check understanding",
+    "Observe + note evidence",
+    "Feedback: specific + kind",
+    "Delegate with escalation",
+    "Review on a set date"
+   ]
+  },
+  {
+   "number": 20,
+   "heading": "The launch challenge: one plan where every number agrees",
+   "text": "The capstone runs a fictional retail business for one simulated month and then adapts the same discipline to a service business, because the test of everything in this workbook is whether the pieces agree with each other. An integrated plan must be internally consistent end to end: customer demand supports the sales forecast; the forecast fits capacity, inventory, and staffing; staffing and inventory fit the margin; the margin fits the cash forecast; and the cash forecast fits the funding actually committed. Marketing cannot promise a quantity operations cannot supply, operations cannot rely on equipment the financial plan never bought, and a forecast of sales is not cash until customers pay on the dates the schedule assumes. Preserve the working: original calculations, decisions, and corrections stay in the record, so a reviewer can trace every conclusion to a source or a stated assumption and re-perform the arithmetic. Then stress the plan the way the month will: introduce a changed condition \u2014 lower demand, a late payment, reduced capacity, a supplier failure \u2014 and show how the plan absorbs it, which numbers move, and which decisions follow. A plan that only works when nothing goes wrong is not finished; the finished plan names its contingencies before the month begins.",
+   "example": "Run the capstone's consistency check with its own figures. An offer priced at $40 carries $16 of variable cost per unit, so contribution is $40 \u2212 $16 = $24 per unit. Monthly fixed costs are $720, giving a break-even quantity of $720 \u00f7 $24 = 30 units. But the operating plan can fulfill only 20 units that month \u2014 the plan cannot reach its own break-even under its stated assumptions, and more advertising makes the gap worse, not better, by selling what cannot be delivered. The team must revise capacity, price, costs, or the offer, then re-test customer acceptance of the revision. Close with cash, kept separate from the forecast: opening cash $500, receipts $900, payments $1,100 gives projected closing cash of $500 + $900 \u2212 $1,100 = $300 \u2014 a timing statement, not a profit figure.",
+   "review": "Your plan breaks even at 30 units, capacity is 20, and marketing wants a bigger campaign. Which section of the plan do you fix first, and why not marketing?",
+   "diagram": [
+    "Demand \u2192 forecast",
+    "Forecast \u2192 capacity + stock",
+    "Units \u2192 margin check",
+    "Margin \u2192 cash forecast",
+    "Cash \u2192 committed funding",
+    "Stress-test one change"
+   ]
+  }
+ ]
+}

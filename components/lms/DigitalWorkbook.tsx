@@ -10,6 +10,7 @@ import { workbookCover } from '@/lib/store/workbook-products';
 import TheoryTimeclock from './TheoryTimeclock';
 import HvacSystemLab from './HvacSystemLab';
 import HvacWorkbookTeaching from './HvacWorkbookTeaching';
+import WorkbookTeaching from './WorkbookTeaching';
 import BarberWorkbookSimulator from './BarberWorkbookSimulator';
 import BeautyWorkbookSimulator from './BeautyWorkbookSimulator';
 import BusinessRetailWorkbookLab from './BusinessRetailWorkbookLab';
@@ -220,6 +221,9 @@ export function SectionEditor({
 
                 {!hidden && workbookSlug === HVAC_WORKBOOK_SLUG ? (
                   <HvacWorkbookTeaching number={section.section_number} />
+                ) : null}
+                {!hidden && workbookSlug !== HVAC_WORKBOOK_SLUG ? (
+                  <WorkbookTeaching slug={workbookSlug} number={section.section_number} />
                 ) : null}
                 {!hidden &&
                 section.course_id === 'd48c61c4-8880-4d9d-9ab5-fab4dd51b201' &&

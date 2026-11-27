@@ -1,0 +1,174 @@
+{
+ "chapters": [
+  {
+   "diagram": [
+    "Name the task",
+    "Classify the family",
+    "Ask: trained on what?",
+    "Ask: run-time data?",
+    "Place human checkpoint"
+   ],
+   "example": "Consider the lesson's fictional operations manager offered a tool that 'fully automates customer email.' Apply the three questions in order. Training: the vendor trained its model on public support forums, not on this company's products or policies. Run-time data: the tool would use only the customer's email, not the company's current price list or warranty terms. Checkpoint: the proposed setup sends replies with no human review. The manager's decision does not reject the technology; it re-engineers its use — pilot it as a drafting assistant whose replies a person approves, restricted to two low-risk topics, and measure its accuracy for a month before expanding.",
+   "heading": "Three families, one boundary: every workplace AI is narrow",
+   "number": 1,
+   "review": "For an AI feature you know, can you name its family, its likely training data, its run-time data, and its human checkpoint?",
+   "text": "Artificial intelligence is not one thing. The term covers software that makes predictions, recognizes patterns, or generates content by learning from data, and different systems are built differently, fail differently, and need different oversight. Rule-based software follows instructions a person wrote, such as routing an invoice for approval when its total exceeds a threshold; it is predictable and auditable, and it breaks when reality does not match the rules. Machine learning instead learns behavior from examples, such as thousands of labeled photos of defective and good parts, so nobody wrote the exact rule it uses — which makes it flexible and its mistakes harder to predict. Generative AI generates new content in response to a prompt, predicting what should come next. Every workplace system you will meet is narrow: it performs the task it was built and trained for and does not understand the world outside that task the way a person does. A model can write fluent summaries yet invent a date or misread a table. Fluency is not understanding, and confidence is not accuracy. Test every claim with three questions: what was it trained on, what data will it use at run time, and where does a human check the output before it causes an effect? The organization, not the model, owns the outcome."
+  },
+  {
+   "diagram": [
+    "Text in, token by token",
+    "Predict the next token",
+    "Repeat to build reply",
+    "Window limits what it sees",
+    "Quote the source line"
+   ],
+   "example": "The lesson's fictional analyst pastes a 200-page report into a chat and asks for the total budget figure from page 190. The model answers with a confident number that appears nowhere in the report. The mechanism explains it: the pasted text exceeded the context window, so page 190 was never visible, and asked for a figure anyway, the model produced a plausible one. The fix is engineering, not hope: extract the budget section first, provide that section with the question, and require the model to quote the line it used. Done that way, the answer is correct — and checkable against the quoted source.",
+   "heading": "Next-token prediction, training, and the context window",
+   "number": 2,
+   "review": "If a model invents a policy date, can you explain the mechanical cause without saying it lied or was careless?",
+   "text": "A large language model is a prediction system. Given a sequence of text, it predicts what text should come next, then does it again, building a response one token at a time. A token is a chunk of text, a word or part of a word. Everything the model does — answering questions, writing code, summarizing documents — is that operation repeated. Unless a tool or document feed is attached, the model is not looking anything up: its knowledge is what was compressed into its parameters during training, and its only awareness of your task is the text inside its context window. During training the model repeatedly predicts the next token; when it is wrong, its parameters are adjusted slightly. Billions of repetitions later it has absorbed grammar, facts, styles, and also the errors and biases in its training data. Training does not give it a verified database, a sense of what it knows versus what it is guessing, or a commitment to truth. When the pattern is thin — an obscure date, a specific record, your company's policy — it fills the gap with something plausible: a hallucination, a property of the mechanism. The context window has a fixed size in tokens, so text outside it might as well not exist. Put important material in the current prompt, summarize long inputs in stages, and retrieve only what is relevant."
+  },
+  {
+   "diagram": [
+    "Role: whose standards",
+    "Task: one clear sentence",
+    "Context: facts supplied",
+    "Constraints: limits set",
+    "Format + examples shown"
+   ],
+   "example": "Take the lesson's weak prompt: 'Summarize this complaint.' The model returns a generic paragraph with a guessed product name. Rebuilt with all five parts: Role — support specialist. Task — summarize the customer message for the service log. Context — the message itself, pasted in full, plus the company's product list. Constraints — use only facts in the message; if the product is not identifiable, write 'product not stated'; no apologies or promises, because this is an internal log. Format — three lines: Product, Issue, Requested action. Examples — two prior log entries in exactly that format. The output is now usable without editing, and when it errs, the team can see which part to adjust.",
+   "heading": "The five working parts of a structured prompt",
+   "number": 3,
+   "review": "Look at a prompt you have used: which of the five parts is missing, and what failure would that predict?",
+   "text": "A prompt is the program you write in natural language, and like any program it works better when it is structured. Beginners type a wish and accept whatever comes back. Practitioners brief the model the way they would brief a capable new colleague who knows nothing about their workplace. A structured prompt has five working parts. Role tells the model whose perspective and standards to adopt. Task states the job in one unambiguous sentence. Context supplies the facts the model cannot know — your product names, your policy, the customer's actual message — because a general model does not have them. Constraints set the boundaries: length, what to avoid, and what to do if information is missing, such as saying so instead of guessing. Output format specifies the shape of the finished piece. Structure makes prompts reusable and debuggable: when an output disappoints, the missing part is usually identifiable, whereas a vague one-sentence prompt leaves nothing specific to fix. Some requirements cannot be carried by description. 'Match our tone' is an adjective; two examples of real replies are evidence. Few-shot prompting — including a small number of input and output examples — lets the model copy a demonstrated pattern. Two to five good examples usually beat a paragraph of style rules, especially when one example shows the hard case, such as answering that information is missing rather than inventing it."
+  },
+  {
+   "diagram": [
+    "Build a fixed test set",
+    "Run and record baseline",
+    "Diagnose each failure",
+    "Change one thing",
+    "Re-run the whole set"
+   ],
+   "example": "A fictional team in the lesson extracts deadlines from client emails. Version 1 misses deadlines written as 'next Friday' and invents dates for emails that contain none. Diagnosis names two distinct failures: a missing rule for relative dates, and no instruction for the no-date case. The fix adds both — resolve relative dates against the email's send date, and output 'no deadline stated' when none exists. The fixed test set of twelve saved emails, three of them dateless, goes from seven correct to twelve. Note what did not happen: nobody reworded the whole prompt or pleaded with the model to try harder. One diagnosis, one fix, one full re-run.",
+   "heading": "Iteration and the failure catalog: test, diagnose, fix one thing",
+   "number": 4,
+   "review": "Given a failing output, can you name its catalog failure before changing any wording in the prompt?",
+   "text": "Nobody writes the final prompt first. Prompt engineering in practice is iteration: run the prompt on real inputs, read the failures closely, change one thing,. Keep a test set from the start — five to ten real inputs including the hardest cases you know: the messy email, the incomplete form, the request that should be refused or flagged. A change that fixes one input and breaks two others is not an improvement, and without a fixed set you cannot tell progress from luck. Most bad outputs come from a small catalog. Ambiguity is most common: 'short summary' leaves length, content, and audience undefined, and the model picks interpretations silently; the fix is a specification, not a better synonym. Contradiction means instructions fight each other, forcing the model to choose which one to betray without telling you. Missing context means the model cannot use facts it was never given, so it stalls or invents. Instruction buried in data is the fourth: material being processed contains text that looks like instructions. In its hostile form this is prompt injection — a document or email telling the model to ignore its instructions, leak information, or approve something. Treat untrusted text as data, never as commands. Models are also not perfectly deterministic, so add a verification step that checks the properties you care about instead of hoping generation stays stable."
+  },
+  {
+   "diagram": [
+    "Map steps in order",
+    "Measure time and errors",
+    "Classify each step",
+    "Choose tool, assistant, API",
+    "Place the checkpoints"
+   ],
+   "example": "The lesson maps a fictional training company's enrollment inquiries: read the inquiry, classify the program of interest, check funding eligibility against policy, draft a reply, send. Classification and drafting are high-volume and reviewable, so AI helps there. Eligibility is rule-bound and consequential, so it stays a rules check with a human decision, with AI only summarizing the evidence. The pilot runs narrowly: AI classifies and drafts for one program's inquiries for two weeks, a staff member approves every send, and accuracy plus time saved are recorded. The expansion criteria are set before the pilot starts — expand only if classification accuracy beats the manual baseline and drafting saves at least a third of handling time.",
+   "heading": "Mapping the workflow first: where AI helps, harms, or stays out",
+   "number": 5,
+   "review": "For one workflow you know, which step is the worst AI candidate, and which property makes it so?",
+   "text": "Businesses do not adopt 'AI'; they change specific workflows. A workflow is the chain of steps that turns an input into an outcome: a customer question becomes a resolved ticket, an application becomes a decision. AI earns its place step by step — drafting here, classifying there, extracting somewhere else — and it fails when pasted over a workflow nobody has mapped. Start by measuring the current workflow without AI: how long each step takes, where errors occur, where work waits. The best opportunities share a signature: high volume, text-heavy, tolerant of a review step, and currently bottlenecked on drafting or sorting rather than judgment. The worst candidates are low-volume, high-stakes, irreversible decisions where a wrong answer is discovered only after the damage. There are three adoption routes. Buy a purpose-built tool when the task is common and a vendor's product already fits. Use a general AI assistant when work is varied, low-volume, and a person is already in the loop. Build with an API when the step must run inside your own systems, at volume, with your data, logging, and rules. The decision turns on volume, risk, data, and maintenance. A checkpoint belongs where an error becomes expensive, irreversible, or invisible, and it must be designed for the reviewer: output beside its source, changes highlighted, rejection as easy as approval."
+  },
+  {
+   "diagram": [
+    "Send key + messages",
+    "Model returns text",
+    "Require structured fields",
+    "Validate every field",
+    "Route failures to human"
+   ],
+   "example": "The lesson's fictional intake tool classifies inquiry emails. The request carries system instructions defining the job and three allowed categories, and one email as the user message. The required response is a JSON object with fields for category, program_slug, confidence, and evidence_quote. The program then validates: the category must be one of the three; the program_slug must exist in the program list; the evidence_quote must actually appear in the email. Of the first 200 emails, 11 fail validation — mostly invented program slugs — and are routed to a staff queue instead of being filed wrong. The model did not become perfect; the system became safe.",
+   "heading": "APIs: requests, keys treated as money, and validated output",
+   "number": 6,
+   "review": "If model output will write to a database, what must happen between receiving it and acting on it?",
+   "text": "When a workflow outgrows a person chatting with a model, the next step is an API: your own software sends the prompt and receives the response, inside your systems, under your rules. A program sends an HTTP request to the provider's endpoint containing your API key, the messages — standing instructions plus the input — and parameters such as which model to use and how long the answer may be. The provider runs the model and returns the generated text along with usage counts. The API does not change the model: it is still predicting tokens inside a context window. API use adds engineering around the exchange, and that engineering is the difference between a demo script and a system other people depend on. An API key is a bearer credential: whoever presents it is charged as you. Keys live in secret configuration — environment variables or a secrets manager — never in source code, spreadsheets, screenshots, chat messages, or anything committed to a code repository. Each environment and application gets its own key, and usage alerts are set. If a key leaks: revoke it immediately, issue a replacement, update the secret configuration, and review usage for the exposure window. Prose is for people; systems need fields, so ask for structured output and then validate it as untrusted input before any program acts on it."
+  },
+  {
+   "diagram": [
+    "Estimate tokens x volume",
+    "Queue when rate-limited",
+    "Back off, with randomness",
+    "Cache and pre-filter",
+    "Budget, alert, fall back"
+   ],
+   "example": "The lesson's fictional document service summarizes uploaded reports, and launch day brings ten times the test volume. Rate-limit errors spike, and the first version — which retried instantly, forever — makes the congestion worse and burns budget on doomed requests. The engineered version adds a queue with backoff, caches summaries by document hash because a third of uploads are duplicates, caps each request's context, and sets a daily token budget with an alert at 80 percent. Same provider, same limits: the error rate falls to near zero, and cost per summary drops by more than half. Each change answers a named failure, not a hope.",
+   "heading": "Cost, rate limits, and designing for the bad day",
+   "number": 7,
+   "review": "Why is instant, unlimited retrying during a provider slowdown worse than not retrying at all?",
+   "text": "A demo that works once is not a system. Systems run thousands of times, on bad days, under other people's deadlines — and they send you a bill for every run. AI APIs charge by the token: you pay for the text you send, including instructions and any documents placed in the context, and for the text the model generates, with prices varying by model capability. A workflow's cost is therefore a design property: prompt length, document size, response length, model choice, and daily volume multiply together. Estimate before you build — tokens per request times requests per day times price — and re-measure after launch, because real inputs are always longer than test inputs. Providers also cap usage with rate limits on requests or tokens per minute; hit the cap and requests fail until capacity frees. Engineered code treats that as weather: requests wait in a queue, retries use backoff — waiting longer after each failure, with randomness — and the workflow sheds load deliberately. Do not spend precious capacity on waste: cache repeated questions, pre-filter inputs that do not need the model, and reserve the large model for requests. Plan reliability in advance: a fallback path, logging of cost, latency, and validation outcome, and token budgets with alerts, so failures degrade gracefully instead of cascading."
+  },
+  {
+   "diagram": [
+    "Classify the data first",
+    "Never-paste stays out",
+    "Minimize what remains",
+    "Ground from your sources",
+    "Keep one source of truth"
+   ],
+   "example": "A fictional advisor in the lesson wants AI help drafting responses to student funding questions. The naive version pastes real student emails — names, incomes, and all — into a consumer chatbot. The engineered version changes the design, not just the care level: the team's approved tool is connected to the current funding policy document through grounding; student identifiers are redacted before drafting; the model answers policy questions from the cited policy text and drafts in the advisor's tone; and the advisor reviews and sends. Same helpfulness, the lesson notes — and no student's record ever left the approved system.",
+   "heading": "Data decisions: never-paste, minimization, and grounding",
+   "number": 8,
+   "review": "Before pasting real data into a tool, can you state its minimized form and the tool's data terms in one sentence each?",
+   "text": "Every AI interaction is a data decision. When you paste text into a model, you are handing it to a system, possibly a third-party service, with its own storage, logging, and terms. The never-paste list is short enough to memorize: credentials and keys of any kind; government identifiers and full financial account numbers; health records and other people's private records, such as a student's file or a client's case notes; and confidential business material whose leak would cause harm, such as unreleased pricing. When a task seems to need such material, the answer is not a more careful paste but a different design: redact it, aggregate it, fictionalize the example, or use an approved system whose data terms your organization has reviewed. Between 'never' and carelessness lies minimization, the daily habit: ask what the task actually needs. Summarizing a complaint does not need the customer's name, address, and account number. Testing a prompt does not need real records; fictional examples with the same shape work. Grounding is the deliberate alternative: at request time the system finds relevant passages from your documents, places them in the context, and instructs the model to answer from them and cite them. Grounding inherits the quality of its sources, so it adds a maintenance duty: one current source of truth per topic, ownership for updates, and removal of superseded versions."
+  },
+  {
+   "diagram": [
+    "List checkable claims",
+    "Check each against source",
+    "Grade: supported or not",
+    "Build cases, known answers",
+    "Score, fix, re-score"
+   ],
+   "example": "The lesson's fictional research assistant produces briefing notes with citations. A reviewer samples five citations and finds two invented and one real but misquoted. Instead of abandoning the tool, the team builds an evaluation set of thirty briefing tasks with verified sources and scores the current setup at 70 percent fully correct. They add grounding from their own document store plus a rule that uncitable claims be marked 'unverified,' and re-score at 93 percent — with the remaining errors concentrated in one document type, which is routed to human drafting. Measurement turned a trust argument into an engineering decision with a named next step.",
+   "heading": "Verification and evaluation sets: measuring instead of trusting",
+   "number": 9,
+   "review": "What does an evaluation set measure that checking a few outputs you happen to notice cannot?",
+   "text": "Evaluation is the skill of telling good output from bad before it does harm,. It rests on a fact about the mechanism: the model cannot tell you how sure it is, because its confidence is a style, not a measurement. Asking 'are you sure?' produces a more confident tone, not information, so verification must come from outside the model — a source, a calculation, a rule, or a person. Match the effort to the stakes. A brainstorming list needs no verification. A draft email needs a read-through. A factual claim that will be published, a figure that will be quoted, or a summary a decision rests on needs source-checking: open the document, find the line, compare. Anything consequential and hard to reverse needs independent confirmation through a different channel. Hallucinations rarely announce themselves with nonsense; they arrive as the most polished sentences in the output. Learn the signs: citations that are almost right, over-specific detail where the input provided none, answers to questions that have no answer, and smoothness exactly where a careful human would hedge. Individual checks protect individual outputs; an evaluation set protects the system. Build twenty to fifty cases each with a known-correct outcome decided by a person in advance, including cases where the correct behavior is to flag, refuse, or say the information is missing — then score the workflow against them."
+  },
+  {
+   "diagram": [
+    "Govern: owners and rules",
+    "Map: context and harms",
+    "Measure: test with data",
+    "Manage: mitigate, monitor",
+    "Feed lessons back in"
+   ],
+   "example": "A fictional nonprofit in the lesson maps a proposed AI resume-screening tool with the framework. Govern: leadership decides screening is a consequential decision about people, so full automation is out of bounds regardless of vendor claims. Map: the tool would rank applicants using historical hiring data, and applicants would never learn a model scored them. Measure: the team's evaluation set, balanced across the applicant pool they actually serve, shows the ranking downgrades career-changers — a group the organization exists to serve. Manage: the tool is rejected for ranking, while a narrower use — checking applications for completeness — is approved with human review, and the decision and evidence are recorded.",
+   "heading": "Govern, Map, Measure, Manage: safety as ordinary discipline",
+   "number": 10,
+   "review": "For one AI use you know, can you name its human owner — and if not, what governance gap have you just found?",
+   "text": "AI safety at work is not science fiction about runaway machines; it is the ordinary discipline of preventing foreseeable harm from systems you chose to deploy. The harms are concrete: a screening tool that learned from biased history quietly disadvantages qualified applicants; a chatbot that invents a policy commits the organization to words it never approved; an assistant pasted full of client records becomes a privacy incident; a pipeline nobody monitors drifts as the world changes. Two principles organize the response. Harms scale with autonomy and consequence, so the more a system acts without review and the more its outputs matter, the more governance it needs. And accountability never transfers to the model: every AI-assisted outcome has a human owner. The map used across industry is the NIST AI Risk Management Framework, AI RMF 1.0, published in 2023. Govern establishes culture and structures: who decides which uses are acceptable, who owns each system, how concerns get raised. Map establishes context: what the system is for, whose data it touches, who can be affected, what could go wrong. Measure tests accuracy, bias, robustness, and privacy behavior. Manage prioritizes the risks found, mitigates them, monitors in operation, and keeps an incident plan. The four functions form a cycle, and a workplace policy turns them into rules about approved uses, prohibited uses, disclosure, review by risk level, and named accountability."
+  },
+  {
+   "diagram": [
+    "Observe, decide, act, repeat",
+    "Judge consequence + reversal",
+    "Grant least authority",
+    "Gate irreversible steps",
+    "Log, sample, can demote"
+   ],
+   "example": "The lesson's fictional facilities team automates work-order triage. The agent reads incoming requests, classifies them, and drafts assignments. For a whitelisted set of low-cost, reversible categories — lighting, cleaning, supplies under a small limit — it creates the work order itself. Anything involving safety systems, vendors, or costs above the limit stops at an approval gate with the evidence attached. Every action is logged, and a supervisor samples ten percent daily. After two months at a measured 98 percent correct on its bounded categories, the team raises the cost limit one step — a promotion earned by evidence, recorded as a governance decision.",
+   "heading": "Agents and the autonomy ladder: autonomy earned, guardrails first",
+   "number": 11,
+   "review": "For a step you would automate, what are its worst realistic error and its reversibility — and which rung do they earn?",
+   "text": "An agent is a model with a loop and a toolbox. Instead of answering once, it observes a situation, decides on an action, takes it through a tool — searching, reading a record, drafting a message, updating a field — observes the result, and decides again, pursuing a goal across many steps. That is a genuine capability jump and a genuine risk jump: a chatbot's worst output is a bad paragraph, while an agent's worst output is a bad paragraph that was also sent, filed, charged, or deleted. So grant autonomy in proportion to evidence, and build the guardrails before the loop. Think of four rungs. Suggestion: the system proposes and a person decides and acts. Supervised action: the system acts, but a person approves each consequential action first. Bounded automation: the system acts alone inside tight limits — small amounts, whitelisted actions, reversible operations — while a person reviews samples and exceptions. Full automation is reserved for steps whose errors are cheap, detectable, and reversible. Two properties decide the rung: consequence, the worst realistic outcome of one wrong action, and reversibility, whether it can be undone completely, cheaply, and quickly. The guardrails are non-negotiable: least authority, approval gates on irreversible steps, logging of every decision and action, a reachable stop mechanism, and the rule that everything the agent reads is data — data never expands its authority."
+  },
+  {
+   "diagram": [
+    "Map workflow + checkpoint",
+    "Plan data, minimized",
+    "Write criteria first",
+    "Build, evaluate, iterate",
+    "Govern and document"
+   ],
+   "example": "A fictional learner in the lesson builds a grounded question-answerer for her volunteer organization's handbook. Map: member question, retrieve handbook passages, draft answer with citations, coordinator approves before posting. Data plan: the handbook only, current edition, no member data at all. Acceptance criteria, written before building: at least 90 percent of evaluation answers fully supported by their citations, and zero answers to questions the handbook does not cover — the correct behavior there is to say so. Evaluation uses twelve questions, three of them traps the handbook cannot answer. The first build answers one trap with invented content; the fix — a constraint plus a citation-required rule — brings the set to full marks on traps and 11 of 12 overall, with the failure and fix recorded in the documentation.",
+   "heading": "The capstone: criteria before building, documentation as the deliverable",
+   "number": 12,
+   "review": "If your demo works live today, what would a stranger still need in writing to run, trust, and maintain it?",
+   "text": "The capstone is where the course becomes evidence. Take one small, real task and carry it through the entire method: map the workflow, plan the data, design the prompt or API step, set acceptance criteria before you build, evaluate against cases with known-correct outcomes, apply the governance pass, and document everything so another person could run it. Small is a requirement, not a compromise: a workflow that fits in your hands is one whose failures you can actually find. Choose with the course's instincts: real enough that the result matters to someone, bounded enough to finish, and honest about its checkpoint — a drafting workflow with human approval, a classifier with a review queue, or a grounded question-answerer over a document set you control. Work in the course's order and keep the artifacts as you go: the workflow map with the AI step and checkpoint marked; the data plan in minimized form from a named source of truth; acceptance criteria written before building, the build itself; an evaluation set of at least ten cases with pre-decided outcomes, run and scored; and the governance pass — owner, prohibitions, logging, review date. Expect iteration, record the failures you find and what you changed, and finish with documentation a stranger could operate from, including known limits."
+  }
+ ],
+ "version": 1,
+ "workbookSlug": "ai-engineering-applied-practice"
+}

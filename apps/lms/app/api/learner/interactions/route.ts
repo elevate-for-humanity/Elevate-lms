@@ -26,6 +26,11 @@ import {
   scoreForkliftAttempt,
   type ForkliftSimulationConfig,
 } from '@/lib/lms/forklift-simulation';
+import {
+  SCENARIO_SIMULATOR_KEY,
+  scoreScenarioAttempt,
+  type ScenarioSimulationConfig,
+} from '@/lib/lms/scenario-simulation';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -353,8 +358,16 @@ function scoreAttempt(
     const config = experience.simulation as
       | ManifoldGaugeSimulationConfig
       | ForkliftSimulationConfig
+      | ScenarioSimulationConfig
       | undefined;
     if (!config) return null;
+    if (config.simulator === SCENARIO_SIMULATOR_KEY) {
+      return scoreScenarioAttempt(
+        config,
+        responses,
+        resolveLessonMasteryPolicy(experience).threshold,
+      );
+    }
     if (config.simulator === FORKLIFT_SIMULATOR_KEY) {
       return scoreForkliftAttempt(
         config,

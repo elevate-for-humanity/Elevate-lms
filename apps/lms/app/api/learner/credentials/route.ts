@@ -68,7 +68,7 @@ export async function POST(request: NextRequest) {
     // review-queue hold. Invalid files are rejected above with a 400
     // before anything is stored.
     verification_status: 'approved',
-    verified_by: 'system',
+    notes: 'Auto-approved on arrival (present + uploaded = approved).',
     verified_at: new Date().toISOString(),
   }).select('id,upload_type,verification_status,created_at').single();
   if (error) {

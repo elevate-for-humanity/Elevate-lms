@@ -41,7 +41,15 @@ export async function GET(request: NextRequest) {
   const rateLimited = await applyRateLimit(request, 'api');
   if (rateLimited) return rateLimited;
 
-  const token = clip(request.nextUrl.searchParams.get('token'), 100);
+  // The session token must not travel in the URL: the platform edge
+  // resets connections whose query string carries a token=<uuid>
+  // parameter (verified live 2026-11-27; POST/PATCH with the token
+  // in the body work, and other parameter names pass). The client
+  // sends it in a header instead; the query form stays for backward
+  // compatibility where it can still arrive.
+  const token =
+    clip(request.nextUrl.searchParams.get('token'), 100) ??
+    clip(request.headers.get('x-demo-session-token'), 100);
   if (!token) return NextResponse.json({ error: 'Sandbox token required.' }, { status: 400 });
 
   const db = await requireAdminClient();

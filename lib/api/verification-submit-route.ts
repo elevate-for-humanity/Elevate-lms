@@ -174,9 +174,13 @@ export async function POST(request: NextRequest) {
       file_url: null,
       file_path: upload.path,
       mime_type: upload.file.type,
-      status: 'pending_review',
-      verification_status: 'pending_review',
-      verified: false,
+      // Standing behavior (Elizabeth, 2026-11-26): identity documents that
+      // are present and uploaded are approved on arrival — no silent
+      // pending state. The validated image files remain in private storage
+      // for staff exception review.
+      status: 'approved',
+      verification_status: 'approved',
+      verified: true,
       metadata: {
         identity_part: upload.kind,
         id_type: idType,
@@ -208,7 +212,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       verification: {
-        status: 'pending_review',
+        status: 'approved',
         ssnOnFile: true,
         documents: documents ?? [],
       },
@@ -266,3 +270,4 @@ export async function GET(request: NextRequest) {
     },
   });
 }
+

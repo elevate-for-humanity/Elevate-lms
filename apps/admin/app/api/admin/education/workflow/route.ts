@@ -203,7 +203,7 @@ export async function POST(request: NextRequest) {
         // contain internal details); log it server-side and return a
         // generic message. The integrity LEAKS audit blocks on
         // error.message in a response body.
-        logger.error('education workflow: enroll student failed', { error: error.message });
+        logger.error('education workflow: enroll student failed', error);
         return fail('Failed to enroll student', 500);
       }
       return ok({ enrollment });
@@ -236,9 +236,7 @@ export async function POST(request: NextRequest) {
       if (existing) {
         const { error } = await db.from('lesson_progress').update(patch).eq('id', existing.id);
         if (error) {
-          logger.error('education workflow: update lesson progress failed', {
-            error: error.message,
-          });
+          logger.error('education workflow: update lesson progress failed', error);
           return fail('Failed to update lesson progress', 500);
         }
       } else {
@@ -250,9 +248,7 @@ export async function POST(request: NextRequest) {
           ...patch,
         });
         if (error) {
-          logger.error('education workflow: record lesson progress failed', {
-            error: error.message,
-          });
+          logger.error('education workflow: record lesson progress failed', error);
           return fail('Failed to update lesson progress', 500);
         }
       }

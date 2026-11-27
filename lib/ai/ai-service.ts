@@ -143,9 +143,19 @@ function resolveConfiguredChatProvider(options: ChatCompletionOptions): AIProvid
   if (requested && requested !== 'none' && requested !== 'auto') {
     const configured = configuredDefaultProvider();
     if (requested !== configured) {
-      throw new Error(
-        `Provider override "${requested}" is not allowed; the configured provider is "${configured}"`,
+      // A caller's provider preference is advisory, never a dead end: the
+      // configured canonical provider serves the request and the result
+      // receipt names the provider that actually answered. Hard-failing
+      // mismatched requests killed every provider-naming caller at 0ms
+      // (ledger: ~2,957 'approval'-classified ai.chat deaths from
+      // 2026-11-03, the day the override throw landed). Callers that
+      // truly require a specific provider use providerPolicy
+      // 'owned-only' or the paid-inference gateway, which establishes
+      // its authorization context by design.
+      logger.warn(
+        `[aiChat] provider preference "${requested}" differs from the configured provider "${configured}"; the configured provider serves this request`,
       );
+      return resolveChatProvider();
     }
     const createProvider = chatProviders[requested];
     if (!createProvider) throw new Error(`Unknown AI chat provider: ${requested}`);

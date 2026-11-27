@@ -404,7 +404,11 @@ test.describe('Admin Portal — Production Proof', () => {
     await expect(auditRecords).toBeVisible();
     await auditRecords.click();
     await expect(page).toHaveURL(/\/students\?include_test=1$/);
-    await expect(page.getByRole('link', { name: 'Operational records', exact: true })).toBeVisible();
+    // students/loading.tsx commits the URL before the server render streams in;
+    // the include_test view renders every QA fixture row (9.2s in run 45982254686).
+    await expect(page.getByRole('link', { name: 'Operational records', exact: true })).toBeVisible({
+      timeout: 20_000,
+    });
   });
 
   // ── 6. Settings: real page, no fake spinner ───────────────────────────────

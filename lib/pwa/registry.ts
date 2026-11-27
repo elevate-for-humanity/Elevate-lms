@@ -5,6 +5,11 @@ export const PWA_APPLICATIONS = {
   // Elevate Mail shares the Admin origin but owns the /mail/ scope: its own
   // worker, caches, manifest, and install identity, insulated from Admin's.
   mail: { workerPath: '/sw-mail.js', cachePrefix: 'elevate-mail-', manifestPath: '/manifest-mail.json', scope: '/mail/' },
+  // The phone system is its own application on the Admin origin: its worker
+  // is scoped to /phone/ so Admin deploys (which restamp sw-admin.js on
+  // every release) can never churn the registration that owns the phone's
+  // call-wake push subscription.
+  phone: { workerPath: '/sw-phone.js', cachePrefix: 'elevate-phone-', manifestPath: '/manifest-phone.json', scope: '/phone/' },
 } as const;
 
 export type PwaApplication = keyof typeof PWA_APPLICATIONS;

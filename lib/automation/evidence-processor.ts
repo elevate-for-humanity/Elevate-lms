@@ -420,13 +420,16 @@ async function autoApprove(
 ): Promise<ProcessingResult> {
   const processingTimeMs = Date.now() - startTime;
 
-  // Update document status
+  // Update document status. verified_by is a uuid column, so the system
+  // attribution lives in verification_notes; setting a text value there
+  // would fail the update and leave the document unapproved.
   await supabase
     .from('documents')
     .update({
       status: 'approved',
+      verified: true,
       verified_at: new Date().toISOString(),
-      verified_by: 'system',
+      verification_notes: 'Auto-approved on arrival by the evidence processor (present + uploaded + legible = approved).',
       extracted_data: extractedData,
       ocr_confidence: confidence,
       updated_at: new Date().toISOString(),

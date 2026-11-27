@@ -1,4 +1,5 @@
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { GoogleSpeechNotConfiguredError } from '@/lib/ai/google-natural-voice';
 import { generateSavedGoogleSpeech } from '@/lib/ai/saved-google-speech';
 import { hydrateProcessEnv } from '@/lib/secrets';
 
@@ -26,6 +27,26 @@ export async function handleNaturalVoiceRequest(request: Request) {
       },
     });
   } catch (cause) {
+    if (cause instanceof GoogleSpeechNotConfiguredError) {
+      // Deployment state, not a transient failure: this deployment has no
+      // speech credential, so there is nothing to retry. Answer with a
+      // graceful availability response (no error status) so narration
+      // clients take their sanctioned no-narration path instead of
+      // logging a failed resource load on every narrated page.
+      return Response.json(
+        {
+          error: 'Natural voice is not configured on this deployment.',
+          code: 'not_configured',
+          available: false,
+          retryable: false,
+        },
+        {
+          status: 200,
+          headers: { 'Cache-Control': 'no-store' },
+        },
+      );
+    }
+
     console.error('[natural-voice] Google speech generation failed', cause);
 
     return Response.json(

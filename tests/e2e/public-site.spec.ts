@@ -421,18 +421,25 @@ test.describe('application entry audit', () => {
     // without submitting a test record or starting paid enrollment.
     await page.getByRole('link', { name: 'Use standard form instead', exact: true }).click();
     await expect(page).toHaveURL(/\/apply\/student\/form\?intent=inquiry$/);
-    await page.getByRole('textbox', { name: 'First Name', exact: true }).fill('Browser');
-    await page.getByRole('textbox', { name: 'Last Name', exact: true }).fill('QA');
-    await page.getByLabel('Date of Birth', { exact: true }).fill('1990-01-01');
-    await page.getByRole('textbox', { name: 'Email', exact: true }).fill('browser-control-check@qa.invalid');
-    await page.getByRole('textbox', { name: 'Phone', exact: true }).fill('317-555-0100');
-    await page.getByRole('textbox', { name: 'Street Address', exact: true }).fill('100 QA Test Way');
-    await page.getByRole('textbox', { name: 'City', exact: true }).fill('Indianapolis');
-    await page.getByRole('textbox', { name: 'State', exact: true }).fill('IN');
-    await page.getByRole('textbox', { name: 'ZIP Code', exact: true }).fill('46201');
     const next = page.getByRole('button', { name: 'Continue', exact: true });
-    await next.click();
-    await page.getByLabel(/Program of Interest/).selectOption('hvac-technician');
+    const program = page.getByLabel(/Program of Interest/);
+    // Fills typed into the server-rendered inputs before StudentApplicationForm
+    // hydrates never reach React state; run 45982254686 reached Continue with
+    // every controlled field reset. Re-enter step 1 until the form accepts it.
+    await expect(async () => {
+      await page.getByRole('textbox', { name: 'First Name', exact: true }).fill('Browser');
+      await page.getByRole('textbox', { name: 'Last Name', exact: true }).fill('QA');
+      await page.getByLabel('Date of Birth', { exact: true }).fill('1990-01-01');
+      await page.getByRole('textbox', { name: 'Email', exact: true }).fill('browser-control-check@qa.invalid');
+      await page.getByRole('textbox', { name: 'Phone', exact: true }).fill('317-555-0100');
+      await page.getByRole('textbox', { name: 'Street Address', exact: true }).fill('100 QA Test Way');
+      await page.getByRole('textbox', { name: 'City', exact: true }).fill('Indianapolis');
+      await page.getByRole('textbox', { name: 'State', exact: true }).fill('IN');
+      await page.getByRole('textbox', { name: 'ZIP Code', exact: true }).fill('46201');
+      await next.click();
+      await expect(program).toBeVisible({ timeout: 2_000 });
+    }).toPass({ timeout: 30_000 });
+    await program.selectOption('hvac-technician');
     await next.click();
     await page.getByLabel(/How do you plan to pay/).selectOption('not_sure');
     await next.click();

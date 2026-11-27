@@ -108,16 +108,14 @@ test.describe('Authenticated student flow', () => {
     expect(hasStudentContent, 'Dashboard body has no student content').toBe(true);
   });
 
-  test('profile_missing redirect goes to /lms/onboarding not /unauthorized', async ({ page }) => {
-    // Simulate the profile_missing path by checking the redirect target in requireRole
-    // We can't easily simulate a missing profile in E2E, but we can verify the
-    // /lms/onboarding?reason=profile_missing URL renders without error.
-    // /onboarding/learner is a Marketing route and 404s on the LMS origin.
-    await page.goto(`${BASE}/lms/onboarding?reason=profile_missing`, {
+  test('profile_missing redirect reaches the Marketing learner checklist, not /unauthorized', async ({ page }) => {
+    // resolveLandingDestination sends a signed-in account without a profile to
+    // /onboarding/learner on the LMS origin, where the learner onboarding bridge
+    // (apps/lms/app/onboarding/learner) hands off to the Marketing-owned checklist.
+    // /lms/onboarding is the separate role-gated LMS checklist and never bridges.
+    await page.goto(`${BASE}/onboarding/learner?reason=profile_missing`, {
       waitUntil: 'domcontentloaded',
     });
-    // The legacy LMS path must reach the existing Marketing-owned checklist,
-    // including its query, rather than passing this test with a 404 document.
     await expect(page).toHaveURL(url => url.origin === new URL(MARKETING).origin && url.pathname === '/onboarding/learner' && url.searchParams.get('reason') === 'profile_missing');
     await expect(page.getByRole('heading', { level: 1, name: /Welcome to/ })).toBeVisible();
     expect(page.url()).not.toContain('/unauthorized');

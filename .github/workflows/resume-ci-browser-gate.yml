@@ -6,7 +6,8 @@ on:
     types: [completed]
 
 concurrency:
-  group: browser-ci-receipt-${{ github.repository }}-${{ github.ref }}
+  # Serialize reconciliation of the same head without displacing other PRs.
+  group: browser-ci-receipt-${{ github.repository }}-${{ github.event.workflow_run.head_repository.id }}-${{ github.event.workflow_run.head_branch }}-${{ github.event.workflow_run.head_sha }}
   cancel-in-progress: false
 
 permissions:

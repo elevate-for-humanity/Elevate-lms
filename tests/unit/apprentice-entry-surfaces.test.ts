@@ -32,7 +32,7 @@ describe('apprenticeship entry surfaces', () => {
     expect(promotion).not.toBeNull();
     expect(hero!.index).toBeLessThan(promotion!.index!);
     const template = readFileSync('components/programs/ProgramDetailPage.tsx', 'utf8');
-    const heroPosition = template.indexOf('{heroOverride ??');
+    const heroPosition = template.indexOf('<Fragment key="hero-override">{heroOverride}</Fragment>');
     expect(heroPosition).toBeGreaterThanOrEqual(0);
     expect(template.indexOf('{afterHero ?')).toBeGreaterThan(heroPosition);
   });

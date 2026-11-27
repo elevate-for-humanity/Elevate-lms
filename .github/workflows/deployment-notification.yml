@@ -1,7 +1,7 @@
 name: Deployment Notifications
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.deployment.id || github.run_id }}
+  cancel-in-progress: false
 
 on:
   workflow_dispatch:

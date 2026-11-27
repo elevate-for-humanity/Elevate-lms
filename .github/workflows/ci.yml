@@ -481,4 +481,8 @@ jobs:
         if: ${{ github.event_name == 'pull_request' }}
         env:
           GITHUB_TOKEN: ${{ github.token }}
+          # A pending browser receipt must fail normally before the five-minute
+          # job timeout. The trusted completion finalizer retries only the
+          # failed receipt after all exact-head browser jobs actually pass.
+          E2E_EVIDENCE_TIMEOUT_MS: '0'
         run: node scripts/ci/require-exact-pr-browser-evidence.mjs

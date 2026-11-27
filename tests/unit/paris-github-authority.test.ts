@@ -14,6 +14,11 @@ import { classifySearchFailure } from '@/lib/devstudio/github-search-fallback';
 it('classifies branch authority from the repository permissions object', () => {
   expect(classifyRepoBranchPermission({ push: true })).toBe('push');
   expect(classifyRepoBranchPermission({ push: false })).toBe('no-push');
+  expect(classifyRepoBranchPermission({ pull: true, push: false })).toBe('no-push');
+  // Installation tokens get all-false flags on a repo they can read and write.
+  expect(
+    classifyRepoBranchPermission({ admin: false, maintain: false, pull: false, push: false, triage: false }),
+  ).toBe('not-reported');
   expect(classifyRepoBranchPermission({})).toBe('unknown');
   expect(classifyRepoBranchPermission(null)).toBe('unknown');
   expect(classifyRepoBranchPermission({ admin: true })).toBe('unknown');

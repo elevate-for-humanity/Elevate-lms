@@ -50,6 +50,11 @@ type EmailContext = {
   mailboxes: ActorMailbox[];
   previewing: boolean;
   isAdmin: boolean;
+  // True when the request arrived through the Admin-origin (oversight)
+  // route — the staff Mail app and office email surfaces, as opposed to
+  // the learner-facing LMS route. The internal office directory is
+  // presented in full on the oversight surfaces (see the GET handler).
+  oversight: boolean;
 };
 
 export type CommunicationEmailApiOptions = {
@@ -98,6 +103,7 @@ async function emailContext(
           mailboxes: actorMailboxes,
           previewing: false,
           isAdmin: true,
+          oversight: true,
         };
       }
     }
@@ -112,6 +118,7 @@ async function emailContext(
       mailboxes,
       previewing: preview.previewing,
       isAdmin: false,
+      oversight: options.adminOversight === true,
     };
   } catch {
     return NextResponse.json({ error: 'Email accounts could not be loaded.' }, { status: 500 });
@@ -305,7 +312,13 @@ export async function handleCommunicationEmailGet(
             .limit(25)
         ).data || []
       : [],
-    directory: context.isAdmin
+    // The internal office directory belongs to the office surfaces: on the
+    // Admin-origin (oversight) route every signed-in office member gets the
+    // full directory of active mailboxes, the way the internal office email
+    // presents it — not just administrators, and never only the caller's own
+    // mailboxes. The learner-facing LMS route (no oversight) keeps the
+    // membership-scoped directory below. Preview sessions stay scoped.
+    directory: context.oversight && !context.previewing
       ? (
           await context.db
             .from('communication_email_mailboxes')

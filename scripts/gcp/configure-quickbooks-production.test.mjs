@@ -1,6 +1,6 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {configureDatabase,productionCredentials,REDIRECT,SOURCE} from './configure-quickbooks-production.mjs';
+import {configureDatabase,productionCredentials,productionVerifier,REDIRECT,SOURCE} from './configure-quickbooks-production.mjs';
 const env={QB_CLIENT_ID:'AB36wjMVx59aNggdTvM8qhnTGgmvuRPkx3a4efcXCkmeo6mFWL',QB_CLIENT_SECRET:'fixtureProductionSecret1234',SUPABASE_SERVICE_ROLE_KEY:'fixture-database-key'};
 test('reject mismatched applications and copied UI labels before database writes',()=>{
  assert.throws(()=>productionCredentials({...env,QB_CLIENT_ID:'wrong-app'}));
@@ -12,6 +12,44 @@ test('bind complete pair and require exact canonical readback without reporting 
  const result=await configureDatabase({env,request});
  assert.equal(calls.length,5);assert.equal(calls[0].body.p_client_secret,env.QB_CLIENT_SECRET);assert.equal(result.companyAuthorizationVerified,false);assert.ok(!JSON.stringify(result).includes(env.QB_CLIENT_SECRET));
  await assert.rejects(()=>configureDatabase({env,request:async()=>Response.json('wrong')}),/UNVERIFIED/);
+});
+test('verifier is optional, validated, and never generated',()=>{
+ assert.equal(productionVerifier(env),'');
+ assert.equal(productionVerifier({...env,QB_WEBHOOK_VERIFIER_TOKEN:'fixtureVerifierToken1234567890'}),'fixtureVerifierToken1234567890');
+ assert.equal(productionVerifier({...env,QUICKBOOKS_WEBHOOK_VERIFIER_TOKEN:'fixtureVerifierToken1234567890'}),'fixtureVerifierToken1234567890');
+ assert.throws(()=>productionVerifier({...env,QB_WEBHOOK_VERIFIER_TOKEN:'short'}),/PRODUCTION_VERIFIER_INVALID/);
+ assert.throws(()=>productionVerifier({...env,QB_WEBHOOK_VERIFIER_TOKEN:'has spaces init'}),/PRODUCTION_VERIFIER_INVALID/);
+});
+test('database path provisions the verifier into platform_secrets with exact readback',async()=>{
+ const verifier='fixtureVerifierToken1234567890';const venv={...env,QB_WEBHOOK_VERIFIER_TOKEN:verifier};
+ const expected={QB_CLIENT_ID:env.QB_CLIENT_ID,QB_CLIENT_SECRET:env.QB_CLIENT_SECRET,QB_ENVIRONMENT:'production',QB_REDIRECT_URI:REDIRECT,QB_WEBHOOK_VERIFIER_TOKEN:verifier};const calls=[];
+ const request=async(url,init)=>{const body=JSON.parse(init.body);calls.push({url,body});
+  if(url.endsWith('/configure_quickbooks_oauth_application'))return Response.json(true);
+  if(url.endsWith('/set_platform_secret')){assert.equal(body.p_key,'QB_WEBHOOK_VERIFIER_TOKEN');assert.equal(body.p_value,verifier);return Response.json(null);}
+  return Response.json(expected[body.p_key]);};
+ const result=await configureDatabase({env:venv,request});
+ assert.equal(result.webhookVerifierConfigured,true);
+ assert.ok(calls.some(c=>c.url.endsWith('/set_platform_secret')));
+ assert.ok(!JSON.stringify(result).includes(verifier));
+ const noVerifier=await configureDatabase({env,request:async(url,init)=>{const body=JSON.parse(init.body);return Response.json(url.endsWith('/configure_quickbooks_oauth_application')?true:expected[body.p_key]);}});
+ assert.equal(noVerifier.webhookVerifierConfigured,false);
+});
+test('Google path binds the verifier under both runtime names when provided',async()=>{
+ const {configureGoogle}=await import('./configure-quickbooks-production.mjs');
+ const {readFileSync}=await import('node:fs');const verifier='fixtureVerifierToken1234567890';const venv={...env,QB_WEBHOOK_VERIFIER_TOKEN:verifier};const configs={},active={};
+ for(const component of ['admin','marketing','lms','store'])configs[component]={version:1,component,runtimeEnvironment:{UNRELATED:'preserved'},runtimeFiles:{},volumes:[]};
+ const run=args=>{
+  const component=(args.find(a=>/^elevate-(admin|marketing|lms|store)-/.test(a))||'').split('-')[1];
+  if(args[0]==='secrets'&&args[1]==='versions'&&args[2]==='access')return JSON.stringify(configs[component]);
+  if(args[0]==='secrets'&&args[1]==='versions'&&args[2]==='add'){configs[component]=JSON.parse(readFileSync(args[args.indexOf('--data-file')+1],'utf8'));return 'version/1';}
+  if(args[1]==='services'&&args[2]==='update'){const flags=JSON.parse(readFileSync(args[args.indexOf('--flags-file')+1],'utf8'));active[component]=flags['--update-env-vars'];return component+'-ready';}
+  if(args[1]==='services'&&args[2]==='describe')return JSON.stringify({status:{traffic:[{percent:100,revisionName:component+'-ready'}]}});
+  if(args[1]==='revisions'&&args[2]==='describe'){const part=args[3].split('-')[0];return JSON.stringify({spec:{containers:[{env:Object.entries(active[part]).map(([name,value])=>({name,value}))}]}});}
+  throw Error('unexpected operation');
+ };
+ const result=configureGoogle({env:venv,run});assert.equal(result.webhookVerifierConfigured,true);
+ for(const config of Object.values(configs)){assert.equal(config.runtimeEnvironment.QB_WEBHOOK_VERIFIER_TOKEN,verifier);assert.equal(config.runtimeEnvironment.QUICKBOOKS_WEBHOOK_VERIFIER_TOKEN,verifier);}
+ assert.ok(!JSON.stringify(result).includes(verifier));
 });
 test('Google alignment preserves unrelated configuration and verifies serving credentials',async()=>{
  const {configureGoogle}=await import('./configure-quickbooks-production.mjs');

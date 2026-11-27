@@ -153,7 +153,7 @@ async function _POST(req: NextRequest) {
       issued++;
     } catch (error) {
       const msg = error instanceof Error ? error.message : 'Unknown error';
-      logger.error('Bulk certificate issue failed for a row', { row, error: msg });
+      logger.error('Bulk certificate issue failed for a row', error, { row });
       errors.push({ row, err: 'Certificate could not be issued for this row.' });
     }
   }

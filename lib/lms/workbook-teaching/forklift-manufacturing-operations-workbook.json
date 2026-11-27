@@ -1,0 +1,342 @@
+{
+  "version": 1,
+  "workbookSlug": "forklift-manufacturing-operations-workbook",
+  "chapters": [
+    {
+      "number": 1,
+      "heading": "Boundaries first: completion is not authorization",
+      "text": "This opening lesson draws a firm line between formal learning and operating authorization. Reading, simulations, and workbook answers can show understanding, but they cannot show that a person can operate a particular truck safely at a particular workplace. A course completion record is not an operator license, an OSHA certification, or an employer's operating authorization. The employer must connect instruction with practical demonstrations and trainee exercises, then evaluate workplace performance. A trainee may operate only under the direct supervision of a person qualified to train and evaluate, and only where the activity endangers no one. That trainer needs relevant knowledge, training, and experience — a job title or this online course alone does not establish it. Organize what must be known under four headings: person, equipment, workplace, and evidence. A forklift also differs from a road vehicle in handling, visibility, load effects, and turning space, so driving habits or experience on another truck or at another facility do not transfer. A missing field in the packet is a question to resolve, not permission to assume.",
+      "example": "Jordan completed an online warehouse course and previously used a different truck at another company. A supervisor asks for help with truck E-17, fitted with a carton clamp, but the packet shows E-17 with standard forks, contains no clamp information, and leaves the evaluator field blank. Jordan records the mismatch, asks for the current configuration's information, and requests the assigned qualified trainer. Jordan does not drive to a quieter area to practice. The useful outcome is a complete handoff request: identify the truck and attachment, resolve the documents, schedule supervised practice, and obtain workplace evaluation before any operation.",
+      "review": "Say the sentence this lesson asks you to practice about what you have completed and what is still pending — word for word in meaning.",
+      "diagram": [
+        "Person: experience + trainer",
+        "Equipment: truck + manual",
+        "Workplace: tasks + areas",
+        "Evidence: practice + sign-off",
+        "Missing field = question"
+      ]
+    },
+    {
+      "number": 2,
+      "heading": "Capacity is conditional: match the card exactly or hold",
+      "text": "A capacity number belongs to specified conditions, not to a truck in general. Truck configuration, attachment, load center, and relevant lift-height information must all be checked against the actual manufacturer's information. An attachment is not a harmless accessory to ignore, and a damaged, unreadable, missing, or inconsistent plate means the capacity question cannot be resolved from memory or from a similar-looking truck. Load center describes the relationship between the load's center of gravity and the fork face; packaging dimensions do not prove where that center is, because contents can be uneven, loose, or displaced. A supplier's documented gross weight is evidence, while 'these boxes are usually light' is only a guess. Stability also depends on load arrangement, support, handling, height, surfaces, and movement. Use a controlled matching process: identify the truck and attachment, collect weight, load center, and lift height, then find an explicit entry with the same conditions. If information is missing, a condition differs, or the weight exceeds the entry, the decision is HOLD. A successful paper match means only that the configuration data matches for further supervised review — never permission to lift.",
+      "example": "Use the fictional card for truck F-17: standard forks at a 24-inch load center allow 3,000 lb at 120 inches and 2,400 lb at 180 inches; clamp C-12 at 24 inches allows 2,000 lb at 120 inches. Order A states standard forks, 24 inches, 180 inches, and 2,600 lb. Its conditions match the second entry exactly, but 2,600 exceeds 2,400, so the decision is HOLD. Order B states 2,300 lb at a 30-inch load center. No entry matches that center, so its lower weight does not justify guessing or interpolating — it is also a hold, for missing evidence rather than excess weight.",
+      "review": "A load weighs less than every number on the card, but its load center matches no entry. Hold or lift — and why?",
+      "diagram": [
+        "Identify truck + attachment",
+        "Collect weight, center, height",
+        "Find exact matching entry",
+        "Compare weight to entry",
+        "No match or over = HOLD"
+      ]
+    },
+    {
+      "number": 3,
+      "heading": "Observe, record, escalate: inspection and route are both decisions",
+      "text": "An inspection is a safety decision, not a paperwork race. Industrial trucks must be examined before use, at least daily, and equipment used around the clock is examined after each shift. A condition that adversely affects safety requires removal from service until corrected, following the employer's procedure for who receives the report, how use is prevented, and who is authorized to repair. This online exercise uses written observations and photographs; it does not ask you to approach, energize, test, or operate a truck, reach into a mast, feel for a pressurized leak, or make an unauthorized repair. Record facts precisely: 'wet patch beneath the hydraulic area' is an observation, while 'the seal is definitely broken' is an unsupported diagnosis. Identify the truck, location, time, and source, and never erase a defect because someone says the truck worked yesterday. Assess the whole workplace too: surfaces, spills, visibility, overhead clearance, narrow areas, docks, and pedestrian separation. A horn, eye contact, or an informal wave does not eliminate a crossing conflict, and when every route contains an unresolved hazard, HOLD is a successful decision.",
+      "example": "Fictional truck E-22 shows a visible fork crack, an unreadable capacity plate, and a small wet patch below the hydraulic area. The learner records all three observations and routes the report through the site's out-of-service process without attempting a repair. The routes are no better: Route A crosses an active pedestrian packing line, Route B contains an unassessed floor opening, and Route C enters a dock with no confirmed trailer status. None is an acceptable release. Equipment condition and route condition must both be resolved — fixing one does not resolve the other.",
+      "review": "Rewrite 'the seal is definitely broken' as a direct observation, and name what else must accompany it in the report.",
+      "diagram": [
+        "Examine before use, daily",
+        "Record observation only",
+        "Report + remove if unsafe",
+        "Check route: people + surfaces",
+        "Unresolved hazard = HOLD"
+      ]
+    },
+    {
+      "number": 4,
+      "heading": "Incidents: protect people first, record facts, hand off honestly",
+      "text": "When an incident or immediate hazard occurs, the priority is protection of people. Follow the site's emergency arrangements, move to a safe location when possible without additional danger, alert the designated response personnel, and request emergency services when the situation requires them. Do not delay an emergency alert to finish a report or take photographs, and do not attempt improvised rescue, hazardous-energy isolation, leak repair, or recovery of a fallen load. Guessing a cause and restarting the truck is not troubleshooting, and a near miss deserves reporting even when no injury or visible damage is apparent. Record facts that support correction: separate observations, reported information, and unknowns in a timeline with time, location, truck identifier if safely available, notifications, and conditions — avoiding blame, guessed speeds, and invented distances. Know the triggers for more training: unsafe operation, an accident or near miss, an evaluation identifying unsafe performance, a different truck type, or a workplace change. Performance must be evaluated at least every three years, but a trigger is addressed when it arises, not at the three-year mark. Independent operation stays restricted until the employer determines competence and authorizes a defined scope.",
+      "example": "A pallet shifts near a crossing at 10:12. Nobody reports an injury, but the route is obstructed. At 10:13 the shift lead is notified under the site's procedure and the area remains restricted. The learner writes 'pallet shifted near crossing,' records the notification, and marks the cause unknown. The learner does not write 'operator was speeding' without evidence, and does not restart movement simply because there was no injury. The employer reviews the near miss, the equipment and site conditions, and any need for refresher training and evaluation before any authorized restart.",
+      "review": "In your incident note, which column does 'cause unknown' belong in — observed, reported, or unknown — and why does that matter?",
+      "diagram": [
+        "Protect people first",
+        "Alert designated responders",
+        "Keep others clear safely",
+        "Record facts vs unknowns",
+        "Employer reviews + decides"
+      ]
+    },
+    {
+      "number": 5,
+      "heading": "Follow the work order: material flow and information flow together",
+      "text": "A manufacturing order connects a customer requirement to a particular quantity of a particular product. At fictional Cedar Works the product is a small desk organizer, DSK-100. The work order identifies what to make, how many units are required, the applicable document revision, and when the order is needed — and the worker first checks that those facts agree with the materials and instructions at the workstation. Three documents answer different questions: the bill of materials (BOM) lists the components required for one finished unit, the routing states which stages the job passes through, and a work instruction describes the authorized method and checks at one stage. Knowing a component count does not establish the approved sequence, and knowing the sequence does not establish that the correct lot was issued. Material moves from receiving to released storage, then kitting, assembly, inspection, and packing; information moves alongside it — identity, quantity, status, revision, and evidence of completed checks. Use four status words consistently: available, in process, hold, and released. When documents disagree, record the conflict and request clarification; a plausible guess is not a controlled instruction.",
+      "example": "Cedar Works order WO-201 requests 24 DSK-100 units at revision B. The packet contains a revision-B BOM, a revision-A assembly instruction, and 24 released base components. The material count is sufficient, but the instruction revision conflicts with the order. The correct response is to hold the assembly start, identify WO-201 and the two revisions in a clarification request, and obtain the approved instruction — not to assume revision A is close enough. After the document owner supplies revision B, record the resolution and check the remaining packet before proceeding. The kit therefore cannot be reported complete, and the record shows exactly which field the next person must resolve.",
+      "review": "At any handoff, which four questions from this lesson must you be able to answer about what is in front of you?",
+      "diagram": [
+        "Check order: qty + revision",
+        "BOM = parts per unit",
+        "Routing = stage sequence",
+        "Track identity + status",
+        "Conflict? Record + clarify"
+      ]
+    },
+    {
+      "number": 6,
+      "heading": "Workstation readiness: people, space, and information — not just parts",
+      "text": "A workstation can have all its parts and still be unready for work. Readiness includes clear access, stable storage, identified materials, current instructions, and a way to contact the responsible person. In this lesson you inspect a written scene rather than a real machine: the purpose is to recognize a condition and choose an appropriate response, not to repair equipment or perform a hazard assessment for an employer. Describe what you can see without claiming to know its cause — a spill at a named location, a box extending into a marked aisle, a container that appears unstable. A missing guard, unexpected motion, damaged cable, unusual odor, or unidentified liquid is not an invitation to troubleshoot: move to a safe location and use the employer's reporting and emergency procedures. Do not bypass a guard, reach into a machine, reset a fault, remove a lock, or try to identify a chemical by touching or smelling it. PPE follows the employer's hazard assessment and task instructions, and chemical information comes from workplace labeling, safety data sheets, and training. A useful report has five fields: location, observation, immediate safe action, person notified, and unresolved need — and it distinguishes action taken from action requested.",
+      "example": "The written scene reports a box blocking the marked aisle, an unlabelled liquid bottle beside the job packet, and a guard missing from nearby equipment. Record three separate observations. For the aisle, avoid the obstruction and report it through the site's process. For the bottle, do not use it or identify it by smell; request identification and handling direction. For the guard, do not start or interact with the equipment; notify the responsible person. A clean bench does not compensate for these unresolved conditions, and starting production does not make an unanswered question disappear.",
+      "review": "Why is 'area unsafe' a failed report, and which five fields turn it into a useful one?",
+      "diagram": [
+        "Scan access, storage, labels",
+        "Note observation, not cause",
+        "Stay out of hazard area",
+        "Report: location + action",
+        "Confirm what is unresolved"
+      ]
+    },
+    {
+      "number": 7,
+      "heading": "Read the drawing, BOM, and revision block before any detail",
+      "text": "A drawing is a controlled set of requirements. The fictional DSK-100 drawing's title block gives product DSK-100, revision B, and units in millimeters. A labeled feature L has a nominal length of 100.00 mm with a tolerance of plus or minus 0.20 mm: the nominal is the target label, and the tolerance defines the permitted interval — 99.80 mm to 100.20 mm. Do not silently replace the tolerance with the number of decimal places shown. Check identity before interpreting detail: compare the drawing number and revision with the work order and work instruction, because a correct dimension on the wrong revision is still the wrong requirement. Then confirm the units; NIST defines one inch as exactly 25.4 millimeters, but converting a value for a calculation does not authorize replacing the controlling drawing or rounding away its limits. Never measure a screen image to infer a dimension — zoom and printing change apparent scale. Connect the drawing to the BOM: one unit uses one base B-100, one cap C-100 revision B, two pins P-10, and one label L-100. Mark facts, calculations, and questions separately so a handwritten assumption is never mistaken for an approved note.",
+      "example": "Drawing DSK-100-B states L = 100.00 ± 0.20 mm and cap revision B, and WO-203 requests 12 units. The requirement table gives a lower limit of 99.80 mm, an upper limit of 100.20 mm, 12 bases, 12 revision-B caps, 24 pins (2 per unit × 12), and 12 labels. A screenshot appears to show a width of about 4 cm, but no width dimension is supplied, so the table marks width 'not specified in this exercise; request the governing requirement if needed' instead of turning a screen measurement into a specification.",
+      "review": "For 24 units, how many pins does the BOM require — and why is that a usage calculation, not a bin count?",
+      "diagram": [
+        "Read title block + revision",
+        "Match order + instruction",
+        "Nominal ± tolerance = limits",
+        "BOM × quantity = requirement",
+        "Facts, calcs, questions apart"
+      ]
+    },
+    {
+      "number": 8,
+      "heading": "Kitting: a kit is a promise about identity as well as count",
+      "text": "Kitting groups the materials needed for an order or a defined portion of it. Counting is necessary, but a kit with the right number of wrong-revision caps is not ready. Each kit record includes the work order, product revision, component part numbers, required quantities, actual quantities, source lots, and status, and every number should answer 'of what?' and 'for which job?' Start with the BOM per finished unit, multiply by the planned order quantity, and compare that requirement with the quantity that is both available and approved for the job. Material on hold, of uncertain identity, or of an unapproved revision is not usable stock, and a shortage by itself does not authorize a partial build — the designated lead must authorize it. Find the limiting component: check every component, and the smallest supported quantity limits the complete-kit count, using whole-unit division rounded down. Keep different lots identifiable; a loose component with no reliable label cannot acquire an identity because it resembles the others. Close the loop with the reconciliation equation: issued equals used plus returned plus held or scrapped plus unexplained difference, with no overlapping categories. If the arithmetic does not balance, recount and investigate rather than adjusting a number to make the form look complete.",
+      "example": "WO-205 needs 24 units, with one base, one cap, two pins, and one label per unit. Usable stock is 24 bases, 23 caps, 49 pins, and 24 labels, supporting 24, 23, 24, and 24 whole units respectively — pins support 24 because 49 ÷ 2 rounds down to 24. The maximum complete kits is therefore 23, limited by caps, and the cap shortage is one. If 23 units are authorized and built, pin usage is 46 and three pins remain for controlled return or another documented status. The strong handoff says exactly that, not 'almost enough.'",
+      "review": "Usable stock supports 23 complete kits for a 24-unit order. What two things must the handoff state besides the number 23?",
+      "diagram": [
+        "BOM × order = requirement",
+        "Count released stock only",
+        "Divide per part, round down",
+        "Smallest result limits kits",
+        "Reconcile issued = outcomes"
+      ]
+    },
+    {
+      "number": 9,
+      "heading": "Sequence preserves the ability to verify: hold points and prevention",
+      "text": "An assembly sequence is more than a list of motions: some steps make later checks possible, and other steps can hide evidence. In the fictional DSK-100 digital exercise, the base identity is verified before component cards are associated with it, two pin cards are recorded before the cap card closes the virtual assembly, and a label is associated only after item identity is established. The current work instruction states the sequence, the check at each hold point, and who may resolve an exception — follow it as written, and route improvement ideas through the employer's review process before use, because uncontrolled changes can alter fit, traceability, or the evidence available to an inspector. Distinguish prevention from detection: prevention makes a mistake less likely or impossible within the approved design, such as a labeled slot for each component or a revision check before selection; detection finds a mistake after it exists, such as a final inspection discovering an incorrect cap. Make every check observable: 'check pins' is vague, while 'record two P-10 pin cards in positions 1 and 2 before closing the virtual cap step' states count, identity, and timing. If a step is skipped, stop the affected sequence and report its state — never invent a successful check.",
+      "example": "The simulated sequence requires identity check, material verification, placement of two pin cards, pin-count verification, cap association, and final record review. A learner associates the cap before verifying the pin count. The correct response is to mark the virtual unit incomplete, identify the skipped hold point, and use the simulation's reset for practice. In a real workplace the learner would follow the exception procedure instead of assuming opening the assembly is safe or authorized. A useful prevention proposal is an onscreen gate that will not accept the cap step until both pin records are present.",
+      "review": "Is a final inspection that catches a wrong cap prevention or detection — and what would the preventive version look like?",
+      "diagram": [
+        "Verify identity first",
+        "Record pins before cap",
+        "Verify count at hold point",
+        "Associate cap, then label",
+        "Skipped step? Stop + report"
+      ]
+    },
+    {
+      "number": 10,
+      "heading": "Production planning: put units into every calculation",
+      "text": "Production math is useful only when it explains a decision, so write the unit beside every number and check that the arithmetic produces the unit you intend. If each unit takes three minutes at the limiting station, dividing 180 available minutes by three minutes per unit produces 60 units; multiplying would not answer the output question. Theoretical capacity is an estimate under stated assumptions, not a guarantee of completed, acceptable product. Separate scheduled time from available time: a four-hour block contains 240 minutes, and breaks, preparation, and required checks are subtracted before any production is modeled — never recover a shortage by deleting breaks, skipping checks, or assuming unapproved speed. Staffing changes the model. With three fully staffed parallel stations taking 2.0, 3.0, and 2.5 minutes per unit, the three-minute station limits the steady rate to 20 units per hour. If one person performs all three tasks sequentially, the work content is 7.5 minutes per unit instead. Compare the plan with the requirement, name the gap and the assumptions, and ask the responsible person for a legitimate scheduling or resource decision. Report units started, completed, accepted, and on hold separately — busy time is not the same as acceptable output.",
+      "example": "A fictional block has 240 scheduled minutes, 30 break minutes, 15 setup minutes, and 15 planned-check minutes, leaving 180 available minutes. With three fully staffed parallel stations at 2.0, 3.0, and 2.5 minutes per unit, the bottleneck is the 3.0-minute station and theoretical capacity is 180 ÷ 3.0 = 60 units. Demand of 70 creates a ten-unit gap. If a single worker performs all three tasks in sequence, capacity is 180 ÷ 7.5 = 24 theoretical units. Neither model includes disruptions or start-up effects, so both are labeled estimates, not promises.",
+      "review": "Demand is 70 and the parallel model supports 60. State the gap and name two things you must not do to close it on paper.",
+      "diagram": [
+        "Scheduled − breaks − setup",
+        "Find bottleneck station",
+        "Available ÷ bottleneck",
+        "One worker: sum all tasks",
+        "Compare to demand, state gap"
+      ]
+    },
+    {
+      "number": 11,
+      "heading": "Required checks: a failure affects a history, not just one unit",
+      "text": "Checks are decisions made at defined points. A first-piece check verifies required characteristics at the start of a defined run under the employer's procedure, and periodic checks provide evidence at the intervals that procedure states. In this exercise the rule is simple and fictional: inspect the first unit, then units 5, 10, 15, and 20, and also check the next unit after a specified component lot changes. Record the actual unit identity and result — never write a result for an unobserved unit, and if a check is missed, show the gap and let the designated reviewer decide the scope of further review. A failure affects a history, not just one object: if unit 10 is the last documented conforming check and unit 15 fails, the intervening units may be affected because no evidence shows exactly when the condition began, so units 11 through 15 form the initial review group in this teaching case. Separate containment from disposition: containment prevents potentially affected material from being used or moved as accepted while the issue is evaluated, while disposition is the authorized decision about what happens to it. A useful exception report names the order, revision, unit identities, requirement, observed result, last conforming check, affected quantity, status, and person notified — without blame or premature cause statements.",
+      "example": "WO-206 has conforming records for units 1, 5, and 10. Unit 15 has one missing label, so units 11–15 — five units — are the initial review group and are placed on hold pending the quality lead's decision. The report quotes the required one-label-per-unit condition, records the observation at unit 15, names the last conforming check at unit 10, and states that the cause is unknown. It does not mark all five as defective, and it does not release units 11–14 merely because no failure was recorded for them. The handoff leaves the release decision explicitly with that lead, so no one downstream has to guess whether the hold is still open.",
+      "review": "Unit 15 fails and unit 10 was the last conforming check. Which units form the initial review group, and what status do they get?",
+      "diagram": [
+        "Check unit 1, then every fifth",
+        "Check after any lot change",
+        "Record identity + result",
+        "Failure? Group since last pass",
+        "Contain, then disposition"
+      ]
+    },
+    {
+      "number": 12,
+      "heading": "The assembly challenge: keep distinct decisions distinct",
+      "text": "The assembly challenge combines the first seven assembly lessons in one connected case: a fictional order, a document register, a BOM, inventory cards, and a short production record. Your task is to decide what can proceed under the exercise rules, what must wait, and what information the next person needs — without operating equipment or assembling a real product. Begin by reading the whole packet once, then review it in a consistent order: identity and revision, material suitability, quantities, required sequence, checks, and handoff status. That order reduces the chance that an attractive number, such as enough total stock, distracts from a more basic mismatch, and a separate open-issues list keeps unanswered questions visible. Do not collapse distinct decisions. A complete-kit calculation answers how many units the released materials support; it does not authorize a partial order. A completed simulation sequence shows the recorded steps occurred; it does not establish that a physical worker can safely perform the real task. A conforming inspection record supports a quality decision within its scope; it does not automatically provide release authority. When authorizations arrive, record them as new evidence at the point they become available, and never rewrite the original order to hide a shortage — the open balance stays visible until an authorized plan addresses it.",
+      "example": "The original order is 24 units, and 23 released caps limit the complete-kit count to 23. A revision conflict first prevents the start. After the correct instruction is supplied, the lead explicitly authorizes a 23-unit partial run. The run produces 23 virtual assemblies: 22 have the required checks recorded, and one has an incomplete label check and is on hold. The handoff states 23 produced, 22 eligible for designated release review, 1 held, and 1 still unproduced against the original order — preserving both the original requirement and the authorized partial action.",
+      "review": "A packet shows 23 produced and 22 with complete checks. How many are held, how many are outstanding, and why are those different categories?",
+      "diagram": [
+        "Read whole packet first",
+        "Check identity, then materials",
+        "Calculate kits, then sequence",
+        "Record each authorization",
+        "Reconcile all quantities"
+      ]
+    },
+    {
+      "number": 13,
+      "heading": "Quality begins with a defined requirement: build the inspection plan",
+      "text": "A product is not conforming merely because it looks familiar or took a long time to make. A quality decision compares evidence with an applicable requirement. For the fictional organizer, requirements include the correct product revision, specified component identities, a defined length interval, a readable label, and a complete traceability record — and the course examples do not establish specifications for any real item. A useful requirement is specific enough that two trained people reach the same conclusion from the same evidence: 'looks good' is incomplete, while 'the printed product code must match DSK-100-B and be readable without missing characters under the supplied viewing conditions' is observable. If a requirement is ambiguous, the responsible technical or commercial owner must clarify it before the plan treats it as an acceptance rule. Build the plan one row at a time with six fields: characteristic, governing document and revision, requirement, method, record, and response. The response states what happens if evidence is missing or the requirement is not met; a plan that lists a dimension but omits its unit or limits is not ready. Keep three steps separate: the inspector's observation, a recorded nonconformance, and the release decision — the designated quality lead owns exceptional disposition and release.",
+      "example": "An inspection row reads: characteristic = label identity; source = DSK-100 revision B, note 4; requirement = product code DSK-100-B and a readable lot code; method = compare the supplied digital label with the order; record = unit ID, observed code, and result; response = hold if either code is missing or mismatched. Unit U-12 reads DSK-100-A. Record the observed value and the mismatch. Do not merely write 'bad label,' and do not replace it without the exercise's rework authorization — the row's response, hold, is the decision the evidence supports.",
+      "review": "Which of the six plan fields does 'check length; should be okay; sign when done' fail to supply — name at least four?",
+      "diagram": [
+        "State requirement observably",
+        "Row: characteristic + source",
+        "Add method + record fields",
+        "Add response for failure",
+        "Observe, record, release apart"
+      ]
+    },
+    {
+      "number": 14,
+      "heading": "Measurements: value, unit, sign, and no invented precision",
+      "text": "A measurement needs a value and a unit. The entries 10.2, 10.20, and 10.200 have the same numerical value, but their presentation can imply different reporting conventions, while 10.02 and 10.20 differ by 0.18 — so align decimal points before subtracting or comparing, and write the unit with every result. Record the displayed value as observed, without adding unobserved digits: if a display reads 25.43 mm, do not record 25.43000 mm to make it appear more precise, and correct any transcription error with a visible explanation rather than silently overwriting history. Convert deliberately: one inch is exactly 25.4 millimeters, so multiply inches by 25.4 for millimeters or divide millimeters by 25.4 for inches. Conversion does not improve the underlying measurement, and a converted nominal does not create a new drawing revision or change a tolerance. Resolution — the smallest displayed increment — is only one part of the measurement system; it is not a guarantee that the displayed number is correct, because instrument condition, calibration, method, environment, and the part itself also matter. Record what was observed before calculating deviation: deviation is measured value minus nominal value, and its sign shows whether the reading is above or below nominal. A negative deviation is not automatically a failure — the specified limits govern.",
+      "example": "A simulated display reads 19.98 mm for a nominal 20.00 mm feature, so the deviation is 19.98 − 20.00 = −0.02 mm. A second display reads 20.08 mm, giving +0.08 mm. The first value is lower, but neither is judged solely by distance from nominal; the specified limits govern both. Separately, a nominal of 0.500 in converts to 0.500 × 25.4 = 12.7 mm. That exact conversion factor does not make a measured 0.500 in value free from uncertainty, and it does not change the controlling document. Both deviations keep their signs and units in the record, so the later limit comparison can be checked by another person.",
+      "review": "A reading is 9.98 mm against a 10.00 mm nominal. Give its signed deviation, and state whether that sign alone passes or fails it.",
+      "diagram": [
+        "Record value + unit as shown",
+        "Align decimals to compare",
+        "Convert: in × 25.4 = mm",
+        "Deviation = measured − nominal",
+        "Keep sign; limits decide"
+      ]
+    },
+    {
+      "number": 15,
+      "heading": "Instrument status and traceability: every condition must hold together",
+      "text": "Before recording a production result, confirm which instrument and method the inspection plan requires. The relevant questions — instrument identity, usable range, display increment, calibration status, condition, and any required reference check — work together: a current calibration label does not make a short-range instrument suitable for a longer feature, and a suitable range does not excuse a failed check. A routine reference check compares an indicated value with a known reference under a stated procedure. It can detect a problem requiring attention, but it is not necessarily a calibration and does not establish the instrument's performance across its whole range. In this exercise a 20.00 mm reference must indicate from 19.98 through 20.02 mm inclusive; an indication of 20.06 mm fails. Do not subtract the difference from later readings as an improvised correction, and do not adjust the instrument to make it pass — mark it unavailable and inform the designated owner. Use traceability language carefully: metrological traceability is a property of a measurement result supported by an established calibration chain and associated uncertainties, and a 'NIST traceable' label is not blanket NIST approval of a tool or supplier. If an instrument is found overdue after results were recorded, identify the instrument, affected records, and known time window for the review owner instead of silently changing a date or scrapping product.",
+      "example": "The exercise requires a 0–150 mm range, a 0.01 mm display increment, current calibration status, and a passing reference check. Instrument C-17 meets range and increment but its status is overdue, so it is not selected. C-19 is current but reads 20.06 mm on the 20.00 mm reference, outside the ±0.02 mm check limits, so it fails. C-18 meets all criteria and reads 20.01 mm, within limits. Select C-18 for the simulation and retain its ID with the results — the choice rests on the complete card, not the display increment alone.",
+      "review": "An instrument is in range and current but fails its reference check. What do you do — correct its readings, adjust it, or neither? Say which.",
+      "diagram": [
+        "Confirm instrument + method",
+        "Check range, increment, status",
+        "Run reference check",
+        "Fail? Mark unavailable, notify",
+        "Keep instrument ID on record"
+      ]
+    },
+    {
+      "number": 16,
+      "heading": "Limits and decision rules answer different questions",
+      "text": "The specification describes the required interval for a feature; the decision rule explains how measurement evidence is used to declare a result conforming, nonconforming, or unresolved. This lesson supplies two simplified rules so identical readings can be seen to produce different decisions. Rule A is an arithmetic exercise: accept a supplied reading when it is at least 99.80 mm and at most 100.20 mm, with boundaries inclusive. Preserve the original reading and apply the rule before any display formatting — a reading of 100.21 mm is outside, and rounding it to 100.2 before comparison would hide the mismatch. Rule B adds a fictional expanded interval of the reading plus or minus 0.03 mm: classify as conforming only when the entire interval lies within 99.80–100.20 mm, nonconforming only when the entire interval lies strictly outside on one side, and hold for review when the interval overlaps a limit. Learners are not calculating uncertainty from raw data here; the interval is supplied. Record the requirement, reading, unit, instrument, and applicable rule with every result, because 'pass' without those facts is difficult to review. Do not average readings to force a result inside the interval, and do not keep measuring until a favorable value appears.",
+      "example": "For 100.00 ± 0.20 mm, the limits are 99.80 and 100.20 mm. Reading 100.18 passes Rule A, but under Rule B its interval is 100.15–100.21 mm, which overlaps the upper limit, so it is held. Reading 100.17 gives 100.14–100.20 mm, entirely within the inclusive limits, so it is conforming under Rule B. Reading 100.25 gives 100.22–100.28 mm, entirely outside, so it is nonconforming. Reading 99.82 passes Rule A but its Rule B interval, 99.79–99.85 mm, overlaps the lower limit — another hold. The rule, not convenience, decides. Each classification is recorded beside its original reading and the rule applied, never beside a rounded substitute value.",
+      "review": "Reading 99.82 mm passes Rule A. Show its Rule B interval and give its Rule B classification in one sentence.",
+      "diagram": [
+        "Spec = required interval",
+        "Rule A: reading inside limits?",
+        "Rule B: build ±0.03 interval",
+        "Interval: in, out, or overlap",
+        "Record reading + rule used"
+      ]
+    },
+    {
+      "number": 17,
+      "heading": "Visual inspection needs a reference: zones, limits, and objective words",
+      "text": "Visual inspection compares an observed condition with an approved requirement. In this online lesson, written evidence cards stand in for product views; they develop classification and reporting skills but do not test visual acuity, lighting control, or physical technique, which an employer must supply with real reference samples and supervised practice. The fictional standard divides the organizer into two appearance zones: Zone A, the front display face, permits a superficial mark of at most 3.0 mm, while Zone B, the underside, permits at most 10.0 mm. Any reported crack, missing required component, or unreadable product or lot code creates a hold. Where a card does not establish the zone or mark length, the correct status is review, not an invented measurement. Evaluate identity and function before appearance: confirm the item and revision, then check structural observations, component completeness, label identity and readability, and appearance in the supplied order. Use objective descriptions — 'front face has a reported 4.0 mm superficial mark' preserves evidence, while 'ugly' does not, and 'crack reported at the upper edge' is an observation while 'dropped by the previous shift' is an unsupported cause. Count units and conditions separately: one unit with two conditions is one nonconforming unit but two defect occurrences.",
+      "example": "Unit V-04 has a readable correct code, all components, no reported crack, and a 4.0 mm superficial mark in Zone A. The Zone-A limit is 3.0 mm, so the appearance condition requires hold. Unit V-05 has the same 4.0 mm mark in Zone B, where the limit is 10.0 mm, and otherwise identical evidence, so it meets the supplied appearance limit. Unit V-06 has a mark of unknown length in an unspecified zone, so the record is review for insufficient evidence rather than a pass based on how small the image seems.",
+      "review": "A 4.0 mm mark holds in one zone and passes in the other. Name the zones and limits that make both answers correct.",
+      "diagram": [
+        "Confirm identity + revision",
+        "Check structure, parts, label",
+        "Then appearance by zone",
+        "Zone A ≤3.0 mm, Zone B ≤10.0",
+        "Missing evidence = review"
+      ]
+    },
+    {
+      "number": 18,
+      "heading": "Sampling: a defined lot decision, not an estimate of lot quality",
+      "text": "Acceptance sampling uses observations from a selected sample to support a decision about a lot under a prescribed plan. Its purpose is a lot-acceptance decision, not an exact estimate of the lot's quality: a passing sample does not prove every unexamined unit conforms, and a failing sample does not establish that every unit is defective. Real plans are selected by qualified personnel; this lesson supplies an invented plan so you can practice following its rules accurately, and its sample size and acceptance number must never be copied into production. Read every part of the plan: a lot of 200 units, eight stated unit IDs selected without replacement, at most one nonconforming sampled unit permitted for ordinary criteria, zero acceptance for a separately listed critical condition, and complete documentation required before the lot is eligible for release review. These conditions work together — a favorable count does not override a critical observation or missing traceability. The plan counts nonconforming units, not total defect occurrences, so one unit with two conditions counts once while both conditions stay in the record. Do not substitute easier-to-reach units or replace a failed sampled unit with a better one; if a selected unit is unavailable, record the problem and ask for direction. State outcomes precisely: 'the sample met the supplied count criterion,' never 'all 200 units are good.'",
+      "example": "Eight selected units contain one unit with both a label mismatch and an excessive appearance mark; the other seven meet the supplied criteria. The nonconforming-unit count is one, not two, because the plan counts units. With acceptance number one, no listed critical condition, and complete documentation, the lot meets the exercise's sample criterion and is eligible for designated release review. If two different units failed, the count would be two and the lot would be held. Neither outcome establishes the exact defect rate of all 200 units. The lot record preserves the plan, the selected IDs, every observation, and the tally behind that decision.",
+      "review": "One sampled unit in eight is nonconforming. Why does that not mean exactly 25 of the 200 units are defective?",
+      "diagram": [
+        "Read whole plan first",
+        "Inspect the stated sample IDs",
+        "Count nonconforming units",
+        "Apply critical gate separately",
+        "State lot decision precisely"
+      ]
+    },
+    {
+      "number": 19,
+      "heading": "Records that let another person reconstruct the decision",
+      "text": "An inspection record connects a requirement, an observation, and the identity of the item inspected. The minimum fields are order, product revision, unit or lot, characteristic, observed value and unit, applicable criterion, method or instrument ID when relevant, inspector identity, observation time, result, and unresolved action. The goal is a reliable chain of evidence, not a form filled with plausible-looking text. Keep two meanings of traceability apart: product traceability describes a product's history through material and processing records, while metrological traceability is the more specific concept about measurement results — a component lot record does not prove a dimensional result is metrologically traceable, and a calibration record does not show which cap lot was used. Preserve identity through changes: when a component lot changes mid-order, associate the affected unit range with the correct lot, and if the exact boundary is unknown, mark the uncertainty instead of assigning a convenient boundary. Use timestamps consistently, preserving both observation time and entry time when they differ, and never sign for a check you did not perform. Make corrections visible: retain the original value, corrected value, reason, author, and correction time. A blank field means missing information — 'not measured' is different from a measured zero, and 'not applicable' under a named plan is different from an empty cell. Finish with both a completeness check and a consistency check.",
+      "example": "The source display for U-13 reads 100.08 mm at 10:15. The entry made at 10:40 says U-31 and 100.80 mm. Reviewing the supplied display and unit card confirms two transcription errors. Retain the original entry, correct the unit to U-13 and the value to 100.08 mm, record 'transcription errors confirmed against source display and unit card,' and identify the correction author and time. Do not change the observation time to 10:40, and do not remove the original value without a correction trail — the trail is what makes the correction trustworthy.",
+      "review": "A record says 'pass' with no value and no instrument ID. Can it establish a dimensional pass — and which two checks catch the problem?",
+      "diagram": [
+        "Record requirement + result",
+        "Link unit, lot, instrument ID",
+        "Preserve observe vs entry time",
+        "Correct visibly, keep original",
+        "Check complete + consistent"
+      ]
+    },
+    {
+      "number": 20,
+      "heading": "Contain nonconforming material, then request a disposition",
+      "text": "A nonconformance is a failure to meet a stated requirement. When one is found, the immediate task is to preserve accurate identity and apply the employer's containment procedure so potentially affected material is not treated as accepted. Containment is provisional control while the situation is evaluated — identifying material, restricting its status, and notifying the designated owner. Disposition is the separate, authorized decision about next steps: rework, repair, return, use-as-is, and scrap are different decisions that may require different approvals, and an entry-level finding authorizes none of them automatically. Determine an initial scope from evidence: start with the failed unit and the relevant process or material history. If the concern is a specific cap lot, include every recorded unit associated with that lot, plus units with unresolved lot identity that could be affected, pending the quality owner's decision. Do not label every potentially affected unit defective — the reason for hold may be uncertainty rather than a demonstrated failure. A containment record identifies the requirement, the observed nonconformance, the affected and potentially affected unit lists, quantity, current location or status, action taken, notification, and unresolved decision, separating known facts from hypotheses. A hold stays open until the authorized decision and any required verification are recorded; a verbal 'probably fine' does not close it.",
+      "example": "A cap-revision concern is confirmed in lot C-102. The traveler links C-102 to four units, U-05 through U-08, while U-09 and U-10 have unresolved cap identities. The initial review list therefore contains six units: four associated and two potentially associated, recorded as held pending review with the association basis stated separately. The packet does not call all six proven defective. It asks the quality lead to determine scope, inspection or disposition instructions, and release authority, while U-01 through U-04 keep their normal inspection and release requirements. Units U-01 through U-04 remain outside this lot-based scope, but their normal evidence must still be complete before any release review.",
+      "review": "Six units are held but only one cap was confirmed mismatched. Write the hold reason in one sentence that stays true to that evidence.",
+      "diagram": [
+        "Identify the nonconformance",
+        "Contain: restrict + notify",
+        "List associated units",
+        "Add unresolved-identity units",
+        "Request authorized disposition"
+      ]
+    },
+    {
+      "number": 21,
+      "heading": "Control limits monitor the process; specifications judge the product",
+      "text": "Product acceptance and process monitoring are different questions. Specification limits describe the product requirement, while control-chart limits are derived for monitoring process behavior under a particular statistical method, and the two sets of lines must never be substituted for one another. A result can sit within the product specification and still trigger a process-monitoring signal; conversely, a consistent process can be centered badly enough to produce unacceptable output. This lesson supplies a fictional chart with center line 100.00 mm, lower control limit 99.90 mm, and upper control limit 100.10 mm, while the product specification is wider at 99.80–100.20 mm. The exercise's only scored signal rule is a single point strictly outside a control limit; learners do not derive production control limits from this small dataset. Preserve the sequence: plot measurements in the order collected, because sorting by size would destroy the time pattern the chart exists to show. For each point ask two separate questions — does it meet the product criterion, and does it trigger the monitoring rule — and write both answers. A signal is a reason to follow the reaction plan and investigate, not a license to discard the point or adjust the process. A dozen points also cannot validate a real process or support a capability claim, so state the rule used and the limits of the conclusion.",
+      "example": "Observation 7 is 100.12 mm. It is below the 100.20 mm product upper limit, so it meets the simplified product interval. It is above the 100.10 mm control limit, so it triggers the supplied monitoring rule. The correct report states both facts and invokes the fictional reaction plan: preserve the chart and refer the signal and further release decisions to the quality lead. It does not call 100.12 a product failure because it crossed a control limit, and it does not dismiss the signal because the product interval is wider.",
+      "review": "A point at 100.12 mm triggers a signal but is not a product failure. Explain in one sentence which limit each half of that sentence uses.",
+      "diagram": [
+        "Plot in time order",
+        "Draw spec + control lines",
+        "Test point vs specification",
+        "Test point vs control limits",
+        "Signal? Preserve + report"
+      ]
+    },
+    {
+      "number": 22,
+      "heading": "Investigate with evidence: problem, hypotheses, then a verified improvement",
+      "text": "State the problem before explaining it. A useful problem statement names what happened, where, when, and how much, along with the requirement involved: 'eight of 100 reviewed units had revision-A labels on revision-B orders during the supplied Tuesday shift' is specific, while 'people are careless' identifies no testable cause. Separate observations from hypotheses. That revision-A and revision-B labels were stored in adjacent open trays is an observation; that the adjacent trays caused every wrong-label event is a hypothesis, alongside others such as an outdated work instruction, a printing-system issue, or an incorrect order field. For each hypothesis, identify what evidence would support or weaken it before choosing a correction. A cause-and-effect table organized by material, method, equipment, people and training, environment, and measurement prompts investigation without assigning blame — and if a worker used the instruction they were given, telling them to be more careful leaves the document problem unchanged. Use counts honestly: rank categories and calculate each share of the total occurrences, remembering that frequency alone does not determine severity. Test any proposed improvement only under approval, defining the change, observation period, number of opportunities, and success measure in advance. A small pilot with no failures is encouraging evidence for those opportunities, not proof the error can never recur.",
+      "example": "A 20-occurrence tally lists label errors 8, missing pins 6, appearance marks 4, and traceability entries 2. The shares are 8/20 = 40%, 30%, 20%, and 10%, with cumulative shares of 40%, 70%, 90%, and 100% — label errors are 40%, not 80%. The record also shows adjacent open label trays, so the proposal is a controlled digital revision check plus separate identified storage, for technical review. A pilot of ten orders produces zero label mismatches: report 0/10 for that pilot and request continued monitoring rather than claiming a permanent 100% reduction.",
+      "review": "Adjacent trays are observed next to eight wrong labels. Is 'the trays caused the errors' an observation or a hypothesis — and what would test it?",
+      "diagram": [
+        "State problem factually",
+        "List hypotheses, not blame",
+        "Name evidence for each",
+        "Rank counts, calculate shares",
+        "Pilot under approval, verify"
+      ]
+    },
+    {
+      "number": 23,
+      "heading": "Yield, rework, scrap, and held: define the measure before calculating",
+      "text": "Quality metrics are useful only when their definitions and denominators are clear. In this lesson, first-pass yield means units accepted at their first completed inspection divided by units entering the defined process. Final accepted yield means units accepted after any authorized rework and verification divided by the same starting quantity at the stated reporting time. An employer's system may define these differently, so name the definition you used. A held unit is not accepted at the reporting time — it may later be accepted, reworked, returned, or scrapped after an authorized decision — so preserve the reporting cutoff and treat every result as a snapshot, not a trend. Rework is an event, not always a final category: units that pass after rework are already inside the final accepted count, and adding them again double-counts the same units. Reconcile before presenting any percentage: mutually exclusive final statuses must sum to the starting quantity, and a polished chart cannot fix missing units. Defect occurrences are a distinct measure too, because one unit can carry several defects, so an occurrence count can exceed the number of nonconforming units. Connect each metric to a next question — is rework rising, are held units awaiting a document decision — rather than using it to hide a failure or relabel held work.",
+      "example": "For 100 starting units, 80 pass initially, 12 pass after authorized rework, 3 are scrapped, and 5 remain held. First-pass yield is 80/100 = 80%. Final accepted yield is (80 + 12)/100 = 92%. Rework incidence is 12%, scrap fraction is 3%, and held fraction is 5%. The final-status check is 92 + 3 + 5 = 100. The sum 92 + 12 + 3 + 5 = 112 is wrong because the 12 reworked-and-accepted units are counted twice — once inside the 92 and again as their own category.",
+      "review": "A report totals 135 outcomes from 120 starting units. Before checking any percentage, what reconciliation tells you it must be wrong?",
+      "diagram": [
+        "Define measure + denominator",
+        "First-pass ÷ starting units",
+        "Final = all accepts ÷ start",
+        "Rework is an event",
+        "Statuses must sum to start"
+      ]
+    },
+    {
+      "number": 24,
+      "heading": "The quality capstone: assemble the evidence before deciding",
+      "text": "The quality capstone is a connected fictional case combining a work order, a revision-controlled requirement sheet, instrument-status cards, dimensional and appearance results, component-lot associations, and a final count summary. Your task is to prepare a defensible review packet: what the evidence supports, what remains unresolved, and who must decide the next action. The online result does not qualify you to release real product or inspect independently for an employer. Work in a deliberate order: first confirm product and document identity, next confirm that the measurement evidence meets the exercise's instrument and method conditions, then compare results with the stated requirements, preserve component associations, identify missing evidence, and finally reconcile quantities and prepare the handoff. That sequence keeps a favorable numerical reading from distracting you from a missing unit identity or an invalid instrument status. Keep decision scope visible: a unit can meet its dimensional interval while failing its label requirement, or meet both and still lack traceability evidence, so separate 'eligible for release review' from 'released' in every table and summary. The packet has six parts — requirement matrix, instrument review, inspection decisions, traceability table, containment list, and quantity reconciliation — and each conclusion should point to its source record so a reviewer can answer 'why is this unit held?' without searching a narrative. List what an employer must still observe in supervised practice before independent work.",
+      "example": "A 10-unit order has four units with complete evidence outside the specific cap-lot concern, four units recorded to the affected cap lot, and two units with unresolved cap lots. The initial review list contains six units: the four associated plus the two unresolved. The other four are eligible for normal release review only if their remaining required evidence is complete — they are not automatically released by being excluded from the lot concern. The capstone packet lists the six units with their reasons, preserves the full 10-unit reconciliation, and asks the quality lead for the scope and disposition decision.",
+      "review": "In the capstone, why are the four units outside the lot concern 'eligible for release review' rather than 'released'?",
+      "diagram": [
+        "Confirm identity + revisions",
+        "Verify instrument status",
+        "Judge each unit vs requirement",
+        "Contain + reconcile all units",
+        "Hand off to deciding role"
+      ]
+    }
+  ]
+}

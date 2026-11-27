@@ -28,6 +28,22 @@ test('the actual required-gate script accepts only a completely successful diagn
   }
 });
 
+
+test('pending exact-head browser evidence exits normally before the CI job timeout so the completion finalizer can retry', () => {
+  const step = gate.split('      - name: Require completed exact-head browser acceptance for pull requests\n')[1];
+  assert.ok(step, 'The required exact-head browser receipt must remain present');
+  assert.match(step, /^\s+E2E_EVIDENCE_TIMEOUT_MS:\s*'0'\s*$/m, 'Use a single evidence check; the trusted completion finalizer handles pending browsers');
+  assert.match(step, /^\s+run: node scripts\/ci\/require-exact-pr-browser-evidence\.mjs\s*$/m);
+});
+
+test('browser completion reconciliation is isolated by source repository, branch and exact head', () => {
+  const finalizer = readFileSync(new URL('../.github/workflows/resume-ci-browser-gate.yml', import.meta.url), 'utf8');
+  const group = finalizer.match(/^  group: (.+)$/m)?.[1];
+  assert.equal(group, 'browser-ci-receipt-${{ github.repository }}-${{ github.event.workflow_run.head_repository.id }}-${{ github.event.workflow_run.head_branch }}-${{ github.event.workflow_run.head_sha }}');
+  assert.match(finalizer, /^  cancel-in-progress: false$/m);
+  assert.match(finalizer, /ref: \$\{\{ github\.sha \}\}/, 'Privileged finalizer must keep executing trusted main');
+});
+
 const browserWorkflow = load(readFileSync(new URL('../.github/workflows/e2e-desktop-chrome.yml', import.meta.url), 'utf8'));
 const browserGate = browserWorkflow.jobs['desktop-chrome'];
 
@@ -81,7 +97,7 @@ test('cancelled browser workflows or skipped aggregates cannot certify the curre
     path: '.github/workflows/e2e-desktop-chrome.yml', event: 'pull_request',
     status: 'completed', conclusion: 'success',
   };
-  const jobs = [browserGate.name, 'Public Host Shop navigation and application (five devices)', 'Email device browsers']
+  const jobs = [browserGate.name, ...[1, 2, 3, 4].map(n => `E2E desktop-chrome shard ${n}/4`), 'Public Host Shop navigation and application (five devices)', 'Email device browsers']
     .map(name => ({ name, status: 'completed', conclusion: 'success' }));
   const evidence = { runs: [run], jobs, sourceRepository, headSha, headBranch };
   assert.equal(inspectExactPrBrowserEvidence(evidence).state, 'verified');

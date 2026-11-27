@@ -13,7 +13,7 @@ const jobs = [...expected.map(name => ({ name, status: 'completed', conclusion: 
     { name: 'Require completed exact-head browser acceptance for pull requests', conclusion: 'failure' },
   ],
 }];
-const browserJobs = ['E2E desktop-chrome', 'Public Host Shop navigation and application (five devices)', 'Email device browsers'].map(name => ({ name, status: 'completed', conclusion: 'success' }));
+const browserJobs = ['E2E desktop-chrome', ...[1, 2, 3, 4].map(n => `E2E desktop-chrome shard ${n}/4`), 'Public Host Shop navigation and application (five devices)', 'Email device browsers'].map(name => ({ name, status: 'completed', conclusion: 'success' }));
 function harness(changes = {}, eventId = 200) {
   const posts = [], reads = [];
   const request = async (url, options = {}) => {

@@ -344,12 +344,15 @@ async function certify(
   for (const path of paths) {
     await test.step(`${testInfo.project.name}: ${path}`, async () => {
       await assertResponsivePage(page, path);
-      // Studio owns a distinct installable app. Verify each destination's
-      // manifest, including Admin before navigating into the Studio workspace.
+      // Studio and Phone own distinct installable apps. Verify each
+      // destination's manifest, including Admin before navigating into
+      // the Studio workspace or the standalone Elevate Phone app.
       const destination = new URL(path, BASE);
       const expectedManifest = destination.origin === ADMIN_BASE && destination.pathname === '/studio'
         ? '/manifest-dev-studio.json'
-        : manifestPath;
+        : destination.origin === ADMIN_BASE && destination.pathname === '/phone'
+          ? '/manifest-phone.json'
+          : manifestPath;
       await expect(
         page.locator('link[rel="manifest"]'),
         `${role} loaded the wrong PWA manifest at ${destination.pathname}`,

@@ -21,6 +21,7 @@ type InstallableApp = {
 const LMS_ORIGIN = process.env.NEXT_PUBLIC_APP_URL || 'https://app.elevateforhumanity.org';
 const apps: readonly InstallableApp[] = [
   { name: 'Admin', description: 'Administrative operations and Dev Studio', manageHref: '/dashboard', installHref: '/install', local: true },
+  { name: 'Elevate Phone', description: 'Calls, voicemail, texts and video meetings on (463) 240-1404.', manageHref: '/phone/dial-pad', manageLabel: 'Open app', installHref: '/install/phone.html', local: false },
   { name: 'PARIS', description: 'Open the signed-in PARIS assistant and install it from the browser menu.', manageHref: '/paris', manageLabel: 'Open app', installHref: '/paris', local: false },
   { name: 'Student / Learner', description: 'Select a real learner for an audited dashboard preview.', manageHref: '/students', installHref: `${LMS_ORIGIN}/install/learner`, local: false },
   { name: 'Apprentice', description: 'Select an enrolled apprentice before opening hours, RTI, and progress.', manageHref: '/students', installHref: `${LMS_ORIGIN}/install/apprentice`, local: false },

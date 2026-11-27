@@ -44,7 +44,11 @@ const config = {
     appDir: 'apps/admin',
     worker: 'sw-admin.js',
     cachePrefix: 'elevate-admin-',
-    files: ['sw-admin.js', 'manifest-admin.json', 'sw-mail.js', 'manifest-mail.json', 'offline.html'],
+    // sw-phone.js + manifest-phone.json belong to the Elevate Phone app,
+    // which the Admin service hosts under /phone/. They ride the admin sync
+    // so the build's PWA cleanup cannot delete them; the phone worker is
+    // never stamped (see stamp-sw.mjs), so Admin releases do not churn it.
+    files: ['sw-admin.js', 'manifest-admin.json', 'sw-mail.js', 'manifest-mail.json', 'offline.html', 'sw-phone.js', 'manifest-phone.json'],
     extraWorkers: [{ file: 'sw-mail.js', cachePrefix: 'elevate-mail-' }],
   },
 };

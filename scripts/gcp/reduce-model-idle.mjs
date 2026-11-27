@@ -5,7 +5,7 @@ import {acceptOwnedCpuModel} from './accept-owned-cpu-model.mjs';
 const name='elevate-owned-cpu-llm';
 function valid(state){
  const c=state.spec?.template?.spec?.containers?.[0],traffic=state.status?.traffic?.filter(x=>x.percent>0)||[];
- return state.metadata?.name===name&&c?.resources?.limits?.cpu==='4'&&c?.resources?.limits?.memory==='8Gi'&&
+ return state.metadata?.name===name&&c?.resources?.limits?.cpu==='8'&&c?.resources?.limits?.memory==='16Gi'&&
   new RegExp('^us-central1-docker\\.pkg\\.dev/'+PROJECT+'/elevate/owned-cpu-llm@sha256:[a-f0-9]{64}$').test(c?.image||'')&&
   (state.spec?.template?.metadata?.annotations?.['autoscaling.knative.dev/minScale']||'0')==='0'&&
   state.status?.conditions?.some(x=>x.type==='Ready'&&x.status==='True')&&traffic.length===1&&traffic[0].percent===100&&
@@ -24,7 +24,7 @@ export async function reduceModelIdle({read,update,accept}){
     after.status.latestReadyRevisionName!==before.status.latestReadyRevisionName||
     (after.metadata?.annotations?.['run.googleapis.com/minScale']||'0')!=='0')throw Error('MODEL_IDLE_READBACK_FAILED');
   if((await accept(after.status.url))?.passed!==true)throw Error('MODEL_IDLE_POST_CHANGE_ACCEPTANCE_FAILED');
-  return {service:name,minimumInstances:0,previousMinimumInstances:1,removedReservedCpu:4,removedReservedMemoryGiB:8,imageUnchanged:true,functionalAcceptance:true,coldStartLatencyMeasured:false,policy:'wake on request; no in-flight work is force-stopped'};
+  return {service:name,minimumInstances:0,previousMinimumInstances:1,removedReservedCpu:8,removedReservedMemoryGiB:16,imageUnchanged:true,functionalAcceptance:true,coldStartLatencyMeasured:false,policy:'wake on request; no in-flight work is force-stopped'};
  }catch(error){
   const current=read();
   if(JSON.stringify(current.spec)===JSON.stringify(before.spec)&&current.status.latestReadyRevisionName===before.status.latestReadyRevisionName){

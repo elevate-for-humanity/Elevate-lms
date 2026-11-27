@@ -1,0 +1,257 @@
+{
+ "chapters": [
+  {
+   "diagram": [
+    "Start: accounting basics",
+    "Assets + sales",
+    "Liabilities + purchases",
+    "Reconcile + statements",
+    "Month-end practice file"
+   ],
+   "example": "A customer is invoiced $750 for services. The sale entry is: debit Accounts Receivable $750, credit Service Revenue $750 — debits equal credits, and revenue is recorded once, when the work is done. When the customer later pays, the collection entry is: debit Cash $750, credit Accounts Receivable $750. Follow the paper trail: the invoice created the receivable, the deposit settles it, and the bank statement later confirms the cash arrived. Both the invoice and the payment record stay in the folder, because together they prove the full story — but the payment is never entered as a second $750 sale, or revenue would be counted twice.",
+   "heading": "Four domains, one traceable practice folder",
+   "number": 1,
+   "review": "If a customer pays an invoice you issued last week, why do you keep both documents yet record the sale only once?",
+   "text": "This course prepares you to apply bookkeeping principles across the four Intuit Certified Bookkeeping Professional objective domains. It is an independent Elevate course: it is not the separate QuickBooks software credential, and completing it does not guarantee an exam result or official certification. Work the domains in order — accounting basics first, then assets and sales, then liabilities and purchases, and finally reconciliation and financial statements — because each later topic leans on the ones before it. Keep your practice records as you go, organized the way a real bookkeeper's file is organized: source documents, journals, ledgers, reconciliation workpapers, and statements. Each kind of record answers a different question. A customer invoice is evidence that a sale was made and a receivable created; a later payment record shows that receivable being settled; a bank statement is the bank's independent record of what actually cleared. Use the glossary, captions, and written explanations alongside each instructional film, and when a term is unfamiliar, look it up and retry the worked example before moving on. Your evidence of readiness is twofold: a final practice assessment across all four domains, and a practical month-end file of traceable records. No quiz score replaces that practical evidence."
+  },
+  {
+   "diagram": [
+    "Classify the item first",
+    "Record the event",
+    "Check A = L + E",
+    "Pick the right statement"
+   ],
+   "example": "Start with assets of $10,000, liabilities of $4,000, and equity of $6,000 — the equation balances. The owner contributes $1,000 cash: assets rise to $11,000 and equity rises to $7,000, and the equation still balances ($11,000 = $4,000 + $7,000). The business then pays a $400 operating expense in cash: assets fall to $10,600 and equity falls to $6,600 ($10,600 = $4,000 + $6,600). Notice what did not happen: the $1,000 contribution never appeared as revenue on the income statement, because money the owner puts in is equity, not sales. Only the $400 expense touches the period's profit.",
+   "heading": "The bookkeeper's duty and the equation that must always balance",
+   "number": 2,
+   "review": "A business borrows $5,000 and the owner invests $2,000 in the same week. How much revenue has it earned, and what did each inflow actually increase?",
+   "text": "A bookkeeper records supported business events, protects confidential records, and reports discrepancies instead of changing records to reach a desired result. Keep source documents and an audit trail for everything you enter. Keep the business separate from the owner: personal spending is not a business transaction. When evidence is incomplete, ask for clarification and document the issue — never invent a receipt, conceal an error, or promise a result outside your authority. The structure underneath every entry is the accounting equation. Assets are resources the business controls; liabilities are obligations to others; equity is the residual interest, assets minus liabilities. Every recorded event must preserve Assets = Liabilities + Equity. Revenue generally increases equity through profit, and expenses reduce profit and equity, while owner contributions and drawings change equity without becoming operating revenue or expense. Each statement answers a different question: the balance sheet describes financial position at a date, the income statement reports revenue and expenses over a period, the statement of equity explains changes in owner interests, and the cash-flow statement explains cash movements. Finally, profit is not cash — a credit sale can raise profit before any money arrives."
+  },
+  {
+   "diagram": [
+    "Analyze the source document",
+    "Name accounts + direction",
+    "Journal: debits = credits",
+    "Post to the ledger",
+    "Trial balance check"
+   ],
+   "example": "Three entries, each balanced. Buy supplies for $600 cash: debit Supplies $600, credit Cash $600. Provide $950 of services on account: debit Accounts Receivable $950, credit Service Revenue $950. Collect $400 of that invoice: debit Cash $400, credit Accounts Receivable $400. Now read the receivable's T-account: debits of $950, credits of $400, leaving a $550 debit balance — exactly the unpaid portion of the invoice. Trace every amount from its source document to the journal and then to the ledger; that trace is what lets a reviewer confirm the $550 is real and still owed.",
+   "heading": "Debits on the left, credits on the right: journal to ledger",
+   "number": 3,
+   "review": "A trial balance totals agree exactly. Name two kinds of error it could still be hiding, and explain why each one slips through.",
+   "text": "A debit is simply the left side of an account and a credit the right side — the words do not mean good, bad, increase, or decrease by themselves. Whether a debit increases an account depends on the account type. Assets, expenses, and owner drawings normally increase with debits. Liabilities, equity, and revenue normally increase with credits. Contra accounts are the exception to remember: they carry balances opposite the account they relate to. Every journal entry must have equal total debits and credits, though an entry may have more than two lines. Analyze before you enter: identify the source document, the date, the accounts affected, their types, and the direction each one changes. The journal records entries chronologically; posting then transfers each amount into its account in the general ledger. A T-account is the same left-and-right logic drawn simply for learning. Software automates the posting step, but it cannot decide whether you classified the transaction correctly — that judgment is yours. A trial balance lists the ledger balances and compares debit and credit totals. Equal totals are a useful arithmetic control, not proof of correctness: an omitted transaction or the wrong expense account can leave it perfectly in balance."
+  },
+  {
+   "diagram": [
+    "Documents → journal → post",
+    "Unadjusted trial balance",
+    "Adjust for the period",
+    "Adjusted trial balance",
+    "Statements, then closing"
+   ],
+   "example": "A business pays $2,400 for twelve months of rent at the start of January, recorded as Prepaid Rent. By January 31 one month has expired: debit Rent Expense $200, credit Prepaid Rent $200, leaving $2,200 of the prepayment still an asset. Separately, employees have earned $300 not yet paid: debit Wages Expense $300, credit Wages Payable $300. Together the two adjustments reduce January profit and ending equity by $500, yet January cash does not move again — the rent cash left in January's original payment, and the wages cash has not left yet. That is the point of adjusting: profit follows the period the cost belongs to, not the payment date.",
+   "heading": "The accounting cycle and the adjustments that fix the period",
+   "number": 4,
+   "review": "An omitted accrued-expense adjustment overstates profit. Which balance-sheet side is also wrong, and in which direction?",
+   "text": "The accounting cycle runs in a fixed order: source documents and transaction analysis, journal entries, posting, an unadjusted trial balance, adjustments, an adjusted trial balance, financial statements, and closing entries — with supporting schedules reconciled along the way. Closing resets the temporary accounts — revenue, expenses, and drawings — so the next period starts fresh, while asset, liability, and continuing equity accounts carry their balances forward. Adjustments exist because cash timing and economic reality rarely match. Their job is to put earned revenue and incurred expenses into the correct period. The common categories are accrued revenue, accrued expenses, expired prepayments, the earned portion of customer advances, supplies used, and depreciation. An adjustment usually touches one income-statement account and one balance-sheet account, and it needs evidence, an identified period, and a clear explanation. Statements are then prepared from the adjusted balances. Skip an expense adjustment and the damage is predictable: current profit is overstated, and typically an asset is overstated or a liability understated as well. Reversing entries, when a business uses them, only simplify later processing — they never excuse omitting the original adjustment."
+  },
+  {
+   "diagram": [
+    "Confirm the entity + period",
+    "Is there a measurable event?",
+    "Earned / incurred, or paid?",
+    "Apply the basis consistently",
+    "Keep the evidence trail"
+   ],
+   "example": "Services worth $1,800 are completed in June but paid in July. The June accrual entry is: debit Accounts Receivable $1,800, credit Revenue $1,800; the July collection simply reduces the receivable. On a simple cash basis, that same revenue would instead appear in July, when the money arrives. June utilities of $150, paid in July, are a June accrual expense with a matching payable. So June's accrual profit from these events is $1,800 − $150 = $1,650, while June's cash movement from them is exactly zero — a clean demonstration that profit and cash keep different calendars.",
+   "heading": "Principles first: what gets recorded, when, and on which basis",
+   "number": 5,
+   "review": "A customer advance and a completed-but-unpaid job both involve $600. Which one is June revenue under accrual accounting, and what is the other one until the work is done?",
+   "text": "Bookkeeping rests on a few working principles. Records describe one defined business entity, measured in money, over defined reporting periods. Methods are applied consistently, and every entry keeps enough evidence for another reviewer to understand it. Not everything that might happen is recorded: a financial transaction requires a measurable event affecting the business, so an unsigned sales possibility or a budget estimate is not earned revenue. Timing is where the two bases part. Under accrual accounting you record revenue when earned and expenses when incurred. Under cash-basis accounting, receipts and payments drive recognition. But neither basis turns every cash receipt into revenue or every payment into an expense — borrowing, owner contributions, loan principal, and asset purchases always need their own classification. Learn to separate an expense consumed in the current period from an asset that still holds future benefit, such as a prepayment. Never choose or switch a method merely to change reported profit. Identify the reporting basis the business is required to use, and refer uncertain policy or tax questions to the responsible accountant; this course teaches classification and timing, not eligibility for a particular tax method."
+  },
+  {
+   "diagram": [
+    "Invoice: receivable + revenue",
+    "Collect: cash replaces it",
+    "Credit memo: document it",
+    "Age + reconcile balances",
+    "Write off against allowance"
+   ],
+   "example": "An invoice for $2,000 is issued, and the customer pays $1,200: the balance due falls to $800. A documented $100 credit memo then reduces the balance to $700 and reduces the relevant revenue or returns balance. Separately, a $150 receivable is confirmed uncollectible and written off against the existing allowance: debit Allowance for Doubtful Accounts $150, credit Accounts Receivable $150 — debits equal credits. Note what the write-off did not do: no cash left the business, and no new bad-debt expense appeared, because that expense was already estimated when the allowance was built.",
+   "heading": "Receivables: sell on credit, collect, credit, and write off — in that order",
+   "number": 6,
+   "review": "Why does writing a receivable off against the allowance record no new expense — and where was that expense recognized instead?",
+   "text": "Assets normally carry debit balances, but they are not all alike. Current assets are expected to be used or converted within the operating cycle or the applicable short-term classification period; long-term assets serve beyond it. Cash, receivables, and inventory behave very differently from equipment, so support each asset balance with a subsidiary record or source evidence. An accrual credit sale increases Accounts Receivable and Revenue. The later collection swaps the receivable for cash and creates no second sale. When something reduces what a customer owes — a credit memo, a refund, or a sales discount — document it and record the reduction in the applicable accounts rather than quietly editing the invoice. Reconcile the individual customer balances to the receivables control account, and review the aging schedule to spot collection problems early. A note receivable is a documented lending arrangement that may earn interest; keep principal and earned interest separate. Some receivables will never be collected. Under the allowance approach, estimated bad-debt expense and a contra-asset allowance reflect expected losses as they are estimated, and a later write-off reduces both the allowance and the customer's receivable. Follow the organization's approved policy — a late payment alone is not permission to write a debt off."
+  },
+  {
+   "diagram": [
+    "Record purchases at cost",
+    "Choose the cost-flow method",
+    "Sale: revenue + COGS",
+    "Count + reconcile",
+    "Adjust only with evidence"
+   ],
+   "example": "Buy 10 units at $5 and 10 more at $7: total cost is $50 + $70 = $120 for 20 units. Sell 12 units. Under FIFO, cost of goods sold takes the earliest costs first: 10 × $5 + 2 × $7 = $64, leaving ending inventory of 8 × $7 = $56. Under weighted average, the unit cost is $120 ÷ 20 = $6, so cost of goods sold is 12 × $6 = $72 and ending inventory is 8 × $6 = $48. Both methods account for the full $120 — they only split it differently between expense and asset, which is why gross profit differs at the same selling price.",
+   "heading": "Inventory: what was sold is an expense, what remains is an asset",
+   "number": 7,
+   "review": "Two methods split the same $120 of cost differently between expense and ending inventory. Why must the two parts always add back to $120?",
+   "text": "Merchandise inventory is goods held for sale — keep it distinct from equipment the business uses to operate. When goods are sold, two things are recognized separately: the sale itself, and the cost of the goods sold. Cost of Goods Sold reduces gross profit, while inventory still on hand remains an asset on the balance sheet. Freight and similar costs are classified under the applicable policy rather than by habit. When identical units were bought at different prices, a cost-flow assumption decides which recorded costs leave with the sale. FIFO assigns the earliest costs to goods sold. Weighted average assigns a calculated average cost per unit. Specific identification traces the actual items. A cost-flow method is an accounting assumption — it need not describe which box physically left the shelf — but it must be applied consistently, comparing the same units, purchase costs, and rounding. Finally, reconcile the inventory records to a physical count. Investigate missing, damaged, or obsolete items, cutoff errors, and unrecorded receipts; record authorized adjustments with an explanation and keep the count sheets. Never force a count to match a desired profit figure."
+  },
+  {
+   "diagram": [
+    "Capitalize the cost",
+    "Cost − residual value",
+    "Divide by useful life",
+    "Expense + contra asset",
+    "Carrying amount reported"
+   ],
+   "example": "Equipment costs $8,000, with a $800 residual estimate and a six-year useful life. Annual straight-line depreciation is ($8,000 − $800) ÷ 6 = $1,200, or $100 per month under an equal-full-months policy: debit Depreciation Expense $100, credit Accumulated Depreciation $100. After two full years, accumulated depreciation is $2,400, the asset account still shows the original $8,000 cost, and the carrying amount is $8,000 − $2,400 = $5,600. Profit fell by $1,200 each year, yet no cash was spent in those years — the cash left once, on the day the equipment was bought.",
+   "heading": "Depreciation: spreading an asset's cost across the periods it serves",
+   "number": 8,
+   "review": "Accumulated depreciation grows every year, but it is not a fund of cash saved for a replacement. What is it, and where does it sit in the accounts?",
+   "text": "A long-lived asset supplies benefits across more than one reporting period, so its capitalized cost is allocated over its useful life through depreciation. Understand what depreciation is not: it is not a bank payment, and it is not a direct estimate of market value. Land is normally considered separately from depreciable improvements and equipment. For straight-line depreciation — the method used throughout this course — subtract the estimated residual value from the asset's cost and divide by its useful life. Keep an asset register for every item: cost, acquisition and in-service dates, useful life, residual estimate, method, and accumulated depreciation. If an estimate changes, that change follows the organization's accounting policy with documented review, and a tax deduction rule is never substituted for financial-book depreciation without approval. The entry itself credits accumulated depreciation, a contra asset, rather than the asset account directly. Gross cost therefore stays visible in the asset account while accumulated depreciation reduces the carrying amount. Depreciation expense appears on the income statement; the net carrying amount appears on the balance sheet. On sale or disposal, both the cost and its related accumulated depreciation come off the books."
+  },
+  {
+   "diagram": [
+    "Sort: exchange or income?",
+    "Entry for each part",
+    "Map to the equation",
+    "Profit = revenue − cost",
+    "Collections add no revenue"
+   ],
+   "example": "Inventory that cost $240 is sold on account for $400. Part one: debit Accounts Receivable $400, credit Sales $400. Part two: debit Cost of Goods Sold $240, credit Inventory $240. Follow the equation: receivables rise $400 while inventory falls $240, so total assets increase $160 — and equity increases $160, exactly the gross profit of $400 − $240. If the sale had been for cash, the $400 debit would land in Cash instead of Receivables, with the same profit. When the customer pays later, cash replaces the receivable and profit does not change again.",
+   "heading": "Sorting events: asset exchanges change nothing, income events change equity",
+   "number": 9,
+   "review": "Buying $2,000 of equipment for cash and selling goods for $2,000 both move assets. Why does only one of them change equity?",
+   "text": "Use a transaction-effect matrix to connect every entry to financial position and profit, and start by sorting events into two families. Asset exchanges rearrange what the business holds without earning anything: buying equipment for cash swaps one asset for another, and total assets and equity do not move. Buying on credit is different — assets and liabilities rise together. Borrowing raises cash and debt; it is not a sale. Income-generating events are the ones that change equity through profit. A merchandise sale in a perpetual inventory system has two parts: record the cash or receivable and the sales revenue, then recognize cost of goods sold and reduce inventory. The profit effect is the revenue minus the related cost and other period expenses. A later collection of that invoice only changes the asset mix — no new revenue. Other asset events need the same care: investing cash in a note, collecting principal, recognizing interest earned, prepaying an expense, and using supplies previously purchased. In each case ask what has actually been earned or consumed before deciding the equity effect. A balanced entry can still be the wrong entry, so support the classification with the underlying event."
+  },
+  {
+   "diagram": [
+    "Match invoice to receiving",
+    "Asset, or expense consumed?",
+    "Record the payable",
+    "Returns reduce the payable",
+    "Payment clears it — once"
+   ],
+   "example": "Inventory costing $950 arrives on credit: debit Inventory $950, credit Accounts Payable $950. Goods worth $150 are returned under an approved vendor credit: debit Accounts Payable $150, credit Inventory $150, bringing the amount owed to $800. Paying the balance: debit Accounts Payable $800, credit Cash $800. End state: inventory up $800 net, cash down $800, supplier balance zero — and no expense anywhere, because none of the goods have been sold yet. The cost becomes an expense later, as cost of goods sold, only when the goods actually sell. Until then it sits in inventory on the balance sheet, and the vendor ledger tells the same story line by line: invoice in, return out, payment clearing the balance to zero.",
+   "heading": "Payables: record the obligation once, then let payment clear it",
+   "number": 10,
+   "review": "A supplier bill was recorded last month and is paid this month. Why does the payment produce no expense this month?",
+   "text": "Liabilities are present obligations, and they normally carry credit balances. Separate current obligations from long-term ones using the applicable reporting rules, remembering that a long-term loan may have a current portion due soon. The balance sheet is where liabilities are reported. Keep two related ideas distinct: an expense is a cost recognized in a period, while a liability is an amount owed — related, but not interchangeable. Before entering a payable, match the supplier invoice to the purchasing and receiving evidence. What arrived decides the debit: inventory or equipment received creates an asset, while services consumed in the period create an expense. Paying a bill that was already recorded reduces Accounts Payable and Cash — it does not record the cost a second time. Reconcile supplier statements and the payables subsidiary ledger to the control account so the detail and the total agree. Other liabilities include customer advances, payroll deductions, taxes collected for authorities, accrued costs, and notes payable; money collected on behalf of others is never revenue. Split loan payments between principal and interest using the supporting schedule, and investigate duplicate invoices, vendor changes, and missing receiving evidence before authorizing any payment."
+  },
+  {
+   "diagram": [
+    "Authorized time + rates",
+    "Register: gross → net",
+    "Withholdings = liabilities",
+    "Employer taxes separate",
+    "Reconcile + remit"
+   ],
+   "example": "Illustrative figures only: gross wages are $2,500 and employee withholdings are $400. The wage entry is: debit Wages Expense $2,500, credit withholding liabilities $400, credit Cash (or net-pay payable) $2,100 — debits of $2,500 equal credits of $400 + $2,100, and net pay is $2,500 − $400 = $2,100. The employer's own taxes of $200 are a second entry: debit Employer Payroll Tax Expense $200, credit employer tax liabilities $200. Total cost to the employer is $2,500 + $200 = $2,700, while the employee takes home $2,100. When the withholdings are later remitted, the liabilities are paid down — no expense is recorded a second time.",
+   "heading": "Payroll: gross pay in, withholdings held, net pay out",
+   "number": 11,
+   "review": "Employee withholdings are already inside gross pay. What goes wrong on the income statement if you also expense them on top of gross wages?",
+   "text": "Gross pay is what an employee earns before deductions; net pay is what the employee actually receives after withholding and other deductions. The amounts withheld from an employee are not the business's money — they create liabilities owed to the appropriate recipients until they are remitted. Employer payroll taxes and employer-paid benefits are a separate, additional cost of employing people, and they may create their own liabilities. Never confuse the employee's share with the employer's expense. Build payroll only from authorized time records, pay rates, and deduction instructions. The payroll register is the bridge: it connects each employee's earnings, deductions, and net pay to the general ledger. Reconcile payroll liabilities to filed reports and actual remittances, restrict access to employee information, and route any change through an authorized process. Know what the key U.S. forms are for: the W-4 supplies federal withholding instructions, the W-2 reports an employee's annual wage information, the W-3 transmits W-2 totals where applicable, Form 941 generally reports quarterly federal payroll tax information, and Form 940 concerns federal unemployment tax. Worker status needs separate verification, and rates, wage bases, deadlines, and filing requirements change — work from current agency instructions, not memorized figures."
+  },
+  {
+   "diagram": [
+    "Begin with opening equity",
+    "Add contributions",
+    "Add profit / subtract loss",
+    "Subtract drawings",
+    "Ending equity → balance sheet"
+   ],
+   "example": "Beginning owner equity is $20,000. During the period the owner contributes $3,000, revenue is $11,000, expenses are $7,500, and the owner withdraws $900. First find profit on the income statement: $11,000 − $7,500 = $3,500 net income. Then roll equity forward: $20,000 + $3,000 + $3,500 − $900 = $25,600 ending equity. Check the traps: profit is $3,500 — not $6,500 (which wrongly counts the contribution as revenue) and not $2,600 (which wrongly treats the drawing as an expense). The contribution and the drawing live only in the equity roll-forward.",
+   "heading": "Owner equity: contributions in, drawings out, profit in between",
+   "number": 12,
+   "review": "An owner's $900 withdrawal reduced cash and equity. Why does it leave operating profit completely untouched?",
+   "text": "Equity is the residual interest — what belongs to the owners after liabilities are subtracted from assets. Its account names depend on the entity: a sole proprietor works with owner capital and drawings, while a corporation uses share capital and retained earnings. Keep the accounts that fit the entity, and never mix owner transactions in with ordinary customer or employee activity. Two classifications cause endless confusion, so fix them firmly. A contribution increases equity, but it is not earned revenue — the business sold nothing. Drawings or distributions reduce equity, but they are not automatically operating expenses — the business consumed nothing. What does flow through profit is the period's results: net income increases equity, and a net loss reduces it. The statement of equity (the equity roll-forward) reconciles the period: beginning balance, plus contributions, plus profit or minus loss, minus withdrawals or distributions, equals ending equity. For a sole-proprietor exercise, the temporary revenue and expense accounts close into the appropriate equity account and drawings are closed under the selected procedure; corporate dividends and retained earnings follow their own names and procedures. Do not assume every entity shares the same tax or legal treatment — your job is to identify each transaction and show a supported reconciliation."
+  },
+  {
+   "diagram": [
+    "Journal the event",
+    "Map to the equation",
+    "Split principal / interest",
+    "Advances stay liabilities",
+    "Tie balances to schedules"
+   ],
+   "example": "A business borrows $5,000: debit Cash $5,000, credit Loan Payable $5,000 — assets and liabilities each rise $5,000. It buys $1,500 of equipment on account: debit Equipment $1,500, credit Accounts Payable $1,500 — both sides rise again. Then it pays a loan installment of $340 that the loan schedule splits into $300 principal and $40 interest: debit Loan Payable $300, debit Interest Expense $40, credit Cash $340. Debits of $340 equal the $340 credit. End state: the loan balance is $4,700, the equipment payable stands at $1,500, and equity has fallen only by the $40 of interest — the $300 of principal was never an expense.",
+   "heading": "One transaction, three views: accounts, equation, and statements",
+   "number": 13,
+   "review": "A $340 loan payment leaves the bank. How much of it is an expense, how much reduces debt — and what document tells you the split?",
+   "text": "This section re-runs liability and equity events through three views at once — the journal accounts, the accounting equation, and the financial statements — because confusing recording, payment, and settlement is where these transactions go wrong. Purchasing goods on credit raises assets and liabilities together. Paying that payable later reduces both. Borrowing raises cash and a loan liability in the same entry. When a loan installment is paid, split it: principal repayment reduces cash and debt and is not an expense, while interest incurred is a separate expense that reduces equity. Payroll follows the same discipline — wage expense for gross earnings, liabilities for deductions and unpaid amounts, cash changing when paid — with employer payroll costs kept separate from employee withholdings. Contributions and distributions change owner equity without touching operating revenue or expense. A customer advance is a liability until the promised work is earned under the applicable accounting basis; only then does it become revenue. Work with a running equation table beside a dated journal, and connect every remaining liability to a schedule or statement. And hold onto the warning from earlier sections: an entry can balance and still be misclassified, so always ask what the business received, used, earned, or owes."
+  },
+  {
+   "diagram": [
+    "Name account + period",
+    "Gather independent evidence",
+    "List every difference",
+    "Classify: timing/error/open",
+    "Adjust only with support"
+   ],
+   "example": "The payables control account shows $5,300, but the vendor schedule totals only $5,000. Investigation finds a $300 supplier invoice that was posted to the control account without being attributed to any vendor. The correct response is to locate that invoice and repair its vendor attribution, so the schedule gains the missing $300 line and both totals agree at $5,300 — with the original transaction trail preserved. Posting a $300 'miscellaneous expense' instead would make nothing agree that matters: the vendor would still be missing from the schedule, the control would still lack support, and a fictitious expense would now distort profit as well.",
+   "heading": "Reconciliation: explaining every difference with evidence",
+   "number": 14,
+   "review": "A reconciliation is $300 out and someone suggests expensing the difference to finish it. Name two things that plug entry fails to fix.",
+   "text": "Reconciliation compares an account balance to independent evidence and explains every difference. A total that happens to match is not enough — the underlying items can still be wrong. Set up each reconciliation properly: name the account and period, state the starting balance, identify the evidence, list the reconciling items, and arrive at an adjusted balance, with the preparer, reviewer, and any unresolved exceptions recorded under the organization's procedures. Almost every balance-sheet account gets reconciled to something: cash to bank statements and receipts; receivables to customer invoices and the aging; payables to supplier statements and bills; inventory to count sheets and inventory records; payroll liabilities to registers and remittances; fixed assets to the asset register; loans to lender statements or amortization schedules. Classify each difference before touching it — timing item, unrecorded transaction, error, or unresolved item — and research the source documents before posting any adjustment. Keep the original records and explain corrections in the open. The forbidden move is the plug: inserting a balancing figure into an expense account to make an unsupported reconciliation look finished. An old outstanding item calls for follow-up, not automatic deletion."
+  },
+  {
+   "diagram": [
+    "Same account + period",
+    "Bank side: timing items",
+    "Book side: fees + errors",
+    "Post book adjustments only",
+    "Adjusted balances agree"
+   ],
+   "example": "The bank statement balance is $6,400. On the bank side, add a $500 deposit in transit and subtract $900 of outstanding checks: $6,400 + $500 − $900 = $6,000 adjusted bank balance. The cash ledger shows $6,075 but omits a $75 bank fee the statement reveals: debit Bank Fee Expense $75, credit Cash $75, bringing the book balance to $6,075 − $75 = $6,000. The two sides agree at $6,000, and the reconciliation is done. Notice the only journal entry was the fee — the deposit and the checks were already in the books, so entering them again would have corrupted a correct ledger.",
+   "heading": "The bank reconciliation: two sides, one adjusted balance",
+   "number": 15,
+   "review": "Outstanding checks appear on the bank side of the reconciliation. Why do they never get a journal entry of their own?",
+   "text": "Prepare the bank reconciliation for the same account and the same statement period as the cash ledger. Gather everything first: the bank statement, the cash ledger, the prior reconciliation, deposit evidence, and check and payment details. Compare cleared items one by one, carry forward genuinely outstanding items from the prior reconciliation, and confirm the beginning balances before you try to explain ending differences. The two sides adjust for different things. The bank side starts from the statement balance and adjusts for what the bank does not know yet: deposits in transit are added, outstanding checks are subtracted, and identified bank errors are corrected with the bank. The book side starts from the ledger balance and adjusts for what the bank has already recorded but the books have missed or gotten wrong — service charges, interest, returned customer payments, and book errors. Timing differences that the ledger already recorded correctly need no second journal entry; entering them again would double-count them. When you finish, the adjusted bank balance and the adjusted book balance must agree. Record only supported book adjustments, keep the reconciliation, and investigate stale checks, unfamiliar withdrawals, duplicate deposits, and unexplained differences — a bank error is reported to the bank, while a book error is corrected in the books."
+  },
+  {
+   "diagram": [
+    "Read title, date, basis first",
+    "Gross profit = sales − COGS",
+    "Margin = gross profit ÷ sales",
+    "Compare budget vs actual",
+    "Check profit against cash"
+   ],
+   "example": "Sales grow from $10,000 to $12,000 — an increase of $2,000, or 20%. Cost of goods sold grows from $6,000 to $7,800. Gross profit therefore moves from $4,000 to $4,200: up in dollars. But gross margin falls from $4,000 ÷ $10,000 = 40% to $4,200 ÷ $12,000 = 35%. Sales grew and profit dollars grew, yet each sales dollar kept less — costs rose faster than prices. The same discipline applies to budgets: if budgeted rent is $800 and actual rent is $880, the variance is $80 over budget, and the next step is to check the lease and the period covered before deciding why — not to declare an error or a saving on sight.",
+   "heading": "Reading statements: growth, margin, budgets, and the profit-versus-cash trap",
+   "number": 16,
+   "review": "Sales and gross profit dollars both rose, yet you flag the month as a concern. What fell, and what does that tell you that the dollar figures hide?",
+   "text": "Before comparing any two figures, read the statement itself: its title, the entity, the reporting date or period, the units, and the accounting basis. Then match the question to the statement — the balance sheet answers questions about assets, obligations, and equity, while the income statement explains revenue, cost of goods sold, and expenses over time. Comparative statements show change, but a percentage means nothing until the base period and the calculation are clear. Two formulas do most of the work here. Gross profit equals sales minus cost of goods sold, and gross margin divides gross profit by sales. Net income goes further, bringing in the other period expenses and relevant income. Budget-versus-actual analysis compares real results with a defined plan and investigates the differences; a higher expense is unfavorable at fixed activity, yet may be entirely understandable when volume rises — a variance is a question, not proof of misconduct. In month-over-month review, weigh timing, seasonality, missing entries, and changes in volume, pricing, and cost, and check unusual balances against supporting records before recommending anything. Above all, keep profit and cash separate in your thinking: a business can show profit and still feel cash pressure when customers have not paid or cash is tied up in assets."
+  },
+  {
+   "diagram": [
+    "Journal the month in order",
+    "Post + reconcile detail",
+    "Unadjusted trial balance",
+    "Adjust with evidence",
+    "Statements + bank rec tie out"
+   ],
+   "example": "A compressed run-through with small numbers. The owner contributes $4,000 and the business borrows $2,000, so cash starts at $6,000. Rent of $500 is paid, services are invoiced on credit for $1,200, and $700 of that is collected: unadjusted cash is $6,000 − $500 + $700 = $6,200, receivables are $500, and revenue is $1,200. One adjustment: wages of $120 incurred but unpaid — debit Wages Expense $120, credit Wages Payable $120. Net income is $1,200 − $500 − $120 = $580, and ending equity is $4,000 + $580 = $4,580. Prove it: assets are $6,200 + $500 = $6,700; liabilities are $2,000 + $120 = $2,120; and $2,120 + $4,580 = $6,700. The file balances.",
+   "heading": "The month-end file: every earlier skill in one auditable package",
+   "number": 17,
+   "review": "Your adjusted trial balance balances but the balance sheet does not. Which two links — profit to equity, and cash to the bank reconciliation — do you re-trace first, and why?",
+   "text": "The month-end file is where the whole course comes together: one fictional service-and-retail business, starting from zero balances, carried from raw events to finished statements with every step traceable. The workflow mirrors the accounting cycle. Record the period's dated events in order in the journal — owner contributions, borrowing, asset purchases, credit purchases, payments, credit and cash sales, collections, advances received, and drawings each classified as earlier sections taught. Post to the general ledger, reconcile the customer and supplier detail to their control accounts, and prepare the unadjusted trial balance. Then work the adjustment list: supplies used, the month's depreciation, wages incurred but unpaid, the portion of a customer advance now earned, interest incurred but unpaid, and any unrecorded bank fee the statement reveals — each with its source-evidence assumption stated. From the adjusted trial balance, prepare the income statement, the statement of owner equity, and the balance sheet, and prove the package ties together: profit flows into ending equity, and the equation balances. Reconcile the bank statement to the adjusted cash balance, taking care not to record timing items twice. Keep the check figures separate from the submission itself, and resolve every discrepancy through evidence — never through an unexplained plug entry, and never by overwriting a real record with this fictional case."
+  },
+  {
+   "diagram": [
+    "All four domains complete",
+    "25-question practice final",
+    "Review misses by objective",
+    "Submit the month-end file",
+    "Handoff memo + exam check"
+   ],
+   "example": "Run the variation test on the month-end case: the credit service invoice rises by $200 while collections stay unchanged. Suppose the invoice was $1,000 with $600 collected. Originally receivables were $400 and cash $600. With the invoice at $1,200 and the same $600 collected, receivables become $600 — up $200 — while cash stays exactly $600. Revenue rises $200, so profit rises $200 and ending equity rises $200 with it. Every changed balance is on the accrual side of the file; the bank side never moves, because no additional money arrived. Being able to predict that pattern — what changes, what does not, and why — before you recalculate is the real readiness check.",
+   "heading": "Cumulative readiness: the practice final, the practical file, and the handoff",
+   "number": 18,
+   "review": "You raise a credit invoice by $200 and collections do not change. Which four balances move, which one stays fixed — and what does that prove you understand?",
+   "text": "Readiness for the external exam rests on two different kinds of evidence, and this closing section keeps them separate. The first is the course's original 25-question cumulative practice final, taken only after all four domains are complete. Elevate's practice mastery mark is 80% — but be clear about what that number is: an internal practice target, not an official exam score, and this practice final is not the official exam. Treat every missed question as a diagnosis, not just a deduction: identify the objective it belongs to, work out the correct reasoning, and redo the matching workbook calculation before attempting fresh problems, because a memorized answer is not evidence of mastery. The second kind of evidence is practical: the complete month-end file, which a quiz cannot replace and which an instructor reviews. The workplace skill that ties the course together is the handoff — explaining to the next person, in plain terms, how the file hangs together: why profit and cash differ, what evidence remains unresolved, which controls protect the records, and what next month needs. One last boundary to hold: confirm your exam registration directly with Certiport, because completing this course or workbook is not itself the external credential."
+  }
+ ],
+ "version": 1,
+ "workbookSlug": "intuit-bookkeeping-guided-practice"
+}

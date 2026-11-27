@@ -3,8 +3,10 @@ import { pathToFileURL } from 'node:url';
 
 const SHA = /^[0-9a-f]{40}$/;
 const WORKFLOW = '.github/workflows/e2e-desktop-chrome.yml';
+const DESKTOP_SHARDS = 4;
 const REQUIRED_JOBS = [
   'E2E desktop-chrome',
+  ...Array.from({ length: DESKTOP_SHARDS }, (_, i) => `E2E desktop-chrome shard ${i + 1}/${DESKTOP_SHARDS}`),
   'Public Host Shop navigation and application (five devices)',
   'Email device browsers',
 ];
@@ -26,7 +28,7 @@ export function inspectExactPrBrowserEvidence({ runs, jobs, sourceRepository, he
   if (!Array.isArray(jobs) || jobs.length >= 100) throw Error('E2E_JOB_INVENTORY_INCOMPLETE');
   for (const name of REQUIRED_JOBS) {
     const matches = jobs.filter(job => job.name === name);
-    if (!matches.length || matches.some(job => job.status !== 'completed' || job.conclusion !== 'success'))
+    if (matches.length !== 1 || matches[0].status !== 'completed' || matches[0].conclusion !== 'success')
       throw Error('E2E_REQUIRED_JOB_NOT_SUCCESSFUL:' + name);
   }
   return { state: 'verified', runId: latest.id };

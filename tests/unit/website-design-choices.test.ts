@@ -2,6 +2,18 @@ import { describe,it,expect } from 'vitest';
 import { applyWebsiteDesign, readWebsiteDesign, websiteCatalog } from '@/lib/website-builder/design-choices';
 import { buildDefaultSiteConfig } from '@/lib/tenant/default-site-config';
 describe('saved website design choices',()=>{
+ it('keeps each inner page layout and photo when the homepage design changes',()=>{
+  const config=buildDefaultSiteConfig({organizationName:'Independent pages'});
+  config.pages=[
+   {id:'home',slug:'/',title:'Home',sections:[{id:'home-hero',type:'hero',content:{image:'/home.jpg'},settings:{layout:'split'}}]},
+   {id:'services',slug:'/services',title:'Services',sections:[{id:'services-hero',type:'hero',content:{image:'/services.jpg'},settings:{layout:'editorial'}}]},
+   {id:'about',slug:'/about',title:'About',sections:[{id:'about-hero',type:'hero',content:{image:'/team.jpg'},settings:{layout:'split'}}]},
+  ];
+  const result=applyWebsiteDesign(config,{template:'modern',layout:'cover'});
+  expect(result.pages!.map(page=>page.sections[0].settings?.layout)).toEqual(['cover','editorial','split']);
+  expect(result.pages!.map(page=>page.sections[0].content.image)).toEqual(['/home.jpg','/services.jpg','/team.jpg']);
+  expect(config.pages[0].sections[0].settings?.layout).toBe('split');
+ });
  it('applies the chosen layout and speaker while preserving business content and images',()=>{
   const original=buildDefaultSiteConfig({organizationName:'Test store'});
   original.pages=[{id:'home',slug:'/',title:'Home',sections:[{id:'hero',type:'hero',content:{title:'Real headline',text:'Real business details',image:'/real-owner-photo.jpg'}}]}];

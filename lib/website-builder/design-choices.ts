@@ -52,7 +52,9 @@ export function applyWebsiteDesign(config: TenantSiteConfig, raw: unknown, optio
   if (options.applyPalette) result.branding = { ...result.branding, primaryColor: primary, secondaryColor: accent, accentColor: accent, backgroundColor: background, textColor: '#17251c' };
   for (const page of result.pages || []) for (const section of page.sections) {
     if (section.type === 'hero') {
-      section.settings = { ...section.settings, layout: choices.layout };
+      // The design picker chooses the homepage layout. Keep independently edited
+      // inner pages intact rather than making every page a copy of the homepage.
+      if (page.slug === '/') section.settings = { ...section.settings, layout: choices.layout };
       if (choices.narration && !section.content.narration) section.content.narration = [section.content.title, section.content.text].filter(v => typeof v === 'string').join('. ').slice(0, 1800);
       if (choices.narration) section.content.narrator = choices.speaker;
       else delete section.content.narration;

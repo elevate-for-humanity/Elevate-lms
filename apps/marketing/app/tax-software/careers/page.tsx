@@ -28,6 +28,7 @@ export default async function Careers({
     <TaxSiteShell>
       <main>
         <TaxHero
+          layout="image-first"
           eyebrow="We're hiring · Office & remote opportunities"
           title={
             <>

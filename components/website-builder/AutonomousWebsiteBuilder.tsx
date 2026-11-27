@@ -2,7 +2,7 @@
 
 import { useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
-import { useWebsiteConfig } from '@/components/website-builder/WebsiteConfigProvider';
+import { useWebsiteConfig, useWebsitePublication } from '@/components/website-builder/WebsiteConfigProvider';
 import { ExternalLink, Loader2, Mic, MicOff, Monitor, Save, Send, Smartphone, Sparkles, Tablet, Volume2 } from 'lucide-react';
 import type { TenantSiteConfig } from '@/lib/tenant/site-types';
 import { ensureComposableSiteConfig } from '@/lib/tenant/site-composition';
@@ -10,7 +10,7 @@ import { PublicTenantComposableSite } from '@/components/tenant/PublicTenantComp
 import { TenantDraftViewport } from '@/components/website-builder/TenantDraftViewport';
 import { readWebsiteDesign } from '@/lib/website-builder/design-choices';
 import { useNaturalVoice } from '@/components/voice/useNaturalVoice';
-import { TENANT_HOST_SUFFIX } from '@/lib/tenant/public-site-url';
+import { websiteLifecycleIntent } from '@/lib/website-builder/lifecycle-intent';
 
 type Message = { role: 'user' | 'assistant'; content: string };
 type Device = 'desktop' | 'tablet' | 'mobile';
@@ -18,7 +18,7 @@ type Device = 'desktop' | 'tablet' | 'mobile';
 const PREVIEW_WIDTHS: Record<Device, number> = { desktop: 1280, tablet: 768, mobile: 390 };
 
 type SaveResponse = {
-  website?: { site_name?: string; site_config?: TenantSiteConfig; is_published?: boolean };
+  website?: { site_name?: string; subdomain?: string | null; site_config?: TenantSiteConfig; is_published?: boolean };
   publicUrl?: string | null;
   validation?: { errors?: Array<{ message?: string }>; warnings?: Array<{ message?: string }> };
   error?: string;
@@ -45,7 +45,9 @@ export function AutonomousWebsiteBuilder({
   const [config, setConfig] = useWebsiteConfig(initialConfig);
   const [siteName, setSiteName] = useState(initialSiteName);
   const [subdomain, setSubdomain] = useState(initialSubdomain || '');
-  const [published, setPublished] = useState(initiallyPublished);
+  const [published, setPublished] = useWebsitePublication(initiallyPublished);
+  const [savedSubdomain, setSavedSubdomain] = useState(initialSubdomain || '');
+  const [publishReview, setPublishReview] = useState(false);
   const [selectedPage, setSelectedPage] = useState('/');
   const [selectedSectionId, setSelectedSectionId] = useState<string | null>(null);
   const [device, setDevice] = useState<Device>('desktop');
@@ -63,7 +65,7 @@ export function AutonomousWebsiteBuilder({
 
   const pages = config.pages || [];
   const page = pages.find((item) => item.slug === selectedPage) || pages[0];
-  const publicUrl = subdomain && published ? `/sites/${subdomain}` : '';
+  const publicUrl = savedSubdomain && published ? `/sites/${savedSubdomain}` : '';
   const site = useMemo(() => ({ id: websiteId, subdomain: subdomain || '', siteName, organizationId: null, config }), [websiteId, subdomain, siteName, config]);
 
   async function persist(publish?: boolean) {
@@ -74,10 +76,14 @@ export function AutonomousWebsiteBuilder({
     });
     const data = await response.json() as SaveResponse;
     if (!response.ok) throw new Error(responseError(data, publish === true ? 'Could not publish website' : 'Could not save website'));
+    if (publish !== undefined && data.website?.is_published !== publish) throw new Error('The server did not confirm the requested publish status. Refresh before trying again.');
     if (data.website?.site_config) setConfig(ensureComposableSiteConfig(data.website.site_config));
     if (data.website?.site_name) setSiteName(data.website.site_name);
-    if (publish === true) setPublished(true);
-    if (publish === false) setPublished(false);
+    if (typeof data.website?.is_published === 'boolean') setPublished(data.website.is_published);
+    if (data.website?.subdomain !== undefined) {
+      setSubdomain(data.website.subdomain || '');
+      setSavedSubdomain(data.website.subdomain || '');
+    }
     return data;
   }
 
@@ -88,11 +94,10 @@ export function AutonomousWebsiteBuilder({
     setMessages((current) => [...current, { role: 'user', content: clean }]);
     setInstruction('');
 
-    const explicitPublish = /\b(publish(?: it| the site| the website)?|go live|make (?:it|the site|the website) live)\b/i.test(clean);
-    const explicitUnpublish = /\b(unpublish|take (?:it|the site|the website) offline|make (?:it|the site|the website) private)\b/i.test(clean);
+    const lifecycle = websiteLifecycleIntent(clean);
 
     try {
-      if (explicitUnpublish) {
+      if (lifecycle === 'unpublish') {
         await persist(false);
         const reply = 'I took the website offline and preserved the draft, domain settings, and version history.';
         setMessages((current) => [...current, { role: 'assistant', content: reply }]);
@@ -100,12 +105,10 @@ export function AutonomousWebsiteBuilder({
         return;
       }
 
-      if (explicitPublish) {
-        if (!subdomain.trim()) throw new Error('Choose a subdomain before asking me to publish.');
-        await persist(true);
-        const reply = 'I ran the pre-publish QA gate and published the website.';
+      if (lifecycle === 'publish') {
+        setPublishReview(true);
+        const reply = 'Review your website address below. You can publish to the included Elevate address, then connect a domain you own or review domain purchase options.';
         setMessages((current) => [...current, { role: 'assistant', content: reply }]);
-        setNotice('Website published.');
         return;
       }
 
@@ -124,6 +127,7 @@ export function AutonomousWebsiteBuilder({
       if (!response.ok) throw new Error(data.error || 'PARIS could not update the website');
       if (data.website?.site_config) setConfig(ensureComposableSiteConfig(data.website.site_config as TenantSiteConfig));
       if (data.website?.site_name) setSiteName(data.website.site_name);
+      if (typeof data.website?.is_published === 'boolean') setPublished(data.website.is_published);
       const reply = data.message || 'I updated the website.';
       setMessages((current) => [...current, { role: 'assistant', content: reply }]);
       setNotice(`${data.operationsApplied || 0} website operation${data.operationsApplied === 1 ? '' : 's'} applied.`);
@@ -140,6 +144,7 @@ export function AutonomousWebsiteBuilder({
     setSaving(true); setError(''); setNotice('');
     try {
       await persist(publish ? true : undefined);
+      setPublishReview(false);
       setNotice(publish ? 'Website published.' : 'Website saved.');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not save website');
@@ -201,14 +206,27 @@ export function AutonomousWebsiteBuilder({
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
           <div className="flex flex-wrap items-end gap-3">
             <label className="block"><span className="mb-1 block text-xs font-bold uppercase tracking-wide text-slate-500">Site name</span><input value={siteName} onChange={(event) => setSiteName(event.target.value)} className="w-56 rounded-lg border border-slate-300 px-3 py-2 font-semibold" /></label>
-            <label className="block"><span className="mb-1 block text-xs font-bold uppercase tracking-wide text-slate-500">Subdomain</span><div className="flex items-center rounded-lg border border-slate-300 bg-white"><input value={subdomain} onChange={(event) => setSubdomain(event.target.value)} className="w-44 rounded-l-lg px-3 py-2 outline-none" /><span className="pr-3 text-xs text-slate-400">{TENANT_HOST_SUFFIX}</span></div></label>
+            <label className="block"><span className="mb-1 block text-xs font-bold uppercase tracking-wide text-slate-500">Website address</span><div className="flex flex-wrap items-center rounded-lg border border-slate-300 bg-white"><span className="pl-3 text-xs text-slate-500">elevateforhumanity.org/sites/</span><input aria-label="Website address" value={subdomain} onChange={(event) => setSubdomain(event.target.value)} className="w-44 rounded-lg px-3 py-2 outline-none" /></div></label>
           </div>
           <div className="flex flex-wrap gap-2">
             <button type="button" disabled={saving || busy} onClick={() => void saveIdentity(false)} className="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 font-bold text-slate-800 disabled:opacity-50"><Save className="h-4 w-4" /> Save</button>
-            <button type="button" disabled={saving || busy} onClick={() => void saveIdentity(true)} className="rounded-lg bg-brand-red-600 px-4 py-2 font-black text-white disabled:opacity-50">{published ? 'Publish updates' : 'Publish'}</button>
+            <span role="status" className="self-center px-2 text-sm font-bold">{published ? 'Published' : 'Unpublished'}</span>
+            <a href="#website-domain" className="self-center px-2 text-sm font-bold underline">Domain settings</a>
+            <button type="button" disabled={saving || busy} onClick={() => setPublishReview(true)} className="rounded-lg bg-brand-red-600 px-4 py-2 font-black text-white disabled:opacity-50">{published ? 'Publish updates' : 'Publish'}</button>
             {publicUrl ? <a href={publicUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 font-bold text-slate-800"><ExternalLink className="h-4 w-4" /> Live</a> : null}
           </div>
         </div>
+
+        {publishReview ? <section aria-labelledby="publish-review-title" className="mb-4 rounded-2xl border border-slate-300 bg-white p-5">
+          <h2 id="publish-review-title" className="text-xl font-black">Choose your website address</h2>
+          <p className="mt-2 text-sm text-slate-700">Use the included Elevate address, or publish there first and then connect a domain you own or review a domain purchase. Domain purchases show availability and price before checkout.</p>
+          <p className="mt-3 break-all font-semibold">{subdomain.trim() ? `https://www.elevateforhumanity.org/sites/${subdomain.trim()}` : 'Enter a website address above before publishing.'}</p>
+          <div className="mt-4 flex flex-wrap gap-3">
+            <button type="button" disabled={saving || busy || !subdomain.trim()} onClick={() => void saveIdentity(true)} className="rounded-lg bg-brand-red-600 px-4 py-3 font-bold text-white disabled:opacity-50">Publish to this address</button>
+            <a href="#website-domain" className="rounded-lg border border-slate-300 px-4 py-3 font-bold">Review custom domain options</a>
+            <button type="button" disabled={saving} onClick={() => setPublishReview(false)} className="rounded-lg px-4 py-3 font-bold">Keep editing</button>
+          </div>
+        </section> : null}
 
         <div className="grid gap-4 xl:grid-cols-[250px_minmax(0,1fr)_380px]">
           <aside className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">

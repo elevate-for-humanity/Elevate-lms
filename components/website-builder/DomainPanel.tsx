@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useWebsitePublication } from './WebsiteConfigProvider';
 
 interface DnsRecord { type: string; name: string; value: string; purpose: string }
 interface WebsiteDomain {
@@ -19,6 +20,7 @@ function normalizeDomain(domain: WebsiteDomain): WebsiteDomain {
 }
 
 export function DomainPanel({ websiteId, isPublished }: Props) {
+  const [published] = useWebsitePublication(isPublished);
   const [domains, setDomains] = useState<WebsiteDomain[]>([]);
   const [configured, setConfigured] = useState(true);
   const [allowed, setAllowed] = useState(false);
@@ -64,7 +66,7 @@ export function DomainPanel({ websiteId, isPublished }: Props) {
         setDomains((current) => current.map((item) => item.id === polling ? { ...item, ...domain } : item));
         if (['active', 'failed', 'deleted'].includes(domain.status)) {
           setPolling(null);
-          if (domain.status === 'active') setInfo('Your domain is live and SSL is active.');
+          if (domain.status === 'active') setInfo('Your domain connection and SSL are active. Website availability follows its publish status.');
         }
       } catch {
         // Poll again on the next interval.
@@ -148,11 +150,11 @@ export function DomainPanel({ websiteId, isPublished }: Props) {
   }
 
   if (!configured) {
-    return <div className="rounded-2xl border border-amber-200 bg-amber-50 p-6"><h2 className="text-lg font-black text-amber-950">Custom domain</h2><p className="mt-2 text-sm text-amber-800">Domain services are temporarily unavailable.</p></div>;
+    return <div id="website-domain" className="rounded-2xl border border-amber-200 bg-amber-50 p-6"><h2 className="text-lg font-black text-amber-950">Custom domain</h2><p className="mt-2 text-sm text-amber-800">Domain services are temporarily unavailable.</p></div>;
   }
 
   return (
-    <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+    <section id="website-domain" className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h2 className="text-xl font-black text-slate-950">Custom domain</h2>
@@ -172,7 +174,7 @@ export function DomainPanel({ websiteId, isPublished }: Props) {
               {!['awaiting_payment', 'processing'].includes(domain.status) && <button type="button" disabled={busy} onClick={() => void disconnect(domain.id)} className="rounded-lg border border-red-200 px-3 py-2 text-xs font-bold text-red-700">Disconnect</button>}
             </div>
           </div>
-          {domain.status === 'active' && <p className="mt-2 text-sm font-bold text-emerald-700">✓ Live · SSL active</p>}
+          {domain.status === 'active' && <p className="mt-2 text-sm font-bold text-emerald-700">{published ? 'Website published · domain connected · SSL active' : 'Domain connected · SSL active · website unpublished'}</p>}
           {domain.dns_records?.length ? <div className="mt-3 rounded-lg bg-slate-50 p-3 text-xs"><p className="font-bold text-slate-600">Add this DNS record:</p>{domain.dns_records.map((record, index) => <p key={`${record.name}-${index}`} className="mt-1 font-mono">{record.type} {record.name} → {record.value}</p>)}<p className="mt-2 text-amber-700">Cloudflare: keep the CNAME DNS-only (grey cloud) until verification completes.</p></div> : null}
         </div>
       ))}</div>}
@@ -183,7 +185,7 @@ export function DomainPanel({ websiteId, isPublished }: Props) {
           <p className="mt-2 text-sm text-slate-700">Custom domains are included with Website Builder Professional and Enterprise. Your Elevate subdomain remains available on Starter.</p>
           <Link href="/store/apps/website-builder" className="mt-4 inline-flex rounded-xl bg-brand-red-600 px-4 py-3 text-sm font-black text-white">Upgrade Website Builder</Link>
         </div>
-      ) : !isPublished ? (
+      ) : !published ? (
         <div className="mt-5 rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm font-semibold text-slate-700">Publish your website first. Domain controls will unlock immediately afterward.</div>
       ) : (
         <div className="mt-5">

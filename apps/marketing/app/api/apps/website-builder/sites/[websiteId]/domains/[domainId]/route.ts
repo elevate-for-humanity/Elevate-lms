@@ -37,7 +37,9 @@ export async function GET(
         points_to_edge: domain.pointsToEdge,
         updated_at: new Date().toISOString(),
       }).eq('id', domainId);
-      return NextResponse.json({ domain: { ...row, ...domain, stored: row } });
+      // The provider ID is not our website_domains primary key. Keep local
+      // identity stable so subsequent polling, verification and disconnect work.
+      return NextResponse.json({ domain: { ...row, ...domain, id: row.id, stored: row } });
     } catch (err) {
       logger.warn('domainee status refresh failed, returning cached', { domainId, error: String(err) });
     }

@@ -48,7 +48,7 @@ export default async function WebsiteEditorPage({ params }: Props) {
   );
 
   return (
-    <WebsiteConfigProvider key={site.id} initialConfig={config}>
+    <WebsiteConfigProvider key={site.id} initialConfig={config} initiallyPublished={Boolean(site.is_published)}>
       <WebsiteLifecyclePanel websiteId={site.id} isPublished={Boolean(site.is_published)} />
       <AutonomousWebsiteBuilder
         websiteId={site.id}

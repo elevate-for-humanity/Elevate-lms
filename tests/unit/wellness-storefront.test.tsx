@@ -16,6 +16,19 @@ beforeEach(() => {
 afterEach(() => { cleanup(); vi.unstubAllGlobals(); });
 
 describe('Curvature shopping flow', () => {
+  it('renders the saved builder homepage media, copy and layout rather than the fixed storefront defaults', () => {
+    const edited = structuredClone(site);
+    edited.config.meta = { heroImageOverride: '/outdated-photo.jpg' };
+    edited.config.pages = [{ id: 'home', slug: '/', title: 'Home', sections: [{
+      id: 'hero', type: 'hero', settings: { layout: 'editorial' },
+      content: { title: 'Our updated ritual', image: '/owner-new-photo.jpg', imageAlt: 'New owner photo', buttonText: 'Browse oils', buttonHref: '/shop' },
+    }] }, { id: 'shop', slug: '/shop', title: 'Shop', sections: [] }];
+    const { container } = render(<WellnessStorefront site={edited} pathname="/" basePath="/sites/meri-gold-round">{null}</WellnessStorefront>);
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Our updated ritual');
+    expect(screen.getByRole('img', { name: 'New owner photo' })).toHaveAttribute('src', '/owner-new-photo.jpg');
+    expect(screen.getByRole('link', { name: 'Browse oils' })).toHaveAttribute('href', '/sites/meri-gold-round/shop');
+    expect(container.querySelector('[data-page="/"]')).toHaveAttribute('data-layout', 'editorial');
+  });
   it('adds products, restores the bag across navigation and updates quantities and subtotal', async () => {
     const { unmount } = show();
     fireEvent.click(screen.getByRole('button', { name: /add to bag/i }));

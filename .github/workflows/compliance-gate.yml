@@ -14,6 +14,13 @@ concurrency:
 env:
   NODE_VERSION: '22'
   PNPM_VERSION: '10.28.2'
+  # Dependency updates use only the isolated public build configuration.
+  NEXT_PUBLIC_SUPABASE_URL: >-
+    ${{ (github.event.pull_request.user.login == 'dependabot[bot]' && secrets.E2E_SUPABASE_URL)
+        || (github.event.pull_request.user.login != 'dependabot[bot]' && (secrets.NEXT_PUBLIC_SUPABASE_URL || secrets.SUPABASE_URL)) || '' }}
+  NEXT_PUBLIC_SUPABASE_ANON_KEY: >-
+    ${{ (github.event.pull_request.user.login == 'dependabot[bot]' && secrets.E2E_SUPABASE_ANON_KEY)
+        || (github.event.pull_request.user.login != 'dependabot[bot]' && (secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY || secrets.SUPABASE_ANON_KEY)) || '' }}
 
 jobs:
   security:
@@ -82,16 +89,12 @@ jobs:
         run: pnpm run ci:build
         env:
           NODE_OPTIONS: '--max-old-space-size=6144'
-          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || secrets.SUPABASE_URL }}
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY || secrets.SUPABASE_ANON_KEY }}
-          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ github.event.pull_request.user.login != 'dependabot[bot]' && secrets.SUPABASE_SERVICE_ROLE_KEY || '' }}
       - name: Build marketing app
         run: pnpm --filter @elevate/marketing build --no-lint
         env:
           NODE_OPTIONS: '--max-old-space-size=4096'
-          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || secrets.SUPABASE_URL }}
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY || secrets.SUPABASE_ANON_KEY }}
-          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ github.event.pull_request.user.login != 'dependabot[bot]' && secrets.SUPABASE_SERVICE_ROLE_KEY || '' }}
           NEXT_PUBLIC_SITE_URL: https://www.elevateforhumanity.org
       - name: Start server
         run: |
@@ -101,14 +104,12 @@ jobs:
           NODE_ENV: production
           PORT: 3000
           HOSTNAME: 127.0.0.1
-          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || secrets.SUPABASE_URL }}
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY || secrets.SUPABASE_ANON_KEY }}
-          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ github.event.pull_request.user.login != 'dependabot[bot]' && secrets.SUPABASE_SERVICE_ROLE_KEY || '' }}
           NEXT_PUBLIC_SITE_URL: https://www.elevateforhumanity.org
           NEXTAUTH_SECRET: ci-test-secret-do-not-use-in-production
           NEXTAUTH_URL: http://127.0.0.1:3000
-          STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY || '' }}
-          SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY || '' }}
+          STRIPE_SECRET_KEY: ${{ github.event.pull_request.user.login != 'dependabot[bot]' && secrets.STRIPE_SECRET_KEY || '' }}
+          SENDGRID_API_KEY: ${{ github.event.pull_request.user.login != 'dependabot[bot]' && secrets.SENDGRID_API_KEY || '' }}
           TEST_MODE: 'true'
       - name: Wait for server
         run: |
@@ -174,16 +175,12 @@ jobs:
         run: pnpm run ci:build
         env:
           NODE_OPTIONS: '--max-old-space-size=6144'
-          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || secrets.SUPABASE_URL }}
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY || secrets.SUPABASE_ANON_KEY }}
-          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ github.event.pull_request.user.login != 'dependabot[bot]' && secrets.SUPABASE_SERVICE_ROLE_KEY || '' }}
       - name: Build marketing app
         run: pnpm --filter @elevate/marketing build --no-lint
         env:
           NODE_OPTIONS: '--max-old-space-size=4096'
-          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || secrets.SUPABASE_URL }}
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY || secrets.SUPABASE_ANON_KEY }}
-          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ github.event.pull_request.user.login != 'dependabot[bot]' && secrets.SUPABASE_SERVICE_ROLE_KEY || '' }}
           NEXT_PUBLIC_SITE_URL: https://www.elevateforhumanity.org
       - name: Start server
         run: |
@@ -193,14 +190,12 @@ jobs:
           NODE_ENV: production
           PORT: 3000
           HOSTNAME: 127.0.0.1
-          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || secrets.SUPABASE_URL }}
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY || secrets.SUPABASE_ANON_KEY }}
-          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ github.event.pull_request.user.login != 'dependabot[bot]' && secrets.SUPABASE_SERVICE_ROLE_KEY || '' }}
           NEXT_PUBLIC_SITE_URL: https://www.elevateforhumanity.org
           NEXTAUTH_SECRET: ci-test-secret-do-not-use-in-production
           NEXTAUTH_URL: http://127.0.0.1:3000
-          STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY || '' }}
-          SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY || '' }}
+          STRIPE_SECRET_KEY: ${{ github.event.pull_request.user.login != 'dependabot[bot]' && secrets.STRIPE_SECRET_KEY || '' }}
+          SENDGRID_API_KEY: ${{ github.event.pull_request.user.login != 'dependabot[bot]' && secrets.SENDGRID_API_KEY || '' }}
           TEST_MODE: 'true'
       - name: Wait for server
         run: |

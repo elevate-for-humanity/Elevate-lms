@@ -24,6 +24,13 @@ concurrency:
 env:
   NODE_VERSION: '22'
   PNPM_VERSION: '10.28.2'
+  # Dependency updates use only the isolated public build configuration.
+  NEXT_PUBLIC_SUPABASE_URL: >-
+    ${{ (github.event.pull_request.user.login == 'dependabot[bot]' && secrets.E2E_SUPABASE_URL)
+        || (github.event.pull_request.user.login != 'dependabot[bot]' && (secrets.NEXT_PUBLIC_SUPABASE_URL || secrets.SUPABASE_URL)) || '' }}
+  NEXT_PUBLIC_SUPABASE_ANON_KEY: >-
+    ${{ (github.event.pull_request.user.login == 'dependabot[bot]' && secrets.E2E_SUPABASE_ANON_KEY)
+        || (github.event.pull_request.user.login != 'dependabot[bot]' && (secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY || secrets.SUPABASE_ANON_KEY)) || '' }}
 
 jobs:
   marketing-staging:
@@ -63,9 +70,6 @@ jobs:
       - name: Verify automatic container memory policy
         run: node scripts/check-build-memory-policy.mjs --source-only
       - name: Build Marketing container
-        env:
-          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || secrets.SUPABASE_URL }}
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY || secrets.SUPABASE_ANON_KEY }}
         run: |
           docker build \
             --file Dockerfile.marketing \
@@ -80,8 +84,6 @@ jobs:
 
       - name: Smoke Marketing container
         env:
-          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || secrets.SUPABASE_URL }}
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY || secrets.SUPABASE_ANON_KEY }}
           HEALTH_PATH: /api/ready
         run: |
           chmod +x scripts/smoke-test-container.sh

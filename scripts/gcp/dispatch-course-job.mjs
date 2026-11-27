@@ -1,8 +1,10 @@
 import { google } from './runtime-config.mjs';
+// Branch refreshed to pick up main (a11d77d8): CI Preflight test fixes for the worker-start dispatcher/resume changes.
+// Branch refreshed to pick up main (e8b0e402): fresh CI after E2E shard 3/4 environment failure on the fcad399b base.
 import { inspectRegionalCapacity, executionAllocationCount } from './regional-capacity.mjs';
 import { pathToFileURL } from 'node:url';
 
-export async function dispatchQueuedCourseJob({run = (_command, args) => google(args), capacityCheck = inspectRegionalCapacity, request = fetch, env = process.env, now = new Date(), delay = ms => new Promise(resolve => setTimeout(resolve, ms)), assignmentAttempts = 1, clock = () => Date.now()} = {}) {
+export async function dispatchQueuedCourseJob({run = (_command, args) => google(args), capacityCheck = inspectRegionalCapacity, request = fetch, env = process.env, queueUrl = 'https://cuxzzpsyufcewtmicszk.supabase.co/rest/v1/ultimate_build_jobs', now = new Date(), delay = ms => new Promise(resolve => setTimeout(resolve, ms)), assignmentAttempts = 1, clock = () => Date.now()} = {}) {
   const scope = ['--project=elegant-racer-299721', '--region=us-central1'];
   // An active Cloud Run execution must not block unrelated queued builds.
   // Atomic database leases prevent two tasks from claiming the same job.
@@ -14,7 +16,7 @@ export async function dispatchQueuedCourseJob({run = (_command, args) => google(
   });
   const token = env.SUPABASE_SERVICE_ROLE_KEY;
   if (!token) throw new Error('SUPABASE_SERVICE_ROLE_KEY_REQUIRED');
-  const url = new URL('https://cuxzzpsyufcewtmicszk.supabase.co/rest/v1/ultimate_build_jobs');
+  const url = new URL(queueUrl);
   // Role jobs use separate resource profiles and role-filtered claims.
   url.searchParams.set('job_type','not.like.lesson_autopilot:*');
   url.searchParams.set('select','id,status,available_at,heartbeat_at,execution_generation,attempts,max_attempts,last_error,build:ultimate_course_builds!inner(owner_paused:profile->>ownerPaused,active_pools:ultimate_autopilot_pools(id))');

@@ -1,3 +1,4 @@
+// Branch refreshed to pick up main (71e31a22): /apply/student E2E fix + Dockerfile.google-lms.
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
@@ -7,13 +8,14 @@ import { readFileSync } from 'node:fs';
 const source = readFileSync('apps/lms/app/lms/(app)/messages/page.tsx', 'utf8');
 const projection = source.match(/\.from\('messages'\)\s*\.select\('([^']+)'\)/)?.[1];
 assert.ok(projection, 'Learner inbox projection was not found in the actual page');
-const base = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
-const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const qa = process.env.CI_SUPABASE_PROJECTION_QA === 'true';
+const base = qa ? 'https://isdgjcdabhxxozarmxta.supabase.co' : process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
+const key = qa ? process.env.CI_SUPABASE_PROJECTION_KEY : process.env.SUPABASE_SERVICE_ROLE_KEY;
 assert.ok(base && key, 'Supabase projection verification credentials are required');
 const url = new URL('/rest/v1/messages', base);
 url.searchParams.set('select', projection);
 url.searchParams.set('limit', '0');
-const response = await fetch(url, { headers: { apikey: key, Authorization: `Bearer ${key}` },
+const response = await fetch(url, { headers: qa ? { apikey: key } : { apikey: key, Authorization: `Bearer ${key}` },
   redirect: 'error', signal: AbortSignal.timeout(15000) });
 assert.equal(response.status, 200, `Learner inbox projection failed with HTTP ${response.status}`);
 const rows = await response.json();

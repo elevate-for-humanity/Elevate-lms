@@ -23,9 +23,9 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     env:
-      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      SUPABASE_URL: ${{ github.ref == 'refs/heads/main' && github.event_name != 'pull_request' && secrets.SUPABASE_URL || '' }}
+      NEXT_PUBLIC_SUPABASE_URL: ${{ github.ref == 'refs/heads/main' && github.event_name != 'pull_request' && secrets.NEXT_PUBLIC_SUPABASE_URL || '' }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ github.ref == 'refs/heads/main' && github.event_name != 'pull_request' && secrets.SUPABASE_SERVICE_ROLE_KEY || '' }}
     steps:
       - name: Verify requested CI commit
         if: github.event_name == 'workflow_dispatch' && inputs.requested_sha != ''
@@ -200,9 +200,15 @@ jobs:
         run: node --test scripts/gcp/dispatch-course-job.test.mjs scripts/gcp/probe-course-dispatch-queue.test.mjs
       - name: Course dispatch PostgREST projection (read-only)
         if: ${{ !cancelled() && steps.dependencies.outcome == 'success' && (github.event.pull_request.head.repo.full_name == github.repository || github.event_name != 'pull_request') }}
+        env:
+          CI_SUPABASE_PROJECTION_QA: ${{ github.ref != 'refs/heads/main' || github.event_name == 'pull_request' }}
+          CI_SUPABASE_PROJECTION_KEY: ${{ secrets.CI_SUPABASE_PROJECTION_KEY }}
         run: node scripts/gcp/probe-course-dispatch-queue.mjs
       - name: Learner inbox PostgREST projection (read-only)
         if: ${{ !cancelled() && steps.dependencies.outcome == 'success' && (github.event.pull_request.head.repo.full_name == github.repository || github.event_name != 'pull_request') }}
+        env:
+          CI_SUPABASE_PROJECTION_QA: ${{ github.ref != 'refs/heads/main' || github.event_name == 'pull_request' }}
+          CI_SUPABASE_PROJECTION_KEY: ${{ secrets.CI_SUPABASE_PROJECTION_KEY }}
         run: node scripts/qa/probe-learner-inbox.mjs
       - name: Google Studio runtime topology regression tests
         if: ${{ !cancelled() && steps.dependencies.outcome == 'success' }}
@@ -269,16 +275,16 @@ jobs:
           node --test scripts/portal-route-contract.test.mjs scripts/portal-audit-detections.test.mjs
           node scripts/audit-portal-contracts.mjs
       - name: Portal/database schema drift — live production contract
-        if: ${{ !cancelled() && steps.dependencies.outcome == 'success' && (github.event_name != 'pull_request') }}
+        if: ${{ !cancelled() && steps.dependencies.outcome == 'success' && (github.ref == 'refs/heads/main' && github.event_name != 'pull_request') }}
         run: pnpm exec tsx scripts/audit-schema-drift.ts --baseline scripts/schema-drift-baseline.json --fail-on-new-drift
       - name: Supabase write payloads — live production contract
-        if: ${{ !cancelled() && steps.dependencies.outcome == 'success' && (github.event_name != 'pull_request') }}
+        if: ${{ !cancelled() && steps.dependencies.outcome == 'success' && (github.ref == 'refs/heads/main' && github.event_name != 'pull_request') }}
         run: pnpm tsx scripts/audit-supabase-mutations.ts
       - name: Portal/database schema drift — PR advisory
         if: ${{ !cancelled() && steps.dependencies.outcome == 'success' && (github.event_name == 'pull_request') }}
         run: pnpm audit:schema
       - name: Live portal data integrity
-        if: ${{ !cancelled() && steps.dependencies.outcome == 'success' && (github.event_name != 'pull_request') }}
+        if: ${{ !cancelled() && steps.dependencies.outcome == 'success' && (github.ref == 'refs/heads/main' && github.event_name != 'pull_request') }}
         run: node scripts/audit-portal-data-integrity.mjs
       - name: Assemble canonical PWA runtime assets
         if: ${{ !cancelled() && steps.dependencies.outcome == 'success' }}

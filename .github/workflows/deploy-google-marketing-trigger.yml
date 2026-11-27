@@ -501,7 +501,7 @@ jobs:
           API="https://api.github.com/repos/$GITHUB_REPOSITORY/deployments"
           DEPLOYMENT="$(curl --fail-with-body -sS -X POST "$API" \
             -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" \
-            -d "$(node -e 'console.log(JSON.stringify({ref:process.env.GITHUB_SHA,environment:"production-google-marketing",auto_merge:false,required_contexts:[],description:"Verified Google Cloud Run and public homepage"}))')")"
+            -d "$(node -e 'console.log(JSON.stringify({ref:process.env.GITHUB_SHA,environment:"production-google-marketing",environment_url:"https://www.elevateforhumanity.org",auto_merge:false,required_contexts:[],description:"Verified Google Cloud Run and public homepage"}))')")"
           ID="$(printf '%s' "$DEPLOYMENT" | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>console.log(JSON.parse(s).id||""))')"
           test -n "$ID"
           curl --fail-with-body -sS -X POST "$API/$ID/statuses" \

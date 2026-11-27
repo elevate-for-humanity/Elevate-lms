@@ -300,7 +300,9 @@ jobs:
               # Preserve the failed mutation without retrying an ambiguous POST.
               raw=error.read(1024)
               try: code=json.loads(raw).get('errorCode','PARIS_REPAIR_PHASE_FAILED')
-              except (ValueError,TypeError): code='PARIS_REPAIR_PHASE_FAILED'
+              # A non-JSON body came from the gateway/load balancer, not the
+              # Admin route's classified failure; never conflate the two.
+              except (ValueError,TypeError): code='PARIS_ADMIN_GATEWAY_NON_JSON'
               if not isinstance(code,str) or not re.fullmatch(r'[A-Z0-9_]{5,64}',code):
                 code='PARIS_REPAIR_PHASE_FAILED'
               print('PARIS_PREPARE_REJECTED HTTP '+str(error.code)+' '+code,flush=True)

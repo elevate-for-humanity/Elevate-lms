@@ -90,6 +90,109 @@ registerSimulation({
     'Hands-on manifold gauge lab: connect the gauges, calculate superheat and subcooling from the PT chart, and charge an undercharged R-410A TXV system to its subcooling target — recover, never vent.',
 });
 
+// Scenario-engine labs (lib/lms/scenario-simulation.ts): inspection,
+// decision, and calculation scenarios scored server-side through the
+// learner interactions API and recorded in interaction_progress, rendered
+// by components/lms/ScenarioSimulator.tsx.
+registerSimulation({
+  id: 'ai-engineering-workflow-lab',
+  title: 'AI Workflow Lab — Brief It, Test It, Verify It, Ship It Safely',
+  trade: 'ai-engineering',
+  component: 'ScenarioSimulator',
+  description:
+    'The AI Engineering capstone rehearsal: narrow-AI judgment, structured prompting, test-set iteration math, outside verification, the never-paste list (hard fail), and API key custody.',
+});
+
+registerSimulation({
+  id: 'business-operations-lab',
+  title: 'Small Business Operations Lab — Price It, Break Even, Mind the Cash',
+  trade: 'business',
+  component: 'ScenarioSimulator',
+  description:
+    'ESB financials in action: cost classification, a break-even computation, margin versus markup, the true cost of a discount, and cash-flow timing judgments.',
+});
+
+registerSimulation({
+  id: 'bookkeeping-month-end-lab',
+  title: 'Month-End Bookkeeping Lab — Entries, Reconciliation, and the File Check',
+  trade: 'bookkeeping',
+  component: 'ScenarioSimulator',
+  description:
+    'Close a month: double-entry direction, a bank reconciliation computed from timing items, book-versus-bank adjustments, trial-balance limits, and a month-end file audit.',
+});
+
+registerSimulation({
+  id: 'esthetician-treatment-room-lab',
+  title: 'Treatment Room Lab — Consult, Turn Over, Treat, Refer, Record',
+  trade: 'esthetics',
+  component: 'ScenarioSimulator',
+  description:
+    'One wax appointment: contraindication screening (consent never overrides it), room turnover, mid-service stop judgment, lesion observation and referral without diagnosis, and the confidential record.',
+});
+
+registerSimulation({
+  id: 'nail-station-lab',
+  title: 'Nail Station Lab — Sanitation, Observation, and the Service Decision',
+  trade: 'nail-technology',
+  component: 'ScenarioSimulator',
+  description:
+    'Station sanitation and chemical safety, observation before service — enhancing over a painful, lifted, discolored nail hard-fails — living-tissue protection, consented charges, and expiry discipline.',
+});
+
+registerSimulation({
+  id: 'financial-household-money-lab',
+  title: 'Household Money Lab — Budget, Safety Net, and Debt Decisions',
+  trade: 'financial-literacy',
+  component: 'ScenarioSimulator',
+  description:
+    'One household month with the course\'s fictional figures: take-home budgeting, net worth, emergency-fund placement, a scam call that hard-fails on code-sharing, and debt payoff order.',
+});
+
+registerSimulation({
+  id: 'hipaa-privacy-scenario-lab',
+  title: 'Privacy Scenario Lab — Disclosures, Access, and Incidents',
+  trade: 'healthcare',
+  component: 'ScenarioSimulator',
+  description:
+    'A clinic shift of privacy decisions: verify before disclosing, minimum necessary (and its treatment exception), role-based access, workspace safeguards, and incident reporting — disclosing to an unverified caller or concealing an incident hard-fails.',
+});
+
+registerSimulation({
+  id: 'osha-hazard-inspection-lab',
+  title: 'Hazard Inspection Lab — Walk the Space, Rank the Risk, Choose the Control',
+  trade: 'workplace-safety',
+  component: 'ScenarioSimulator',
+  description:
+    'A full walkthrough inspection: hazard recognition (including the safety-versus-privacy distinction), reporting order by risk, hierarchy-of-controls choices, and PPE judgment — running an unguarded machine hard-fails.',
+});
+
+registerSimulation({
+  id: 'cosmetology-salon-client-lab',
+  title: 'Salon Client Lab — Consultation, Color, and Infection Control',
+  trade: 'cosmetology',
+  component: 'ScenarioSimulator',
+  description:
+    'A full color-client visit: station reset to infection-control standard, consultation, hair and scalp analysis, the skin-test versus strand-test decision, a label mixing calculation, and documentation — proceeding on an irritated scalp hard-fails.',
+});
+
+registerSimulation({
+  id: 'barbering-client-lab',
+  title: 'Barbershop Client Lab — Consultation, Tools, and the Razor',
+  trade: 'barbering',
+  component: 'ScenarioSimulator',
+  description:
+    'One barbershop visit: tool processing (clean, disinfect per label, sharps discipline), the consultation, a scalp finding that pauses the service, razor preparation, price confirmation, and the client record.',
+});
+
+registerSimulation({
+  id: 'welding-weld-booth-lab',
+  title: 'Weld Booth Lab — Set Up, Weld, and Inspect a Coupon',
+  trade: 'welding',
+  component: 'ScenarioSimulator',
+  description:
+    'Booth job end to end: PPE and booth check, the hot-work fire call, GMAW machine setup, the diagonal squareness proof, bead reading, and a finished-coupon visual inspection with a crack disposition that hard-fails if accepted or concealed.',
+});
+
 // Forklift pre-operation inspection + safe load handling lab for the
 // Forklift and Manufacturing Operations course
 // (components/lms/ForkliftSimulator.tsx, scenario + server-side scorer in

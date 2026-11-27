@@ -1,3 +1,4 @@
+import path from 'node:path';
 import { expect, test, type APIRequestContext, type Page } from '@playwright/test';
 
 const CRITICAL_PUBLIC_ROUTES = [
@@ -178,6 +179,14 @@ async function collectInternalLinks(page: Page, selector: string): Promise<strin
   return [...new Set(hrefs.filter(isInternalHref))].sort();
 }
 
+// Section narration synthesizes speech through Google Cloud, which is not
+// provisioned for CI dev servers. Serve a committed recording so the audit
+// measures page runtime health rather than speech-provider availability.
+const NARRATION_FIXTURE = path.resolve(
+  process.cwd(),
+  'public/audio/program-introductions/barber-apprenticeship.mp3',
+);
+
 async function assertNoRuntimeFailure(page: Page, route: string) {
   try {
     await checkPageOnce(page, route);
@@ -213,6 +222,9 @@ async function checkPageOnce(page: Page, route: string) {
   const onResponse = (response: import('@playwright/test').Response) => {
     if (response.status() >= 500) failedResponses.push({ status: response.status(), url: response.url() });
   };
+  await page.route('**/api/voice/natural', (request) =>
+    request.fulfill({ path: NARRATION_FIXTURE, contentType: 'audio/mpeg' }),
+  );
   page.on('pageerror', onPageError);
   page.on('console', onConsole);
   page.on('response', onResponse);
@@ -332,7 +344,8 @@ test.describe('responsive navigation acceptance', () => {
     await expect(menuButton).toBeVisible();
     await menuButton.click();
 
-    // Match the actual HeaderMobileMenu landmark and the public navigation audit.
+    // Match the accessible name rendered by HeaderMobileMenu and asserted
+    // by the shared public navigation audit.
     const mobileNav = page.getByRole('navigation', { name: 'Mobile navigation', exact: true });
     await expect(mobileNav).toBeVisible();
   });
@@ -371,12 +384,8 @@ test.describe('application entry audit', () => {
     test.setTimeout(300_000);
     await assertNoRuntimeFailure(page, '/programs/barber-apprenticeship/apply');
     await expect(page.getByRole('link', { name: 'Submit Free Inquiry' })).toBeVisible();
-    const enrollment = page.getByRole('link', { name: 'Start Enrollment' });
-    await expect(enrollment).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Start Enrollment' })).toBeVisible();
     await expect(page.getByRole('link', { name: 'Start Host Site Application' })).toBeVisible();
-    await expect(enrollment).toHaveAttribute('href', '/apply/student/interview?program=barber-apprenticeship&intent=enrollment');
-    await enrollment.click();
-    await expect(page).toHaveURL(/\/enroll\/barber-apprenticeship(?:\?|$)/);
   });
 
   for (const route of ['/apply/student']) {
@@ -412,6 +421,15 @@ test.describe('application entry audit', () => {
     });
   }
 
+  test('Barber enrollment retains the selected program and paid enrollment intent', async ({ page }) => {
+    await assertNoRuntimeFailure(page, '/programs/barber-apprenticeship/apply');
+    const enrollment = page.getByRole('link', { name: 'Start Enrollment' });
+    await expect(enrollment).toHaveAttribute('href',
+      '/apply/student/interview?program=barber-apprenticeship&intent=enrollment');
+    await enrollment.click();
+    await expect(page).toHaveURL(/\/enroll\/barber-apprenticeship(?:\?|$)/);
+  });
+
   test('student application has a submission control', async ({ page }) => {
     await page.goto('/apply/student', { waitUntil: 'domcontentloaded' });
     // The canonical entry opens PARIS; its accessible standard-form path is a
@@ -419,18 +437,25 @@ test.describe('application entry audit', () => {
     // without submitting a test record or starting paid enrollment.
     await page.getByRole('link', { name: 'Use standard form instead', exact: true }).click();
     await expect(page).toHaveURL(/\/apply\/student\/form\?intent=inquiry$/);
-    await page.getByRole('textbox', { name: 'First Name', exact: true }).fill('Browser');
-    await page.getByRole('textbox', { name: 'Last Name', exact: true }).fill('QA');
-    await page.getByLabel('Date of Birth', { exact: true }).fill('1990-01-01');
-    await page.getByRole('textbox', { name: 'Email', exact: true }).fill('browser-control-check@qa.invalid');
-    await page.getByRole('textbox', { name: 'Phone', exact: true }).fill('317-555-0100');
-    await page.getByRole('textbox', { name: 'Street Address', exact: true }).fill('100 QA Test Way');
-    await page.getByRole('textbox', { name: 'City', exact: true }).fill('Indianapolis');
-    await page.getByRole('textbox', { name: 'State', exact: true }).fill('IN');
-    await page.getByRole('textbox', { name: 'ZIP Code', exact: true }).fill('46201');
     const next = page.getByRole('button', { name: 'Continue', exact: true });
-    await next.click();
-    await page.getByLabel(/Program of Interest/).selectOption('hvac-technician');
+    const program = page.getByLabel(/Program of Interest/);
+    // Fills typed into the server-rendered inputs before StudentApplicationForm
+    // hydrates never reach React state; run 45982254686 reached Continue with
+    // every controlled field reset. Re-enter step 1 until the form accepts it.
+    await expect(async () => {
+      await page.getByRole('textbox', { name: 'First Name', exact: true }).fill('Browser');
+      await page.getByRole('textbox', { name: 'Last Name', exact: true }).fill('QA');
+      await page.getByLabel('Date of Birth', { exact: true }).fill('1990-01-01');
+      await page.getByRole('textbox', { name: 'Email', exact: true }).fill('browser-control-check@qa.invalid');
+      await page.getByRole('textbox', { name: 'Phone', exact: true }).fill('317-555-0100');
+      await page.getByRole('textbox', { name: 'Street Address', exact: true }).fill('100 QA Test Way');
+      await page.getByRole('textbox', { name: 'City', exact: true }).fill('Indianapolis');
+      await page.getByRole('textbox', { name: 'State', exact: true }).fill('IN');
+      await page.getByRole('textbox', { name: 'ZIP Code', exact: true }).fill('46201');
+      await next.click();
+      await expect(program).toBeVisible({ timeout: 2_000 });
+    }).toPass({ timeout: 30_000 });
+    await program.selectOption('hvac-technician');
     await next.click();
     await page.getByLabel(/How do you plan to pay/).selectOption('not_sure');
     await next.click();

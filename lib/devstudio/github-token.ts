@@ -79,7 +79,8 @@ export async function verifyGitHubBranchAuthority(
     },
   );
   if (!response.ok) {
-    if (response.status === 403) throw githubBranchAuthorityError(`GitHub returned HTTP 403 for the repository read.`);
+    // A refused repository read (rate limit, SSO, suspended App) is not a
+    // branch-write denial; only POST /git/refs HTTP 403 is GITHUB_APP_403_BRANCH.
     throw new Error(`GITHUB_BRANCH_AUTHORITY_CHECK_HTTP_${response.status}`);
   }
   const payload = await response.json().catch(() => ({}));

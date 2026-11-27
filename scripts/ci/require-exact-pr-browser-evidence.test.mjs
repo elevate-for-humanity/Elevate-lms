@@ -7,7 +7,8 @@ const repository = 'elevate-for-humanity/Elevate-lms';
 const headBranch = 'fix/required-test';
 const run = { id: 123, head_sha: sha, head_branch: headBranch, head_repository: { full_name: repository },
   path: '.github/workflows/e2e-desktop-chrome.yml', event: 'pull_request', status: 'completed', conclusion: 'success' };
-const names = ['E2E desktop-chrome', 'Public Host Shop navigation and application (five devices)', 'Email device browsers'];
+const shardNames = [1, 2, 3, 4].map(n => `E2E desktop-chrome shard ${n}/4`);
+const names = ['E2E desktop-chrome', ...shardNames, 'Public Host Shop navigation and application (five devices)', 'Email device browsers'];
 const jobs = names.map(name => ({ name, status: 'completed', conclusion: 'success' }));
 const inspect = (runs = [run], checkedJobs = jobs) => inspectExactPrBrowserEvidence({
   runs, jobs: checkedJobs, sourceRepository: repository, headSha: sha, headBranch,
@@ -28,6 +29,16 @@ test('skipped, absent and incomplete browser jobs block', () => {
   assert.throws(() => inspect([run], jobs.slice(1)), /E2E_REQUIRED_JOB_NOT_SUCCESSFUL/);
   assert.throws(() => inspect([run], jobs.map((job, i) => i === 1 ? { ...job, conclusion: 'skipped' } : job)), /E2E_REQUIRED_JOB_NOT_SUCCESSFUL/);
   assert.throws(() => inspect([run], jobs.map((job, i) => i === 2 ? { ...job, status: 'in_progress' } : job)), /E2E_REQUIRED_JOB_NOT_SUCCESSFUL/);
+});
+test('every desktop shard must be present exactly once and successful', () => {
+  const withShard = (name, mutate) => jobs.flatMap(job => job.name === name ? mutate(job) : [job]);
+  for (const name of shardNames) {
+    assert.throws(() => inspect([run], withShard(name, () => [])), /E2E_REQUIRED_JOB_NOT_SUCCESSFUL:E2E desktop-chrome shard/);
+    assert.throws(() => inspect([run], withShard(name, job => [job, job])), /E2E_REQUIRED_JOB_NOT_SUCCESSFUL:E2E desktop-chrome shard/);
+    assert.throws(() => inspect([run], withShard(name, job => [{ ...job, conclusion: 'failure' }])), /E2E_REQUIRED_JOB_NOT_SUCCESSFUL:E2E desktop-chrome shard/);
+    assert.throws(() => inspect([run], withShard(name, job => [{ ...job, conclusion: 'skipped' }])), /E2E_REQUIRED_JOB_NOT_SUCCESSFUL:E2E desktop-chrome shard/);
+  }
+  assert.throws(() => inspect([run], jobs.filter(job => job.name !== 'E2E desktop-chrome')), /E2E_REQUIRED_JOB_NOT_SUCCESSFUL:E2E desktop-chrome$/);
 });
 test('wrong repository, branch, event, or SHA never satisfies this PR', () => {
   for (const change of [

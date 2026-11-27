@@ -155,7 +155,7 @@ jobs:
           exit 1
       - name: Clean up disposable Apprentice and Host Shop QA identities
         if: always()
-        run: node scripts/qa/provision-apprenticeship-e2e.mjs cleanup  
+        run: node scripts/qa/provision-apprenticeship-e2e.mjs cleanup
       - name: Clean up disposable Learner and Program Holder QA identities
         if: always()
         run: node scripts/qa/provision-learner-program-holder-e2e.mjs cleanup

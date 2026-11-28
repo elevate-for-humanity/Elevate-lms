@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { ArrowRight, CheckCircle2 } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import {
   EMPLOYER_NETWORK_REGIONS,
   EMPLOYER_TALENT_PATHWAYS,
@@ -69,7 +69,7 @@ export default async function TalentPathwayPage({
             <div className="mt-6 space-y-3">
               {pathway.training.map((item) => (
                 <p key={item} className="flex gap-3 rounded-xl bg-slate-50 p-4 font-bold">
-                  <CheckCircle2 className="h-6 w-6 shrink-0 text-emerald-700" />
+                  <span aria-hidden="true" className="shrink-0 text-slate-400">•</span>
                   {item}
                 </p>
               ))}
@@ -131,3 +131,4 @@ export default async function TalentPathwayPage({
     </main>
   );
 }
+

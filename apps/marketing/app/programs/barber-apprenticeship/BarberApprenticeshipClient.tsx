@@ -4,10 +4,10 @@ import Image from 'next/image';
 import Link from 'next/link';
 import {
   ArrowRight,
-  CheckCircle2,
+  Award,
   GraduationCap,
   Scissors,
-  ShieldCheck,
+  Shield,
   Store,
   WalletCards,
 } from 'lucide-react';
@@ -100,7 +100,7 @@ export default function BarberApprenticeshipClient({
         <div className="mx-auto max-w-6xl">
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {[
-              { icon: CheckCircle2, label: 'Registered Completion', value: `${COMPETENCY_COUNT} competencies` },
+              { icon: Award, label: 'Registered Completion', value: `${COMPETENCY_COUNT} competencies` },
               { icon: GraduationCap, label: 'Related Instruction', value: `${RTI_HOURS} verified RTI hours` },
               { icon: WalletCards, label: 'Self-Pay Tuition', value: `$${BARBER_PRICING.fullPrice.toLocaleString()}` },
               { icon: Store, label: 'Training Site', value: 'Approved host shop' },
@@ -158,7 +158,7 @@ export default function BarberApprenticeshipClient({
               'Current Indiana licensing application and examination requirements after registered-program completion',
             ].map((item) => (
               <div key={item} className="flex gap-3 rounded-2xl border border-slate-200 bg-white p-5 text-slate-900">
-                <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-emerald-700" aria-hidden="true" />
+                <span aria-hidden="true" className="mt-0.5 shrink-0 text-slate-400">•</span>
                 <p className="font-semibold leading-6">{item}</p>
               </div>
             ))}
@@ -177,7 +177,7 @@ export default function BarberApprenticeshipClient({
             <div className="mt-8 grid gap-5 md:grid-cols-3">
               {credentials.map((credential) => (
                 <article key={credential.name} className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-                  <ShieldCheck className="h-6 w-6 text-brand-blue-700" aria-hidden="true" />
+                  <Shield className="h-6 w-6 text-brand-blue-700" aria-hidden="true" />
                   <h3 className="mt-4 text-xl font-black text-slate-950">{credential.name}</h3>
                   <p className="mt-2 text-sm font-semibold text-brand-blue-800">{credential.issuer}</p>
                   <p className="mt-3 text-sm leading-6 text-slate-800">{credential.description}</p>
@@ -258,3 +258,4 @@ export default function BarberApprenticeshipClient({
 </main>
   );
 }
+

@@ -90,8 +90,10 @@ export default function NarratedProgramIntro({
           <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-600">
             Elevate for Humanity • Career training
           </p>
-          <h2 className="mt-3 text-3xl font-black leading-tight sm:text-4xl">{program.title}</h2>
-          <p className="mt-4 text-base leading-7 text-slate-700">{program.subtitle}</p>
+          {/* Visual caption only — the page's H1 and pitch live once, in the
+              hero content panel below, so the title and subtitle are not
+              printed twice. */}
+          <p className="mt-3 text-3xl font-black leading-tight sm:text-4xl">{program.title}</p>
           <ProgramIntroductionAudio program={program} />
         </figcaption>
       </div>
@@ -137,3 +139,4 @@ export function ProgramLearningPreview({ program }: { program: ProgramSchema }) 
     </section>
   );
 }
+

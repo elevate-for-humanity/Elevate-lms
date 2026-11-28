@@ -10,7 +10,6 @@ import {
   Award,
   Briefcase,
   GraduationCap,
-  CheckCircle,
 } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
@@ -384,3 +383,4 @@ export function ProgramTemplate({ program }: ProgramTemplateProps) {
     </main>
   );
 }
+

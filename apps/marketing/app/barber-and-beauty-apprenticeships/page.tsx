@@ -13,8 +13,8 @@ export const metadata: Metadata = {
 const images: Record<(typeof BEAUTY_TRADES)[number]['key'], string> = {
   barber: '/images/partners/top-shelf-barber-lounge/top-shelf-fade-profile-enhanced-2026.webp',
   cosmetology: '/images/partners/salon-saloon/team-interior-enhanced-2026.webp',
-  esthetician: '/images/pexels/esthetician.webp',
-  'nail-technician': '/images/pexels/nail-tech.webp',
+  esthetician: '/images/partners/mesmerized-by-beauty/downtown-esthetician-program.webp',
+  'nail-technician': '/images/partners/mesmerized-by-beauty/downtown-nail-program.webp',
 };
 
 export default function BarberBeautyProgramsPage() {
@@ -66,3 +66,4 @@ export default function BarberBeautyProgramsPage() {
     </main>
   );
 }
+

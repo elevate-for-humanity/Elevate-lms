@@ -9,7 +9,7 @@ export const IT_HELP_DESK: ProgramSchema = {
   category: 'Information Technology',
   programType: 'workforce',
 
-  heroImage: '/images/pexels/network.webp',
+  heroImage: '/images/refresh-20261014/technology.webp',
   heroImageAlt: 'IT support student troubleshooting hardware in a lab',
   videoSrc: '/videos/it-technology.mp4',
 
@@ -392,3 +392,4 @@ export const IT_HELP_DESK: ProgramSchema = {
     fundingNotes: 'Indiana ETPL-listed. WIOA Title I and WRG funding available. CompTIA A+ certification pathway.',
   },
 };
+

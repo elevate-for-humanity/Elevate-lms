@@ -2,7 +2,7 @@ import { IMAGE_LOADING_BLUR } from '@/lib/ui/blur-placeholder';
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowRight, BadgeCheck, HeartPulse, Stethoscope } from 'lucide-react';
+import { ArrowRight, Award, HeartPulse, Stethoscope } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Healthcare Training Programs | Elevate for Humanity',
@@ -123,7 +123,7 @@ export default function HealthcareProgramsPage() {
                   ) : index % 3 === 1 ? (
                     <Stethoscope className="h-5 w-5" />
                   ) : (
-                    <BadgeCheck className="h-5 w-5" />
+                    <Award className="h-5 w-5" />
                   )}
                 </div>
                 <h3 className="mt-4 text-xl font-black">{program.title}</h3>
@@ -142,3 +142,4 @@ export default function HealthcareProgramsPage() {
     </main>
   );
 }
+

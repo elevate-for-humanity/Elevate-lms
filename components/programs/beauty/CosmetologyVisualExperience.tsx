@@ -3,7 +3,7 @@
 import { IMAGE_LOADING_BLUR } from '@/lib/ui/blur-placeholder';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowRight, BadgeCheck, ChevronLeft, ChevronRight, Pause, Play } from 'lucide-react';
+import { ArrowRight, Award, ChevronLeft, ChevronRight, Pause, Play } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 
 const slides = [
@@ -109,7 +109,7 @@ export default function CosmetologyVisualExperience() {
                   'Progress tracked in your portal',
                 ].map((item) => (
                   <span key={item} className="inline-flex items-center gap-2">
-                    <BadgeCheck className="h-4 w-4 text-emerald-700" />
+                    <Award className="h-4 w-4 text-emerald-700" />
                     {item}
                   </span>
                 ))}
@@ -202,3 +202,4 @@ export default function CosmetologyVisualExperience() {
     </>
   );
 }
+

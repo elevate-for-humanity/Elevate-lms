@@ -90,7 +90,7 @@ export default async function FeaturedHostPartners({
               alt={getProgramImageAlt(programSlug ?? 'cosmetology-apprenticeship')}
               fill
               className="object-contain"
-              sizes="(max-width: 1024px) 100vw, 50vw"
+              sizes="(max-width: 1024px) 100vw, 640px"
             />
           </div>
           <div className="flex flex-col justify-center p-7 sm:p-10">
@@ -317,3 +317,4 @@ export default async function FeaturedHostPartners({
     </>
   );
 }
+

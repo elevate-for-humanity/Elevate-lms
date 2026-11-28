@@ -63,7 +63,13 @@ export async function POST(request: NextRequest) {
     storage_bucket: 'credential-uploads',
     storage_path: path,
     original_filename: file.name,
-    verification_status: 'pending',
+    // Standing behavior (Elizabeth, 2026-11-26): the file passed content
+    // validation and is stored, so it is approved on arrival — no
+    // review-queue hold. Invalid files are rejected above with a 400
+    // before anything is stored.
+    verification_status: 'approved',
+    notes: 'Auto-approved on arrival (present + uploaded = approved).',
+    verified_at: new Date().toISOString(),
   }).select('id,upload_type,verification_status,created_at').single();
   if (error) {
     await db.storage.from('credential-uploads').remove([path]);
@@ -71,3 +77,4 @@ export async function POST(request: NextRequest) {
   }
   return NextResponse.json({ upload: data }, { status: 201 });
 }
+

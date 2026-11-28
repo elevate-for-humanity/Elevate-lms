@@ -212,8 +212,16 @@ async function _POST(request: NextRequest) {
         file_url: null,
         file_size_bytes: file.size,
         mime_type: file.type,
-        status: 'pending',
-        verification_status: 'pending',
+        // Standing behavior (Elizabeth, 2026-11-26): a document that is
+        // present and uploaded is approved on arrival — no review-queue
+        // hold. The storage location is written to the storage_path column
+        // as well as metadata so every reader surface can find the file.
+        status: 'approved',
+        verification_status: 'approved',
+        verified: true,
+        verified_at: new Date().toISOString(),
+        verification_notes: 'Auto-approved on arrival (present + uploaded = approved).',
+        storage_path: storagePath,
         metadata: {
           program_slug: programSlug,
           enrollment_id: enrollment.id,
@@ -386,3 +394,4 @@ async function _DELETE(request: NextRequest) {
 export const GET = withApiAudit('/api/apprentice/documents', _GET);
 export const POST = withApiAudit('/api/apprentice/documents', _POST);
 export const DELETE = withApiAudit('/api/apprentice/documents', _DELETE);
+

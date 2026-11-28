@@ -156,7 +156,7 @@ export function InteractiveCommunityDemo() {
               'Sandbox data only — never touches production learner/community records',
               'Persistent during this browser session',
               'Sandbox configuration carries into the trial workspace',
-              'Paid membership checkout activates after the owner connects Stripe',
+              'Paid membership checkout activates after the owner connects QuickBooks',
             ].map((item) => (
               <div key={item} className="flex gap-2"><Check className="mt-0.5 h-4 w-4 shrink-0" /> {item}</div>
             ))}
@@ -241,7 +241,7 @@ export function InteractiveCommunityDemo() {
               <div className="flex items-center rounded-xl border border-amber-300 bg-white px-3"><span className="font-black text-slate-500">$</span><input value={membershipPrice} onChange={(event) => setMembershipPrice(event.target.value)} inputMode="decimal" className="w-full px-1 py-2 text-sm font-semibold outline-none" /></div>
               <button onClick={() => void createMembership()} className="rounded-xl bg-amber-600 px-4 py-2 text-xs font-black text-white hover:bg-amber-700">Preview plan</button>
             </div>
-            {community.membershipName && <p className="mt-2 text-xs font-bold text-amber-900">{community.membershipName}: ${community.membershipPrice}/mo sandbox preview. The real workspace can connect Stripe before taking payments.</p>}
+            {community.membershipName && <p className="mt-2 text-xs font-bold text-amber-900">{community.membershipName}: ${community.membershipPrice}/mo sandbox preview. The real workspace can connect QuickBooks before taking payments.</p>}
           </div>
 
           <div className="mt-5 flex flex-col gap-3 rounded-2xl bg-slate-950 p-5 text-white sm:flex-row sm:items-center sm:justify-between">

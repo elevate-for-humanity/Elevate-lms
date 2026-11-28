@@ -5,15 +5,15 @@ export const TESTING_PROVIDER_IMAGES: Record<string, { src: string; alt: string 
     alt: 'Illustrative instructor supervising HVAC refrigerant-service training',
   },
   midland: {
-    src: '/images/programs/hvac/training-20261029/instructor-demo.webp',
+    src: '/images/programs/hvac/training-20261029/career.webp',
     alt: 'Illustrative HVAC instructor and learner inspecting equipment',
   },
   nrf: {
-    src: '/images/licensed-envato/testing-workkeys-0adce9d3.webp',
+    src: '/images/team/instructors/instructor-retail.webp',
     alt: 'Illustrative instructor guiding workplace business-skills learning',
   },
   certiport: {
-    src: '/images/licensed-envato/testing-exam-291b8cff.webp',
+    src: '/images/refresh-20261014/technology.webp',
     alt: 'Illustrative information technology instructor and learner in a computer lab',
   },
   nha: {
@@ -29,3 +29,4 @@ export const TESTING_PROVIDER_IMAGES: Record<string, { src: string; alt: string 
     alt: 'Workers in hard hats and high-visibility vests attending a safety briefing',
   },
 };
+

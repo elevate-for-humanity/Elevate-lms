@@ -12,7 +12,6 @@ import { logger } from '@/lib/logger';
 
 import EnrollmentPipeline from '@/components/programs/EnrollmentPipeline';
 import ProgramCohortFlyer from '@/components/programs/ProgramCohortFlyer';
-import ProgramExperienceGuide from '@/components/programs/ProgramExperienceGuide';
 
 import Image from 'next/image';
 import { RAPIDS_VERIFIED_INVENTORY } from '@/lib/apprenticeship/rapids-verified-inventory';
@@ -22,7 +21,6 @@ import Link from 'next/link';
 import { Fragment } from 'react';
 import dynamic from 'next/dynamic';
 import NarratedProgramIntro, {
-  ProgramLearningPreview,
   ProgramIntroductionAudio,
 } from './NarratedProgramIntro';
 import ProgramApplyForm from '@/components/programs/ProgramApplyForm';
@@ -167,38 +165,6 @@ export default function ProgramDetailPage({
     ? `Welcome to ${p.title}. This is an earn-while-you-learn path that connects classroom instruction with supervised experience at an approved Host Site. Picture yourself learning a skill, practicing it with a qualified professional, and seeing your progress build week by week. The full pathway is ${durationLabel}, usually ${weeklyHoursLabel.replace('hrs/week', 'hours each week')}. You will grow through areas such as ${narrationCurriculum || 'the skills required for this occupation'}, while working toward ${narrationCredentials || 'the program completion requirements'}. Your first step is simple: apply and complete intake. We will then help confirm your Host Site, schedule, and self-pay tuition before training begins. Move through this page at your own pace. You will see what to expect, what it costs, and exactly how to apply.`
     : `Welcome to ${p.title}. This program is designed to help you move from interest to real, usable career skills. The ${durationLabel} experience is ${p.deliveryMode === 'hybrid' ? 'a blend of flexible online learning and scheduled hands-on practice' : p.deliveryMode === 'online' ? 'available online, so you can build skills with a flexible learning routine' : 'taught in person, with direct guidance and practical learning'}. Along the way, you will build confidence in areas such as ${narrationCurriculum || 'the program skills'} and prepare for ${narrationCredentials || 'the program credentials'}. Start by applying and completing intake. That gives admissions what they need to confirm your schedule, requirements, and best enrollment path. ${isWorkforceFunded ? 'Your training may be free if you qualify and receive written approval from the workforce agency before enrollment.' : 'You will also find clear payment choices on this page.'} Take your time, review the details, and use the application link when you are ready.`;
 
-  const pathwaySteps = [
-    {
-      step: 'Step 1',
-      title: isWorkforceFunded ? 'Eligibility & Intake' : 'Enrollment & Intake',
-      detail: isWorkforceFunded
-        ? 'Program selection, readiness review, and the correct funding or self-pay path.'
-        : 'Program selection, readiness review, and the published self-pay enrollment path.',
-    },
-    {
-      step: 'Step 2',
-      title: 'Training & Assessments',
-      detail: 'Structured modules, lessons, and checkpoints in a tracked LMS path.',
-    },
-    {
-      step: 'Step 3',
-      title: 'Credential',
-      detail: 'Industry credential completion plus verifiable training records.',
-    },
-    {
-      step: 'Step 4',
-      title: 'Employer Placement',
-      detail: 'Placement support through named employer partners and matching workflow.',
-    },
-    {
-      step: 'Step 5',
-      title: 'Wage Outcome',
-      detail: p.laborMarket?.salaryRange?.toLowerCase().startsWith('varies')
-        ? `Career earnings ${p.laborMarket.salaryRange.toLowerCase()}.`
-        : `Target entry wages aligned to ${p.laborMarket?.salaryRange ?? 'regional labor data'}.`,
-    },
-  ];
-
   return (
     <main className="min-h-screen bg-white [&_a]:no-underline [&_a:hover]:no-underline">
       {/* A. HERO */}
@@ -310,19 +276,9 @@ export default function ProgramDetailPage({
             <div className="flex flex-col lg:flex-row lg:items-start gap-8">
               <div className="flex-1">
                 {/* Badges row — program badge + delivery model */}
-                <div className="flex flex-wrap items-center gap-2 mb-3">
+                <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mb-3">
                   {p.badge && (
-                    <span
-                      className={`inline-block text-xs font-bold text-white px-3 py-1 rounded-full ${
-                        p.badgeColor === 'orange'
-                          ? 'bg-orange-700'
-                          : p.badgeColor === 'green'
-                            ? 'bg-green-800'
-                            : p.badgeColor === 'red'
-                              ? 'bg-red-700'
-                              : 'bg-blue-700'
-                      }`}
-                    >
+                    <span className="text-xs font-bold uppercase tracking-wider text-slate-700">
                       {p.badge}
                     </span>
                   )}
@@ -431,7 +387,7 @@ export default function ProgramDetailPage({
         </div>
       </section>
 
-      {visualContent ? <div>{visualContent}</div> : <ProgramLearningPreview program={p} />}
+      {visualContent ? <div>{visualContent}</div> : null}
 
       <section
         id="program-overview"
@@ -454,39 +410,7 @@ export default function ProgramDetailPage({
             </p>
           </div>
 
-          <div className={`mt-8 grid gap-5 ${consolidatedEnrollment ? 'lg:grid-cols-2' : 'lg:grid-cols-3'}`}>
-            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-              <h3 className="text-xl font-black text-slate-950">Program format</h3>
-              <dl className="mt-4 space-y-3 text-sm">
-                <div>
-                  <dt className="font-bold text-slate-500">Length</dt>
-                  <dd className="mt-1 font-black text-slate-950">{durationLabel}</dd>
-                </div>
-                <div>
-                  <dt className="font-bold text-slate-500">Weekly schedule</dt>
-                  <dd className="mt-1 font-black text-slate-950">
-                    {p.schedule || weeklyHoursLabel.replace('hrs/week', 'hours per week')}
-                  </dd>
-                </div>
-                <div>
-                  <dt className="font-bold text-slate-500">Delivery</dt>
-                  <dd className="mt-1 font-black text-slate-950">
-                    {p.deliveryMode === 'hybrid'
-                      ? 'Self-paced from home + scheduled hands-on site training'
-                      : p.deliveryMode === 'online'
-                        ? 'Online'
-                        : 'In-person'}
-                  </dd>
-                </div>
-                <div>
-                  <dt className="font-bold text-slate-500">Credentials</dt>
-                  <dd className="mt-1 font-black text-slate-950">
-                    {p.credentials.length} listed credential{p.credentials.length === 1 ? '' : 's'}
-                  </dd>
-                </div>
-              </dl>
-            </div>
-
+          <div className="mt-8 max-w-2xl">
             <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
               <h3 className="text-xl font-black text-slate-950">Your next steps</h3>
               <ol className="mt-4 space-y-3 text-sm leading-6 text-slate-700">
@@ -509,45 +433,6 @@ export default function ProgramDetailPage({
               </ol>
             </div>
 
-            {!consolidatedEnrollment && (
-            <div
-              id="payment-options"
-              className="rounded-2xl border border-emerald-200 bg-emerald-50 p-6 shadow-sm"
-            >
-              <h3 className="text-xl font-black text-slate-950">
-                {isApprenticeship
-                  ? 'Self-pay tuition and payment options'
-                  : 'Funding and payment options'}
-              </h3>
-              <ul className="mt-4 space-y-3 text-sm leading-6 text-slate-700">
-                {isWorkforceFunded ? (
-                  <li>
-                    <strong className="text-slate-950">Workforce funding:</strong> Training may be
-                    free only if you qualify and receive written agency authorization before
-                    enrollment.
-                  </li>
-                ) : null}
-                <li>
-                  <strong className="text-slate-950">Pay in full:</strong> Pay the published tuition
-                  through the secure enrollment process.
-                </li>
-                <li>
-                  <strong className="text-slate-950">Payment plan:</strong> Split eligible tuition
-                  into installments; deposit and terms are shown before acceptance.
-                </li>
-                <li>
-                  <strong className="text-slate-950">Buy Now Pay Later:</strong> This is an optional
-                  self-pay financing method with separate provider approval and repayment terms.
-                </li>
-                {!isApprenticeship ? (
-                  <li>
-                    <strong className="text-slate-950">Employer-sponsored:</strong> An employer may
-                    pay eligible costs when an arrangement is approved.
-                  </li>
-                ) : null}
-              </ul>
-            </div>
-            )}
           </div>
 
           <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
@@ -656,8 +541,6 @@ export default function ProgramDetailPage({
         <ProgramCohortFlyer programSlug={p.slug} programTitle={p.title} />
       ) : null}
 
-      {!consolidatedEnrollment && <ProgramExperienceGuide program={p} />}
-
       {afterHero ? <div>{afterHero}</div> : null}
 
       {/* DECISION PANEL — answers the questions visitors need before applying */}
@@ -680,18 +563,9 @@ export default function ProgramDetailPage({
                 </div>
               ))}
             </div>
-            <div className="mt-6 grid grid-cols-1 min-[390px]:grid-cols-2 gap-3 sm:grid-cols-4">
-              <DecisionFact label="Length" value={durationLabel} />
-              <DecisionFact label="Schedule" value={weeklyHoursLabel} />
-              <DecisionFact
-                label={registeredTerm ? 'Registered term' : 'Training'}
-                value={registeredTerm?.displayedTerm ?? (instructionHours > 0 ? `${instructionHours.toLocaleString()} hours` : hoursRange)}
-              />
-              <DecisionFact label="Credential" value={`${p.credentials.length} included`} />
-            </div>
           </div>
 
-          <aside id={consolidatedEnrollment ? "payment-options" : undefined} className="rounded-2xl border border-slate-200 bg-white p-5 text-slate-950 sm:p-6">
+          <aside id="payment-options" className="rounded-2xl border border-slate-200 bg-white p-5 text-slate-950 sm:p-6">
             <p className="mt-5 text-xs font-black uppercase tracking-[0.16em] text-slate-700">
               Price & Enrollment
             </p>
@@ -943,31 +817,6 @@ export default function ProgramDetailPage({
           </div>
         </section>
       )}
-
-      {/* 5-STEP WORKFORCE PATHWAY */}
-      <section className="py-12 bg-slate-50 border-y border-slate-100">
-        <div className="max-w-6xl mx-auto px-4">
-          <h2 className="text-2xl font-extrabold text-slate-900 mb-2">
-            {isWorkforceFunded ? 'Full Workforce Pathway' : 'Full Career Pathway'}
-          </h2>
-          <p className="text-slate-600 text-sm mb-8">
-            {isWorkforceFunded
-              ? 'Built for agency deployment: intake to wage outcome in one system.'
-              : 'A clear path from enrollment through training, credential, and career support.'}
-          </p>
-          <div className="grid gap-3 md:grid-cols-5">
-            {pathwaySteps.map((item) => (
-              <div key={item.step} className="rounded-xl border border-slate-200 bg-white p-4">
-                <p className="text-[10px] uppercase tracking-widest font-bold text-brand-red-600 mb-2">
-                  {item.step}
-                </p>
-                <h3 className="text-sm font-extrabold text-slate-900 mb-1">{item.title}</h3>
-                <p className="text-xs text-slate-600 leading-relaxed">{item.detail}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
 
       {/* CURRICULUM */}
       <section id="curriculum" className="py-12">
@@ -1486,15 +1335,6 @@ function SectionHeader({ icon: Icon, title }: { icon: any; title: string }) {
   );
 }
 
-function DecisionFact({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-      <div className="text-xs font-bold uppercase tracking-wider text-slate-500">{label}</div>
-      <div className="mt-1 text-base font-extrabold text-slate-950">{value}</div>
-    </div>
-  );
-}
-
 function SpecItem({ icon: Icon, label, value }: { icon: any; label: string; value: string }) {
   return (
     <div className="text-center">
@@ -1519,3 +1359,4 @@ function HoursBar({ label, hours, total }: { label: string; hours: number; total
     </div>
   );
 }
+

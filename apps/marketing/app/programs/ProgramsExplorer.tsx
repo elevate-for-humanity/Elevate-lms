@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { ArrowRight, Award, Clock, DollarSign, Search, ShieldCheck, Star } from 'lucide-react';
+import { ArrowRight, Award, Clock, DollarSign, Search, Star } from 'lucide-react';
 import type { ProgramsPageRow } from '@/lib/programs/public-programs-page';
 import PublicCatalogCard from '@/components/programs/PublicCatalogCard';
 
@@ -126,3 +126,4 @@ export function ProgramsExplorer({
 }
 
 export default ProgramsExplorer;
+

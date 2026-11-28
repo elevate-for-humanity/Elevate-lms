@@ -8,12 +8,13 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import {
   ArrowRight,
-  BadgeCheck,
+  Award,
   BookOpen,
   Building2,
+  CircleDollarSign,
   Clock3,
   Scissors,
-  ShieldCheck,
+  Shield,
 } from 'lucide-react';
 import HeroVideo from '@/components/marketing/HeroVideo';
 import BeautyTheoryDailyPolicy from '@/components/programs/beauty/BeautyTheoryDailyPolicy';
@@ -50,7 +51,7 @@ const FLOW = [
     body: 'Document OJL, RTI, skills, attendance, and required apprenticeship milestones.',
   },
   {
-    icon: BadgeCheck,
+    icon: Award,
     title: 'Prepare for licensing',
     body: 'Complete the pathway requirements tied to Indiana barber licensing preparation.',
   },
@@ -192,14 +193,14 @@ export default async function BarberApprenticeshipPage() {
       <section className="border-b border-slate-200 bg-slate-50 px-4 py-8">
         <div className="mx-auto grid max-w-7xl gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <Fact
-            icon={ShieldCheck}
+            icon={Shield}
             label="On-the-job learning"
             value={`${BARBER_STANDARD.totalOjlHours.toLocaleString()} OJL hours`}
           />
           <Fact icon={BookOpen} label="Required RTI" value={`${BARBER_RTI_HOURS} verified hours`} />
           <Fact icon={Scissors} label="Training setting" value="Approved host shop" />
           <Fact
-            icon={BadgeCheck}
+            icon={CircleDollarSign}
             label="Self-pay tuition"
             value={program.selfPayCost || 'See program details'}
           />
@@ -461,7 +462,7 @@ function Fact({
   label,
   value,
 }: {
-  icon: typeof ShieldCheck;
+  icon: typeof Shield;
   label: string;
   value: string;
 }) {
@@ -506,3 +507,4 @@ export async function generateMetadata() {
     },
   };
 }
+

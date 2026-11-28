@@ -228,7 +228,7 @@ export function HomeFeaturedHostShop() {
         </div>
         <aside aria-labelledby="downtown-beauty-preview" className="mt-8 grid overflow-hidden rounded-2xl border border-blue-200 bg-blue-50 sm:grid-cols-2">
           <div className="relative aspect-[16/10] sm:aspect-auto">
-            <Image src="/images/partners/mesmerized-by-beauty/downtown-nail-program.webp" alt="Preview of the planned Mesmerized by Beauty downtown nail space" fill sizes="(min-width: 640px) 50vw, 100vw" className="object-cover" />
+            <Image src="/images/partners/mesmerized-by-beauty/downtown-nail-program.webp" alt="Preview of the planned Mesmerized by Beauty downtown nail space" fill sizes="(min-width: 1024px) 620px, (min-width: 640px) 50vw, 100vw" className="object-cover" />
           </div>
           <div className="p-6 sm:p-8">
             <p className="text-sm font-bold text-blue-800">Coming soon · Downtown Indianapolis</p>
@@ -241,3 +241,4 @@ export function HomeFeaturedHostShop() {
     </section>
   );
 }
+

@@ -188,7 +188,7 @@ function FeaturedProgramCard({ program, index }: { program: FeaturedProgram; ind
           src={program.image}
           alt={program.title}
           fill
-          className="object-contain" sizes="100vw"
+          className="object-contain" sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 400px"
         />
 
         <div className="absolute bottom-4 left-4 right-4">
@@ -258,3 +258,4 @@ function FeaturedProgramCard({ program, index }: { program: FeaturedProgram; ind
     </motion.div>
   );
 }
+

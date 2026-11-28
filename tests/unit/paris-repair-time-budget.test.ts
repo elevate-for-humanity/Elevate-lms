@@ -3,6 +3,7 @@ import {
   budgetRepairTurn,
   estimateCpuTurnMs,
   estimatePromptTokens,
+  maxPromptTokensForDeadline,
   MIN_USEFUL_COMPLETION_TOKENS,
   PARIS_REPAIR_TURN_EXCEEDS_TIME_BUDGET,
 } from '@/lib/devstudio/repair-inference-time-budget.mjs';
@@ -82,4 +83,27 @@ it('rejects invalid budgets instead of guessing', () => {
   expect(() => budgetRepairTurn({ messages: [], maxTokens: 1536, deadlineMs: 0 })).toThrow('PARIS_TURN_DEADLINE_REQUIRED');
   expect(() => estimateCpuTurnMs({ promptTokens: -1, completionTokens: 100 })).toThrow('PARIS_TURN_PROMPT_TOKENS_REQUIRED');
   expect(() => estimateCpuTurnMs({ promptTokens: 100, completionTokens: 0 })).toThrow('PARIS_TURN_COMPLETION_TOKENS_REQUIRED');
+});
+
+it('derives the admitted prompt ceiling from the same budget the guard enforces', () => {
+  // Planning rates: prefill 13 tok/s, decode 4 tok/s, 210s deadline,
+  // reserving the 384-token minimum useful completion (96s of decode)
+  // leaves 114s of prefill -> 1482 prompt tokens.
+  delete process.env.PARIS_CPU_PREFILL_TOKENS_PER_SEC;
+  delete process.env.PARIS_CPU_DECODE_TOKENS_PER_SEC;
+  expect(maxPromptTokensForDeadline({})).toBe(1482);
+  // The ceiling is exactly the guard's admission boundary.
+  const atCeiling = [{ role: 'system', content: 'x'.repeat((1482 - 12) * 3) }];
+  expect(estimatePromptTokens(atCeiling)).toBe(1482);
+  expect(budgetRepairTurn({ messages: atCeiling, maxTokens: 1536 }).fits).toBe(true);
+  const overCeiling = [{ role: 'system', content: 'x'.repeat((1483 - 12) * 3) }];
+  expect(budgetRepairTurn({ messages: overCeiling, maxTokens: 1536 }).fits).toBe(false);
+  // Recalibration moves the ceiling: measured rates are the env overrides.
+  process.env.PARIS_CPU_PREFILL_TOKENS_PER_SEC = '40';
+  process.env.PARIS_CPU_DECODE_TOKENS_PER_SEC = '12';
+  expect(maxPromptTokensForDeadline({})).toBe(7120);
+  delete process.env.PARIS_CPU_PREFILL_TOKENS_PER_SEC;
+  delete process.env.PARIS_CPU_DECODE_TOKENS_PER_SEC;
+  expect(() => maxPromptTokensForDeadline({ deadlineMs: 0 })).toThrow('PARIS_TURN_DEADLINE_REQUIRED');
+  expect(() => maxPromptTokensForDeadline({ completionTokens: 0 })).toThrow('PARIS_TURN_COMPLETION_TOKENS_REQUIRED');
 });

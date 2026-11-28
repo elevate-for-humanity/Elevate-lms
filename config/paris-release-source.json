@@ -69,9 +69,10 @@
     {
       "source": "app/tax-software/page.tsx",
       "target": "apps/marketing/app/tax-software/page.tsx",
-      "sha256": "d1aabff2cf2d71518d8831a9122ce6b9c95f68ac39bec02fa0ac0f5cfa571f88",
+      "sha256": "70e1a50419867f1ca3643bf219ae1aaf9235a2d1917471368277ce516596e6be",
       "sourceSha256": "f3bd148ab41437d72f1d10003e04d6c3f93d6375dfd12fee449186bf85138a7f",
-      "localRevisionReason": "Polish Supersonic visitor journeys, navigation, public pages and sign-in return paths"
+      "localRevisionReason": "Polish Supersonic visitor journeys, navigation, public pages and sign-in return paths",
+      "changeReason": "Site cleanup 2026-11-27: remove literal check-mark bullets from the Supersonic landing page under the site design rule (plain disc bullets instead); preserve the pinned upstream source digest."
     },
     {
       "source": "app/tax-software/pricing/page.tsx",

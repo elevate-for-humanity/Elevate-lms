@@ -24,7 +24,7 @@ test('CPU planner immutable policy preserves protected boundaries and does not i
 
 test('actual PARIS policy with an 813-character failed task fits owned CPU minimum turn',()=>{
   const system={role:'system',content:identity+'\n'+PARIS_REPAIR_ACTION_POLICY};
-  const task='Repair original producer; preserve all learner records, release and payment gates. '+'x'.repeat(734);
+  const task='Repair original producer; preserve all learner records, release and payment gates. '+'x'.repeat(730);
   assert.equal(task.length,813);
   const input={
     task,sourceEvidence:null,turn:1,writes:0,maximumWrites:100,

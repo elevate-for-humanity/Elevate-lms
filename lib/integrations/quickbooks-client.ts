@@ -156,10 +156,29 @@ export async function quickBooksRequest<T = any>(db: Database, config: QuickBook
       ? latest.accessToken : await refreshQuickBooksToken(db, config);
     response = await rawRequest(config, retryToken, path, init);
   }
-  if (!response.ok) throw new QuickBooksError(
-    response.status === 401 ? 'oauth_reauthorization_required' : response.status === 403 ? 'provider_access_denied' : 'provider_request_failed',
-    `QuickBooks request failed (${response.status}).`,
-  );
+  if (!response.ok) {
+    // Surface Intuit's Fault detail (code + message). Discarding it left every
+    // provider failure recorded as a bare "QuickBooks request failed (400)",
+    // which made live checkout failures undiagnosable (2026-11-28: program
+    // enrollment invoices failed with no actionable cause anywhere in the
+    // system). Fault text contains no credentials and is safe to log/store.
+    let faultDetail = '';
+    let faultCode = '';
+    try {
+      const fault = (await response.json()) as any;
+      const firstError = fault?.Fault?.Error?.[0];
+      if (firstError) {
+        faultCode = firstError.code ? ` [code ${firstError.code}]` : '';
+        faultDetail = [firstError.Message, firstError.Detail].filter(Boolean).join(' — ');
+      }
+    } catch {
+      faultDetail = '';
+    }
+    throw new QuickBooksError(
+      response.status === 401 ? 'oauth_reauthorization_required' : response.status === 403 ? 'provider_access_denied' : 'provider_request_failed',
+      `QuickBooks request failed (${response.status})${faultCode}${faultDetail ? `: ${faultDetail}` : ''} [${path.split('?')[0]}]`,
+    );
+  }
   return response.json() as Promise<T>;
 }
 

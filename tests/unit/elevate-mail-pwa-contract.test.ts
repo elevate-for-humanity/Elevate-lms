@@ -89,14 +89,21 @@ describe('Elevate Mail PWA contract', () => {
     expect(nextConfig).toContain("source: '/manifest-mail.json'");
   });
 
-  it('points the existing email launcher at the real app', () => {
-    expect(registry).toContain("email: { name: 'Email', openPath: '/mail'");
-    expect(installPage).toContain('href="/mail"');
+  it('points every email install surface at the real app, inside its own scope', () => {
+    expect(registry).toContain("email: { name: 'Email', openPath: '/mail', installPath: '/mail/install' }");
     // Standing rule (Elizabeth, 2026-11-26): every install surface points at
-    // the real app. The install page installs Elevate Mail itself — its own
-    // manifest and worker — never a launcher that opens the install page.
-    expect(installPage).toContain('href="/manifest-mail.json"');
-    expect(installPage).not.toContain('manifest-email.json');
+    // the real app. Corrected design (PWA audit 2026-11-28, RC-1): the
+    // install surface is a route inside the /mail/ scope, where the mail
+    // layout links the mail manifest and the root layout registers the mail
+    // worker, so beforeinstallprompt can actually fire. The retired static
+    // page sat outside the scope and could never offer an install; it now
+    // only redirects into the app.
+    const installRoute = readFileSync('apps/admin/app/mail/install/page.tsx', 'utf8');
+    expect(installRoute).toContain('PwaInstallButton');
+    expect(installPage).toContain('url=/mail/install');
+    expect(installPage).toContain('href="/mail/install"');
+    expect(installPage).not.toContain('rel="manifest"');
+    expect(installPage).not.toContain('serviceWorker.register');
     expect(installPage).not.toContain('workspace.js');
   });
 });

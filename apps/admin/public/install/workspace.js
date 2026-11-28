@@ -86,18 +86,24 @@ document.getElementById('workspace').onclick = (event) => {
   event.preventDefault();
   feedback.textContent = 'Reconnect to open this workspace.';
 };
+// The static workspace pages are offline draft pads, not installable apps
+// (PWA audit 2026-11-28, RC-2): they carry no manifest and no install
+// button. The install surfaces live inside the apps themselves. This guard
+// keeps the shared script safe on pages without an install button.
 window.addEventListener('beforeinstallprompt', (event) => {
   event.preventDefault();
   installPrompt = event;
-  installButton.hidden = false;
+  if (installButton) installButton.hidden = false;
 });
-installButton.onclick = async () => {
-  const prompt = installPrompt;
-  installPrompt = null;
-  installButton.hidden = true;
-  if (prompt) await prompt.prompt();
-};
-window.addEventListener('appinstalled', () => { installButton.hidden = true; });
+if (installButton) {
+  installButton.onclick = async () => {
+    const prompt = installPrompt;
+    installPrompt = null;
+    installButton.hidden = true;
+    if (prompt) await prompt.prompt();
+  };
+}
+window.addEventListener('appinstalled', () => { if (installButton) installButton.hidden = true; });
 
 async function prepareOffline() {
   showConnection();

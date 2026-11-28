@@ -125,6 +125,19 @@ const adminConfig = {
         headers: [{ key: 'Cache-Control', value: 'no-store, no-cache, must-revalidate, max-age=0' }],
       },
       {
+        // Elevate Phone pair, mirroring the mail rules (PWA audit
+        // 2026-11-28, RC-3). No Service-Worker-Allowed: sw-phone.js sits at
+        // the root, so its maximum scope already covers /phone/.
+        source: '/sw-phone.js',
+        headers: [
+          { key: 'Cache-Control', value: 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0' },
+        ],
+      },
+      {
+        source: '/manifest-phone.json',
+        headers: [{ key: 'Cache-Control', value: 'no-store, no-cache, must-revalidate, max-age=0' }],
+      },
+      {
         source: '/offline.html',
         headers: [{ key: 'Cache-Control', value: 'no-store, no-cache, must-revalidate, max-age=0' }],
       },

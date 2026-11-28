@@ -328,7 +328,7 @@ export default function HostShopShowcase({
                       src={image.backdropSrc}
                       alt=""
                       fill
-                      sizes="(max-width: 1024px) 100vw, 58vw"
+                      sizes="(max-width: 1024px) 100vw, 620px"
                       className="object-contain opacity-90"
                       aria-hidden="true"
                     />
@@ -390,7 +390,7 @@ export default function HostShopShowcase({
                     src={image.backdropSrc}
                     alt={image.alt}
                     fill
-                    sizes="(max-width: 1024px) 100vw, 58vw"
+                    sizes="(max-width: 1024px) 100vw, 620px"
                     className="object-contain"
                   />
                 </div>
@@ -402,7 +402,7 @@ export default function HostShopShowcase({
                     alt={image.alt}
                     fill
                     priority={activeIndex === 0}
-                    sizes="(max-width: 1024px) 100vw, 58vw"
+                    sizes="(max-width: 1024px) 100vw, 620px"
                     className="host-showcase-media-enter object-contain"
                     onError={() =>
                       setFailedImages((current) => {
@@ -558,3 +558,4 @@ export default function HostShopShowcase({
     </section>
   );
 }
+

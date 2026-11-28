@@ -8,7 +8,7 @@ export const PROJECT_MANAGEMENT: ProgramSchema = {
   sector: 'business',
   category: 'Project Management',
   programType: 'workforce',
-  heroImage: '/images/pexels/project.webp',
+  heroImage: '/images/pages/business-meeting.webp',
   heroImageAlt: 'Project manager leading a team meeting',
   deliveryMode: 'hybrid',
   deliveredBy: 'Elevate',
@@ -230,3 +230,4 @@ export const PROJECT_MANAGEMENT: ProgramSchema = {
     fundingNotes: 'Indiana ETPL-listed. WIOA Title I and WRG funding available for eligible Indiana residents.',
   },
 };
+

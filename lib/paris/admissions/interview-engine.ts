@@ -212,7 +212,7 @@ export function getRequiredInterviewFields(
   answers: ApplicationInterviewAnswers,
 ): ApplicationInterviewField[] {
   const fields = [...BASE_REQUIRED];
-  if (!isApprenticeshipProgram(answers.program) && requiresWorkOne(answers.fundingSource)) {
+  if (requiresWorkOne(answers.fundingSource)) {
     fields.push('hasWorkOneReferral');
     if (normalized(answers.hasWorkOneReferral) === 'yes') fields.push('workoneCenter');
   }
@@ -259,7 +259,10 @@ function questionOptions(field: ApplicationInterviewField, locale: ApplicationIn
         { value: 'email', label: es ? 'Correo electrónico' : 'Email' },
       ];
     case 'fundingSource':
-      if (isApprenticeshipProgram(answers.program)) return [{ value: 'self_pay', label: es ? 'Pago personal solamente' : 'Self-pay only' }];
+      // Owner rule (2026-11-28): apprentices see the same funding paths as
+      // every other applicant. Self-pay is the standard apprenticeship path,
+      // but a declared workforce-funding path is accepted and routed to
+      // Admissions review — never rejected or deposit-gated.
       return [
         { value: 'wioa', label: 'WIOA / WorkOne' },
         { value: 'wrg', label: 'Workforce Ready Grant' },
@@ -327,7 +330,7 @@ export function getNextApplicationInterviewQuestion(
 
   const help =
     next === 'fundingSource'
-      ? isApprenticeshipProgram(state.answers.program) ? state.locale === 'es' ? 'La matrícula del aprendizaje se paga por cuenta propia. Revise el precio y las condiciones de pago antes de inscribirse.' : 'Apprenticeship tuition is self-pay only. Review the published tuition and payment terms before enrollment.' : TEXT[state.locale].fundingHelp
+      ? isApprenticeshipProgram(state.answers.program) ? state.locale === 'es' ? 'La matrícula del aprendizaje normalmente se paga por cuenta propia. Si tiene financiamiento de WIOA, WorkOne, WRG o un empleador, su solicitud pasa a revisión de Admisiones sin depósito.' : 'Apprenticeship tuition is normally self-pay. If you have WIOA, WorkOne, WRG, or employer funding, your application goes to Admissions review with no deposit required.' : TEXT[state.locale].fundingHelp
       : next === 'transferHours'
         ? TEXT[state.locale].transferHelp
         : next === 'applicationCertification'
@@ -426,7 +429,7 @@ export function interviewStateToApplicationPayload(state: ApplicationInterviewSt
   const a = state.answers;
   const transferHours = claimedTransferHours(a.transferHours);
   const apprenticeship = isApprenticeshipProgram(a.program);
-  const workOne = !apprenticeship && requiresWorkOne(a.fundingSource);
+  const workOne = requiresWorkOne(a.fundingSource);
   const hasWorkOneReferral = normalized(a.hasWorkOneReferral);
   const needsWorkOneAppointment = workOne && hasWorkOneReferral === 'no';
   return {
@@ -444,8 +447,8 @@ export function interviewStateToApplicationPayload(state: ApplicationInterviewSt
     program: a.program,
     programSlug: a.program,
     goals: a.goals,
-    fundingType: apprenticeship ? 'self_pay' : a.fundingSource,
-    funding: apprenticeship ? 'self_pay' : a.fundingSource,
+    fundingType: a.fundingSource,
+    funding: a.fundingSource,
     fundingEligibilityStatus: needsWorkOneAppointment ? 'needs_appointment' : undefined,
     hasWorkOneReferral: workOne ? a.hasWorkOneReferral : undefined,
     workoneCenter: workOne ? a.workoneCenter : undefined,

@@ -1,7 +1,7 @@
 import {pathToFileURL} from 'node:url';
 import {google,loadGoogleConfig,PROJECT} from './runtime-config.mjs';
 import {modelCredential} from './deploy-owned-llm.mjs';
-import {CPU_SERVICE,CPU_REGION,CPU_CACHE_ENV,reviewPrivateModelPolicy} from './deploy-owned-cpu-model.mjs';
+import {CPU_SERVICE,CPU_REGION,CPU_CACHE_ENV,CPU_CAPACITY,reviewPrivateModelPolicy} from './deploy-owned-cpu-model.mjs';
 import {inspectRegionalCapacity} from './regional-capacity.mjs';
 import {acceptOwnedCpuModel} from './accept-owned-cpu-model.mjs';
 import {quotaContact,requestHeadroom} from './request-run-headroom.mjs';
@@ -13,12 +13,27 @@ function servingRevision(service) {
  if(traffic?.length!==1||traffic[0].percent!==100||!/^elevate-owned-cpu-llm-[a-z0-9-]+$/.test(traffic[0].revisionName||''))fail('SERVING_REVISION_REQUIRED');
  return traffic[0].revisionName;
 }
-function verifyTask(task) {
+function verifyBoundedTask(task,{cpu,memory,containerConcurrency}) {
  const container=task?.containers?.[0];
- if(task?.containers?.length!==1||container.resources?.limits?.cpu!=='8'||container.resources?.limits?.memory!=='16Gi'||
-  task.containerConcurrency!==2||task.serviceAccountName!==`elevate-llm-runtime@${PROJECT}.iam.gserviceaccount.com`||
+ if(task?.containers?.length!==1||container.resources?.limits?.cpu!==cpu||container.resources?.limits?.memory!==memory||
+  task.containerConcurrency!==containerConcurrency||task.serviceAccountName!==`elevate-llm-runtime@${PROJECT}.iam.gserviceaccount.com`||
   !new RegExp('^us-central1-docker\\.pkg\\.dev/'+PROJECT+'/elevate/owned-cpu-llm@sha256:[a-f0-9]{64}$').test(container.image||''))fail('BOUNDED_RUNTIME_REQUIRED');
  return container;
+}
+function verifyTask(task) {
+ return verifyBoundedTask(task,{cpu:CPU_CAPACITY.cpu,memory:CPU_CAPACITY.memory,containerConcurrency:2});
+}
+/** The serving revision predates the capacity release, so it cannot already
+ * report the target envelope. Accept exactly the two known bounded envelopes
+ * (the legacy 4 CPU / 8 GiB / concurrency 1 deployment or the target one) with
+ * identity and image integrity at full strength; the target envelope is
+ * enforced unchanged on the candidate this repair stages. */
+const LEGACY_TASK=Object.freeze({cpu:'4',memory:'8Gi',containerConcurrency:1});
+function verifySourceTask(task) {
+ for(const envelope of [LEGACY_TASK,{cpu:CPU_CAPACITY.cpu,memory:CPU_CAPACITY.memory,containerConcurrency:2}]) {
+  try{return verifyBoundedTask(task,envelope);}catch{/* fall through to the other known envelope */}
+ }
+ fail('BOUNDED_RUNTIME_REQUIRED');
 }
 
 export async function repeatCpuInference({base,token,invokerToken,request=fetch}={}) {
@@ -43,7 +58,7 @@ export async function repairOwnedCpuMemory({run=google,capacity=inspectRegionalC
  const before=read(['run','services','describe',CPU_SERVICE]);
  const previous=servingRevision(before);
  const current=read(['run','revisions','describe',previous]);
- const original=verifyTask(current.spec);
+ const original=verifySourceTask(current.spec);
  const adminConfig=loadGoogleConfig('admin',run);
  const token=modelCredential(adminConfig);
  const admin=JSON.parse(run(['run','services','describe','elevate-admin-migration','--project',PROJECT,'--region','us-central1','--format=json']));
@@ -62,6 +77,7 @@ export async function repairOwnedCpuMemory({run=google,capacity=inspectRegionalC
  if(before.spec?.template?.spec?.containers?.[0]?.image!==original.image)fail('CONCURRENT_CANDIDATE_PRESENT');
  const tag='elevate-owned-cpu-llm-mem';
  run(['run','services','update',CPU_SERVICE,...scope,'--no-traffic','--tag='+tag,
+  '--cpu',CPU_CAPACITY.cpu,'--memory',CPU_CAPACITY.memory,'--concurrency','2',
   '--update-env-vars='+Object.entries(CPU_CACHE_ENV).map(([key,value])=>key+'='+value).join(','),'--quiet']);
  const staged=read(['run','services','describe',CPU_SERVICE]);
  if(servingRevision(staged)!==previous)fail('TRAFFIC_CHANGED_CONCURRENTLY');
@@ -91,6 +107,7 @@ export async function repairOwnedCpuMemory({run=google,capacity=inspectRegionalC
    run(['run','services','update-traffic',CPU_SERVICE,...scope,'--to-revisions='+previous+'=100','--quiet']);
   throw error;
  }
- return {repaired:true,previousRevision:previous,revision,modelUrl:before.status.url,memory:'8Gi',cpu:'4',cache:CPU_CACHE_ENV,acceptance,sustained,liveAcceptance:true,permissionsChanged:false};
+ return {repaired:true,previousRevision:previous,revision,modelUrl:before.status.url,memory:CPU_CAPACITY.memory,cpu:CPU_CAPACITY.cpu,cache:CPU_CACHE_ENV,acceptance,sustained,liveAcceptance:true,permissionsChanged:false};
 }
 if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href)repairOwnedCpuMemory({requestStagingHeadroom:process.env.REQUEST_PARIS_STAGING_HEADROOM==='true'}).then(report=>console.info(JSON.stringify(report))).catch(error=>{console.error(JSON.stringify({error:error.message?.startsWith('CPU_MEMORY_REPAIR_')||error.message?.startsWith('OWNED_CPU_MODEL_')?error.message:error.code||'CPU_MEMORY_REPAIR_FAILED',...(error.capacity?{capacity:error.capacity}:{}),...(error.quotaRequests?{quotaRequests:error.quotaRequests}:{})}));process.exitCode=1;});
+

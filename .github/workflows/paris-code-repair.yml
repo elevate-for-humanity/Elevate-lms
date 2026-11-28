@@ -1,4 +1,5 @@
 name: PARIS verified code repair
+run-name: ${{ inputs.repair_id != '' && format('PARIS repair {0}', inputs.repair_id) || 'PARIS monitor tick — no repair attempted' }}
 on:
   push:
     branches: [main]
@@ -434,6 +435,7 @@ jobs:
           print(json.dumps({'status':result.get('status'),'sha':result.get('sha'),'verifiedLive':False}))
           PY
   report:
+    name: Failure reporting (repair stages only; runs only on failure)
     if: always() && github.event_name == 'workflow_dispatch' && inputs.repair_id != '' && (needs.prepare.result != 'success' || needs.validate.result != 'success' || needs.publish.result != 'success')
     needs: [prepare,validate,publish]
     runs-on: ubuntu-24.04
@@ -451,3 +453,33 @@ jobs:
           req=urllib.request.Request(os.environ['PARIS_ADMIN_ORIGIN'].rstrip('/')+'/api/cron/paris-code-repair',data=data,headers={'Authorization':'Bearer '+os.environ['PARIS_ID_TOKEN'],'Content-Type':'application/json'})
           urllib.request.urlopen(req,timeout=int(os.environ['PARIS_DISPATCH_FAILURE_TIMEOUT_SECONDS'])).read()
           PY
+
+  verdict:
+    name: Run verdict
+    needs: [monitor, prepare, validate, publish, report]
+    if: always()
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Classify this run honestly
+        env:
+          REPAIR_ID: ${{ inputs.repair_id }}
+          MONITOR: ${{ needs.monitor.result }}
+          PREPARE: ${{ needs.prepare.result }}
+          VALIDATE: ${{ needs.validate.result }}
+          PUBLISH: ${{ needs.publish.result }}
+          REPORT: ${{ needs.report.result }}
+        run: |
+          set -euo pipefail
+          { echo '## PARIS run verdict'; echo "- monitor: $MONITOR"; echo "- prepare: $PREPARE"; echo "- validate: $VALIDATE"; echo "- publish: $PUBLISH"; echo "- failure-report: $REPORT"; } >> "$GITHUB_STEP_SUMMARY"
+          if [[ -n "$REPAIR_ID" ]]; then
+            if [[ "$PREPARE" == success && "$VALIDATE" == success && "$PUBLISH" == success ]]; then
+              echo 'All substantive repair stages completed. Live verification is recorded in the repair ledger; this workflow run does not itself prove live deployment.' >> "$GITHUB_STEP_SUMMARY"
+              exit 0
+            fi
+            echo "::error::Repair dispatch did not complete every substantive stage (prepare=$PREPARE validate=$VALIDATE publish=$PUBLISH). This is not a successful repair."
+            exit 1
+          fi
+          echo 'MONITOR ONLY — no repair was attempted in this run. A successful monitor tick is not a successful repair.' >> "$GITHUB_STEP_SUMMARY"
+          if [[ "$MONITOR" != success && "$MONITOR" != skipped ]]; then exit 1; fi
+          exit 0

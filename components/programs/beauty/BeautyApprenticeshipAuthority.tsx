@@ -1,12 +1,13 @@
 import Link from 'next/link';
 import {
   ArrowRight,
-  BadgeCheck,
+  Award,
   Building2,
   CircleDollarSign,
   GraduationCap,
   MapPin,
-  ShieldCheck,
+  MessageSquare,
+  Shield,
 } from 'lucide-react';
 import type { ProgramSchema } from '@/lib/programs/program-schema';
 import { isRAPIDSProgram } from '@/lib/compliance/rapids-config';
@@ -225,7 +226,7 @@ export default function BeautyApprenticeshipAuthority({ program }: { program: Pr
 
               <div className="mt-6 grid gap-3 sm:grid-cols-3">
                 <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                  <ShieldCheck className="h-6 w-6 text-rose-700" />
+                  <Shield className="h-6 w-6 text-rose-700" />
                   <div className="mt-3 text-sm font-black text-slate-950">
                     {registered ? 'Registered Apprenticeship' : 'Apprenticeship Pathway'}
                   </div>
@@ -353,7 +354,7 @@ export default function BeautyApprenticeshipAuthority({ program }: { program: Pr
 
           <div className="mt-12">
             <div className="flex items-center gap-2 text-sm font-black uppercase tracking-[0.14em] text-slate-500">
-              <BadgeCheck className="h-5 w-5 text-rose-700" /> Frequently asked questions
+              <MessageSquare className="h-5 w-5 text-rose-700" /> Frequently asked questions
             </div>
             <div className="mt-4 divide-y divide-slate-200 overflow-hidden rounded-2xl border border-slate-200 bg-white">
               {faqs.map((faq) => (
@@ -382,3 +383,4 @@ function Responsibility({ title, body }: { title: string; body: string }) {
     </article>
   );
 }
+

@@ -349,7 +349,7 @@ export const PROGRAM_IMAGES: Record<string, ProgramImageEntry> = {
     alt: 'Office administrator working at a professional workstation',
   },
   'project-management': {
-    card: '/images/pages/business-meeting.webp',
+    card: '/images/pages/project-management.webp',
     hero: `${P}/comp-home-highlight-success.webp`,
     alt: 'Project manager leading a team meeting',
   },

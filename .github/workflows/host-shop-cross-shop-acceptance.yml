@@ -59,6 +59,7 @@ jobs:
       TEST_MODE: 'true'
       QA_CROSS_SHOP_ACCEPTANCE: '1'
       QA_CROSS_SHOP_PREFIX: .qa-host-shop-cross
+      QA_E2E_ALLOW_PRODUCTION_DISPOSABLES: '1'
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4

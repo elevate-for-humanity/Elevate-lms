@@ -2,46 +2,16 @@
 <html lang="en">
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#153052"><meta name="robots" content="noindex,nofollow">
-  <meta name="apple-mobile-web-app-title" content="Elevate Email">
-  <link rel="apple-touch-icon" href="/install/email-192.png">
-  <link rel="manifest" href="/manifest-mail.json">
-  <link rel="stylesheet" href="/install/workspace.css">
-  <title>Elevate Email</title>
+  <meta name="robots" content="noindex,nofollow">
+  <meta http-equiv="refresh" content="0; url=/mail/install">
+  <title>Elevate Email — Install</title>
 </head>
-<body data-workspace="email">
-<main>
-  <header><h1>Elevate Email</h1>
-    <p id="readiness" role="status">Connect to open your inbox.</p>
-    <a class="primary" id="workspace" href="/mail">Open staff inbox</a>
-    <a class="primary" href="https://app.elevateforhumanity.org/communications/email">Open learner inbox</a>
-    <button type="button" id="install" hidden>Install Elevate Email</button>
-    <p id="feedback" role="status"></p>
-  </header>
-  <footer>On Android or desktop Chrome, use the Install app button or the browser’s Install app command. On iPhone, use Share → Add to Home Screen in Safari.</footer>
-</main>
-<script>
-  // The mail app has its own service worker, scoped to /mail/, registered
-  // here as well as inside the app so Elevate Mail is ready from the first
-  // open. It is intentionally not the shared workspace worker: this page
-  // installs Elevate Mail itself, with its own manifest and worker.
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw-mail.js', { scope: '/mail/' }).catch(() => {});
-  }
-  let installPrompt;
-  const installButton = document.getElementById('install');
-  window.addEventListener('beforeinstallprompt', (event) => {
-    event.preventDefault();
-    installPrompt = event;
-    installButton.hidden = false;
-  });
-  installButton.onclick = async () => {
-    const prompt = installPrompt;
-    installPrompt = null;
-    installButton.hidden = true;
-    if (prompt) await prompt.prompt();
-  };
-  window.addEventListener('appinstalled', () => { installButton.hidden = true; });
-</script>
+<body>
+  <!-- Retired (PWA audit 2026-11-28, RC-1): this static page sat outside the
+       /mail/ scope, so no mail worker ever controlled it and its Install
+       button could never appear. The install surface now lives inside the
+       app at /mail/install; this file only redirects there. -->
+  <p>The Elevate Mail install page has moved into the app. <a href="/mail/install">Continue to install Elevate Mail</a>.</p>
+  <script>window.location.replace('/mail/install');</script>
 </body>
 </html>

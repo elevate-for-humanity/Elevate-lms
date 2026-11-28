@@ -2,44 +2,16 @@
 <html lang="en">
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#153052"><meta name="robots" content="noindex,nofollow">
-  <meta name="apple-mobile-web-app-title" content="Elevate Phone">
-  <link rel="apple-touch-icon" href="/icon-phone-192.png">
-  <link rel="manifest" href="/manifest-phone.json">
-  <link rel="stylesheet" href="/install/workspace.css">
-  <title>Elevate Phone</title>
+  <meta name="robots" content="noindex,nofollow">
+  <meta http-equiv="refresh" content="0; url=/phone/install">
+  <title>Elevate Phone — Install</title>
 </head>
-<body data-workspace="phone">
-<main>
-  <header><h1>Elevate Phone</h1>
-    <p id="readiness" role="status">Calls, voicemail, texts and video meetings on (463) 240-1404.</p>
-    <a class="primary" id="workspace" href="/phone/dial-pad">Open Elevate Phone</a>
-    <button type="button" id="install" hidden>Install Phone</button>
-    <p id="feedback" role="status"></p>
-  </header>
-  <footer>On Android or desktop Chrome, use the Install app button or the browser’s Install app command. On iPhone, use Share → Add to Home Screen in Safari.</footer>
-</main>
-<script>
-  // The phone app has its own service worker, scoped to /phone/, registered
-  // here as well as inside the app so the call-wake push path is ready from
-  // the first open. It is intentionally not the shared workspace worker.
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw-phone.js', { scope: '/phone/' }).catch(() => {});
-  }
-  let installPrompt;
-  const installButton = document.getElementById('install');
-  window.addEventListener('beforeinstallprompt', (event) => {
-    event.preventDefault();
-    installPrompt = event;
-    installButton.hidden = false;
-  });
-  installButton.onclick = async () => {
-    const prompt = installPrompt;
-    installPrompt = null;
-    installButton.hidden = true;
-    if (prompt) await prompt.prompt();
-  };
-  window.addEventListener('appinstalled', () => { installButton.hidden = true; });
-</script>
+<body>
+  <!-- Retired (PWA audit 2026-11-28, RC-1): this static page sat outside the
+       /phone/ scope, so no phone worker ever controlled it and its Install
+       button could never appear. The install surface now lives inside the
+       app at /phone/install; this file only redirects there. -->
+  <p>The Elevate Phone install page has moved into the app. <a href="/phone/install">Continue to install Elevate Phone</a>.</p>
+  <script>window.location.replace('/phone/install');</script>
 </body>
 </html>

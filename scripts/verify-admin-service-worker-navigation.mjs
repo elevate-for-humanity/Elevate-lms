@@ -58,6 +58,12 @@ await preparation;
 assert.equal(result, true);
 assert.equal(downloads.length, 4);
 offline = true;
+// The /install/<slug>.html pages are offline draft pads, not the apps
+// (PWA audit 2026-11-28, RC-2): the installable apps are the in-app routes
+// (/studio, /studio/courses) with route-generated manifests. A pad must
+// point at its app's in-app install route and must not present itself as
+// the installable app with a manifest link of its own.
+const padInstallRoutes = { 'dev-studio': '/studio/install', 'course-builder': '/studio/courses/install' };
 for (const slug of ['dev-studio', 'course-builder']) {
   let pending;
   handle({
@@ -66,7 +72,9 @@ for (const slug of ['dev-studio', 'course-builder']) {
   });
   const response = await pending;
   assert.equal(response.status, 200);
-  assert.ok((await response.text()).includes('href="/manifest-' + slug + '.json"'));
+  const body = await response.text();
+  assert.ok(body.includes(`href="${padInstallRoutes[slug]}"`), `Draft pad must point at its in-app install route: ${slug}`);
+  assert.ok(!body.includes('rel="manifest"'), `Draft pad must not link a manifest: ${slug}`);
   checked++;
 }
 assert.equal(downloads.length, 4);

@@ -104,7 +104,7 @@ jobs:
         timeout-minutes: 15
         run: |
           set -euo pipefail
-          gcloud run services proxy elevate-owned-cpu-verify --project=elegant-racer-299721 --region=us-east1 --port=18080 >/tmp/run-proxy.log 2>&1 &
+            gcloud run services proxy elevate-owned-cpu-verify --project=elegant-racer-299721 --region=us-east1 --port=18080 >/tmp/run-proxy.log 2>&1 &
           echo $! > /tmp/run-proxy.pid
           ready=false
           for attempt in $(seq 1 120); do

@@ -1,13 +1,9 @@
 import { EMT_INQUIRY_HREF, EMT_INQUIRY_MESSAGE, isEmtInquiryOnly } from '@/lib/programs/emt-inquiry-only';
 import { verifyPaidApplication, activatePaidApplication } from '@/lib/enrollment/paid-application';
-import { POST as submitProgramInquiry } from '../inquiries/route';
 import { applicationMatchesProgram, resolveCanonicalSlug } from '@/lib/programs/slug';
 import { paidInvoiceMatchesProgram, requiresSelfPayProgramPayment } from '@/lib/programs/paid-intake-policy.mjs';
 import { copyApplicationToProgramHolders } from '@/lib/program-holder/application-copy';
-import {
-  apprenticeshipPaymentError,
-  isSelfPayApprenticeship,
-} from '@/lib/programs/apprenticeship-payment-policy';
+import { apprenticeshipPaymentError } from '@/lib/programs/apprenticeship-payment-policy';
 // PUBLIC ROUTE: public program application submission
 
 // app/api/applications/route.ts
@@ -189,8 +185,10 @@ async function _POST(req: Request) {
         { status: 400, headers: corsHeadersForOrigin(origin, allowedOrigins) },
       );
     }
-    if (isSelfPayApprenticeship(normalizedProgram) && normalizedFunding)
-      body.fundingType = 'self_pay';
+    // Owner rule (2026-11-28): an apprentice who declares workforce funding
+    // keeps that funding path. It is never rewritten to self-pay here; the
+    // funded branch below routes the application to Admissions review and no
+    // deposit is demanded.
 
     const rawModalityPreference = body.modalityPreference ?? body.modality_preference;
     const modalityPreference = normalizeApplicationModalityPreference(rawModalityPreference);
@@ -298,7 +296,15 @@ async function _POST(req: Request) {
     const requiresSelfPayPayment = requiresSelfPayProgramPayment(catalogResult.data, body.fundingType);
     const requestedFunding = String(body.fundingType || '').trim().toLowerCase();
     const usesWorkOne = ['wioa', 'wrg', 'workone'].includes(requestedFunding);
-    const isFunded = usesWorkOne || requestedFunding === 'jri';
+    // Employer sponsorship is a funded path for review purposes: the
+    // applicant is never deposit-gated, and the application waits in
+    // Admissions review until the sponsorship is documented. Activation still
+    // requires verified funding evidence or paidEvidence — never this flag.
+    const isFunded =
+      usesWorkOne ||
+      requestedFunding === 'jri' ||
+      requestedFunding === 'employer' ||
+      requestedFunding === 'employer_sponsored';
     const billingInvoiceId = String(body.billingInvoiceId || body.billing_invoice_id || '').trim();
     if (isFunded && billingInvoiceId) {
       return NextResponse.json({ error: 'Submit a state-funded application without a self-pay invoice.' },
@@ -346,29 +352,13 @@ async function _POST(req: Request) {
       return NextResponse.json({ error: 'Verified payment is required before submitting the Full Enrollment Application.',
         paymentRequired: true, nextStepUrl: `/enroll/${encodeURIComponent(program)}` }, { status: 402 });
     }
-    // Intake is an inquiry, never a full enrollment application.
-
-    // Reuse canonical lead persistence and deduplicated inquiry notifications.
-    if (!fullEnrollment) {
-      const inquiryResponse = await submitProgramInquiry(new Request(
-        new URL('/api/inquiries', req.url), {
-          method: 'POST', headers: req.headers,
-          body: JSON.stringify({ ...body,
-            name: `${body.firstName} ${body.lastName}`.trim(),
-            email: String(body.email).trim().toLowerCase(), program,
-            source: 'paid-program-inquiry', fundingInterest: body.fundingType,
-          }),
-        }));
-      const inquiry = await inquiryResponse.json();
-      return NextResponse.json(inquiryResponse.ok ? {
-        ...inquiry, applicationStatus: 'inquiry',
-        referenceNumber: inquiry.leadId, paymentRequired: true,
-        nextStepUrl: `/enroll/${encodeURIComponent(program)}`,
-        message: 'Intake application received. For self-pay, verify payment and submit the full application to activate dashboard access. Funded applications require Admissions review.',
-      } : inquiry, {
-        status: inquiryResponse.status, headers: corsHeadersForOrigin(origin, allowedOrigins),
-      });
-    }
+    // Intake submissions are real applications. They persist through the
+    // canonical insert below with intake_stage='inquiry' and land on the
+    // confirmation page — never on the payment page. (Before 2026-11-28 this
+    // branch diverted intake to the CRM leads table via /api/inquiries and
+    // redirected the applicant to /enroll/<program>; intake applications
+    // silently vanished from public.applications for three weeks. Lightweight
+    // "request info" widgets still use /api/inquiries directly.)
 
     if (fullEnrollment && body.applicationCertification !== true)
       return NextResponse.json({ error: 'Confirm the application certification before submitting.' }, { status: 400 });
@@ -1064,6 +1054,7 @@ async function _POST(req: Request) {
     }
 
     const requiresSelfPayCheckout =
+      fullEnrollment &&
       !verifiedPaidInvoice &&
       String(fundingType || '').startsWith('self_pay') &&
       requiresSelfPayPayment;

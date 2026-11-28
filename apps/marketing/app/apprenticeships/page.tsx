@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowRight, BriefcaseBusiness, GraduationCap, MapPin, ShieldCheck } from 'lucide-react';
+import { ArrowRight, BriefcaseBusiness, GraduationCap, MapPin, Shield } from 'lucide-react';
 import { BARBER_APPRENTICESHIP } from '@/data/programs/barber-apprenticeship';
 import HeroPicture from '@/components/marketing/HeroPicture';
 import HostShopShowcase from '@/components/programs/beauty/HostShopShowcase';
@@ -22,7 +22,7 @@ const PATHWAYS = [
     title: 'Barber Apprenticeship',
     href: '/programs/barber-apprenticeship',
     applyHref: '/apply/student?program=barber-apprenticeship',
-    image: PROGRAM.heroImage || '/images/pexels/barber-hero.webp',
+    image: PROGRAM.heroImage || '/images/partners/top-shelf-barber-lounge/top-shelf-fade-profile-enhanced-2026.webp',
     imageAlt: PROGRAM.heroImageAlt || 'Barber apprentice training at a licensed host shop',
     badge: 'DOL Registered Pathway',
     description: 'Structured on-the-job learning, related technical instruction, documented progress, and preparation for Indiana barber licensing requirements.',
@@ -31,7 +31,7 @@ const PATHWAYS = [
     title: 'Cosmetology Apprenticeship',
     href: '/programs/cosmetology-apprenticeship',
     applyHref: '/apply/student?program=cosmetology-apprenticeship',
-    image: '/images/pexels/cosmetology.webp',
+    image: '/images/partners/salon-saloon/team-interior-enhanced-2026.webp',
     imageAlt: 'Cosmetology apprentice receiving supervised salon training',
     badge: 'Beauty Apprenticeship Pathway',
     description: 'Supervised salon learning in hair services, client care, sanitation, business practices, and documented progress toward the applicable licensing pathway.',
@@ -40,7 +40,7 @@ const PATHWAYS = [
     title: 'Esthetics Apprenticeship',
     href: '/programs/esthetician-apprenticeship',
     applyHref: '/apply/student?program=esthetician-apprenticeship',
-    image: '/images/pexels/esthetician.webp',
+    image: '/images/partners/mesmerized-by-beauty/downtown-esthetician-program.webp',
     imageAlt: 'Esthetics apprentice completing supervised skincare training',
     badge: 'Beauty Apprenticeship Pathway',
     description: 'Hands-on skincare training with supervision, sanitation, client safety, service practice, and progress documentation.',
@@ -49,7 +49,7 @@ const PATHWAYS = [
     title: 'Nail Technician Apprenticeship',
     href: '/programs/nail-technician-apprenticeship',
     applyHref: '/apply/student?program=nail-technician-apprenticeship',
-    image: '/images/pexels/nail-tech.webp',
+    image: '/images/partners/mesmerized-by-beauty/downtown-nail-program.webp',
     imageAlt: 'Nail technician apprentice completing supervised salon training',
     badge: 'Beauty Apprenticeship Pathway',
     description: 'Supervised nail-services training covering sanitation, manicuring, client care, service skills, and documented training progress.',
@@ -59,7 +59,7 @@ const PATHWAYS = [
 const EXPERIENCE = [
   { icon: GraduationCap, title: 'Learn the craft', body: 'Complete structured instruction connected to your occupation and licensing pathway.' },
   { icon: BriefcaseBusiness, title: 'Train on the job', body: 'Build skills through supervised work-based learning at an approved participating site.' },
-  { icon: ShieldCheck, title: 'Track real progress', body: 'Hours, competencies, documents, RTI, and required milestones are recorded in the apprenticeship workflow.' },
+  { icon: Shield, title: 'Track real progress', body: 'Hours, competencies, documents, RTI, and required milestones are recorded in the apprenticeship workflow.' },
   { icon: MapPin, title: 'Work with a host site', body: 'Host-site availability is confirmed during enrollment and depends on current participating capacity.' },
 ] as const;
 
@@ -198,3 +198,4 @@ export default async function ApprenticeshipsPage() {
 </main>
   );
 }
+

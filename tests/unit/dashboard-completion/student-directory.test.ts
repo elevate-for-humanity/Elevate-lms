@@ -22,6 +22,8 @@ it('loads every learner page and batches both primary and legacy enrollment iden
     ],
   };
   const roles: string[][] = [];
+  let activeEnrollmentReads = 0;
+  let peakEnrollmentReads = 0;
   const db = {
     from(table: keyof typeof rows) {
       let predicates: ((row: Record<string, unknown>) => boolean)[] = [];
@@ -45,13 +47,21 @@ it('loads every learner page and batches both primary and legacy enrollment iden
           end = b;
           return q;
         },
-        then: (resolve: (value: unknown) => unknown) =>
-          Promise.resolve({
-            data: rows[table]
-              .filter((row) => predicates.every((f) => f(row)))
-              .slice(start, end + 1),
-            error: null,
-          }).then(resolve),
+        then: (resolve: (value: unknown) => unknown) => {
+          if (table === 'program_enrollments') {
+            activeEnrollmentReads += 1;
+            peakEnrollmentReads = Math.max(peakEnrollmentReads, activeEnrollmentReads);
+          }
+          return Promise.resolve().then(() => {
+            if (table === 'program_enrollments') activeEnrollmentReads -= 1;
+            return resolve({
+              data: rows[table]
+                .filter((row) => predicates.every((f) => f(row)))
+                .slice(start, end + 1),
+              error: null,
+            });
+          });
+        },
       };
       return q;
     },
@@ -59,6 +69,7 @@ it('loads every learner page and batches both primary and legacy enrollment iden
   const result = await loadStudentDirectory(db as unknown as SupabaseClient);
   expect(result.profiles).toHaveLength(1003);
   expect(roles[0]).toContain('barber_apprentice');
+  expect(peakEnrollmentReads).toBe(2);
   expect(result.enrollments.map((row) => row.id)).toEqual(['primary', 'legacy']);
 });
 it('never labels stale active enrollment rows as active after revocation', () => {

@@ -9,7 +9,8 @@ const identity = "You are PARIS, Elevate's combined AI system: PARIS admissions,
 
 test('CPU planner immutable policy preserves protected boundaries and does not imply release authorization',()=>{
   for(const required of ['authorized','student records','secrets','authorization/RBAC',
-    'protected repair controls','workflows','Dockerfiles','untrusted','read back',
+    'protected repair controls','workflows','operational scripts','fixed acceptance tests','Dockerfiles','untrusted','read back',
+    'media rendering changes bump the shared rendering producer version to invalidate stale encoded segments',
     'regression test','No merge','privacy','production readback','blocked']) {
     assert.ok(PARIS_REPAIR_ACTION_POLICY.includes(required), 'missing policy: '+required);
   }

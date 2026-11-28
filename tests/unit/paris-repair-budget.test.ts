@@ -92,3 +92,15 @@ it('never admits a CPU prompt the time budget cannot process (budget coordinatio
  const gpu=budgetRepairMessages(messages,8192,2400,'gpu');
  expect(estimatePromptTokens(gpu as any)).toBeGreaterThan(1482);
 });
+
+
+it('uses the guard’s exact per-message token rounding at a fully occupied CPU cap',()=>{
+ const system={role:'system',content:'x'.repeat(3385)};
+ const task='Preserve the authorized source.';
+ const messages=[system,{role:'user',content:JSON.stringify({task,observations:['READ lib/source.ts: '+ 'a'.repeat(10000)]})}];
+ const out=budgetRepairMessages(messages,8192,384,'cpu');
+ expect(out[0]).toBe(system);
+ expect(JSON.parse(out[1].content).task).toBe(task);
+ expect(estimatePromptTokens(out as any)).toBe(1482);
+ expect(budgetRepairTurn({messages:out as any,maxTokens:384,deadlineMs:REPAIR_INFERENCE_TIMEOUT_MS,tier:'cpu'}).fits).toBe(true);
+});

@@ -113,7 +113,10 @@ export default function HvacTrainingShowcase({ compact = false }: { compact?: bo
   const Heading = 'h2';
   const headingId = compact ? 'hvac-home-showcase' : 'hvac-training-gallery';
   // Keep homepage previews distinct from the full program gallery.
-  const selectedScenes = compact ? scenes.slice(0, 3) : scenes;
+  const selectedScenes = compact ? scenes.slice(0, 3) : [
+    { image: '/images/hvac-hero.webp', title: 'Air-conditioning systems', description: 'Prepare for HVAC work with system inspection, safety and maintenance fundamentals.', alt: 'Technician inspecting an outdoor air-conditioning unit' },
+    { image: '/images/pexels/hvac.webp', title: 'Tools and diagnostics', description: 'Connect coursework with the tools used to inspect and service HVAC equipment.', alt: 'HVAC technician checking an outdoor condenser with service tools' },
+  ];
   return (
     <section
       aria-labelledby={headingId}
@@ -160,9 +163,9 @@ export default function HvacTrainingShowcase({ compact = false }: { compact?: bo
               key={scene.image}
               className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl"
             >
-              <div data-home-card-image className="relative aspect-[4/3] overflow-hidden bg-slate-100">
+              {compact ? <div data-home-card-image className="relative aspect-[4/3] overflow-hidden bg-slate-100">
                 <Image src={`${imageRoot}/${scene.image}.webp`} alt={scene.alt} fill loading="lazy" sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 410px" className="object-cover object-[center_35%]" />
-              </div>
+              </div> : <Image src={scene.image} alt={scene.alt} width={scene.image.includes('pexels') ? 915 : 1880} height={scene.image.includes('pexels') ? 650 : 1253} loading="lazy" sizes="(max-width: 640px) 100vw, 50vw" className="block h-auto w-full" />}
               <figcaption className="p-5">
                 <h3 className="text-xl font-bold text-slate-950">{scene.title}</h3>
                 <p className="mt-2 leading-7 text-slate-600">{scene.description}</p>

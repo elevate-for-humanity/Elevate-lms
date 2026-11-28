@@ -27,6 +27,7 @@ export default async function StandardStudentApplicationPage({
     payment?: string;
     billing_invoice_id?: string;
     session_id?: string;
+    funding?: string;
   }>;
 }) {
   const params = await searchParams;
@@ -52,8 +53,16 @@ export default async function StandardStudentApplicationPage({
   }
   const applicationIntent = params?.intent === 'enrollment' ? 'enrollment' : 'inquiry';
   const paymentSessionId = params?.billing_invoice_id || '';
+  // Owner rule (2026-11-28): a declared workforce-funding path is never
+  // deposit-gated. Funded applicants skip the paid-session gate and submit
+  // straight into Admissions review; /api/applications remains the
+  // enforcement point (an unpaid self-pay enrollment still cannot submit,
+  // and a funded application is never activated without verified funding).
+  const declaredFunding = String(params?.funding || '').trim().toLowerCase();
+  const fundedPathDeclared = ['wioa', 'wrg', 'workone', 'jri', 'employer', 'employer_sponsored'].includes(declaredFunding);
   if (
     applicationIntent === 'enrollment' &&
+    !fundedPathDeclared &&
     (!initialProgram || !(await verifyPaidApplication(initialProgram, paymentSessionId)))
   ) {
     const checkoutQuery = new URLSearchParams({
@@ -134,6 +143,7 @@ export default async function StandardStudentApplicationPage({
             paymentSessionId={paymentSessionId}
             lockedProgram={Boolean(initialProgram)}
             initialHostShopName={hostShopName}
+            initialFundingSource={fundedPathDeclared ? declaredFunding : ''}
           />
         </div>
       </div>

@@ -28,6 +28,8 @@ describe('enrollment program details', () => {
     expect(await screen.findByRole('heading', { name: 'Full Enrollment Application — Nail Technician Apprenticeship' })).toBeInTheDocument();
     if (weeks) expect(screen.getByText('Duration: 12 weeks')).toBeInTheDocument();
     else expect(screen.queryByText(/Duration:/)).not.toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Continue to Secure Payment' })).toBeInTheDocument();
+    // Owner rule (2026-11-28): the funding path is chosen before any payment
+    // step, so the initial button asks for that choice instead of payment.
+    expect(screen.getByRole('button', { name: 'Choose a funding path to continue' })).toBeInTheDocument();
   });
 });

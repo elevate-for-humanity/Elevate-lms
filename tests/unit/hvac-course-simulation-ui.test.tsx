@@ -26,6 +26,16 @@ import type {
 // with the suite's own timeout philosophy; assertions are unchanged.
 configure({ asyncUtilTimeout: 10000 });
 
+// Synchronization is condition-based, never budget-based. Two conditions
+// gate every control edit: (1) the control's mount effect syncs its local
+// value from props in a passive effect — an edit fired before that flush
+// lands is overwritten by it and the submit never posts — so tests drain
+// pending effects with act before editing; (2) a submit posts only once
+// the edit has committed (its Apply button enables), so tests wait for
+// that enablement before submitting, and every save assertion polls the
+// specific posted payload or the rendered save result. The budget above
+// is only a ceiling for those condition waits.
+
 const courseId = 'd48c61c4-8880-4d9d-9ab5-fab4dd51b201';
 const lessonId = '5d54f2f0-08f3-4fd8-bdce-a222c76fa44a';
 const fetchMock = vi.fn<typeof fetch>();
@@ -189,17 +199,23 @@ describe('full-course HVAC virtual practice', () => {
     const voltage = await screen.findByRole('spinbutton', { name: 'Supply voltage (V)' });
     voltage.focus();
     expect(voltage).toHaveFocus();
+    await act(async () => {});
     fireEvent.change(voltage, { target: { value: '36' } });
     expect(fetchMock).toHaveBeenCalledTimes(1);
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: 'Apply Supply voltage' })).toBeEnabled(),
+    );
     expect(screen.getByText('Apply this setting to update the model readings.')).toBeVisible();
     fireEvent.submit(voltage.closest('form')!);
-    expect(posted()).toMatchObject({
-      courseId,
-      lessonId,
-      simulationId: 'hvac-electrical-v1',
-      expectedRevision: 0,
-      action: { type: 'set-control', controlId: 'voltage', value: 36 },
-    });
+    await waitFor(() =>
+      expect(posted()).toMatchObject({
+        courseId,
+        lessonId,
+        simulationId: 'hvac-electrical-v1',
+        expectedRevision: 0,
+        action: { type: 'set-control', controlId: 'voltage', value: 36 },
+      }),
+    );
     expect(posted().requestId).toMatch(/^[a-f\d-]{36}$/i);
     expect(screen.getByText('Saving this action…')).toBeVisible();
     expect(screen.getByRole('button', { name: 'Run virtual check' })).toBeDisabled();
@@ -311,10 +327,14 @@ describe('full-course HVAC virtual practice', () => {
       'data-reading-value',
       '0',
     );
+    await act(async () => {});
     fireEvent.change(select, { target: { value: 'closed' } });
     expect(view.container.querySelector('[data-switch-position]')).toHaveAttribute(
       'data-switch-position',
       'open',
+    );
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: 'Apply Switch position' })).toBeEnabled(),
     );
     fireEvent.submit(select.closest('form')!);
     await waitFor(() =>
@@ -381,7 +401,11 @@ describe('full-course HVAC virtual practice', () => {
     const input = await screen.findByRole('slider', { name: 'Suction-line temperature (°F)' });
     expect(view.container.querySelector('[data-meter-id="superheat"]')).toHaveTextContent('15 °F');
     expect(view.container.querySelector('[data-meter-id="subcooling"]')).toHaveTextContent('10 °F');
+    await act(async () => {});
     fireEvent.change(input, { target: { value: '60' } });
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: 'Apply Suction-line temperature' })).toBeEnabled(),
+    );
     fireEvent.submit(input.closest('form')!);
     await waitFor(() =>
       expect(posted().action).toEqual({ type: 'set-control', controlId: 'suctionLine', value: 60 }),
@@ -456,10 +480,11 @@ describe('full-course HVAC virtual practice', () => {
     );
     expect(within(figure).getByText('Indoor airflow observation')).toBeVisible();
     const select = screen.getByRole('combobox', { name: 'Diagnostic tool' });
+    await act(async () => {});
     fireEvent.change(select, { target: { value: 'manifold' } });
     expect(figure.querySelector('[data-instrument-mode="temperature"]')).toBeInTheDocument();
     const apply = screen.getByRole('button', { name: 'Apply Diagnostic tool' });
-    expect(apply).toBeEnabled();
+    await waitFor(() => expect(apply).toBeEnabled());
     fireEvent.click(apply);
     expect(await screen.findByRole('figure', { name: 'Virtual manifold bench' })).toBeVisible();
     expect(posted().action).toEqual({ type: 'set-control', controlId: 'tool', value: 'manifold' });
@@ -532,13 +557,19 @@ describe('full-course HVAC virtual practice', () => {
     expect(figure.querySelector('[data-pump-condition]')).toBeNull();
     expect(figure.querySelector('[data-meter-id="current"]')).toHaveTextContent('128 psig');
     const select = screen.getByRole('combobox', { name: 'Measurement mode' });
+    await act(async () => {});
     fireEvent.change(select, { target: { value: 'vacuum' } });
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: 'Apply Measurement mode' })).toBeEnabled(),
+    );
     fireEvent.submit(select.closest('form')!);
     await waitFor(() =>
-      expect(posted().action).toEqual({
-        type: 'set-control',
-        controlId: 'measurement',
-        value: 'vacuum',
+      expect(posted()).toMatchObject({
+        courseId,
+        lessonId,
+        simulationId: 'hvac-electrical-v1',
+        expectedRevision: 0,
+        action: { type: 'set-control', controlId: 'measurement', value: 'vacuum' },
       }),
     );
     expect(await screen.findByRole('figure', { name: 'Virtual evacuation station' })).toBeVisible();
@@ -664,7 +695,11 @@ describe('full-course HVAC virtual practice', () => {
       'data-cylinder-fill',
       '1',
     );
+    await act(async () => {});
     fireEvent.change(input, { target: { value: '24' } });
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: 'Apply Simulated gross mass' })).toBeEnabled(),
+    );
     fireEvent.submit(input.closest('form')!);
     await waitFor(() =>
       expect(view.container.querySelector('[data-cylinder-fill]')).toHaveAttribute(

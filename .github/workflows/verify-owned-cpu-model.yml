@@ -34,26 +34,191 @@ jobs:
           df -h /
       - name: Build CPU-only model from checksum-verified approved weights
         run: docker build -f services/llm-cpu-worker/Dockerfile.google -t elevate-owned-cpu-candidate .
-      - name: Run actual model within eight CPU and sixteen GiB limits
+      - name: Record where full model acceptance runs
+        run: |
+          echo 'This job verified CPU workload policy, the bounded acceptance unit tests, and that the candidate image builds. It no longer runs the model locally: no available runner can host the 8 CPU / 16 GiB candidate (Docker rejects --cpus=8 on the four-CPU hosted runner, and the only self-hosted runner is a four-vCPU VM whose runner group allows only the marketing deploy workflow). Full model acceptance runs in the verify-cloud-run job of this workflow on workflow_dispatch from main, against a temporary Cloud Run service at the production candidate spec (8 CPU / 16 GiB / concurrency 2); the service is deleted in the same run and the production service is never touched.' >> "$GITHUB_STEP_SUMMARY"
+  verify-cloud-run:
+    needs: verify
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    environment: production
+    permissions:
+      contents: read
+      id-token: write
+    concurrency:
+      group: owned-cpu-model-cloud-run-verify
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+        with: {skip_install: true}
+      - name: Make room for the approved checkpoint on the ephemeral runner
+        run: |
+          sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/ghc /opt/hostedtoolcache/CodeQL
+          df -h /
+      - name: Build CPU-only model from checksum-verified approved weights
+        run: docker build -f services/llm-cpu-worker/Dockerfile.google -t elevate-owned-cpu-candidate .
+      - name: Push candidate image to Artifact Registry
+        id: image
+        run: |
+          set -euo pipefail
+          IMAGE=us-central1-docker.pkg.dev/elegant-racer-299721/elevate/owned-cpu-llm
+          gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
+          docker tag elevate-owned-cpu-candidate "$IMAGE:verify-$GITHUB_SHA"
+          docker push "$IMAGE:verify-$GITHUB_SHA"
+          echo "digest=$(gcloud artifacts docker images describe "$IMAGE:verify-$GITHUB_SHA" --project=elegant-racer-299721 --format='value(image_summary.digest)')" >> "$GITHUB_OUTPUT"
+      - name: Deploy temporary Cloud Run verify service at eight CPU and sixteen GiB
+        id: deploy
+        run: |
+          set -euo pipefail
+          gcloud run deploy elevate-owned-cpu-verify \
+            --project=elegant-racer-299721 --region=us-east1 \
+            --image=us-central1-docker.pkg.dev/elegant-racer-299721/elevate/owned-cpu-llm@${{ steps.image.outputs.digest }} \
+            --service-account=elevate-llm-runtime@elegant-racer-299721.iam.gserviceaccount.com \
+            --port=8080 --cpu=8 --memory=16Gi \
+            --min-instances=0 --max-instances=1 --concurrency=2 --timeout=300s --cpu-boost \
+            --update-env-vars=LLAMA_ARG_CACHE_RAM=0,LLAMA_ARG_CTX_CHECKPOINTS=0 \
+            --startup-probe='httpGet.path=/health,httpGet.port=8080,periodSeconds=10,timeoutSeconds=5,failureThreshold=24' \
+            --set-secrets=LLM_WORKER_SECRET=elevate-owned-llm-token:latest \
+            --labels=purpose=owned-cpu-model-verify \
+            --no-allow-unauthenticated --quiet
+          echo "url=$(gcloud run services describe elevate-owned-cpu-verify --project=elegant-racer-299721 --region=us-east1 --format='value(status.url)')" >> "$GITHUB_OUTPUT"
+      - name: Allow the workflow identity to invoke the temporary verify service
+        run: |
+          gcloud run services add-iam-policy-binding elevate-owned-cpu-verify \
+            --project=elegant-racer-299721 --region=us-east1 \
+            --member='serviceAccount:elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com' \
+            --role='roles/run.invoker' --quiet
+      - name: Wait for the verify service to become healthy
         timeout-minutes: 15
         run: |
           set -euo pipefail
-          export LLM_WORKER_SECRET="$(openssl rand -hex 32)"
-          echo "::add-mask::$LLM_WORKER_SECRET"
-          docker run --detach --name elevate-cpu-acceptance --cpus=8 --memory=16g --memory-swap=16g \
-            --env LLM_WORKER_SECRET --publish 127.0.0.1:8080:8080 elevate-owned-cpu-candidate
-          trap 'docker rm --force elevate-cpu-acceptance >/dev/null 2>&1 || true' EXIT
+          gcloud run services proxy elevate-owned-cpu-verify --project=elegant-racer-299721 --region=us-east1 --port=18080 >/tmp/run-proxy.log 2>&1 &
+          echo $! > /tmp/run-proxy.pid
           ready=false
           for attempt in $(seq 1 120); do
-            if curl --fail --silent http://127.0.0.1:8080/health >/dev/null; then ready=true; break; fi
-            if test "$(docker inspect --format='{{.State.Running}}' elevate-cpu-acceptance)" != true; then break; fi
+            if curl --fail --silent http://127.0.0.1:18080/health >/dev/null; then ready=true; break; fi
+            if ! kill -0 "$(cat /tmp/run-proxy.pid)" 2>/dev/null; then break; fi
             sleep 5
           done
           if test "$ready" != true; then
-            docker logs --tail=80 elevate-cpu-acceptance
-            echo 'CPU model startup failed'; exit 1
+            cat /tmp/run-proxy.log || true
+            gcloud run services logs read elevate-owned-cpu-verify --project=elegant-racer-299721 --region=us-east1 --limit=80 || true
+            echo 'CPU model startup failed on the Cloud Run verify service'; exit 1
           fi
-          CPU_MODEL_LOCAL_TEST=true CPU_MODEL_URL=http://127.0.0.1:8080 node scripts/gcp/accept-owned-cpu-model.mjs
-          test "$(docker inspect --format='{{.State.OOMKilled}}' elevate-cpu-acceptance)" = false
-          docker stats --no-stream --format='{{.CPUPerc}} {{.MemUsage}}' elevate-cpu-acceptance
-          echo 'Real model auth, inference, forced tool call and streaming passed within Docker 8 CPU / 16 GiB. No production resources, permissions or configuration changed.' >> "$GITHUB_STEP_SUMMARY"
+      - name: Accept real authentication, inference, tools and streaming, and measure timings
+        timeout-minutes: 20
+        run: |
+          set -euo pipefail
+          export LLM_WORKER_SECRET="$(gcloud secrets versions access latest --secret=elevate-owned-llm-token --project=elegant-racer-299721)"
+          echo "::add-mask::$LLM_WORKER_SECRET"
+          CPU_MODEL_LOCAL_TEST=true CPU_MODEL_URL=http://127.0.0.1:18080 node scripts/gcp/accept-owned-cpu-model.mjs
+          cat > "$RUNNER_TEMP/measure-owned-cpu-model.mjs" <<'MEASURE_EOF'
+          import {appendFileSync} from 'node:fs';
+          const base = process.env.CPU_MODEL_URL;
+          const token = process.env.LLM_WORKER_SECRET;
+          const fail = (code) => { throw Error('OWNED_CPU_MODEL_TIMING_' + code); };
+          const completionStarted = performance.now();
+          const completionResponse = await fetch(new URL('/v1/chat/completions', base), {
+            method: 'POST',
+            headers: {Authorization: 'Bearer ' + token, 'Content-Type': 'application/json'},
+            body: JSON.stringify({model: 'elevate-local', messages: [{role: 'user', content: 'What is 2 plus 2? Answer with the number only.'}], temperature: 0, max_tokens: 16}),
+            signal: AbortSignal.timeout(180000),
+          });
+          const completionPayload = await completionResponse.json().catch(() => null);
+          const completionTotalMs = Math.round(performance.now() - completionStarted);
+          if (!completionResponse.ok || !completionPayload) fail('COMPLETION_FAILED');
+          const streamStarted = performance.now();
+          const stream = await fetch(new URL('/v1/chat/completions', base), {
+            method: 'POST',
+            headers: {Authorization: 'Bearer ' + token, 'Content-Type': 'application/json'},
+            body: JSON.stringify({model: 'elevate-local', messages: [{role: 'user', content: 'Say hello in one short sentence.'}], temperature: 0, max_tokens: 32, stream: true}),
+            signal: AbortSignal.timeout(180000),
+          });
+          if (!stream.ok || !stream.body) fail('STREAM_FAILED');
+          const reader = stream.body.getReader();
+          const decoder = new TextDecoder();
+          let pending = '', ttftMs = null, tokens = 0;
+          for (;;) {
+            const chunk = await reader.read();
+            if (chunk.done) break;
+            pending += decoder.decode(chunk.value, {stream: true});
+            let boundary;
+            while ((boundary = /\r?\n\r?\n/.exec(pending))) {
+              const frame = pending.slice(0, boundary.index);
+              pending = pending.slice(boundary.index + boundary[0].length);
+              const data = frame.split(/\r?\n/).filter(l => l.startsWith('data:')).map(l => l.slice(5).trimStart()).join('\n');
+              if (!data || data === '[DONE]') continue;
+              const event = JSON.parse(data);
+              if (typeof event.choices?.[0]?.delta?.content === 'string' && event.choices[0].delta.content) {
+                tokens++;
+                if (ttftMs === null) ttftMs = Math.round(performance.now() - streamStarted);
+              }
+            }
+          }
+          const streamTotalMs = Math.round(performance.now() - streamStarted);
+          if (ttftMs === null || tokens === 0) fail('STREAM_EMPTY');
+          const serverTimings = completionPayload.timings ?? {};
+          const report = {
+            spec: 'cloud-run 8 cpu / 16 GiB / concurrency 2 (temporary service elevate-owned-cpu-verify)',
+            completion: {
+              totalMs: completionTotalMs,
+              promptTokens: completionPayload.usage?.prompt_tokens ?? null,
+              completionTokens: completionPayload.usage?.completion_tokens ?? null,
+              serverPromptTokensPerSec: serverTimings.prompt_per_second ?? null,
+              serverPredictedTokensPerSec: serverTimings.predicted_per_second ?? null,
+            },
+            streaming: {
+              ttftMs,
+              totalMs: streamTotalMs,
+              contentDeltas: tokens,
+              impliedDecodeTokensPerSec: streamTotalMs > ttftMs ? +(tokens / ((streamTotalMs - ttftMs) / 1000)).toFixed(2) : null,
+            },
+          };
+          console.log(JSON.stringify(report));
+          const lines = [
+            '',
+            'Owned CPU model — measured timings at the 8 CPU / 16 GiB candidate spec (temporary Cloud Run service elevate-owned-cpu-verify, us-east1):',
+            '',
+            '| Probe | Result |',
+            '| --- | --- |',
+            `| Completion total latency | ${report.completion.totalMs} ms |`,
+            `| Completion server prompt (prefill) rate | ${report.completion.serverPromptTokensPerSec ?? 'n/a'} tok/s |`,
+            `| Completion server decode rate | ${report.completion.serverPredictedTokensPerSec ?? 'n/a'} tok/s |`,
+            `| Streaming time to first token | ${report.streaming.ttftMs} ms |`,
+            `| Streaming total latency | ${report.streaming.totalMs} ms |`,
+            `| Streaming implied decode rate | ${report.streaming.impliedDecodeTokensPerSec ?? 'n/a'} tok/s |`,
+            '',
+            '```json',
+            JSON.stringify(report, null, 2),
+            '```',
+          ];
+          if (process.env.GITHUB_STEP_SUMMARY) appendFileSync(process.env.GITHUB_STEP_SUMMARY, lines.join('\n') + '\n');
+          MEASURE_EOF
+          CPU_MODEL_URL=http://127.0.0.1:18080 node "$RUNNER_TEMP/measure-owned-cpu-model.mjs"
+          kill "$(cat /tmp/run-proxy.pid)" 2>/dev/null || true
+          echo 'Real model auth, inference, forced tool call and streaming passed on a temporary Cloud Run service at 8 CPU / 16 GiB. The production service elevate-owned-cpu-llm was not changed.' >> "$GITHUB_STEP_SUMMARY"
+      - name: Delete the temporary Cloud Run verify service
+        if: always() && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+        run: |
+          set -uo pipefail
+          kill "$(cat /tmp/run-proxy.pid 2>/dev/null)" 2>/dev/null || true
+          if gcloud run services describe elevate-owned-cpu-verify --project=elegant-racer-299721 --region=us-east1 >/dev/null 2>&1; then
+            gcloud run services delete elevate-owned-cpu-verify --project=elegant-racer-299721 --region=us-east1 --quiet
+            if gcloud run services describe elevate-owned-cpu-verify --project=elegant-racer-299721 --region=us-east1 >/dev/null 2>&1; then
+              echo '::error::Temporary Cloud Run verify service still exists after delete'
+              exit 1
+            fi
+            echo 'Temporary Cloud Run verify service elevate-owned-cpu-verify deleted. Production service elevate-owned-cpu-llm was not touched.' >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo 'Temporary Cloud Run verify service already absent; nothing to delete.' >> "$GITHUB_STEP_SUMMARY"
+          fi

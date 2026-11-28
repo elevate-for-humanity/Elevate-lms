@@ -161,6 +161,10 @@ test('provision-apprenticeship-e2e.mjs: production payment is waived with fixtur
   const source = readScript('provision-apprenticeship-e2e.mjs');
   const production = extractObjectLiteral(source, 'productionPayment');
   assert.match(production, /payment_status:\s*'waived'/);
+  // Production program_enrollments_funding_status_check excludes 'waived'.
+  // Waiver is a payment state only; no synthetic funding claim is permitted.
+  assert.match(production, /funding_status:\s*'unfunded_self_continuing'/);
+  assert.doesNotMatch(production, /funding_status:\s*'waived'/);
   assert.match(production, /approved_by:/);
   assert.doesNotMatch(production, /payment_reference/);
   assert.doesNotMatch(production, /self_pay_application_verified_at/);

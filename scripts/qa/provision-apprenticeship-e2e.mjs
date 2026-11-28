@@ -267,7 +267,9 @@ async function provision() {
     // source 'qa_e2e'.
     const productionPayment = {
       payment_status: 'waived',
-      funding_status: 'waived',
+      // Funding classification is independent of the waived payment state.
+      // Keep this disposable self-pay fixture unfunded; never fabricate funding.
+      funding_status: 'unfunded_self_continuing',
       approved_at: new Date().toISOString(),
       approved_by: approver ? approver.id : null,
     };

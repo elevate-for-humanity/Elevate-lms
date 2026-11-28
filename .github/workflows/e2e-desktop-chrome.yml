@@ -142,7 +142,20 @@ jobs:
         run: |
           args=()
           if [[ "$EXHAUSTIVE_BROWSER_RUN" == true ]]; then args+=(--max-failures=0); fi
-          pnpm test:e2e --shard=${{ matrix.shard }}/4 --reporter=line,html,json "${args[@]}"
+          # The registered-apprenticeship authenticated spec runs in its own
+          # job (e2e-apprenticeship-authenticated) so it executes exactly once.
+          # Playwright matches --grep-invert against the test title path,
+          # which includes the spec file name.
+          pnpm test:e2e --shard=${{ matrix.shard }}/4 --reporter=line,html,json --grep-invert registered-apprenticeship-authenticated "${args[@]}"
+      - name: Upload early shard artifacts
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: e2e-desktop-chrome-shard-${{ matrix.shard }}-early
+          path: |
+            browser-shard.json
+            test-results/
+          retention-days: 14
       - name: Enforce authenticated portal certification
         if: ${{ !cancelled() && matrix.shard == 1 && steps.portal_certification.outcome != 'success' }}
         run: |
@@ -174,18 +187,117 @@ jobs:
             browser-shard.json
           retention-days: 14
 
+  # Runs ONLY tests/e2e/registered-apprenticeship-authenticated.spec.ts, using
+  # the same container, environment, setup and provisioning steps as the
+  # desktop-chrome shards. The shard pool excludes this spec with
+  # --grep-invert, so it runs exactly once across this workflow.
+  e2e-apprenticeship-authenticated:
+    name: E2E apprenticeship authenticated
+    runs-on: ubuntu-24.04
+    container:
+      image: mcr.microsoft.com/playwright:v1.57.0-noble@sha256:3bed4b1a12f2338642f3d8cba28e291deef3c66bd4a964bbeb3e57bbff511dbd
+      options: --init --shm-size=1g
+    defaults:
+      run:
+        shell: bash
+    timeout-minutes: 120
+    env:
+      PLAYWRIGHT_HTML_OPEN: never
+      NODE_OPTIONS: '--max-old-space-size=6144'
+      EXPECTED_LMS_SHA: ${{ github.sha }}
+      QA_PORTAL_E2E_RUN_ID: ${{ github.run_id }}-${{ github.run_attempt }}-apprenticeship-authenticated
+      # Isolated QA only: the full local-dev suite includes service-role
+      # writes. Never use the production learner database or its service key.
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.E2E_SUPABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.E2E_SUPABASE_ANON_KEY }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.E2E_SUPABASE_SERVICE_ROLE_KEY }}
+      TEST_ADMIN_EMAIL: ${{ secrets.E2E_ADMIN_EMAIL }}
+      TEST_ADMIN_PASSWORD: ${{ secrets.E2E_ADMIN_PASSWORD }}
+      E2E_ADMIN_EMAIL: ${{ secrets.E2E_ADMIN_EMAIL }}
+      E2E_ADMIN_PASSWORD: ${{ secrets.E2E_ADMIN_PASSWORD }}
+      TEST_STUDENT_EMAIL: ${{ secrets.E2E_LEARNER_EMAIL }}
+      TEST_STUDENT_PASSWORD: ${{ secrets.E2E_LEARNER_PASSWORD }}
+      E2E_LEARNER_EMAIL: ${{ secrets.E2E_LEARNER_EMAIL }}
+      E2E_LEARNER_PASSWORD: ${{ secrets.E2E_LEARNER_PASSWORD }}
+      TEST_PROGRAM_HOLDER_EMAIL: ${{ secrets.E2E_PROGRAM_HOLDER_EMAIL }}
+      TEST_PROGRAM_HOLDER_PASSWORD: ${{ secrets.E2E_PROGRAM_HOLDER_PASSWORD }}
+      E2E_PROGRAM_HOLDER_EMAIL: ${{ secrets.E2E_PROGRAM_HOLDER_EMAIL }}
+      E2E_PROGRAM_HOLDER_PASSWORD: ${{ secrets.E2E_PROGRAM_HOLDER_PASSWORD }}
+      E2E_APPRENTICE_EMAIL: ${{ secrets.E2E_APPRENTICE_EMAIL }}
+      E2E_APPRENTICE_PASSWORD: ${{ secrets.E2E_APPRENTICE_PASSWORD }}
+      E2E_EMPLOYER_EMAIL: ${{ secrets.E2E_EMPLOYER_EMAIL }}
+      E2E_EMPLOYER_PASSWORD: ${{ secrets.E2E_EMPLOYER_PASSWORD }}
+      E2E_INSTRUCTOR_EMAIL: ${{ secrets.E2E_INSTRUCTOR_EMAIL }}
+      E2E_INSTRUCTOR_PASSWORD: ${{ secrets.E2E_INSTRUCTOR_PASSWORD }}
+      E2E_STAFF_EMAIL: ${{ secrets.E2E_STAFF_EMAIL }}
+      E2E_STAFF_PASSWORD: ${{ secrets.E2E_STAFF_PASSWORD }}
+      E2E_CASE_MANAGER_EMAIL: ${{ secrets.E2E_CASE_MANAGER_EMAIL }}
+      E2E_CASE_MANAGER_PASSWORD: ${{ secrets.E2E_CASE_MANAGER_PASSWORD }}
+      # Only a designated disposable Host Shop identity may certify authenticated
+      # shop dashboard geometry; never borrow Admin or Program Holder credentials.
+      E2E_HOST_SHOP_EMAIL: ${{ secrets.E2E_HOST_SHOP_EMAIL }}
+      E2E_HOST_SHOP_PASSWORD: ${{ secrets.E2E_HOST_SHOP_PASSWORD }}
+      TEST_MODE: 'true'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.28.2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
+      - name: Verify isolated QA database and three-service E2E configuration
+        run: node scripts/qa/verify-e2e-service-config.mjs
+      - name: Provision disposable Employer, Instructor, Staff, Case Manager and Admin QA identities
+        run: node scripts/qa/provision-remaining-portal-e2e.mjs provision
+      - name: Provision disposable Learner and Program Holder QA identities
+        run: node scripts/qa/provision-learner-program-holder-e2e.mjs provision
+      - name: Provision disposable Apprentice and Host Shop QA identities
+        run: node scripts/qa/provision-apprenticeship-e2e.mjs provision
+      - name: Verify preinstalled Playwright browsers
+        run: node scripts/verify-playwright-runtime.mjs chromium
+      - name: Run registered apprenticeship authenticated spec
+        if: ${{ success() }}
+        env:
+          PLAYWRIGHT_JSON_OUTPUT_NAME: browser-shard.json
+        run: pnpm test:e2e tests/e2e/registered-apprenticeship-authenticated.spec.ts --reporter=line,html,json
+      - name: Clean up disposable Apprentice and Host Shop QA identities
+        if: always()
+        run: node scripts/qa/provision-apprenticeship-e2e.mjs cleanup
+      - name: Clean up disposable Learner and Program Holder QA identities
+        if: always()
+        run: node scripts/qa/provision-learner-program-holder-e2e.mjs cleanup
+      - name: Clean up disposable Employer, Instructor, Staff, Case Manager and Admin QA identities
+        if: always()
+        run: node scripts/qa/provision-remaining-portal-e2e.mjs cleanup
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: e2e-apprenticeship-authenticated
+          path: |
+            playwright-report/
+            test-results/
+            browser-shard.json
+          retention-days: 14
+
   # Preserve the exact required job name. The matrix result is successful
   # only when every shard succeeds; skipped, canceled and failed all fail closed.
   desktop-chrome:
     name: E2E desktop-chrome
     runs-on: ubuntu-24.04
-    needs: [desktop-chrome-shard]
+    needs: [desktop-chrome-shard, e2e-apprenticeship-authenticated]
     if: ${{ !cancelled() }}
     steps:
       - name: Require successful desktop results from the full matrix
         env:
           SHARD_RESULT: ${{ needs.desktop-chrome-shard.result }}
-        run: test "$SHARD_RESULT" = success
+          APPRENTICESHIP_AUTHENTICATED_RESULT: ${{ needs.e2e-apprenticeship-authenticated.result }}
+        run: test "$SHARD_RESULT" = success && test "$APPRENTICESHIP_AUTHENTICATED_RESULT" = success
 
   # An isolated, public-only regression must finish even if the broad
   # cross-app E2E suite runs into unrelated Course Builder/Program Holder failures.

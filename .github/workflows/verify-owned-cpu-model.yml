@@ -100,7 +100,7 @@ jobs:
             --role='roles/run.invoker' --quiet
         - name: Install Cloud Run proxy component
           run: sudo apt-get install -y google-cloud-cli-cloud-run-proxy
-    - name: Wait for the verify service to become healthy
+      - name: Wait for the verify service to become healthy
         timeout-minutes: 15
         run: |
           set -euo pipefail

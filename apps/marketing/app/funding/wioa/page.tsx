@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowRight, CheckCircle2, FileCheck2, Landmark, ShieldCheck } from 'lucide-react';
+import { ArrowRight, FileText, Landmark, Shield } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
@@ -113,7 +113,7 @@ export default function WioaPage() {
       <section className="border-b border-amber-200 bg-amber-50">
         <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6">
           <div className="flex items-start gap-3">
-            <ShieldCheck className="mt-0.5 h-6 w-6 shrink-0 text-amber-800" aria-hidden="true" />
+            <Shield className="mt-0.5 h-6 w-6 shrink-0 text-amber-800" aria-hidden="true" />
             <p className="text-sm leading-6 text-amber-950 sm:text-base">
               <strong>Funding is not guaranteed.</strong> Provider or program listing does not by itself guarantee a referral, voucher, or payment. Your local workforce agency determines participant eligibility, program eligibility, available funds, covered costs, and required authorization.
             </p>
@@ -139,8 +139,7 @@ export default function WioaPage() {
           <div className="grid gap-4 sm:grid-cols-2">
             {MAY_COVER.map((item) => (
               <article key={item.title} className="rounded-2xl border border-slate-200 bg-slate-50 p-6">
-                <CheckCircle2 className="h-6 w-6 text-brand-green-700" aria-hidden="true" />
-                <h3 className="mt-4 text-lg font-bold text-slate-950">{item.title}</h3>
+                <h3 className="text-lg font-bold text-slate-950">{item.title}</h3>
                 <p className="mt-2 text-sm leading-6 text-slate-700">{item.description}</p>
               </article>
             ))}
@@ -179,7 +178,7 @@ export default function WioaPage() {
           <div className="grid gap-8 rounded-3xl border border-slate-200 bg-slate-50 p-7 sm:p-10 lg:grid-cols-[1fr_auto] lg:items-center">
             <div>
               <div className="flex items-center gap-2 text-brand-blue-800">
-                <FileCheck2 className="h-5 w-5" aria-hidden="true" />
+                <FileText className="h-5 w-5" aria-hidden="true" />
                 <span className="text-sm font-bold uppercase tracking-[0.16em]">Before you enroll</span>
               </div>
               <h2 className="mt-3 text-3xl font-extrabold text-slate-950">Confirm the exact program with your advisor.</h2>
@@ -222,3 +221,4 @@ export default function WioaPage() {
     </main>
   );
 }
+

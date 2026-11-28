@@ -1,7 +1,7 @@
-import { FileText, CheckCircle, Clock, AlertTriangle, Shield, Calendar } from 'lucide-react';
+import { FileText, Clock, AlertTriangle, Shield, Calendar } from 'lucide-react';
 const POLICIES = [
   {
-    icon: CheckCircle,
+    icon: FileText,
     title: 'ID Requirements',
     items: [
       "Valid government-issued photo ID required (driver's license, state ID, passport, or military ID)",
@@ -80,3 +80,4 @@ export default function TestingPolicies() {
     </div>
   );
 }
+

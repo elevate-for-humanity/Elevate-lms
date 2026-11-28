@@ -56,7 +56,7 @@ export default function EnrollmentPipeline({
                     : 'bg-slate-800 border-slate-600 text-slate-300'
                 }`}
               >
-                {activeIndex !== undefined && i < activeIndex ? '✓' : i + 1}
+                {i + 1}
               </div>
               <p className="text-xs font-semibold text-white mt-2 text-center">{step.label}</p>
               <p className="text-xs text-slate-400 text-center max-w-7xl leading-tight">{step.desc}</p>
@@ -88,3 +88,4 @@ export default function EnrollmentPipeline({
     </div>
   );
 }
+

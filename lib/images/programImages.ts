@@ -40,7 +40,7 @@ export const PROGRAM_IMAGES: Record<string, ProgramImageEntry> = {
   },
   'automotive-technician': {
     card: `${P}/diesel-mechanic.webp`,
-    hero: '/images/pexels/diesel.webp',
+    hero: `${P}/diesel-mechanic.webp`,
     alt: 'Automotive technician inspecting vehicle systems in a service shop',
   },
   'business-operations': {
@@ -154,7 +154,7 @@ export const PROGRAM_IMAGES: Record<string, ProgramImageEntry> = {
     alt: 'Illustrative Chef instructor supervising culinary skills practice in a teaching kitchen',
   },
   'hvac-technician': {
-    card: '/images/hvac-hero.webp',
+    card: '/images/programs/hvac/training-20261029/instructor-demo.webp',
     hero: '/images/hvac-hero.webp',
     alt: 'HVAC technician inspecting an air-conditioning unit',
   },
@@ -314,7 +314,7 @@ export const PROGRAM_IMAGES: Record<string, ProgramImageEntry> = {
     alt: 'Illustrative CAD drafting instructor and learner reviewing a mechanical drawing',
   },
   technology: {
-    card: '/images/pexels/webdev.webp',
+    card: `${P}/programs-it-hero.webp`,
     hero: `${P}/programs-it-hero.webp`,
     alt: 'Technology learner building practical IT and digital skills',
   },
@@ -329,8 +329,8 @@ export const PROGRAM_IMAGES: Record<string, ProgramImageEntry> = {
     alt: 'Illustrative Instructor and learners reviewing business records at laptops',
   },
   'finance-bookkeeping-accounting': {
-    card: '/images/pexels/bookkeeping.webp',
-    hero: '/images/pexels/bookkeeping.webp',
+    card: '/images/business/team-2.jpg',
+    hero: '/images/business/team-2.jpg',
     alt: 'Bookkeeping ledger showing financial entries',
   },
   entrepreneurship: {
@@ -349,7 +349,7 @@ export const PROGRAM_IMAGES: Record<string, ProgramImageEntry> = {
     alt: 'Office administrator working at a professional workstation',
   },
   'project-management': {
-    card: '/images/pexels/project.webp',
+    card: '/images/pages/project-management.webp',
     hero: `${P}/comp-home-highlight-success.webp`,
     alt: 'Project manager leading a team meeting',
   },
@@ -442,3 +442,4 @@ export function getProgramImageAlt(
 ): string {
   return PROGRAM_IMAGES[slug]?.alt ?? fallback;
 }
+

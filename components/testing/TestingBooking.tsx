@@ -1,6 +1,6 @@
 import { getPublicExamAmountCents } from '@/lib/testing/exam-pricing';
 import Link from 'next/link';
-import { ArrowLeft, ShieldCheck } from 'lucide-react';
+import { ArrowLeft, Shield } from 'lucide-react';
 import { ACTIVE_PROVIDERS } from '@/lib/testing/proctoring-capabilities';
 import TestingCheckoutClient from '@/apps/marketing/app/testing/checkout/TestingCheckoutClient';
 
@@ -46,7 +46,7 @@ export default async function TestingBooking({
 
         <div className="mt-6 rounded-2xl border border-slate-200 bg-white p-6 sm:p-8">
           <div className="flex items-start gap-3">
-            <ShieldCheck className="mt-1 h-7 w-7 shrink-0 text-emerald-600" />
+            <Shield className="mt-1 h-7 w-7 shrink-0 text-emerald-600" />
             <div>
               <p className="text-sm font-bold uppercase tracking-widest text-emerald-700">
                 Secure exam checkout
@@ -79,3 +79,4 @@ export default async function TestingBooking({
     </section>
   );
 }
+

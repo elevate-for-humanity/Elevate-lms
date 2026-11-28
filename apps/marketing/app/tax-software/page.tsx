@@ -72,10 +72,10 @@ export default function TaxSoftwarePage() {
                 Tell us about your personal, self-employed, business or amended return. We will
                 discuss your needs, required documents and preparation price.
               </p>
-              <ul className="my-6 space-y-3 text-sm">
-                <li>✓ A conversation about your return</li>
-                <li>✓ A document checklist for your situation</li>
-                <li>✓ Scope and pricing reviewed before work begins</li>
+              <ul className="my-6 list-disc space-y-3 pl-5 text-sm">
+                <li>A conversation about your return</li>
+                <li>A document checklist for your situation</li>
+                <li>Scope and pricing reviewed before work begins</li>
               </ul>
               <Link
                 href="/tax-software/contact"
@@ -93,10 +93,10 @@ export default function TaxSoftwarePage() {
                 Use the guided workspace to enter your information, confirm uploaded documents and
                 review your preparation estimate.
               </p>
-              <ul className="my-6 space-y-3 text-sm">
-                <li>✓ Free to start your return information</li>
-                <li>✓ Review additional form charges before choosing services</li>
-                <li>✓ Save your progress in your account</li>
+              <ul className="my-6 list-disc space-y-3 pl-5 text-sm">
+                <li>Free to start your return information</li>
+                <li>Review additional form charges before choosing services</li>
+                <li>Save your progress in your account</li>
               </ul>
               <Link
                 href="/tax-software/self-file"
@@ -224,3 +224,4 @@ export default function TaxSoftwarePage() {
     </TaxSiteShell>
   );
 }
+

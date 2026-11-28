@@ -15,8 +15,8 @@ function servingRevision(service) {
 }
 function verifyTask(task) {
  const container=task?.containers?.[0];
- if(task?.containers?.length!==1||container.resources?.limits?.cpu!=='4'||container.resources?.limits?.memory!=='8Gi'||
-  task.containerConcurrency!==1||task.serviceAccountName!==`elevate-llm-runtime@${PROJECT}.iam.gserviceaccount.com`||
+ if(task?.containers?.length!==1||container.resources?.limits?.cpu!=='8'||container.resources?.limits?.memory!=='16Gi'||
+  task.containerConcurrency!==2||task.serviceAccountName!==`elevate-llm-runtime@${PROJECT}.iam.gserviceaccount.com`||
   !new RegExp('^us-central1-docker\\.pkg\\.dev/'+PROJECT+'/elevate/owned-cpu-llm@sha256:[a-f0-9]{64}$').test(container.image||''))fail('BOUNDED_RUNTIME_REQUIRED');
  return container;
 }
@@ -48,7 +48,7 @@ export async function repairOwnedCpuMemory({run=google,capacity=inspectRegionalC
  const token=modelCredential(adminConfig);
  const admin=JSON.parse(run(['run','services','describe','elevate-admin-migration','--project',PROJECT,'--region','us-central1','--format=json']));
  reviewPrivateModelPolicy(read(['run','services','get-iam-policy',CPU_SERVICE]),admin.spec?.template?.spec?.serviceAccountName);
- const capacityInput={region:CPU_REGION,task:{containers:[{resources:{limits:{cpu:'4',memory:'8Gi'}}}]},run};
+ const capacityInput={region:CPU_REGION,task:{containers:[{resources:{limits:{cpu:'8',memory:'16Gi'}}}]},run};
  let budget=await capacity(capacityInput);
  let quotaRequests;
  if(!budget.fits&&requestStagingHeadroom) {

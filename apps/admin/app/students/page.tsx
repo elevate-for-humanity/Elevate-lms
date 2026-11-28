@@ -60,10 +60,29 @@ function EnrollmentBadge({
   );
 }
 
+const STUDENTS_PER_PAGE = 50;
+
+function studentDirectoryPage(value: string | undefined, total: number) {
+  const last = Math.max(1, Math.ceil(total / STUDENTS_PER_PAGE));
+  const requested = value && /^[1-9]\d*$/.test(value) ? Number(value) : 1;
+  const page = Math.min(last, requested);
+  const offset = (page - 1) * STUDENTS_PER_PAGE;
+  return { page, last, offset };
+}
+
+function studentDirectoryHref(page: number, includeTest: boolean, search: string) {
+  const params = new URLSearchParams();
+  if (includeTest) params.set('include_test', '1');
+  if (search) params.set('search', search);
+  if (page > 1) params.set('page', String(page));
+  const query = params.toString();
+  return query ? `/students?${query}` : '/students';
+}
+
 export default async function StudentsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ include_test?: string; search?: string }>;
+  searchParams: Promise<{ include_test?: string; search?: string; page?: string }>;
 }) {
   await requireRole(['admin', 'staff']);
   const db = await requireAdminClient();
@@ -82,6 +101,8 @@ export default async function StudentsPage({
     ? allStudents
     : allStudents.filter((student) => !isTestOrAuditProfile(student));
   const students = eligibleStudents.filter((student) => studentMatchesSearch(student, search));
+  const { page, last, offset } = studentDirectoryPage(params.page, students.length);
+  const visibleStudents = students.slice(offset, offset + STUDENTS_PER_PAGE);
   const operationalStudents = allStudents.filter((student) => !isTestOrAuditProfile(student));
   const totalStudents = operationalStudents.length;
   const operationalStudentIds = new Set(operationalStudents.map((student) => student.id));
@@ -190,7 +211,7 @@ export default async function StudentsPage({
         {students && students.length > 0 ? (
           <>
             <div className="space-y-3 p-3 sm:hidden">
-              {students.map((student: any) => {
+              {visibleStudents.map((student: any) => {
                 const enr = enrollmentByUser[student.id];
                 return (
                   <article
@@ -249,7 +270,7 @@ export default async function StudentsPage({
                   <div className="col-span-1">Joined</div>
                   <div className="col-span-1"></div>
                 </div>
-                {students.map((student: any) => {
+                {visibleStudents.map((student: any) => {
                   const enr = enrollmentByUser[student.id];
                   return (
                     <div
@@ -336,6 +357,21 @@ export default async function StudentsPage({
           />
         )}
       </AdminCard>
+      {last > 1 && (
+        <nav aria-label="Student directory pagination" className="flex flex-wrap items-center gap-4 px-1 text-sm text-slate-700">
+          <span>Page {page} of {last}</span>
+          {page > 1 && (
+            <Link className="font-semibold text-blue-700" href={studentDirectoryHref(page - 1, includeTest, search)}>
+              Previous page
+            </Link>
+          )}
+          {page < last && (
+            <Link className="font-semibold text-blue-700" href={studentDirectoryHref(page + 1, includeTest, search)}>
+              Next page
+            </Link>
+          )}
+        </nav>
+      )}
     </AdminPageShell>
   );
 }

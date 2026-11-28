@@ -15,10 +15,13 @@ export async function loadStudentDirectory(db: SupabaseClient) {
     profiles.push(...(data ?? []));
     if ((data ?? []).length < 500) break;
   }
+  // Keep concurrency bounded while avoiding two network round trips in series
+  // for every 100 learners. The two lookups are disjoint.
   const enrollments = [];
   for (let start = 0; start < profiles.length; start += 100) {
     const ids = profiles.slice(start, start + 100).map((profile) => profile.id);
-    for (const key of ['user_id', 'student_id'] as const) {
+    const readKey = async (key: 'user_id' | 'student_id') => {
+      const rows = [];
       for (let offset = 0; ; offset += 500) {
         let query = db
           .from('program_enrollments')
@@ -32,10 +35,13 @@ export async function loadStudentDirectory(db: SupabaseClient) {
         if (key === 'student_id') query = query.is('user_id', null);
         const { data, error } = await query;
         if (error) throw new Error('STUDENT_ENROLLMENTS_UNAVAILABLE');
-        enrollments.push(...(data ?? []));
+        rows.push(...(data ?? []));
         if ((data ?? []).length < 500) break;
       }
-    }
+      return rows;
+    };
+    const [current, legacy] = await Promise.all([readKey('user_id'), readKey('student_id')]);
+    enrollments.push(...current, ...legacy);
   }
   enrollments.sort((a, b) =>
     String(b.enrolled_at ?? '').localeCompare(String(a.enrolled_at ?? '')),

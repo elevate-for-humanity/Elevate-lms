@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowRight, BookOpen, CheckCircle2, ShieldCheck } from 'lucide-react';
+import { ArrowRight, BookOpen, Shield } from 'lucide-react';
 
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { ProgramStructuredData } from '@/components/seo/CourseStructuredData';
@@ -177,7 +177,7 @@ export default function FinancialLiteracyPage() {
             <ul className="mt-7 grid gap-4 sm:grid-cols-2">
               {topics.map((topic) => (
                 <li key={topic} className="flex gap-3 rounded-xl border border-slate-200 p-4">
-                  <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-emerald-700" aria-hidden="true" />
+                  <span aria-hidden="true" className="mt-0.5 shrink-0 text-slate-400">•</span>
                   <span className="leading-7 text-slate-700">{topic}</span>
                 </li>
               ))}
@@ -185,7 +185,7 @@ export default function FinancialLiteracyPage() {
           </div>
 
           <aside className="rounded-2xl border border-slate-200 bg-slate-50 p-6">
-            <ShieldCheck className="h-8 w-8 text-slate-700" aria-hidden="true" />
+            <Shield className="h-8 w-8 text-slate-700" aria-hidden="true" />
             <h2 className="mt-4 text-2xl font-black text-slate-950">FREE to those who qualify</h2>
             <p className="mt-3 leading-7 text-slate-700">
               Personal finance and financial literacy are delivered inside Elevate&apos;s 8-week Accounting &amp; Financial Empowerment Career Pathway rather than as a duplicate standalone course. Eligible participants may receive workforce funding for approved training costs.
@@ -237,3 +237,4 @@ export default function FinancialLiteracyPage() {
     </main>
   );
 }
+

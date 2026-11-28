@@ -3,10 +3,9 @@ import Link from 'next/link';
 import {
   ArrowRight,
   Award,
-  CheckCircle2,
   GraduationCap,
   Handshake,
-  ShieldCheck,
+  Shield,
   Users,
 } from 'lucide-react';
 import HeroPicture from '@/components/marketing/HeroPicture';
@@ -81,7 +80,7 @@ export default function EmployerJourneyPage() {
       <section className="border-y border-slate-200 bg-slate-50 px-6 py-14">
         <div className="max-w-6xl mx-auto">
           <div className="flex items-center gap-3 mb-5">
-            <ShieldCheck className="w-7 h-7 text-emerald-700" />
+            <Shield className="w-7 h-7 text-emerald-700" />
             <h2 className="text-2xl font-extrabold text-slate-950">Government-facing controls</h2>
           </div>
           <div className="grid md:grid-cols-2 gap-5">
@@ -95,7 +94,7 @@ export default function EmployerJourneyPage() {
                 key={text}
                 className="flex items-start gap-3 rounded-xl border border-slate-200 bg-white p-5"
               >
-                <CheckCircle2 className="w-5 h-5 text-emerald-700 mt-0.5 flex-none" />
+                <span aria-hidden="true" className="mt-0.5 flex-none text-slate-400">•</span>
                 <p className="text-sm text-slate-700 leading-relaxed">{text}</p>
               </div>
             ))}
@@ -124,3 +123,4 @@ export default function EmployerJourneyPage() {
     </main>
   );
 }
+

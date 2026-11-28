@@ -8,11 +8,10 @@ import Image from 'next/image';
 import Link from 'next/link';
 import {
   ArrowRight,
-  BadgeCheck,
   CalendarDays,
   CircleDollarSign,
   MapPin,
-  ShieldCheck,
+  Shield,
 } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { getPublicExamAmountCents } from '@/lib/testing/exam-pricing';
@@ -101,7 +100,7 @@ export default async function TestingPage({
         <div className="mx-auto max-w-6xl px-4">
           <div className="mt-7 grid gap-3 sm:grid-cols-3">
             <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
-              <ShieldCheck className="h-5 w-5 text-emerald-600" />
+              <Shield className="h-5 w-5 text-emerald-600" />
               <p className="mt-2 font-bold text-slate-900">Review before payment</p>
               <p className="mt-1 text-sm text-slate-600">
                 Your exact exam, appointment and total are shown before you pay.
@@ -182,11 +181,9 @@ export default async function TestingPage({
                         </p>
                       </div>
                       {canCheckout ? (
-                        <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-bold text-emerald-800 ring-1 ring-emerald-200">
-                          <BadgeCheck className="h-4 w-4" /> Online checkout
-                        </span>
+                        <span className="text-xs font-bold text-emerald-800">Online checkout</span>
                       ) : (
-                        <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-3 py-1.5 text-xs font-bold text-amber-900 ring-1 ring-amber-200">
+                        <span className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-900">
                           <CircleDollarSign className="h-4 w-4" /> Ask for current pricing
                         </span>
                       )}
@@ -285,3 +282,4 @@ export default async function TestingPage({
     </main>
   );
 }
+

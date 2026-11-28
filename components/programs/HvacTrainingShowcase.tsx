@@ -69,10 +69,7 @@ export function HvacLabHero() {
       </div>
       <figcaption className="mx-auto max-w-7xl px-4 py-7 sm:px-6 sm:py-10">
         <p className="text-sm font-bold tracking-wide text-orange-800">Sponsored by Elevate for Humanity</p>
-        <h2 className="mt-3 text-3xl font-black sm:text-5xl">Build your future in HVAC.</h2>
-        <p className="mt-4 max-w-3xl text-lg leading-8 text-slate-700">
-          Explore six-week hybrid training, hands-on skills, and EPA Section 608 exam preparation.
-        </p>
+        <p className="mt-3 text-3xl font-black sm:text-5xl">Build your future in HVAC.</p>
         <a href="#hvac-program-film" className="mt-5 inline-flex min-h-12 items-center rounded-xl bg-orange-500 px-6 py-3 font-bold text-slate-950 hover:bg-orange-400">
           Watch the program introduction
         </a>
@@ -98,7 +95,7 @@ export function HvacProgramFilm({ assistance = true }: { assistance?: boolean })
           controls
           playsInline
           preload="metadata"
-          poster="/images/hvac-hero.webp"
+          poster="/images/programs/hvac/elevate-20261029/instructor-demo.webp"
           width={720}
           height={900}
           className="mx-auto block aspect-[4/5] h-auto w-full max-w-[24rem] rounded-xl bg-slate-950 object-contain"
@@ -140,10 +137,12 @@ export default function HvacTrainingShowcase({ compact = false }: { compact?: bo
                 ? 'Build your next chapter in HVAC.'
                 : 'See the skills you can start building.'}
             </Heading>
-            <p className="mt-4 text-lg leading-8 text-slate-700">
-              Six-week hybrid HVAC training combines self-paced coursework, scheduled hands-on
-              learning, and preparation for EPA Section 608 Core and Types I, II, and III.
-            </p>
+            {compact && (
+              <p className="mt-4 text-lg leading-8 text-slate-700">
+                Six-week hybrid HVAC training combines self-paced coursework, scheduled hands-on
+                learning, and preparation for EPA Section 608 Core and Types I, II, and III.
+              </p>
+            )}
           </div>
           {!compact && (
             <Link
@@ -252,3 +251,4 @@ export default function HvacTrainingShowcase({ compact = false }: { compact?: bo
     </section>
   );
 }
+

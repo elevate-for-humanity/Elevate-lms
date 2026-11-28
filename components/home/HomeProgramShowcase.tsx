@@ -125,7 +125,7 @@ export function HomeProgramShowcase({ asHero = false }: { asHero?: boolean }) {
               fill
               priority={active === 0}
               className="object-contain"
-              sizes="(max-width: 1024px) 100vw, 55vw"
+              sizes="(max-width: 1024px) 100vw, 700px"
             />
           </div>
           <div className="border-t border-slate-200 p-4 sm:p-5">
@@ -169,3 +169,4 @@ export function HomeProgramShowcase({ asHero = false }: { asHero?: boolean }) {
     </section>
   );
 }
+

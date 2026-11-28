@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowRight, BadgeCheck, Sparkles } from 'lucide-react';
+import { ArrowRight, Award, Sparkles } from 'lucide-react';
 import { BeautyEnrollmentPromotion } from '@/components/promotions/BeautyEnrollmentPromotion';
 
 const TRACKS = [
@@ -10,7 +10,7 @@ const TRACKS = [
     focus: 'Haircutting, fades, grooming, sanitation, client service, and professional practice',
     image: '/images/partners/kountry-kutz/interior-active.webp',
     href: '/programs/barber-apprenticeship',
-    icon: BadgeCheck,
+    icon: Award,
   },
   {
     title: 'Hair Stylist / Cosmetology Apprenticeship',
@@ -34,7 +34,7 @@ const TRACKS = [
     focus: 'Manicuring, pedicuring, nail enhancements, sanitation, and client safety',
     image: '/images/pexels/nail-tech.webp',
     href: '/programs/nail-technician-apprenticeship',
-    icon: BadgeCheck,
+    icon: Award,
   },
 ] as const;
 
@@ -106,3 +106,4 @@ export function HomeBeautyPriority() {
     </section>
   );
 }
+

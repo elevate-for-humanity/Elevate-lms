@@ -30,7 +30,7 @@ const services = {
     appDir: 'apps/admin',
     worker: 'sw-admin.js',
     cachePrefix: 'elevate-admin-',
-    files: ['sw-admin.js', 'manifest-admin.json', 'sw-mail.js', 'manifest-mail.json', 'offline.html'],
+    files: ['sw-admin.js', 'manifest-admin.json', 'sw-mail.js', 'manifest-mail.json', 'offline.html', 'sw-phone.js', 'manifest-phone.json'],
   },
 };
 

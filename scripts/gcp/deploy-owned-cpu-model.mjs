@@ -6,8 +6,10 @@ import {modelCredential} from './deploy-owned-llm.mjs';
 
 export const CPU_SERVICE='elevate-owned-cpu-llm';
 export const CPU_REGION='us-east1';
+// Share the production resource envelope with the fail-closed quota preflight.
+export const CPU_CAPACITY=Object.freeze({cpu:'8',memory:'16Gi',maxInstances:3});
 // The engine defaults to an additional 8 GiB prompt cache. That cannot fit
-// alongside model weights and the active context in an 8 GiB container.
+// alongside model weights and the active context in a 16 GiB container.
 export const CPU_CACHE_ENV={LLAMA_ARG_CACHE_RAM:'0',LLAMA_ARG_CTX_CHECKPOINTS:'0'};
 const MODEL_IDENTITY=`elevate-llm-runtime@${PROJECT}.iam.gserviceaccount.com`;
 const DEPLOY_IDENTITY=`elevate-github-deploy@${PROJECT}.iam.gserviceaccount.com`;
@@ -21,12 +23,17 @@ export function privateCpuDeploymentArguments(digest) {
   // to load, while the live chat route gives up after 45s and the health probe
   // after 15s, so the apps reported the model "unavailable" even though it was
   // healthy (verified live 2026-11-23: workflow run #6 green, homepage/Admin
-  // chat both falling back). One warm instance is an always-on 4 CPU / 8 GiB
+  // chat both falling back). One warm instance is an always-on 8 CPU / 16 GiB
   // cost; that is the price of a live PARIS, not a free default.
+  // Owner resize (2026-11-27, Elizabeth: "make it big and fix it"): 4 CPU /
+  // 8 GiB / concurrency 1 serialized every parallel platform call behind a
+  // single 47-132s generation. The worker now runs two parallel 8192-token
+  // slots on eight threads, so the service takes concurrency 2 per instance
+  // and up to 3 instances; the per-request context contract is unchanged.
   return ['run','deploy',CPU_SERVICE,'--project',PROJECT,'--region',CPU_REGION,
     '--image',`us-central1-docker.pkg.dev/${PROJECT}/elevate/owned-cpu-llm@${digest}`,
-    '--service-account',MODEL_IDENTITY,'--port','8080','--cpu','4','--memory','8Gi',
-    '--min','1','--min-instances','1','--max-instances','2','--concurrency','1','--timeout','300s','--cpu-boost',
+    '--service-account',MODEL_IDENTITY,'--port','8080','--cpu',CPU_CAPACITY.cpu,'--memory',CPU_CAPACITY.memory,
+    '--min','1','--min-instances','1','--max-instances',String(CPU_CAPACITY.maxInstances),'--concurrency','2','--timeout','300s','--cpu-boost',
     '--update-env-vars='+Object.entries(CPU_CACHE_ENV).map(([key,value])=>key+'='+value).join(','),
     '--startup-probe','httpGet.path=/health,httpGet.port=8080,periodSeconds=10,timeoutSeconds=5,failureThreshold=24',
     '--set-secrets',`LLM_WORKER_SECRET=${SECRET}:latest`,'--quiet'];
@@ -52,7 +59,10 @@ export async function preflightPrivateCpuRelease({run=google,capacity=inspectReg
     if(!policy.bindings?.some(binding=>binding.role==='roles/secretmanager.secretAccessor'&&!binding.condition&&binding.members?.includes('serviceAccount:'+identity)))fail('EXISTING_SECRET_READER_REQUIRED');
   }
   if(run(['secrets','versions','access','latest','--secret',SECRET,'--project',PROJECT])!==token)fail('EXISTING_TOKEN_MISMATCH');
-  const allocation=await capacity({region:CPU_REGION,task:{containers:[{resources:{limits:{cpu:'4',memory:'8Gi'}}}]},run});
+  // Retain all serving/tagged old revisions and active executions in the bound,
+  // plus the full new revision envelope. This conservative overlap bound also
+  // covers post-cutover demand; one candidate instance cannot prove capacity.
+  const allocation=await capacity({region:CPU_REGION,task:{containers:[{resources:{limits:{cpu:CPU_CAPACITY.cpu,memory:CPU_CAPACITY.memory}}}]},taskCount:CPU_CAPACITY.maxInstances,run});
   if(!allocation.fits)fail('REGIONAL_CAPACITY_REQUIRED');
   return {region:CPU_REGION,adminIdentity,existingIdentityAndSecretVerified:true,capacity:allocation};
 }
@@ -67,7 +77,7 @@ export async function deployPrivateCpuCandidate({digest,run=google,preflight=pre
   if(!/^https:\/\/elevate-owned-cpu-llm-[a-z0-9.-]+\.run\.app$/.test(base??''))fail('SERVICE_URL_UNVERIFIED');
   const container=resource.spec?.template?.spec?.containers?.[0];
   const limits=container?.resources?.limits;
-  if(resource.spec?.template?.spec?.serviceAccountName!==MODEL_IDENTITY || limits?.cpu!=='4' || limits?.memory!=='8Gi' || limits?.['nvidia.com/gpu'])fail('RESOURCE_READBACK_FAILED');
+  if(resource.spec?.template?.spec?.serviceAccountName!==MODEL_IDENTITY || limits?.cpu!==CPU_CAPACITY.cpu || limits?.memory!==CPU_CAPACITY.memory || limits?.['nvidia.com/gpu'])fail('RESOURCE_READBACK_FAILED');
   const policy=JSON.parse(run(['run','services','get-iam-policy',CPU_SERVICE,'--project',PROJECT,'--region',CPU_REGION,'--format=json']));
   const invocation=reviewPrivateModelPolicy(policy,ready.adminIdentity);
   return {service:CPU_SERVICE,region:CPU_REGION,url:base,revision:resource.status?.latestReadyRevisionName,imageDigest:digest,...invocation,productionEndpointChanged:false};

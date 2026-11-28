@@ -10,6 +10,15 @@ export function productionCredentials(env=process.env){
  if(clientId!=='AB36wjMVx59aNggdTvM8qhnTGgmvuRPkx3a4efcXCkmeo6mFWL'||!/^[A-Za-z0-9]{20,256}$/.test(clientSecret))throw Error('PRODUCTION_CREDENTIALS_INVALID');
  return {clientId,clientSecret};
 }
+export const VERIFIER_KEYS=['QB_WEBHOOK_VERIFIER_TOKEN','QUICKBOOKS_WEBHOOK_VERIFIER_TOKEN'];
+/** The authentic Intuit webhook verifier, recovered from the Intuit Developer
+ * Portal by the account owner. Optional: OAuth-only runs keep prior behavior.
+ * Never generate a replacement; a wrong value fails Intuit's signature check. */
+export function productionVerifier(env=process.env){
+ const verifier=(env.QB_WEBHOOK_VERIFIER_TOKEN||env.QUICKBOOKS_WEBHOOK_VERIFIER_TOKEN||'').trim();
+ if(verifier&&!/^[A-Za-z0-9_-]{16,256}$/.test(verifier))throw Error('PRODUCTION_VERIFIER_INVALID');
+ return verifier;
+}
 export async function configureDatabase({env=process.env,request=fetch}={}){
  const {clientId,clientSecret}=productionCredentials(env);
  if(!env.SUPABASE_SERVICE_ROLE_KEY)throw Error('DATABASE_CREDENTIAL_MISSING');
@@ -22,15 +31,29 @@ export async function configureDatabase({env=process.env,request=fetch}={}){
  for(const [key,expected] of Object.entries({QB_CLIENT_ID:clientId,QB_CLIENT_SECRET:clientSecret,QB_REDIRECT_URI:REDIRECT,QB_ENVIRONMENT:'production'})){
   if(await rpc('get_platform_secret',{p_key:key})!==expected)throw Error('DATABASE_READBACK_FAILED');
  }
- return {databaseConfigured:true,applicationChanged:changed,companyAuthorizationVerified:false,valuesExposed:false};
+ // The webhook verifier is a first-class production credential: every runtime
+ // consumer (health, webhook signature check, marketplace readiness) resolves
+ // it from process.env, which hydration fills from platform_secrets
+ // scope='runtime'. Provision it through the same canonical store with the
+ // same exact readback discipline as the OAuth pair.
+ const verifier=productionVerifier(env);
+ if(verifier){
+  await rpc('set_platform_secret',{p_key:'QB_WEBHOOK_VERIFIER_TOKEN',p_value:verifier,p_description:'QuickBooks webhook verifier token (Intuit Developer Portal)',p_category:'billing'});
+  if(await rpc('get_platform_secret',{p_key:'QB_WEBHOOK_VERIFIER_TOKEN'})!==verifier)throw Error('DATABASE_READBACK_FAILED');
+ }
+ return {databaseConfigured:true,applicationChanged:changed,webhookVerifierConfigured:Boolean(verifier),companyAuthorizationVerified:false,valuesExposed:false};
 }
 export function configureGoogle({env=process.env,run=google}={}){
- const {clientId,clientSecret}=productionCredentials(env),services=[];
+ const {clientId,clientSecret}=productionCredentials(env),verifier=productionVerifier(env),services=[];
  const folder=mkdtempSync(join(tmpdir(),'qb-production-bindings-'));
  try{
   for(const component of ['admin','marketing','lms','store']){
    const config=loadGoogleConfig(component,run),next=structuredClone(config);
    const updates={QB_CLIENT_ID:clientId,QB_CLIENT_SECRET:clientSecret,QB_REDIRECT_URI:REDIRECT,QB_ENVIRONMENT:'production'};
+   // Bind the verifier under both names the runtime accepts so the serving
+   // revision env carries it even where platform_secrets hydration is not
+   // the authority (ELEVATE_RUNTIME_CONFIG_PROVIDER=google-secret-manager).
+   if(verifier)for(const key of VERIFIER_KEYS)updates[key]=verifier;
    Object.assign(next.runtimeEnvironment,updates);
    const retired=['QB_ACCESS_TOKEN','QB_REFRESH_TOKEN','QB_TOKEN_EXPIRES','QB_REALM_ID'];
    for(const key of retired)delete next.runtimeEnvironment[key];
@@ -50,7 +73,7 @@ export function configureGoogle({env=process.env,run=google}={}){
    if(Object.entries(updates).some(([key,value])=>active[key]!==value)||retired.some(key=>active[key]!==undefined))throw Error('SERVING_CONFIGURATION_UNVERIFIED');
    services.push({component,configurationVerified:true});
   }
-  return {services,companyAuthorizationVerified:false,valuesExposed:false};
+  return {services,webhookVerifierConfigured:Boolean(verifier),companyAuthorizationVerified:false,valuesExposed:false};
  }finally{rmSync(folder,{recursive:true,force:true});}
 }
 if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href){

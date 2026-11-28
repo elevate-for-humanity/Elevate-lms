@@ -3,12 +3,16 @@ import assert from 'node:assert/strict';
 import {repairOwnedCpuMemory,repeatCpuInference} from './repair-owned-cpu-memory.mjs';
 import {CPU_CACHE_ENV} from './deploy-owned-cpu-model.mjs';
 
-function fixture({tamper=false}={}) {
+function legacyTask({cpu='4',memory='8Gi',containerConcurrency=1}={}) {
+ return {serviceAccountName:'elevate-llm-runtime@elegant-racer-299721.iam.gserviceaccount.com',containerConcurrency,
+  containers:[{image:'us-central1-docker.pkg.dev/elegant-racer-299721/elevate/owned-cpu-llm@sha256:'+'a'.repeat(64),resources:{limits:{cpu,memory}},env:[{name:'LLM_WORKER_SECRET',valueFrom:{secretKeyRef:{name:'existing-secret',key:'latest'}}}]}]};
+}
+function fixture({tamper=false,sourceTask=null}={}) {
  const base='https://elevate-owned-cpu-llm-aabnh2y32a-ue.a.run.app';
  const old='elevate-owned-cpu-llm-old',next='elevate-owned-cpu-llm-new';
  const calls=[];let staged=false,serving=old;
- const task={serviceAccountName:'elevate-llm-runtime@elegant-racer-299721.iam.gserviceaccount.com',containerConcurrency:1,
-  containers:[{image:'us-central1-docker.pkg.dev/elegant-racer-299721/elevate/owned-cpu-llm@sha256:'+'a'.repeat(64),resources:{limits:{cpu:'4',memory:'8Gi'}},env:[{name:'LLM_WORKER_SECRET',valueFrom:{secretKeyRef:{name:'existing-secret',key:'latest'}}}]}]};
+ const task={serviceAccountName:'elevate-llm-runtime@elegant-racer-299721.iam.gserviceaccount.com',containerConcurrency:2,
+  containers:[{image:'us-central1-docker.pkg.dev/elegant-racer-299721/elevate/owned-cpu-llm@sha256:'+'a'.repeat(64),resources:{limits:{cpu:'8',memory:'16Gi'}},env:[{name:'LLM_WORKER_SECRET',valueFrom:{secretKeyRef:{name:'existing-secret',key:'latest'}}}]}]};
  const run=args=>{
   calls.push(args);
   if(args[0]==='projects')return JSON.stringify({bindings:[{role:'roles/owner',members:['user:owner@example.test']}]});
@@ -19,11 +23,11 @@ function fixture({tamper=false}={}) {
   if(args[2]==='update'){staged=true;return '';}
   if(args[2]==='update-traffic'){serving=args.some(a=>a==='--to-revisions='+next+'=100')?next:old;return '';}
   if(args[1]==='revisions'){
-   const spec=structuredClone(task);
+   const spec=structuredClone(args[3]===next?task:(sourceTask??task));
    if(args[3]===next)spec.containers[0].env.push(...Object.entries(CPU_CACHE_ENV).map(([name,value])=>({name,value:tamper?'8192':value})));
    return JSON.stringify({spec});
   }
-  if(args[2]==='describe')return JSON.stringify({spec:{template:{spec:task}},status:{url:base,latestCreatedRevisionName:staged?next:old,latestReadyRevisionName:staged?next:old,
+  if(args[2]==='describe')return JSON.stringify({spec:{template:{spec:sourceTask??task}},status:{url:base,latestCreatedRevisionName:staged?next:old,latestReadyRevisionName:staged?next:old,
    traffic:[{percent:100,revisionName:serving},...(staged?[{tag:'elevate-owned-cpu-llm-mem',revisionName:next,url:'https://elevate-owned-cpu-llm-mem---'+new URL(base).hostname}]:[])]}});
   throw Error('UNEXPECTED_OPERATION');
  };
@@ -32,9 +36,25 @@ function fixture({tamper=false}={}) {
 test('isolated candidate keeps the immutable image, identity and limits and activates only after repeated inference',async()=>{
  const f=fixture();let accepted=false,repeated=false;
  const result=await repairOwnedCpuMemory({...f,accept:async({base})=>{if(!accepted){assert.match(base,/mem---/);assert.ok(!f.calls.some(c=>c[2]==='update-traffic'));}else assert.equal(base,f.base);accepted=true;return {passed:true};},repeat:async()=>{assert.ok(accepted);assert.ok(!f.calls.some(c=>c[2]==='update-traffic'));repeated=true;return {passed:true,requests:8};}});
- assert.ok(repeated);assert.equal(result.repaired,true);assert.equal(result.memory,'8Gi');assert.equal(result.permissionsChanged,false);
+ assert.ok(repeated);assert.equal(result.repaired,true);assert.equal(result.memory,'16Gi');assert.equal(result.cpu,'8');assert.equal(result.permissionsChanged,false);
  assert.ok(f.calls.find(c=>c[2]==='update').includes('--no-traffic'));
  assert.ok(!f.calls.some(c=>c.includes('add-iam-policy-binding')||c.includes('deploy')));
+});
+test('legacy serving envelope is accepted and the candidate is staged at the target envelope',async()=>{
+ const f=fixture({sourceTask:legacyTask()});
+ const result=await repairOwnedCpuMemory(f);
+ assert.equal(result.repaired,true);assert.equal(result.memory,'16Gi');assert.equal(result.cpu,'8');
+ const update=f.calls.find(c=>c[2]==='update');
+ assert.ok(update.includes('--no-traffic'));
+ const at=flag=>update[update.indexOf(flag)+1];
+ assert.equal(at('--cpu'),'8');assert.equal(at('--memory'),'16Gi');assert.equal(at('--concurrency'),'2');
+});
+test('a serving revision outside both bounded envelopes is refused before staging',async()=>{
+ for(const sourceTask of [legacyTask({cpu:'2',memory:'4Gi'}),legacyTask({cpu:'8',memory:'16Gi',containerConcurrency:8})]){
+  const f=fixture({sourceTask});
+  await assert.rejects(repairOwnedCpuMemory(f),/BOUNDED_RUNTIME_REQUIRED/);
+  assert.ok(!f.calls.some(c=>c[2]==='update'));
+ }
 });
 test('failed acceptance preserves serving traffic',async()=>{
  for(const stage of ['accept','repeat']){
@@ -84,3 +104,4 @@ test('sustained proof performs eight different bounded requests and rejects wron
  assert.equal(result.requests,8);assert.equal(new Set(prompts).size,8);assert.ok(prompts.every(p=>p.length>4000));
  await assert.rejects(repeatCpuInference({base:f.base,request:async()=>Response.json({choices:[{message:{content:'wrong'}}]})}),/REPEATED_INFERENCE_FAILED/);
 });
+

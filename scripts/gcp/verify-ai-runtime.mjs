@@ -51,7 +51,7 @@ export async function inspectModelServicePermissions(accessToken,{request=fetch}
 export function classifyRuntimeErrors(entries) {
   return entries.map(entry => {
     const text=JSON.stringify(entry.textPayload??entry.jsonPayload??'');
-    const category=/MODEL_BOUNDED_EIGHT_GIB_MEMORY_REQUIRED/.test(text)?'model_memory_boundary':
+    const category=/MODEL_BOUNDED_SIXTEEN_GIB_MEMORY_REQUIRED/.test(text)?'model_memory_boundary':
       /MODEL_CHECKSUM_FAILED/.test(text)?'model_checksum':
       /MODEL_AUTHENTICATION_CONFIGURATION_REQUIRED/.test(text)?'model_authentication_configuration':
       /diagnostic-only/.test(text)?'diagnostic_narration_config':

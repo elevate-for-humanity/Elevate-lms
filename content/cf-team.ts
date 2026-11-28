@@ -61,10 +61,5 @@ export const teamMembers: TeamMember[] = [
     title: 'Director of Information Technology',
     bio: 'Ameco Martin holds an Associate\'s Degree in Business and a Bachelor\'s Degree in Computer Programming. She is the owner of Ameco\'s Enterprise LLC, located at 6110 West 25th Street, Unit 241022, Indianapolis, IN 46224. As Director of Information Technology at Elevate for Humanity, Ameco oversees all IT and technology credential programs including IT Help Desk / CompTIA A+, Cybersecurity Analyst, Network Administration, Network Support Technician, Web Development, Software Development, Graphic Design, CAD/Drafting, Bookkeeping & QuickBooks, Tax Preparation, Office Administration, Business Administration, Entrepreneurship, and Project Management. She also serves as the dedicated Career Coach embedded full-time at Warren Central High School under Elevate\'s WIOA In-School Youth contract with EmployIndy, providing in-person career coaching, WIOA eligibility screening, Individual Service Strategy development, Indiana Career Connect data entry, employer coordination, and work-based learning placement.',
   },
-  {
-    slug: 'naomi-jordan',
-    name: 'Naomi Jordan',
-    title: 'Director of Healthcare Administration',
-    bio: 'Naomi Jordan is the owner of Rebuilds Mind and Body Studio LLC, located at 6331 N Keystone Ave, Indianapolis, IN 46220. She holds active Indiana credentials as a Certified Nursing Assistant (CNA), Home Health Aide (HHA), Phlebotomy Technician, and Qualified Medication Aide (QMA). As Director of Healthcare Administration at Elevate for Humanity, Naomi oversees all healthcare program administration, clinical coordination, healthcare partner relationships, and curriculum compliance for CNA, HHA, Phlebotomy, QMA, Medical Assistant, Pharmacy Technician, and Peer Recovery Specialist programs. She brings direct clinical experience to program design and ensures that Elevate\'s healthcare graduates are fully prepared to pass state and national credentialing exams and enter the healthcare workforce.',
-  },
 ];
+

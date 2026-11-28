@@ -33,20 +33,27 @@ async function _POST(req: Request) {
     const tier = getProgramFundingTier(program);
     const funding = getVerifiedProgramFunding(program);
 
-    try {
-      const db = await createClient();
-      await db.from('inquiries').insert({
-        name,
-        email,
-        phone,
-        program_interest: program,
-        funding_type: tier === 'workforce-funded' ? 'workforce-funded' : 'self-pay',
-        status: 'new',
-        source: 'website_program_inquiry',
-        created_at: new Date().toISOString(),
-      });
-    } catch (error) {
-      logger.error('[program-inquiry] Database insert failed', error);
+    // public.inquiries contract: (inquiry_type NOT NULL, data jsonb NOT NULL,
+    // funding_type, program_interest, source, status) — the submitter's flat
+    // fields live inside the data payload. Supabase returns insert errors
+    // instead of throwing, so the result MUST be checked: until 2026-11-28
+    // every insert was rejected on unknown columns and the failure was
+    // swallowed, leaving the notification email as the only record.
+    const db = await createClient();
+    const { error: insertError } = await db.from('inquiries').insert({
+      inquiry_type: 'program_inquiry',
+      data: { name, email, phone, question },
+      program_interest: program,
+      funding_type: tier === 'workforce-funded' ? 'workforce-funded' : 'self-pay',
+      status: 'new',
+      source: 'website_program_inquiry',
+    });
+    if (insertError) {
+      logger.error('[program-inquiry] Database insert failed', insertError);
+      return NextResponse.json(
+        { error: 'Unable to submit inquiry. Please try again.' },
+        { status: 500 },
+      );
     }
 
     const programLabel = program.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());

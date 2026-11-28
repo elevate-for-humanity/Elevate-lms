@@ -46,21 +46,33 @@ async function _POST(req: Request) {
       return NextResponse.json({ error: 'Please fill in all required fields' }, { status: 400 });
     }
 
-    // Save inquiry to database
+    // Save inquiry to database. public.inquiries contract: (inquiry_type
+    // NOT NULL, data jsonb NOT NULL, funding_type, program_interest, source,
+    // status) — the submitter's flat fields live inside the data payload.
+    // Supabase returns insert errors instead of throwing, so the result MUST
+    // be checked: until 2026-11-28 every insert was rejected on unknown
+    // columns and the failure was swallowed, leaving the notification email
+    // as the only record. A persistence failure now returns 500 and no
+    // notification emails are sent.
     let leadScore = null;
-    try {
-      const supabase = await createClient();
-      await supabase.from('inquiries').insert({
-        name,
-        email,
-        phone,
-        program_interest: program,
-        funding_type: funding || null,
-        status: 'new',
-        source: 'website',
-        created_at: new Date().toISOString(),
-      });
+    const supabase = await createClient();
+    const { error: insertError } = await supabase.from('inquiries').insert({
+      inquiry_type: 'website_inquiry',
+      data: { name, email, phone },
+      program_interest: program,
+      funding_type: funding || null,
+      status: 'new',
+      source: 'website',
+    });
+    if (insertError) {
+      logger.error('Failed to save inquiry to database:', insertError);
+      return NextResponse.json(
+        { error: 'Failed to submit inquiry. Please call 463-240-1404.' },
+        { status: 500 },
+      );
+    }
 
+    try {
       // Score and store lead
       const nameParts = (name || '').split(' ');
       leadScore = await scoreLead({
@@ -83,9 +95,11 @@ async function _POST(req: Request) {
       }).catch(() => {}); // Non-blocking
 
       logger.info('[inquiry] Lead scored', { email, score: leadScore.total, grade: leadScore.grade });
-    } catch (dbError) {
-      logger.error('Failed to save inquiry to database:', dbError);
-      // Continue with email even if DB fails
+    } catch (scoringError) {
+      // Lead scoring is a CRM side effect, not the inquiry record itself —
+      // the inquiry is already persisted above, so a scoring failure stays
+      // non-blocking (but is logged, never silently swallowed).
+      logger.error('[inquiry] Lead scoring failed (inquiry saved):', scoringError);
     }
 
     const programSlug = (program || '').toLowerCase().replace(/\s+/g, '-');

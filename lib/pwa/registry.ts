@@ -23,8 +23,13 @@ export const LMS_ROLE_MANIFESTS = [
   '/manifest-shop-owner.json',
 ] as const;
 
+// Install surfaces live inside each app's own scope (PWA audit 2026-11-28):
+// the page that offers the install must link the app's manifest and be
+// controlled by a covering worker, or Chrome never fires
+// beforeinstallprompt. The static pages under /install/*.html are offline
+// draft pads only — they are never the install target.
 export const ADMIN_WORKSPACE_PWAS = {
-  'dev-studio': { name: 'Dev Studio', openPath: '/studio', installPath: '/install/dev-studio.html' },
-  'course-builder': { name: 'Course Builder', openPath: '/studio/courses', installPath: '/install/course-builder.html' },
-  email: { name: 'Email', openPath: '/mail', installPath: '/install/email.html' },
+  'dev-studio': { name: 'Dev Studio', openPath: '/studio', installPath: '/studio/install' },
+  'course-builder': { name: 'Course Builder', openPath: '/studio/courses', installPath: '/studio/courses/install' },
+  email: { name: 'Email', openPath: '/mail', installPath: '/mail/install' },
 } as const;

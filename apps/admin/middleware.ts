@@ -42,8 +42,23 @@ const PUBLIC_PATHS = [
   '/install',
 ];
 
+// The per-app install surfaces must render without a session: the owner
+// installs Phone, Mail, Dev Studio, and Course Builder from these pages
+// before (or without) signing in, exactly like the Admin /install route
+// above. Installability comes from each route's in-scope manifest + service
+// worker + prompt-capture button, not from a session. Exact matches only —
+// the apps themselves (/phone, /mail, /studio) stay behind the auth gate,
+// and an installed app opening into the sign-in is correct.
+const PUBLIC_INSTALL_PATHS = new Set([
+  '/phone/install',
+  '/mail/install',
+  '/studio/install',
+  '/studio/courses/install',
+]);
+
 function isPublicPath(pathname: string): boolean {
   return (
+    PUBLIC_INSTALL_PATHS.has(pathname) ||
     PUBLIC_PATHS.some(
       (path) => pathname === path || (path !== '/' && pathname.startsWith(`${path}/`)),
     ) ||
@@ -190,7 +205,22 @@ export async function middleware(req: NextRequest) {
   // verifies issuer, audience, signature, repo, branch and workflow before work.
   if (pathname === '/api/cron/paris-code-repair') return NextResponse.next();
 
-  if (isPublicPath(pathname)) return NextResponse.next();
+  if (isPublicPath(pathname)) {
+    // The root layout mounts MailPwaRegister instead of AdminPwaRegister
+    // only when middleware marks the request with x-elevate-mail-app, and
+    // that marking normally happens in the authenticated flow below. The
+    // public mail install route must carry the mark too, or the signed-out
+    // page registers the Admin worker and the mail worker never activates,
+    // so beforeinstallprompt can never fire for Elevate Mail.
+    if (pathname === '/mail/install') {
+      const requestHeaders = new Headers(req.headers);
+      requestHeaders.delete('x-elevate-staff-inbox');
+      requestHeaders.delete('x-elevate-mail-app');
+      requestHeaders.set('x-elevate-mail-app', '1');
+      return NextResponse.next({ request: { headers: requestHeaders } });
+    }
+    return NextResponse.next();
+  }
 
   // Scheduled jobs have no browser session. Admit every cron route only when
   // the shared scheduler credential matches; each route verifies it again.

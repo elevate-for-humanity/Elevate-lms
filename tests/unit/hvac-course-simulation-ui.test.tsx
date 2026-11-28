@@ -1,4 +1,13 @@
-import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
+import {
+  act,
+  cleanup,
+  configure,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+  within,
+} from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import HvacCourseSimulation from '@/components/lms/HvacCourseSimulation';
 import type {
@@ -8,6 +17,14 @@ import type {
   HvacSimulationResponse,
   HvacSimulationView,
 } from '@/lib/lms/hvac-simulation-types';
+
+// Testing Library's default async budget (1s) is far below this repo's
+// vitest testTimeout (60s) and expires on loaded CI runners before the
+// mocked save round-trip is rendered, flaking a different test in this
+// file per run (main CI 46150065508: the recovery fill test timed out
+// with the correct pre-save state still shown). Align the async budget
+// with the suite's own timeout philosophy; assertions are unchanged.
+configure({ asyncUtilTimeout: 10000 });
 
 const courseId = 'd48c61c4-8880-4d9d-9ab5-fab4dd51b201';
 const lessonId = '5d54f2f0-08f3-4fd8-bdce-a222c76fa44a';
@@ -242,16 +259,18 @@ describe('full-course HVAC virtual practice', () => {
       );
     render(<HvacCourseSimulation courseId={courseId} lessonId={lessonId} />);
     fireEvent.click(await screen.findByRole('button', { name: 'Run virtual check' }));
-    expect(posted().action).toEqual({ type: 'observe' });
+    await waitFor(() => expect(posted().action).toEqual({ type: 'observe' }));
     const option = await screen.findByRole('button', { name: 'Record the open switch condition' });
     await waitFor(() => expect(option).toBeEnabled());
     fireEvent.click(option);
-    expect(posted()).toMatchObject({
-      expectedRevision: 1,
-      action: { type: 'choose', stageId: 'inspect', optionId: 'open-circuit' },
-    });
+    await waitFor(() =>
+      expect(posted()).toMatchObject({
+        expectedRevision: 1,
+        action: { type: 'choose', stageId: 'inspect', optionId: 'open-circuit' },
+      }),
+    );
     const next = await screen.findByRole('heading', { name: 'Explain the evidence' });
-    expect(next).toHaveFocus();
+    await waitFor(() => expect(next).toHaveFocus());
     expect(screen.getByRole('progressbar')).toHaveAttribute('value', '1');
     expect(screen.getByText('The observation supports your decision.')).toBeVisible();
   });
@@ -298,7 +317,9 @@ describe('full-course HVAC virtual practice', () => {
       'open',
     );
     fireEvent.submit(select.closest('form')!);
-    expect(posted().action).toEqual({ type: 'set-control', controlId: 'switch', value: 'closed' });
+    await waitFor(() =>
+      expect(posted().action).toEqual({ type: 'set-control', controlId: 'switch', value: 'closed' }),
+    );
     await waitFor(() =>
       expect(view.container.querySelector('[data-switch-position]')).toHaveAttribute(
         'data-switch-position',
@@ -362,7 +383,9 @@ describe('full-course HVAC virtual practice', () => {
     expect(view.container.querySelector('[data-meter-id="subcooling"]')).toHaveTextContent('10 °F');
     fireEvent.change(input, { target: { value: '60' } });
     fireEvent.submit(input.closest('form')!);
-    expect(posted().action).toEqual({ type: 'set-control', controlId: 'suctionLine', value: 60 });
+    await waitFor(() =>
+      expect(posted().action).toEqual({ type: 'set-control', controlId: 'suctionLine', value: 60 }),
+    );
     await waitFor(() =>
       expect(view.container.querySelector('[data-meter-id="superheat"]')).toHaveAttribute(
         'data-reading-value',
@@ -511,11 +534,13 @@ describe('full-course HVAC virtual practice', () => {
     const select = screen.getByRole('combobox', { name: 'Measurement mode' });
     fireEvent.change(select, { target: { value: 'vacuum' } });
     fireEvent.submit(select.closest('form')!);
-    expect(posted().action).toEqual({
-      type: 'set-control',
-      controlId: 'measurement',
-      value: 'vacuum',
-    });
+    await waitFor(() =>
+      expect(posted().action).toEqual({
+        type: 'set-control',
+        controlId: 'measurement',
+        value: 'vacuum',
+      }),
+    );
     expect(await screen.findByRole('figure', { name: 'Virtual evacuation station' })).toBeVisible();
     expect(view.container.querySelector('[data-instrument-mode="pressure"]')).toBeNull();
     expect(view.container.querySelector('[data-pump-condition]')).toHaveAttribute(
@@ -751,13 +776,16 @@ describe('full-course HVAC virtual practice', () => {
       );
     render(<HvacCourseSimulation courseId={courseId} lessonId={lessonId} />);
     fireEvent.click(await screen.findByRole('button', { name: 'Run virtual check' }));
-    const first = posted();
+    let first: HvacSimulationRequest | undefined;
+    await waitFor(() => {
+      first = posted();
+    });
     expect(await screen.findByRole('alert')).toHaveTextContent('connection was interrupted');
     expect(screen.getByText('This action has not been confirmed as saved.')).toBeVisible();
     expect(screen.getByRole('button', { name: 'Run virtual check' })).toBeDisabled();
     expect(screen.queryByText('Progress saved to your course.')).toBeNull();
     fireEvent.click(screen.getByRole('button', { name: 'Retry save' }));
-    expect(posted()).toEqual(first);
+    await waitFor(() => expect(posted()).toEqual(first));
     expect(await screen.findByText('Progress saved to your course.')).toBeVisible();
     expect(screen.getByText('Attempts: 1')).toBeVisible();
   });
@@ -813,7 +841,9 @@ describe('full-course HVAC virtual practice', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Run virtual check' }));
     await waitFor(() => expect(restart).toBeEnabled());
     fireEvent.click(restart);
-    expect(posted()).toMatchObject({ expectedRevision: 1, action: { type: 'reset' } });
+    await waitFor(() =>
+      expect(posted()).toMatchObject({ expectedRevision: 1, action: { type: 'reset' } }),
+    );
     await waitFor(() => expect(screen.getByText('Attempts: 2')).toBeVisible());
     expect(restart).toBeDisabled();
     fireEvent.click(restart);
@@ -864,7 +894,9 @@ describe('full-course HVAC virtual practice', () => {
     expect(await screen.findByRole('heading', { name: 'Simulation mastered' })).toBeVisible();
     expect(screen.getByText('Mastery saved')).toBeVisible();
     fireEvent.click(screen.getByRole('button', { name: 'Practice again' }));
-    expect(posted()).toMatchObject({ expectedRevision: 9, action: { type: 'reset' } });
+    await waitFor(() =>
+      expect(posted()).toMatchObject({ expectedRevision: 9, action: { type: 'reset' } }),
+    );
     expect(await screen.findByRole('button', { name: 'Restart this practice' })).toBeDisabled();
     expect(screen.getByText('Mastery saved')).toBeVisible();
     expect(screen.getByText('Best saved score:').parentElement).toHaveTextContent('92%');

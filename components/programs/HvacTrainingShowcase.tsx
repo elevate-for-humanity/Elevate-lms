@@ -69,10 +69,7 @@ export function HvacLabHero() {
       </div>
       <figcaption className="mx-auto max-w-7xl px-4 py-7 sm:px-6 sm:py-10">
         <p className="text-sm font-bold tracking-wide text-orange-800">Sponsored by Elevate for Humanity</p>
-        <h2 className="mt-3 text-3xl font-black sm:text-5xl">Build your future in HVAC.</h2>
-        <p className="mt-4 max-w-3xl text-lg leading-8 text-slate-700">
-          Explore six-week hybrid training, hands-on skills, and EPA Section 608 exam preparation.
-        </p>
+        <p className="mt-3 text-3xl font-black sm:text-5xl">Build your future in HVAC.</p>
         <a href="#hvac-program-film" className="mt-5 inline-flex min-h-12 items-center rounded-xl bg-orange-500 px-6 py-3 font-bold text-slate-950 hover:bg-orange-400">
           Watch the program introduction
         </a>
@@ -98,7 +95,7 @@ export function HvacProgramFilm({ assistance = true }: { assistance?: boolean })
           controls
           playsInline
           preload="metadata"
-          poster="/images/hvac-hero.webp"
+          poster="/images/programs/hvac/elevate-20261029/instructor-demo.webp"
           width={720}
           height={900}
           className="mx-auto block aspect-[4/5] h-auto w-full max-w-[24rem] rounded-xl bg-slate-950 object-contain"
@@ -116,10 +113,7 @@ export default function HvacTrainingShowcase({ compact = false }: { compact?: bo
   const Heading = 'h2';
   const headingId = compact ? 'hvac-home-showcase' : 'hvac-training-gallery';
   // Keep homepage previews distinct from the full program gallery.
-  const selectedScenes = compact ? scenes.slice(0, 3) : [
-    { image: '/images/hvac-hero.webp', title: 'Air-conditioning systems', description: 'Prepare for HVAC work with system inspection, safety and maintenance fundamentals.', alt: 'Technician inspecting an outdoor air-conditioning unit' },
-    { image: '/images/pexels/hvac.webp', title: 'Tools and diagnostics', description: 'Connect coursework with the tools used to inspect and service HVAC equipment.', alt: 'HVAC technician checking an outdoor condenser with service tools' },
-  ];
+  const selectedScenes = compact ? scenes.slice(0, 3) : scenes;
   return (
     <section
       aria-labelledby={headingId}
@@ -140,10 +134,12 @@ export default function HvacTrainingShowcase({ compact = false }: { compact?: bo
                 ? 'Build your next chapter in HVAC.'
                 : 'See the skills you can start building.'}
             </Heading>
-            <p className="mt-4 text-lg leading-8 text-slate-700">
-              Six-week hybrid HVAC training combines self-paced coursework, scheduled hands-on
-              learning, and preparation for EPA Section 608 Core and Types I, II, and III.
-            </p>
+            {compact && (
+              <p className="mt-4 text-lg leading-8 text-slate-700">
+                Six-week hybrid HVAC training combines self-paced coursework, scheduled hands-on
+                learning, and preparation for EPA Section 608 Core and Types I, II, and III.
+              </p>
+            )}
           </div>
           {!compact && (
             <Link
@@ -164,9 +160,9 @@ export default function HvacTrainingShowcase({ compact = false }: { compact?: bo
               key={scene.image}
               className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl"
             >
-              {compact ? <div data-home-card-image className="relative aspect-[4/3] overflow-hidden bg-slate-100">
+              <div data-home-card-image className="relative aspect-[4/3] overflow-hidden bg-slate-100">
                 <Image src={`${imageRoot}/${scene.image}.webp`} alt={scene.alt} fill loading="lazy" sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 410px" className="object-cover object-[center_35%]" />
-              </div> : <Image src={scene.image} alt={scene.alt} width={scene.image.includes('pexels') ? 915 : 1880} height={scene.image.includes('pexels') ? 650 : 1253} loading="lazy" sizes="(max-width: 640px) 100vw, 50vw" className="block h-auto w-full" />}
+              </div>
               <figcaption className="p-5">
                 <h3 className="text-xl font-bold text-slate-950">{scene.title}</h3>
                 <p className="mt-2 leading-7 text-slate-600">{scene.description}</p>
@@ -252,3 +248,4 @@ export default function HvacTrainingShowcase({ compact = false }: { compact?: bo
     </section>
   );
 }
+

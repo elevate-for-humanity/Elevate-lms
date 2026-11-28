@@ -23,3 +23,32 @@ test('missing existing model identity blocks before compute, configuration or IA
  await assert.rejects(preflightPrivateCpuRelease({run}));
  assert.ok(calls.every(args=>!args.some(x=>['deploy','update','add','create','add-iam-policy-binding'].includes(x))));
 });
+
+test('preflight budgets the complete new model envelope without dropping the old serving bound',async()=>{
+ const model='elevate-llm-runtime@elegant-racer-299721.iam.gserviceaccount.com';
+ const fixture='a'.repeat(32);
+ const calls=[];
+ const run=args=>{
+   calls.push(args);
+   if(args.includes('elevate-admin-runtime-config'))return JSON.stringify({version:1,component:'admin',runtimeEnvironment:{ELEVATE_LLM_SECRET:fixture},volumes:[],runtimeFiles:{}});
+   if(args[0]==='iam')return model;
+   if(args[0]==='secrets'&&args[1]==='get-iam-policy')return JSON.stringify({bindings:[{role:'roles/secretmanager.secretAccessor',members:['serviceAccount:'+model,'serviceAccount:'+admin]}]});
+   if(args[0]==='run'&&args[1]==='services')return JSON.stringify({spec:{template:{spec:{serviceAccountName:admin}}}});
+   if(args[0]==='secrets'&&args[1]==='versions')return fixture;
+   throw Error('Unexpected command');
+ };
+ const capacity=({region,task,taskCount})=>{
+   assert.equal(region,'us-east1');
+   assert.equal(taskCount,3);
+   assert.deepEqual(task.containers,[{resources:{limits:{cpu:'8',memory:'16Gi'}}}]);
+   // Old 2 x 4 CPU / 8 GiB plus all 3 new slots: 32 CPU / 64 GiB.
+   const required={cpu:8000+8000*taskCount,memory:(16+16*taskCount)*2**30};
+   const granted={cpu:20000,memory:40*2**30};
+   return {required,granted,fits:required.cpu<=granted.cpu&&required.memory<=granted.memory};
+ };
+ await assert.rejects(preflightPrivateCpuRelease({run,capacity}),/REGIONAL_CAPACITY_REQUIRED/);
+ const accepted=await preflightPrivateCpuRelease({run,capacity:args=>({...capacity(args),granted:{cpu:32000,memory:64*2**30},fits:true})});
+ assert.equal(accepted.capacity.required.cpu,32000);
+ assert.equal(accepted.capacity.required.memory,64*2**30);
+ assert.ok(calls.every(args=>!args.some(x=>['deploy','update','add','create','add-iam-policy-binding'].includes(x))));
+});

@@ -17,7 +17,7 @@ export default async function CdlTrainingPage() {
         program={p}
         banner={banner}
         heroOverride={
-          <section className="relative overflow-hidden bg-sky-100">
+          <section key="cdl-hero" className="relative overflow-hidden bg-sky-100">
             <img
               src="/images/cdl-partner/road.jpg"
               alt="Commercial tractor-trailer on the open road"
@@ -42,7 +42,7 @@ export default async function CdlTrainingPage() {
           </section>
         }
         visualContent={
-          <section className="bg-white px-5 py-10">
+          <section key="cdl-visual-content" className="bg-white px-5 py-10">
             <div className="mx-auto grid max-w-6xl gap-8 md:grid-cols-2 md:items-center">
               <img
                 src="/images/cdl-partner/training.jpg"

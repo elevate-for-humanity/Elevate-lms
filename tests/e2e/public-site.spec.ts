@@ -214,64 +214,80 @@ const RESTART_TRANSIENT_MESSAGE =
 async function checkPageOnce(page: Page, route: string) {
   const pageErrors: string[] = [];
   const consoleErrors: string[] = [];
-
+  const failedResponses: { status: number; url: string }[] = [];
+  const onPageError = (error: Error) => pageErrors.push(error.message);
+  const onConsole = (message: import('@playwright/test').ConsoleMessage) => {
+    if (message.type() === 'error') consoleErrors.push(message.text());
+  };
+  const onResponse = (response: import('@playwright/test').Response) => {
+    if (response.status() >= 500) failedResponses.push({ status: response.status(), url: response.url() });
+  };
   await page.route('**/api/voice/natural', (request) =>
     request.fulfill({ path: NARRATION_FIXTURE, contentType: 'audio/mpeg' }),
   );
+  page.on('pageerror', onPageError);
+  page.on('console', onConsole);
+  page.on('response', onResponse);
+  try {
 
-  page.on('pageerror', (error) => pageErrors.push(error.message));
-  page.on('console', (message) => {
-    if (message.type() === 'error') consoleErrors.push(message.text());
-  });
+    const response = await page.goto(route, { waitUntil: 'domcontentloaded' });
+    expect(response, `${route} did not return a response`).not.toBeNull();
+    expect(response!.status(), `${route} returned ${response!.status()}`).toBeLessThan(400);
 
-  const response = await page.goto(route, { waitUntil: 'domcontentloaded' });
-  expect(response, `${route} did not return a response`).not.toBeNull();
-  expect(response!.status(), `${route} returned ${response!.status()}`).toBeLessThan(400);
+    const documentBody = page.locator('body');
+    await expect
+      .poll(async () => (await documentBody.innerText()).trim().length, {
+        message: `${route} rendered an empty body`,
+        timeout: 15_000,
+      })
+      .toBeGreaterThan(80);
 
-  const documentBody = page.locator('body');
-  await expect
-    .poll(async () => (await documentBody.innerText()).trim().length, {
-      message: `${route} rendered an empty body`,
-      timeout: 15_000,
-    })
-    .toBeGreaterThan(80);
+    await page.waitForLoadState('networkidle').catch(() => undefined);
 
-  await page.waitForLoadState('networkidle').catch(() => undefined);
+    // Re-poll after networkidle: hydration can swap the server-rendered body
+    // for a transient client loading shell while it fetches data, so a single
+    // immediate read can catch the shell (observed: 34 chars) on an otherwise
+    // healthy page.
+    await expect
+      .poll(async () => (await documentBody.innerText()).trim().length, {
+        message: `${route} rendered an empty body`,
+        timeout: 15_000,
+      })
+      .toBeGreaterThan(80);
 
-  // Re-poll after networkidle: hydration can swap the server-rendered body
-  // for a transient client loading shell while it fetches data, so a single
-  // immediate read can catch the shell (observed: 34 chars) on an otherwise
-  // healthy page.
-  await expect
-    .poll(async () => (await documentBody.innerText()).trim().length, {
-      message: `${route} rendered an empty body`,
-      timeout: 15_000,
-    })
-    .toBeGreaterThan(80);
+    // innerText excludes embedded scripts. The application shell intentionally
+    // contains chunk-recovery source code whose text includes "ChunkLoadError";
+    // that source is not a rendered failure and must not trip the visible-page check.
+    const body = await documentBody.innerText();
+    for (const placeholder of FORBIDDEN_PLACEHOLDERS) {
+      expect(body, `${route} contains forbidden placeholder: ${placeholder}`).not.toContain(placeholder);
+    }
+    expect(body, `${route} rendered an application exception`).not.toMatch(
+      /Application error|client-side exception|server-side exception|ChunkLoadError|no healthy upstream/i,
+    );
 
-  // innerText excludes embedded scripts. The application shell intentionally
-  // contains chunk-recovery source code whose text includes "ChunkLoadError";
-  // that source is not a rendered failure and must not trip the visible-page check.
-  const body = await documentBody.innerText();
-  for (const placeholder of FORBIDDEN_PLACEHOLDERS) {
-    expect(body, `${route} contains forbidden placeholder: ${placeholder}`).not.toContain(placeholder);
+    expect(pageErrors, `${route} emitted page errors: ${pageErrors.join(' | ')}`).toEqual([]);
+
+    const actionableConsoleErrors = consoleErrors.filter(
+      (error) => !/favicon|third-party cookie/i.test(error),
+    );
+    expect(
+      actionableConsoleErrors,
+      `${route} emitted console errors: ${actionableConsoleErrors.join(' | ')}`,
+    ).toEqual([]);
+    const origin = new URL(response!.url()).origin;
+    const sameOriginFailures = failedResponses.filter(item => new URL(item.url).origin === origin)
+      .map(item => `${item.status} ${new URL(item.url).pathname}`);
+    expect(sameOriginFailures, `${route} emitted HTTP failures: ${sameOriginFailures.join(' | ')}`).toEqual([]);
+  } finally {
+    page.off('pageerror', onPageError);
+    page.off('console', onConsole);
+    page.off('response', onResponse);
   }
-  expect(body, `${route} rendered an application exception`).not.toMatch(
-    /Application error|client-side exception|server-side exception|ChunkLoadError|no healthy upstream/i,
-  );
-
-  expect(pageErrors, `${route} emitted page errors: ${pageErrors.join(' | ')}`).toEqual([]);
-
-  const actionableConsoleErrors = consoleErrors.filter(
-    (error) => !/favicon|third-party cookie/i.test(error),
-  );
-  expect(
-    actionableConsoleErrors,
-    `${route} emitted console errors: ${actionableConsoleErrors.join(' | ')}`,
-  ).toEqual([]);
 }
 
-test.describe.configure({ mode: 'serial' });
+// Independent route cases retain the global failure limit without skipping
+// unrelated routes after one failure or replaying the full serial suite.
 
 test.describe('page-by-page public production audit', () => {
   // The link checks run FIRST, while the dev server's heap is still low (only
@@ -324,7 +340,7 @@ test.describe('responsive navigation acceptance', () => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto('/', { waitUntil: 'domcontentloaded' });
 
-    const menuButton = page.getByRole('button', { name: /open menu|menu/i }).first();
+    const menuButton = page.getByRole('button', { name: 'Open menu', exact: true });
     await expect(menuButton).toBeVisible();
     await menuButton.click();
 

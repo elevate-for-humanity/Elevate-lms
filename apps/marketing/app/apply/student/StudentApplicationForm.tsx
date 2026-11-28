@@ -20,6 +20,7 @@ interface StudentApplicationFormProps {
   initialHostShopName?: string;
   applicationIntent?: 'inquiry' | 'enrollment';
   paymentSessionId?: string;
+  initialFundingSource?: string;
 }
 
 type SubmissionResult = {
@@ -126,7 +127,7 @@ async function postApplication(payload: Record<string, unknown>, idempotencyKey:
   }
 }
 
-function createEmptyForm(initialProgram: string): StudentForm {
+function createEmptyForm(initialProgram: string, initialFundingSource = ''): StudentForm {
   return {
     firstName: '',
     lastName: '',
@@ -144,7 +145,7 @@ function createEmptyForm(initialProgram: string): StudentForm {
     hasHostShop: '',
     hostShopName: '',
     transferHours: '',
-    fundingSource: initialProgram.includes('apprenticeship') ? 'self_pay' : '',
+    fundingSource: initialFundingSource,
     fundingEligibilityStatus: '',
     hasWorkOneReferral: '',
     workoneCenter: '',
@@ -172,10 +173,11 @@ export default function StudentApplicationForm({
   paymentSessionId = '',
   lockedProgram = false,
   initialHostShopName = '',
+  initialFundingSource = '',
 }: StudentApplicationFormProps) {
   const router = useRouter();
   const [form, setForm] = useState<StudentForm>(() => ({
-    ...createEmptyForm(initialProgram),
+    ...createEmptyForm(initialProgram, initialFundingSource),
     ...(initialHostShopName ? { hasHostShop: 'yes', hostShopName: initialHostShopName } : {}),
   }));
   const [submissionKey] = useState(createSubmissionKey);
@@ -201,7 +203,14 @@ export default function StudentApplicationForm({
 
   const requiresWorkOne = form.fundingSource === 'wioa' || form.fundingSource === 'wrg';
   const isApprenticeship = form.program.includes('apprenticeship');
-  const stateFunded = !isApprenticeship && (requiresWorkOne || form.fundingSource === 'jri');
+  // Owner rule (2026-11-28): workforce-funded applicants — apprentices
+  // included — are never deposit-gated. Funded applications submit for
+  // Admissions review; only self-pay enrollment requires verified payment.
+  const stateFunded =
+    requiresWorkOne ||
+    form.fundingSource === 'jri' ||
+    form.fundingSource === 'employer_sponsored' ||
+    form.fundingSource === 'employer';
   const paymentRequired = applicationIntent === 'enrollment' && !stateFunded && !paymentSessionId;
   const apprenticeshipFundingSelected =
     isApprenticeship && Boolean(form.fundingSource) && form.fundingSource !== 'self_pay';
@@ -214,8 +223,9 @@ export default function StudentApplicationForm({
     if (lockedProgram && name === 'program') return;
     setResult(null);
     if (name === 'program' && value.includes('apprenticeship')) {
-      setForm((prev) => ({ ...prev, program: value, fundingSource: 'self_pay' }));
-      setWorkOneAcknowledged(false);
+      // Keep the applicant's declared funding path when they switch to an
+      // apprenticeship program — never force it back to self-pay.
+      setForm((prev) => ({ ...prev, program: value }));
       setApprenticeshipFundingConfirmed(false);
       return;
     }
@@ -246,7 +256,7 @@ export default function StudentApplicationForm({
       router.push(EMT_INQUIRY_HREF);
       return;
     }
-    setForm(resumed.program.includes('apprenticeship') ? { ...resumed, fundingSource: 'self_pay' } : resumed);
+    setForm(resumed);
     setWorkOneAcknowledged(savedData.workOneAcknowledged);
     setApprenticeshipFundingConfirmed(Boolean(savedData.apprenticeshipFundingConfirmed));
     setTransferHoursDocument(null);
@@ -274,7 +284,6 @@ export default function StudentApplicationForm({
     }
     if (current === 3) {
       if (!form.fundingSource) return 'Select a funding/payment option or choose Not sure yet.';
-      if (apprenticeshipFundingSelected) return 'Apprenticeship enrollment is self-pay only. Choose self-pay.';
       if (requiresWorkOne && !workOneAcknowledged) {
         return 'For WIOA or Workforce Ready Grant, confirm that you scheduled or started the WorkOne intake process.';
       }
@@ -383,7 +392,7 @@ export default function StudentApplicationForm({
         ? ['WorkOne intake appointment scheduled or intake process started']
         : undefined,
       workOneAppointmentUrl: requiresWorkOne ? WORKONE_INTAKE_URL : undefined,
-      source: 'student-application',
+      source: applicationIntent === 'enrollment' ? 'student-application' : 'intake-form',
       applicationCertification: true,
       applicationIntent: stateFunded ? 'enrollment' : applicationIntent,
       billingInvoiceId: stateFunded ? undefined : paymentSessionId || undefined,
@@ -591,9 +600,9 @@ export default function StudentApplicationForm({
 
       {step === 3 && (
         <section className="space-y-5">
-          <div><h3 className="text-xl font-black text-slate-950">{isApprenticeship ? "Self-pay enrollment" : "Funding and eligibility"}</h3><p className="mt-1 text-sm text-slate-700">{isApprenticeship ? "Apprenticeship tuition is self-pay only. Review your program’s published tuition and payment terms." : "Funding eligibility is determined by the applicable workforce agency, not by submitting this form."}</p></div>
+          <div><h3 className="text-xl font-black text-slate-950">Funding and eligibility</h3><p className="mt-1 text-sm text-slate-700">{isApprenticeship ? "Apprenticeship tuition is normally self-pay. If you have workforce or employer funding, choose it below — funded applications go to Admissions for review and no deposit is required." : "Funding eligibility is determined by the applicable workforce agency, not by submitting this form."}</p></div>
           {isApprenticeship ? <ApprenticeshipFundingNotice /> : null}
-          <div><label htmlFor="fundingSource" className={labelClass}>How do you plan to pay? *</label><select id="fundingSource" name="fundingSource" required value={form.fundingSource} onChange={handleChange} className={fieldClass}><option value="">Select an option</option><option value="self_pay">Self-pay / Payment plan</option>{!isApprenticeship ? <><option value="wioa">WIOA / WorkOne funding</option><option value="wrg">Workforce Ready Grant</option><option value="jri">Job Ready Indy / Reentry funding</option><option value="employer_sponsored">Employer sponsored</option></> : null}{!isApprenticeship ? <option value="not_sure">Not sure yet</option> : null}</select></div>
+          <div><label htmlFor="fundingSource" className={labelClass}>How do you plan to pay? *</label><select id="fundingSource" name="fundingSource" required value={form.fundingSource} onChange={handleChange} className={fieldClass}><option value="">Select an option</option><option value="self_pay">Self-pay / Payment plan</option><option value="wioa">WIOA / WorkOne funding</option><option value="wrg">Workforce Ready Grant</option><option value="jri">Job Ready Indy / Reentry funding</option><option value="employer_sponsored">Employer sponsored</option><option value="not_sure">Not sure yet</option></select></div>
 
           {requiresWorkOne && (
             <div className="rounded-xl border-2 border-amber-300 bg-amber-50 p-5 text-amber-950">

@@ -55,6 +55,15 @@ export default function EnrollPage() {
   const [paymentPlan, setPaymentPlan] = useState<'full' | 'installments'>(() =>
     getClientSearchParam('payment_plan') === 'full' ? 'full' : 'installments',
   );
+  // Owner rule (2026-11-28): a deposit may be asked ONLY of self-paying
+  // applicants. The funding branch is chosen before any payment UI renders.
+  const [fundingPath, setFundingPath] = useState<'undecided' | 'funded' | 'employer' | 'self_pay'>(() => {
+    const declared = getClientSearchParam('funding');
+    if (declared === 'wioa' || declared === 'wrg' || declared === 'workone' || declared === 'jri') return 'funded';
+    if (declared === 'employer' || declared === 'employer_sponsored') return 'employer';
+    if (declared === 'self_pay') return 'self_pay';
+    return 'undecided';
+  });
   const [eligibility, setEligibility] = useState<any>(null);
   const supabase = createClient();
 
@@ -135,7 +144,24 @@ export default function EnrollPage() {
     }
   };
 
+  const fundedApplicationUrl = () =>
+    `/apply/student/form?program=${encodeURIComponent(program?.slug || programId)}&intent=enrollment&funding=${
+      fundingPath === 'employer' ? 'employer_sponsored' : 'wioa'
+    }`;
+
+  const goFundedApplication = () => {
+    if (/apprentice/i.test(program?.slug || '') && !apprenticeshipDisclosureAccepted) {
+      setMessage('Please review and acknowledge the apprenticeship training, licensing, materials and payment disclosures before continuing.');
+      return;
+    }
+    router.push(fundedApplicationUrl());
+  };
+
   const handleEnroll = async () => {
+    if (!program?.is_free && (program?.price || program?.total_cost) && fundingPath === 'undecided' && !program?.funding_eligible) {
+      setMessage('Choose how you will fund this program first: workforce funding, employer sponsorship, or self-pay.');
+      return;
+    }
     if (/apprentice/i.test(program?.slug || '') && !apprenticeshipDisclosureAccepted) {
       setMessage('Please review and acknowledge the apprenticeship training, licensing, materials and payment disclosures before continuing.');
       return;
@@ -168,8 +194,14 @@ export default function EnrollPage() {
       // Programs are free if: is_free=true OR funding_eligible (WIOA/WRG covers cost)
       const isFreeProgram = program?.is_free === true;
       const isPaid = !isFreeProgram && (program?.price || program?.total_cost);
+      // Only an explicit self-pay choice takes the payment checkout. A
+      // priced funding-eligible program with no choice made defaults to the
+      // funded checkout below (no invoice, no deposit); funded/employer
+      // choices are routed to the application by the button handler, and an
+      // undecided priced non-eligible program was already stopped above.
+      const useSelfPayCheckout = Boolean(isPaid && fundingPath === 'self_pay');
 
-      if (isPaid) {
+      if (useSelfPayCheckout) {
         const customDownPayment = !onlineSchoolProgram && paymentMethod === 'quickbooks' && paymentPlan === 'installments' && /apprentice/i.test(program?.slug || '')
           ? downPaymentCents(downPayment) : undefined;
         if (customDownPayment !== undefined) programInstallmentTerms(program!.slug!, Math.round(Number(program!.price ?? program!.total_cost) * 100), customDownPayment);
@@ -202,8 +234,10 @@ export default function EnrollPage() {
           return;
         }
       } else {
-        // Funded enrollment - still use canonical checkout with funding_source
-        const fundingSource = program?.funding_eligible ? 'wioa' : 'self_pay';
+        // Funded/free enrollment - still use canonical checkout with
+        // funding_source. Funding-eligible programs default to the funded
+        // (wioa) checkout, which creates no invoice and no deposit.
+        const fundingSource = fundingPath === 'employer' ? 'employer_sponsored' : fundingPath === 'funded' || program?.funding_eligible ? 'wioa' : 'self_pay';
         const response = await fetch('/api/programs/enroll/checkout', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -323,11 +357,38 @@ export default function EnrollPage() {
             </div>
 
             <div className="p-4 sm:p-6 md:p-8">
-              {!onlineSchoolProgram && <div className="mb-6 rounded-xl border border-blue-200 bg-blue-50 p-5">
+              {!onlineSchoolProgram && !program.is_free && (program.price || program.total_cost) ? (
+                <fieldset className="mb-6 rounded-xl border border-blue-200 bg-blue-50 p-5">
+                  <legend className="px-1 text-xl font-bold">How will you fund this program?</legend>
+                  <p className="mt-2">Choose your funding path first. A deposit is required only if you are self-paying. Funded applications require Admissions review — no deposit is asked while your funding is verified. Complete orientation, required documents, and any required Host Shop placement before training starts.</p>
+                  <div className="mt-4 grid gap-3">
+                    <label className={`flex cursor-pointer items-start gap-3 rounded-xl border-2 bg-white p-4 ${fundingPath === 'funded' ? 'border-blue-600' : 'border-slate-200'}`}>
+                      <input type="radio" name="funding-path" value="funded" checked={fundingPath === 'funded'} onChange={() => setFundingPath('funded')} className="mt-1" />
+                      <span><span className="font-bold text-slate-950">Workforce funding (WIOA / WorkOne / WRG / agency)</span><span className="mt-1 block text-sm text-slate-700">No deposit. Submit your application and Admissions will review it and coordinate with your funding agency.</span></span>
+                    </label>
+                    <label className={`flex cursor-pointer items-start gap-3 rounded-xl border-2 bg-white p-4 ${fundingPath === 'employer' ? 'border-blue-600' : 'border-slate-200'}`}>
+                      <input type="radio" name="funding-path" value="employer" checked={fundingPath === 'employer'} onChange={() => setFundingPath('employer')} className="mt-1" />
+                      <span><span className="font-bold text-slate-950">Employer sponsored</span><span className="mt-1 block text-sm text-slate-700">No deposit. Submit your application and Admissions will verify the sponsorship with your employer.</span></span>
+                    </label>
+                    <label className={`flex cursor-pointer items-start gap-3 rounded-xl border-2 bg-white p-4 ${fundingPath === 'self_pay' ? 'border-blue-600' : 'border-slate-200'}`}>
+                      <input type="radio" name="funding-path" value="self_pay" checked={fundingPath === 'self_pay'} onChange={() => setFundingPath('self_pay')} className="mt-1" />
+                      <span><span className="font-bold text-slate-950">Self-pay</span><span className="mt-1 block text-sm text-slate-700">Pay the required deposit or tuition, then submit your full enrollment application. Once payment is verified and the application is submitted, dashboard access activates automatically.</span></span>
+                    </label>
+                  </div>
+                  <a className="mt-3 inline-block font-bold underline" href={`/apply/student?program=${encodeURIComponent(program.slug || programId)}&intent=inquiry`}>Only requesting information? Use the Intake Application.</a>
+                </fieldset>
+              ) : !onlineSchoolProgram ? <div className="mb-6 rounded-xl border border-blue-200 bg-blue-50 p-5">
                 <h2 className="text-xl font-bold">Self-pay enrollment</h2>
                 <p className="mt-2">Pay the required deposit or tuition and submit your full enrollment application. Once payment is verified and the application is submitted, dashboard access activates automatically. Funded applications require Admissions review. Complete orientation, required documents, and any required Host Shop placement before training starts.</p>
                 <a className="mt-3 inline-block font-bold underline" href={`/apply/student?program=${encodeURIComponent(program.slug || programId)}&intent=inquiry`}>Only requesting information? Use the Intake Application.</a>
-              </div>}
+              </div> : null}
+              {(fundingPath === 'funded' || fundingPath === 'employer') && !program.is_free && (program.price || program.total_cost) ? (
+                <div className="mb-6 rounded-xl border border-green-300 bg-green-50 p-5">
+                  <h2 className="text-xl font-bold">No deposit required</h2>
+                  <p className="mt-2">Continue to the full application. It will be submitted to Admissions for review{fundingPath === 'employer' ? ' while we verify your employer sponsorship' : ' while we verify your funding with the agency'}. You will not be asked for payment on this path.</p>
+                  <button type="button" onClick={goFundedApplication} className="mt-4 rounded-xl bg-blue-700 px-5 py-3 font-bold text-white">Continue to funded application</button>
+                </div>
+              ) : null}
               {paymentUrl && <div className="mb-6 rounded-xl border border-green-300 p-5">
                 <a href={paymentUrl} target="_blank" rel="noopener noreferrer" className="block font-bold underline">Open secure payment checkout</a>
                 <button type="button" onClick={() => void verifyPayment()} className="mt-4 rounded-xl bg-blue-700 px-5 py-3 font-bold text-white">I have paid — verify and continue</button>
@@ -420,7 +481,7 @@ export default function EnrollPage() {
                 </ul>
               </div>
 
-              {!program.is_free && (program.price || program.total_cost) ? (
+              {!program.is_free && (program.price || program.total_cost) && fundingPath === 'self_pay' ? (
                 <>
                   <fieldset className="mb-6 rounded-xl border border-slate-200 bg-white p-4">
                     <legend className="px-1 font-black text-slate-950">
@@ -558,7 +619,7 @@ export default function EnrollPage() {
 
               <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
                 <button
-                  onClick={handleEnroll}
+                  onClick={(fundingPath === 'funded' || fundingPath === 'employer') && !program?.is_free && (program?.price || program?.total_cost) ? goFundedApplication : handleEnroll}
                   disabled={enrolling}
                   className="flex-1 flex items-center justify-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
@@ -569,11 +630,17 @@ export default function EnrollPage() {
                     </>
                   ) : (
                     <>
-                      {program?.is_free === true || program?.funding_eligible
-                        ? 'Complete Enrollment'
-                        : program?.price || program?.total_cost
-                          ? 'Continue to Secure Payment'
-                          : 'Complete Enrollment'}
+                      {(fundingPath === 'funded' || fundingPath === 'employer') && !program?.is_free && (program?.price || program?.total_cost)
+                        ? 'Continue to funded application'
+                        : program?.is_free === true
+                          ? 'Complete Enrollment'
+                          : program?.price || program?.total_cost
+                            ? fundingPath === 'self_pay'
+                              ? 'Continue to Secure Payment'
+                              : program?.funding_eligible
+                                ? 'Complete Enrollment'
+                                : 'Choose a funding path to continue'
+                            : 'Complete Enrollment'}
                       <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
                     </>
                   )}

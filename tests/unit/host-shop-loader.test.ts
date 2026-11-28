@@ -25,6 +25,76 @@ describe('approved host directory data', () => {
       public_host_shops: { data: [{ id: 'profile-1', public_slug: 'style-and-scissors-hair-salon', display_name: 'Style and Scissors', programs: ['cosmetology', 'barber', 'nail_technician'] }], error: null },
     };
   });
+  function linkedExecutiveWorksite() {
+    fixture.rows.barbershop_partner_applications.data = [];
+    fixture.rows.public_host_shops.data = [];
+    fixture.rows.host_shop_applications.data = [{
+      id: '5e8e1f9a-0000', shop_name: 'Executive Cutz',
+      address: '2049 Veterans Memorial Pkwy S, Suite 8, Lafayette, IN 47909',
+      phone: '3175550112', intake: { programs: ['barber'] }, approved_by: null,
+    }];
+    fixture.rows.host_shops.data = [{
+      id: '787ce25f-0000', name: 'Executive Cuts', address: '2049 Veterans Memorial Pkwy S, Suite 8',
+      city: 'Lafayette', state: 'IN', zip_code: '47909', specializations: ['cosmetology'],
+    }];
+    fixture.rows.host_shop_partnerships.data = [{
+      partner_id: 'approved-owner', application_id: '5e8e1f9a-0000', shop_id: '787ce25f-0000',
+    }];
+  }
+  it('lists an explicitly linked worksite once and keeps the old public profile URL resolving without exposing intake contacts', async () => {
+    linkedExecutiveWorksite();
+    const all = await getApprovedShops();
+    expect(all).toHaveLength(1);
+    expect(all[0]).toMatchObject({
+      id: '5e8e1f9a-0000', name: 'Executive Cutz', phone: '', email: '',
+      publicSlug: 'executive-cutz-5e8e1f9a', publicSlugAliases: ['executive-cuts-787ce25f'],
+      programs: ['barber-apprenticeship', 'cosmetology-apprenticeship'],
+    });
+    expect((await getApprovedShopByPublicSlug('executive-cuts-787ce25f'))?.publicSlug)
+      .toBe('executive-cutz-5e8e1f9a');
+    expect(await getApprovedShops('cosmetology')).toHaveLength(1);
+  });
+  it('preserves separately listed shops if an exact active link or complete matching worksite is missing', async () => {
+    linkedExecutiveWorksite();
+    const original = fixture.rows.host_shop_partnerships.data;
+    fixture.rows.host_shop_partnerships.data = [];
+    expect(await getApprovedShops()).toHaveLength(2);
+    fixture.rows.host_shop_partnerships.data = original;
+    fixture.rows.host_shops.data![0].address = '2049 Veterans Memorial Pkwy S, Suite 9';
+    expect(await getApprovedShops()).toHaveLength(2);
+  });
+  it('does not let an archived application absorb an eligible active worksite or its URL', async () => {
+    linkedExecutiveWorksite();
+    fixture.rows.partners.data = [{ name: 'Executive Cutz' }];
+    const all = await getApprovedShops();
+    expect(all).toHaveLength(1);
+    expect(all[0]).toMatchObject({
+      id: '787ce25f-0000', publicSlug: 'executive-cuts-787ce25f',
+      programs: ['cosmetology-apprenticeship'],
+    });
+    expect(await getApprovedShopByPublicSlug('executive-cutz-5e8e1f9a')).toBeNull();
+    expect((await getApprovedShopByPublicSlug('executive-cuts-787ce25f'))?.id).toBe('787ce25f-0000');
+  });
+  it('does not inherit occupations or a website from an archived active alias', async () => {
+    linkedExecutiveWorksite();
+    fixture.rows.partners.data = [{ name: 'Executive Cuts' }];
+    fixture.rows.host_shops.data![0].website = 'https://retired.example.test';
+    const all = await getApprovedShops();
+    expect(all).toHaveLength(1);
+    expect(all[0]).toMatchObject({ id: '5e8e1f9a-0000', programs: ['barber-apprenticeship'] });
+    expect(all[0].website).toBeUndefined();
+    expect(await getApprovedShopByPublicSlug('executive-cuts-787ce25f')).toBeNull();
+  });
+  it('preserves an eligible public website on canonical and old URLs without copying operational contacts', async () => {
+    linkedExecutiveWorksite();
+    fixture.rows.host_shops.data![0].website = 'https://executive.example.test';
+    fixture.rows.host_shops.data![0].phone = '3175550199';
+    for (const slug of ['executive-cutz-5e8e1f9a', 'executive-cuts-787ce25f']) {
+      expect(await getApprovedShopByPublicSlug(slug)).toMatchObject({
+        id: '5e8e1f9a-0000', website: 'https://executive.example.test', phone: '', email: '',
+      });
+    }
+  });
   it('uses public programme approvals without duplicating the operational shop', async () => {
     const all = await getApprovedShops();
     expect(all).toHaveLength(2);

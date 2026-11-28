@@ -212,15 +212,11 @@ async function _POST(request: NextRequest) {
         file_url: null,
         file_size_bytes: file.size,
         mime_type: file.type,
-        // Standing behavior (Elizabeth, 2026-11-26): a document that is
-        // present and uploaded is approved on arrival — no review-queue
-        // hold. The storage location is written to the storage_path column
-        // as well as metadata so every reader surface can find the file.
-        status: 'approved',
-        verification_status: 'approved',
-        verified: true,
-        verified_at: new Date().toISOString(),
-        verification_notes: 'Auto-approved on arrival (present + uploaded = approved).',
+        // An apprentice upload records receipt, not verified evidence.
+        // Preserve the storage path for every reader while review is pending.
+        status: 'pending',
+        verification_status: 'pending',
+        verified: false,
         storage_path: storagePath,
         metadata: {
           program_slug: programSlug,
